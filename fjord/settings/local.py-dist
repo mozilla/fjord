@@ -9,11 +9,10 @@ from . import base
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'playdoh_app',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
+        'NAME': 'fjord',
+        'USER': 'fjord',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',
         'OPTIONS': {
             'init_command': 'SET storage_engine=InnoDB',
             'charset' : 'utf8',
@@ -22,9 +21,6 @@ DATABASES = {
         'TEST_CHARSET': 'utf8',
         'TEST_COLLATION': 'utf8_general_ci',
     },
-    # 'slave': {
-    #     ...
-    # },
 }
 
 # Uncomment this and set to all slave DBs in use on the site.
@@ -67,15 +63,15 @@ ENGAGE_ROBOTS = True
 # CELERY_ALWAYS_EAGER = False  # required to activate celeryd
 # BROKER_HOST = 'localhost'
 # BROKER_PORT = 5672
-# BROKER_USER = 'playdoh'
-# BROKER_PASSWORD = 'playdoh'
-# BROKER_VHOST = 'playdoh'
+# BROKER_USER = 'fjord'
+# BROKER_PASSWORD = 'fjord'
+# BROKER_VHOST = 'fjord'
 # CELERY_RESULT_BACKEND = 'amqp'
 
 ## Log settings
 
-# SYSLOG_TAG = "http_app_playdoh"  # Make this unique to your project.
-# LOGGING = dict(loggers=dict(playdoh={'level': logging.DEBUG}))
+# SYSLOG_TAG = "http_app_fjord"  # Make this unique to your project.
+# LOGGING = dict(loggers=dict(fjord={'level': logging.DEBUG}))
 
 # Common Event Format logging parameters
 #CEF_PRODUCT = 'Playdoh'
