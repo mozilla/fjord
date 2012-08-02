@@ -1,11 +1,12 @@
 from django.conf import settings
 from django.conf.urls.defaults import patterns, include
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-
-from .examples import urls
+from django.http import HttpResponse
 
 from funfactory.monkeypatches import patch
 patch()
+
+from fjord.base import urls
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -14,7 +15,7 @@ patch()
 urlpatterns = patterns('',
     # Example:
     (r'', include(urls)),
-    
+
     # Generate a robots.txt
     (r'^robots\.txt$', 
         lambda r: HttpResponse(

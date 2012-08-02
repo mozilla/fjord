@@ -12,7 +12,7 @@ This chapter helps you get a minimal installation of Fjord up and
 running so as to make it easier for contributing.
 
 If you're interested in setting up Fjord for a production
-deployment, this is not the chapter for you---look no further!
+deployment, this is not the chapter for you---look elsewhere.
 
 If you have any problems getting Fjord running, let us know. See the
 :ref:`contact-us-chapter`.
@@ -52,8 +52,6 @@ us know.
 Requirements
 ============
 
-FIXME - everything below this point is probably wrong.
-
 For the minimum installation, you'll need the following:
 
 * git
@@ -61,10 +59,6 @@ For the minimum installation, you'll need the following:
 * `pip <http://www.pip-installer.org/en/latest/>`_
 * MySQL server and client headers
 * Memcached Server
-* libxml and headers
-* libxslt and headers
-* libjpeg and headers
-* zlib and headers
 
 Installation for these is very system dependent. Using a package
 manager, like yum, aptitude, or brew, is encouraged.
@@ -92,7 +86,7 @@ Installing dependencies
 Compiled Packages
 -----------------
 
-There are a small number of compiled packages, including the MySQL
+There are a small number of packages that need compiling, including the MySQL
 Python client.
 
 You can install these either with your system's package manager or
@@ -133,8 +127,8 @@ instructions assume you use:
 
     $ mysql -u root -p
     mysql> CREATE DATABASE fjord;
-    mysql> create user 'fjord'@'localhost' identified by 'password';
-    mysql> GRANT ALL ON fjord.* TO 'fjord'@'localhost' IDENTIFIED BY 'password';
+    mysql> create user 'fjord'@'localhost' IDENTIFIED BY 'password';
+    mysql> GRANT ALL ON fjord.* TO 'fjord'@'localhost';
 
 
 .. Note::
@@ -146,86 +140,37 @@ instructions assume you use:
 Configuration
 =============
 
-Start by creating a file named ``settings_local.py`` in the
-``fjord`` directory. Start with this::
+Copy the file ``local.py-dist`` in the ``fjord/settings`` directory to
+``local.py``, and edit it to fit your needs. In particular, you should:
 
-    from settings import *
+* Set the database options to fit what you configured above in ``DATABASES``.
+* Fill in a value for ``SECRET_KEY``. This should be some random string. It
+  will be used to seed hashing algorithms.
+* Fill in a value for ``HMAC_KEYS``. This should also be a random string, the
+  longer the better. It is used as a sort of 'pepper' analagous to the password
+  salt. Not supplying this will make cause user generation to fail.
+* Set ``CELERY_ALWAYS_EAGER = False``, which allows running Fjord without
+  running Celery---all tasks will be done synchronously.
+* Set ``SESSION_COOKIE_SECURE = False``, unless you plan on using https.
 
-    DEBUG = True
-    TEMPLATE_DEBUG = DEBUG
-    SESSION_COOKIE_SECURE = False
-
-    # Allows you to run Fjord without running Celery---all tasks
-    # will be done synchronously.
-    CELERY_ALWAYS_EAGER = True
-
-    # Allows you to specify waffle settings in the querystring.
-    WAFFLE_OVERRIDE = True
-
-    # Change this to True if you're going to be doing search-related
-    # work.
-    ES_LIVE_INDEXING = False
-
-    # Basic cache configuration for development.
-    CACHES = {
-        'default': {
-            'BACKEND': 'caching.backends.memcached.CacheClass',
-            'LOCATION': 'localhost:11211'
-            }
-        }
-
-    CACHE_MACHINE_USE_REDIS = True
-    CACHE_MIDDLEWARE_ALIAS = 'default'
-    CACHE_MIDDLEWARE_KEY_PREFIX = ''
-    CACHE_MIDDLEWARE_SECONDS = 600
-
-    # Basic database configuration for development.
-    DATABASES = {
-        'default': {
-            'NAME': 'fjord',
-            'ENGINE': 'django.db.backends.mysql',
-            'HOST': 'localhost',
-            'USER': 'fjord',
-            'PASSWORD': 'password',
-            'OPTIONS': {'init_command': 'SET storage_engine=InnoDB'},
-            'TEST_CHARSET': 'utf8',
-            'TEST_COLLATION': 'utf8_unicode_ci',
-            },
-        }
-
-    REDIS_BACKENDS = {
-            'default': 'redis://localhost:6379?socket_timeout=0.5&db=0',
-            'karma': 'redis://localhost:6381?socket_timeout=0.5&db=0',
-            'helpfulvotes': 'redis://localhost:6379?socket_timeout=0.\
-                5&db=1',
-        }
-
-    REDIS_BACKEND = REDIS_BACKENDS['default']
-
-    LESS_PREPROCESS = True
-
-Now you can copy and modify any settings from ``settings.py`` into
-``settings_local.py`` and the value will override the default.
-
-
-memcached
----------
-
-If you are running Red Hat/CentOS/Fedora, once you have installed memcached you
-can start it and configure it to run on startup using::
-
-    $ chkconfig memcached on
-    $ /etc/init.d/memcached start
-    $ service memcached start
+Now you can copy and modify any settings from ``settings/base.py`` into
+``settings/local.py`` and the value will override the default.
 
 .. Note::
 
-   This should probably be somewhere else, but the easy way to flush
-   your cache is something like this::
+    These instructions are to set up a development environment; more care
+    should be taken in production.
 
-       echo "flush_all" | nc localhost 11211
+Memcached
+---------
 
-   Assuming you have memcache configured to listen to 11211.
+Make sure you have Memcached running; it is used for caching database queries.
+
+An easy way to flush the cache if things are going funny is like this::
+
+   echo "flush_all" | nc localhost 11211
+
+Assuming you have Memcached configured to listen to 11211.
 
 
 LESS
@@ -242,69 +187,23 @@ Ensure that lessc (might be located at /usr/lib/node_modules/less/bin) is
 accessible on your PATH.
 
 
-Running redis
--------------
-
-This script runs all three servers---one for each configuration.
-
-I (Will) put that in a script that creates the needed directories in
-``/var/redis/`` and kicks off the three redis servers::
-
-    #!/bin/bash
-
-    set -e
-
-    # Adjust these according to your setup!
-    REDISBIN=/usr/bin/redis-server
-    CONFFILE=/path/to/conf/files/
-
-    if test ! -e /var/redis/sumo/
-    then
-        echo "creating /var/redis/sumo/"
-        mkdir -p /var/redis/sumo/
-    fi
-
-    if test ! -e /var/redis/sumo-test/
-    then
-        echo "creating /var/redis/sumo-test/"
-        mkdir -p /var/redis/sumo-test/
-    fi
-
-    if test ! -e /var/redis/sumo-persistent/
-    then
-        echo "creating /var/redis/sumo-persistent/"
-        mkdir -p /var/redis/sumo-persistent/
-    fi
-
-    $REDISBIN $CONFFILE/redis-persistent.conf
-    $REDISBIN $CONFFILE/redis-test.conf
-    $REDISBIN $CONFFILE/redis-volatile.conf
-
-
-Database
---------
-
-At a minimum, you will need to define a database connection. See above
-for a sample database configuration.
+Database Schemas
+----------------
 
 Note the two settings ``TEST_CHARSET`` and ``TEST_COLLATION``. Without
 these, the test suite will use MySQL's (moronic) defaults when
 creating the test database (see below) and lots of tests will
 fail. Hundreds.
 
-Create the database and grant permissions to the user, based on your
-database settings. For example, using the settings above::
+For details on how to create the database, see above.
 
-    $ mysql -u root -p
-    mysql> CREATE DATABASE fjord;
-    mysql> GRANT ALL ON fjord.* TO fjord@localhost IDENTIFIED BY \
-        'password';
+Fjord uses South_ for database migrations. To get an initial database set up,
+run::
 
-To load the latest database schema, use ``scripts/schema.sql`` and
-``schematic``::
+    $ ./manage.py syncdb         # To get South ready
+    $ ./manage.py migrate --all  # To run the initial migrations
 
-    $ mysql -u fjord -p fjord < scripts/schema.sql
-    $ ./vendor/src/schematic/schematic migrations/
+.. _South: http://south.aeracode.org/
 
 You'll now have an empty but up-to-date database!
 
@@ -313,11 +212,7 @@ Finally, you'll probably want to create a superuser. Just use Django's
 
     $ ./manage.py createsuperuser
 
-and follow the prompts. After logging in, you can create a profile for
-the user by going to ``/users/edit`` in your browser.
-
-See also the :ref:`important wiki documents <wiki-chapter>`
-documentation.
+and follow the prompts.
 
 
 Product Details Initialization
@@ -338,7 +233,7 @@ To start the dev server, run ``./manage.py runserver``, then open up
 ``http://localhost:8000``.
 
 If everything's working, you should see a somewhat empty version of
-the SUMO home page!
+the Input home page!
 
 
 Running the tests
@@ -374,9 +269,7 @@ components.
 
 The following aren't installed in this guide:
 
-* Redis
-* RabbitMQ
-* Elastic Search
+* Coming Soon
 
 For installing and configuring those components, you should look at
 the more comprehensive :ref:`installation-chapter`.
