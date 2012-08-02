@@ -13,6 +13,7 @@ PROJECT_MODULE = 'fjord'
 ROOT_URLCONF = '%s.urls' % PROJECT_MODULE
 
 INSTALLED_APPS = list(INSTALLED_APPS) + [
+    'south',
     # Application base, containing global templates.
     '%s.base' % PROJECT_MODULE,
 ]
