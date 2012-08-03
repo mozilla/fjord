@@ -12,7 +12,7 @@ This chapter helps you get a minimal installation of Fjord up and
 running so as to make it easier for contributing.
 
 If you're interested in setting up Fjord for a production
-deployment, this is not the chapter for you---look further!
+deployment, this is not the chapter for you---look elsewhere.
 
 If you have any problems getting Fjord running, let us know. See the
 :ref:`contact-us-chapter`.
@@ -86,7 +86,7 @@ Installing dependencies
 Compiled Packages
 -----------------
 
-There are a small number of packages that need compiled, including the MySQL
+There are a small number of packages that need compiling, including the MySQL
 Python client.
 
 You can install these either with your system's package manager or
@@ -127,8 +127,8 @@ instructions assume you use:
 
     $ mysql -u root -p
     mysql> CREATE DATABASE fjord;
-    mysql> create user 'fjord'@'localhost';
-    mysql> GRANT ALL ON fjord.* TO 'fjord'@'localhost' IDENTIFIED BY 'password';
+    mysql> create user 'fjord'@'localhost' IDENTIFIED BY 'password';
+    mysql> GRANT ALL ON fjord.* TO 'fjord'@'localhost';
 
 
 .. Note::
@@ -144,9 +144,11 @@ Copy the file ``local.py-dist`` in the ``fjord/settings`` directory to
 ``local.py``, and edit it to fit your needs. In particular, you should:
 
 * Set the database options to fit what you configured above in ``DATABASES``.
-* Fill in a value for ``SECRET_KEY``.
-* Fill in a value for ``HMAC_KEYS``. Not doing this will make cause user
-  generation to fail.
+* Fill in a value for ``SECRET_KEY``. This should be some random string. It
+  will be used to seed hashing algorithms.
+* Fill in a value for ``HMAC_KEYS``. This should also be a random string, the
+  longer the better. It is used as a sort of 'pepper' analagous to the password
+  salt. Not supplying this will make cause user generation to fail.
 * Set ``CELERY_ALWAYS_EAGER = False``, which allows running Fjord without
   running Celery---all tasks will be done synchronously.
 * Set ``SESSION_COOKIE_SECURE = False``, unless you plan on using https.
@@ -162,21 +164,13 @@ Now you can copy and modify any settings from ``settings/base.py`` into
 Memcached
 ---------
 
-If you are running Red Hat/CentOS/Fedora, once you have installed Memcached you
-can start it and configure it to run on startup using::
+Make sure you have Memcached running; it is used for caching database queries.
 
-    $ chkconfig memcached on
-    $ /etc/init.d/memcached start
-    $ service memcached start
+An easy way to flush the cache if things are going funny is like this::
 
-.. Note::
+   echo "flush_all" | nc localhost 11211
 
-   This should probably be somewhere else, but the easy way to flush
-   your cache is something like this::
-
-       echo "flush_all" | nc localhost 11211
-
-   Assuming you have Memcached configured to listen to 11211.
+Assuming you have Memcached configured to listen to 11211.
 
 
 LESS
@@ -219,8 +213,6 @@ Finally, you'll probably want to create a superuser. Just use Django's
     $ ./manage.py createsuperuser
 
 and follow the prompts.
-
-See also the :ref:`important wiki documents <wiki-chapter>` documentation.
 
 
 Product Details Initialization
