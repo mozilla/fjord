@@ -15,7 +15,7 @@ If you're interested in setting up Fjord for a production
 deployment, this is not the chapter for you---look elsewhere.
 
 If you have any problems getting Fjord running, let us know. See the
-:ref:`contact-us-chapter`.
+:ref:`project-details`.
 
 
 Operating systems
@@ -104,13 +104,15 @@ hand.
 Python Packages
 ---------------
 
-All the pure-Python requirements are provided in the ``vendor``
-directory, also known as the "vendor library". This makes the packages
-available to Python without installing them globally and keeps them
-pinned to known-compatible versions.
+All the pure-Python requirements are provided in the "vendor library"
+which is the ``fjord/vendor`` and ``fjord/vendor-local`` directories.
+
+This makes the packages available to Python without installing them
+globally and keeps them pinned to known-compatible versions.
 
 See the :ref:`vendor library <vendor-chapter>` documentation for more
-information on getting the vendor lib and keeping it up to date.
+information on getting the vendor library, adding things to it, and
+keeping it up to date.
 
 
 Set up the database
@@ -123,7 +125,7 @@ instructions assume you use:
 :username: fjord
 :password: password
 
-::
+In a terminal, do::
 
     $ mysql -u root -p
     mysql> CREATE DATABASE fjord;
@@ -236,12 +238,14 @@ If everything's working, you should see a somewhat empty version of
 the Input home page!
 
 
-Running the tests
------------------
+.. _setting-up-tests:
 
-A great way to check that everything really is working is to run the
-test suite. You'll need to add an extra grant in MySQL for your
-database user::
+Setting up the tests
+--------------------
+
+Let's do the setup required for running tests.
+
+You'll need to add an extra grant in MySQL for your database user::
 
     $ mysql -u root -p
     mysql> GRANT ALL ON test_NAME.* TO USER@localhost;
@@ -270,6 +274,3 @@ components.
 The following aren't installed in this guide:
 
 * Coming Soon
-
-For installing and configuring those components, you should look at
-the more comprehensive :ref:`installation-chapter`.
