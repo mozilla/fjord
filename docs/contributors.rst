@@ -18,8 +18,7 @@ Help with hacking!
 First step is to set up Fjord so you can run it and hack on it. For
 that, see the :ref:`hacking-howto-chapter`.
 
-If you have problems, please let us know! See
-:ref:`contact-us-chapter`.
+If you have problems, please let us know! See :ref:`project-details`.
 
 After you've got it up and running, come say hi!
 
