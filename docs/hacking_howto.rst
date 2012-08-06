@@ -238,12 +238,14 @@ If everything's working, you should see a somewhat empty version of
 the Input home page!
 
 
-Running the tests
------------------
+.. _setting-up-tests:
 
-A great way to check that everything really is working is to run the
-test suite. You'll need to add an extra grant in MySQL for your
-database user::
+Setting up the tests
+--------------------
+
+Let's do the setup required for running tests.
+
+You'll need to add an extra grant in MySQL for your database user::
 
     $ mysql -u root -p
     mysql> GRANT ALL ON test_NAME.* TO USER@localhost;

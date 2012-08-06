@@ -25,6 +25,7 @@ Part 1: Contributor's Guide
    hacking_howto
    conventions
    vendor
+   testing
 
 
 Indices and tables
