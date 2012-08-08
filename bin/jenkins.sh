@@ -34,8 +34,8 @@ source $VENV/bin/activate
 pip install -q -r requirements/compiled.txt
 pip install -q -r requirements/dev.txt
 
-cat > settings/local.py <<SETTINGS
-from settings.base import *
+cat > fjord/settings/local.py <<SETTINGS
+from fjord.settings.base import *
 
 ROOT_URLCONF = 'workspace.urls'
 LOG_LEVEL = logging.ERROR
