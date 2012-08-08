@@ -37,7 +37,9 @@ pip install -q -r requirements/dev.txt
 cat > fjord/settings/local.py <<SETTINGS
 from fjord.settings.base import *
 
-ROOT_URLCONF = 'workspace.urls'
+DEBUG = True
+SECRET_KEY = 'pining'
+ROOT_URLCONF = 'fjord.urls'
 LOG_LEVEL = logging.ERROR
 # Database name has to be set because of sphinx
 DATABASES = {
