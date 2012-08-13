@@ -14,8 +14,11 @@ ROOT_URLCONF = '%s.urls' % PROJECT_MODULE
 
 INSTALLED_APPS = list(INSTALLED_APPS) + [
     'south',
-    # Application base, containing global templates.
-    '%s.base' % PROJECT_MODULE,
+
+    'fjord.base',
+    'fjord.search',
+    'fjord.feedback',
+    'fjord.analytics',
 ]
 
 LOCALE_PATHS = (
