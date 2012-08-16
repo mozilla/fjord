@@ -13,7 +13,7 @@ Setting up the tests
 ====================
 
 To set up the tests, follow the instructions in
-:ref:`setting_up_tests`.
+:ref:`setting-up-tests`.
 
 
 Running tests
@@ -24,12 +24,12 @@ Running tests and arguments
 
 To run the test suite, do::
 
-    ./manage.py test
+    $ ./manage.py test
 
 However, that doesn't provide the most sensible defaults. Here is a
 good command to alias to something short::
 
-    ./manage.py test -s --noinput --logging-clear-handlers
+    $ ./manage.py test -s --noinput --logging-clear-handlers
 
 The ``-s`` flag is important if you want to be able to drop into PDB
 from within tests.
@@ -57,7 +57,7 @@ When the schema changes, you may need to drop the test database. You
 can also run the test suite with ``FORCE_DB`` once to cause Django to
 drop and recreate it::
 
-    FORCE_DB=1 ./manage.py test -s --noinput --logging-clear-handlers
+    $ FORCE_DB=1 ./manage.py test -s --noinput --logging-clear-handlers
 
 
 Running specific tests
@@ -66,20 +66,20 @@ Running specific tests
 You can run part of the test suite by specifying the apps you want to
 run, like::
 
-    ./manage.py test wiki search kbforums
+    $ ./manage.py test wiki search kbforums
 
 You can also specify modules::
 
-    ./manage.py test wiki.tests.test_views
+    $ ./manage.py test wiki.tests.test_views
 
 You can specify specific tests::
 
-    ./manage.py test wiki.tests.test_views:VersionGroupTests.test_version_groups
+    $ ./manage.py test wiki.tests.test_views:VersionGroupTests.test_version_groups
 
 You can also exclude tests that match a regular expression with
 ``-e``::
 
-    ./manage.py test -e"search"
+    $ ./manage.py test -e"search"
 
 See the output of ``./manage.py test --help`` for more arguments.
 

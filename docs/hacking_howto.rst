@@ -115,6 +115,8 @@ information on getting the vendor library, adding things to it, and
 keeping it up to date.
 
 
+.. _hacking-howto-db:
+
 Set up the database
 ===================
 
@@ -139,6 +141,8 @@ In a terminal, do::
    correct places in the rest of the instructions.
 
 
+.. _hacking-howto-configuration:
+
 Configuration
 =============
 
@@ -162,6 +166,7 @@ Now you can copy and modify any settings from ``settings/base.py`` into
 
     These instructions are to set up a development environment; more care
     should be taken in production.
+
 
 Memcached
 ---------
@@ -189,6 +194,8 @@ Ensure that lessc (might be located at /usr/lib/node_modules/less/bin) is
 accessible on your PATH.
 
 
+.. _hacking-howto-schemas:
+
 Database Schemas
 ----------------
 
@@ -197,15 +204,14 @@ these, the test suite will use MySQL's (moronic) defaults when
 creating the test database (see below) and lots of tests will
 fail. Hundreds.
 
-For details on how to create the database, see above.
+For details on how to create the database, see :ref:`hacking-howto-db`.
 
-Fjord uses South_ for database migrations. To get an initial database set up,
-run::
+Fjord uses `South <http://south.aeracode.org>`_ for database
+migrations. To get an initial database set up, run::
 
     $ ./manage.py syncdb         # To get South ready
     $ ./manage.py migrate --all  # To run the initial migrations
 
-.. _South: http://south.aeracode.org/
 
 You'll now have an empty but up-to-date database!
 
@@ -267,10 +273,9 @@ For more information, see the :ref:`test documentation
 Advanced install
 ================
 
-This page covers a minimal install. This minimal install lets you run
-Fjord and work on many parts of Fjord. However, it's missing some
-components.
+After reading the above, you should have everything you need for a
+minimal working install which lets you run Fjord and work on many
+parts of it.
 
-The following aren't installed in this guide:
-
-* Coming Soon
+However, it's missing some components. See
+:ref:`advanced-installation-chapter` for everything else.
