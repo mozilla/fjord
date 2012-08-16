@@ -23,9 +23,12 @@ Part 1: Contributor's Guide
 
    contributors
    hacking_howto
+   advanced_installation
    conventions
-   vendor
    testing
+   db
+   l10n
+   vendor
 
 
 Indices and tables
