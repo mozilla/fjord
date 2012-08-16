@@ -12,14 +12,19 @@ PROJECT_MODULE = 'fjord'
 # Defines the views served for root URLs.
 ROOT_URLCONF = '%s.urls' % PROJECT_MODULE
 
-INSTALLED_APPS = list(INSTALLED_APPS) + [
+INSTALLED_APPS = tuple(INSTALLED_APPS) + (
     'south',
 
     'fjord.base',
     'fjord.search',
     'fjord.feedback',
     'fjord.analytics',
-]
+)
+
+MIDDLEWARE_CLASSES = tuple(MIDDLEWARE_CLASSES) + (
+    'fjord.base.middleware.MobileQueryStringOverrideMiddleware',
+)
+
 
 LOCALE_PATHS = (
     os.path.join(ROOT, PROJECT_MODULE, 'locale'),

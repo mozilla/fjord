@@ -1,6 +1,8 @@
-from django.conf.urls.defaults import patterns
-from django.http import HttpResponse
+from django.conf.urls.defaults import patterns, url
 
-urlpatterns = patterns('',
-    (r'^$', lambda x: HttpResponse("Oh hai!"))
+
+urlpatterns = patterns(
+    'fjord.base.views',
+
+    url(r'^$', 'home_view', name='home_view'),
 )
