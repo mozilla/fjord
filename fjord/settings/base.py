@@ -14,6 +14,8 @@ ROOT_URLCONF = '%s.urls' % PROJECT_MODULE
 
 INSTALLED_APPS = list(INSTALLED_APPS) + [
     'south',
+    'django_nose',
+    'test_utils',
     # Application base, containing global templates.
     '%s.base' % PROJECT_MODULE,
 ]
