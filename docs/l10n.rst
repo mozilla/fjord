@@ -19,16 +19,21 @@ To get the localizations, do::
 Updating strings in svn
 =======================
 
-To update strings in svn, do::
+First you have to::
+
+    $ cd locale
+    $ svn update
+    $ cd ..
+
+Then::
 
     $ ./manage.py extract
     $ ./manage.py merge
 
+Then::
 
-Then commit them to svn.
-
-TODO: Add instructions here.
-
+    $ cd locale
+    $ svn commit -m 'String update YYYY/MM/DD'
 
 If you want to see these changes in your project::
 
