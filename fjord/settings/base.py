@@ -14,6 +14,8 @@ ROOT_URLCONF = '%s.urls' % PROJECT_MODULE
 
 INSTALLED_APPS = tuple(INSTALLED_APPS) + (
     'south',
+    'django_nose',
+    'test_utils',
 
     'fjord.base',
     'fjord.search',
@@ -24,7 +26,6 @@ INSTALLED_APPS = tuple(INSTALLED_APPS) + (
 MIDDLEWARE_CLASSES = tuple(MIDDLEWARE_CLASSES) + (
     'fjord.base.middleware.MobileQueryStringOverrideMiddleware',
 )
-
 
 LOCALE_PATHS = (
     os.path.join(ROOT, PROJECT_MODULE, 'locale'),
