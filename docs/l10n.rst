@@ -1,0 +1,60 @@
+==================
+ Maintaining l10n
+==================
+
+.. _l10n-installing-from-svn:
+
+Installing localizations from svn
+=================================
+
+TODO: Update this when we have the svn url
+
+Localizations are not stored in this repository, but are in Mozilla's SVN.
+
+To get the localizations, do::
+
+    $ svn checkout URL locale
+
+
+Updating strings in svn
+=======================
+
+First you have to::
+
+    $ cd locale
+    $ svn update
+    $ cd ..
+
+Then::
+
+    $ ./manage.py extract
+    $ ./manage.py merge
+
+Then::
+
+    $ cd locale
+    $ svn commit -m 'String update YYYY/MM/DD'
+
+If you want to see these changes in your project::
+
+    $ ./bin/compile-mo.sh locale/
+
+
+Creating new localization locales
+=================================
+
+In your projects ``settings.py`` add the new locale to
+``KNOWN_LANGUAGES``.
+
+Then run::
+
+    $ ./manage.py merge -c
+
+which will create directories for any locales that are missing in
+``locale/``.
+
+
+.. seealso::
+
+   http://playdoh.readthedocs.org/en/latest/userguide/l10n.html#creating-new-locales
+     Playdoh docs on creating new locales
