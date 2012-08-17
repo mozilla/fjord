@@ -6,15 +6,15 @@ from django.http import HttpResponse
 from funfactory.monkeypatches import patch
 patch()
 
-from fjord.base import urls
-
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
+
     # Example:
-    (r'', include(urls)),
+    (r'', include('fjord.base.urls')),
 
     # Generate a robots.txt
     (r'^robots\.txt$', 
