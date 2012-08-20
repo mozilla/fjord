@@ -1,6 +1,7 @@
 import re
+from collections import namedtuple
 
-from mobility.middleware import USER_AGENTS as mobile_ua_re
+from mobility.middleware import USER_AGENTS as MOBILE_UA_RE
 
 
 # From http://msdn.microsoft.com/en-us/library/ms537503(v=vs.85).aspx
@@ -20,20 +21,30 @@ WINDOWS_VERSION = {
 
 
 class ParseUseragentMiddleware(object):
+    """Add `request.client`, which contains information from the user agent.
+
+    Contains the keys:
+
+    - BROWSER: The user's browser, eg: "Firefox".
+    - BROWSER_VERSION: The browser's version, eg: "14.0.1"
+    - PLATFORM: The general platform the user is using, eg "Windows".
+    - PLATFORM_VERSION: The version of the platform, eg. "XP" or "10.6.2".
+    - MOBILE: If the client is using a mobile device. `True` or `False`.
+
+    Any of the above may be `None` if detection fails.
+    """
 
     def process_request(self, request):
         ua = request.META.get('HTTP_USER_AGENT', '')
         parsed = parse_ua(ua)
 
-        request.BROWSER = parsed['browser']
-        request.BROWSER_VERSION = parsed['browser_version']
-        request.PLATFORM = parsed['platform']
-        request.PLATFORM_VERSION = parsed['platform_version']
+        Client = namedtuple('Client', ['BROWSER', 'BROWSER_VERSION',
+            'PLATFORM', 'PLATFORM_VERSION', 'MOBILE'])
 
-        # In case something like django-mobility has already set the mobile
-        # flag, don't clobber it, they probably know better than we do.
-        if not hasattr(request, 'MOBILE'):
-            request.MOBILE = parsed['mobile']
+        # kwargs the dict to Client, but turn the keys to upper case. This
+        # would be a dictionary comprehension, but those don't work in
+        # Python 2.6
+        request.client = Client(**dict((k.upper(), v) for k, v in parsed.items()))
 
 
 def parse_ua(ua):
@@ -45,7 +56,7 @@ def parse_ua(ua):
     - platform: eg: "Windows", "OS X", "Linux", or "Android"
     - platform_version: On Windows returns something like "Vista", or "7".
         On OS X returns something like "10.6.2" or "10.4.0"
-    - mobile: True if the user agent rperesents a mobile browser.
+    - mobile: True if the user agent represents a mobile browser.
 
     If detection fails, the above values will be `None`.
     """
@@ -60,12 +71,17 @@ def parse_ua(ua):
     if 'firefox' not in ua.lower():
         return no_browser
 
+    # For reference, a normal Firefox on android useragent looks like
+    # Mozilla/5.0 (Android; Mobile; rv:14.0) Gecko/14.0 Firefox/14.0.2
+
     match = re.match(r'^Mozilla[^(]+\(([^)]+)\) (.+)', ua)
 
     if match is None:
         return no_browser
 
+    # The part in parenthesis is semi-colon seperated
     platform_parts = [p.strip() for p in match.group(1).split(';')]
+    # The rest is space seperated A/B pairs. Pull out both sides of the slash.
     browser_parts = [p.split('/') for p in match.group(2).split(' ')]
 
     browser = 'Firefox'
@@ -85,8 +101,7 @@ def parse_ua(ua):
 
     if platform in WINDOWS_VERSION.keys():
         platform, platform_version = WINDOWS_VERSION[platform]
-
-    if platform.startswith('Linux'):
+    elif platform.startswith('Linux'):
         platform = 'Linux'
     elif platform.startswith('FreeBSD'):
         platform = 'FreeBSD'
@@ -97,10 +112,11 @@ def parse_ua(ua):
                 break
         platform_version = platform_version.replace('_', '.')
 
+    # Make sure everything is at least x.y.z
     while browser_version.count('.') < 2:
         browser_version += '.0'
 
-    mobile = 'mobile' in ua.lower() or bool(mobile_ua_re.match(ua))
+    mobile = 'mobile' in ua.lower() or bool(MOBILE_UA_RE.match(ua))
 
     return {
         'browser': browser,

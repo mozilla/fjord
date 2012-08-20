@@ -1,22 +1,14 @@
 import json
 import os
-from nose.tools import eq_
 
 from django import test
 
-from fjord import browsers
+from nose.tools import eq_
+
+from fjord.base import browsers
 
 
 class TestUserAgentDetection(object):
-
-    def test_parse_ua(self):
-        """Test that a suite of should-work user agents work."""
-        path = os.path.join(os.path.dirname(__file__), 'user_agent_data.json')
-        with open(path) as f:
-            cases = f.read()
-        cases = json.loads(cases)
-        for case in cases:
-            self.check_ua(case)
 
     def check_ua(cls, case):
         """Check and individual user agent test case."""
@@ -30,6 +22,15 @@ class TestUserAgentDetection(object):
         for key in keys:
             eq_(parsed[key], case[key])
 
+    def test_parse_ua(self):
+        """Test that a suite of should-work user agents work."""
+        path = os.path.join(os.path.dirname(__file__), 'user_agent_data.json')
+        with open(path) as f:
+            cases = f.read()
+        cases = json.loads(cases)
+        for case in cases:
+            self.check_ua(case)
+
     def test_error_handling(self):
         """Make sure that good, bad, and ugly UAs don't break the parser."""
         path = os.path.join(os.path.dirname(__file__), 'bad_useragents.txt')
@@ -37,7 +38,6 @@ class TestUserAgentDetection(object):
             for ua in f:
                 browsers.parse_ua(ua)
 
-    #def check(self, ua):
     def test_middleware(self):
         """Check that the middleware injects data properly."""
         ua = "Mozilla/5.0 (Android; Mobile; rv:14.0) Gecko/14.0 Firefox/14.0.2"
@@ -57,5 +57,5 @@ class TestUserAgentDetection(object):
         }
 
         for k, v in checks.items():
-            assert(hasattr(request, k))
-            eq_(getattr(request, k), v)
+            assert(hasattr(request.client, k))
+            eq_(getattr(request.client, k), v)
