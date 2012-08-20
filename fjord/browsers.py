@@ -1,5 +1,6 @@
 import re
-import sys
+
+from mobility.middleware import USER_AGENTS as mobile_ua_re
 
 
 # From http://msdn.microsoft.com/en-us/library/ms537503(v=vs.85).aspx
@@ -15,8 +16,6 @@ WINDOWS_VERSION = {
     'Windows 98; Win 9x 4.90': ('Windows', 'ME'),
     'Windows 98': ('Windows', '98'),
     'Windows 95': ('Windows', '95'),
-    'Windows CE': ('Windows', 'CE'),
-    'WindowsCE 6.0': ('Windows', 'CE'),
 }
 
 
@@ -29,19 +28,31 @@ def parse_ua(ua):
     - platform: eg: "Windows", "OS X", "Linux", or "Android"
     - platform_version: On Windows returns something like "Vista", or "7".
         On OS X returns something like "10.6.2" or "10.4.0"
-    - mobile: True if the user agent represents a mobile browser.
+    - mobile: True if the user agent rperesents a mobile browser.
 
-    Returns `None` if detection fails.
+    If detection fails, the above values will be `None`.
     """
+    no_browser = {
+        'browser': None,
+        'browser_version': None,
+        'platform': None,
+        'platform_version': None,
+        'mobile': None
+    }
 
     if 'firefox' not in ua.lower():
-        # If it isn't firefox, don't even try.
-        return None
+        return no_browser
 
-    match = re.match(r'Mozilla.*\((.*)\) (.*)', ua)
+    match = re.match(r'^Mozilla[^(]+\(([^)]+)\) (.+)', ua)
+
+    if match is None:
+        return no_browser
+
     platform_parts = [p.strip() for p in match.group(1).split(';')]
     browser_parts = [p.split('/') for p in match.group(2).split(' ')]
+
     browser = 'Firefox'
+    browser_version = '0.0.0'
 
     for part in browser_parts:
         if 'Firefox' in part:
@@ -53,8 +64,6 @@ def parse_ua(ua):
     platform_version = None
 
     while platform in ['X11', 'Ubuntu', 'U']:
-        if platform == 'Ubuntu':
-            platform_version = 'Ubuntu'
         platform = platform_parts.pop(0)
 
     if platform in WINDOWS_VERSION.keys():
@@ -62,9 +71,9 @@ def parse_ua(ua):
 
     if platform.startswith('Linux'):
         platform = 'Linux'
-    if platform.startswith('FreeBSD'):
+    elif platform.startswith('FreeBSD'):
         platform = 'FreeBSD'
-    if platform == 'OS X':
+    elif platform == 'OS X':
         for part in platform_parts:
             if 'OS X' in part:
                 platform_version = part.split(' ')[-1]
@@ -74,7 +83,7 @@ def parse_ua(ua):
     while browser_version.count('.') < 2:
         browser_version += '.0'
 
-    mobile = 'Mobile' in platform_parts or platform_version == 'CE'
+    mobile = 'mobile' in ua.lower() or bool(mobile_ua_re.match(ua))
 
     return {
         'browser': browser,
