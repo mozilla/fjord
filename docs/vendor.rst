@@ -70,7 +70,7 @@ submodule is as easy as::
     $ git checkout <REFSPEC>
     $ cd ../..
     $ git add vendor-local/src/<LIBRARY-DIR>
-    $ git ci -m "Updating <LIBRARY>"
+    $ git ci -m "[bug xyz] Update <LIBRARY>"
 
 Easy! Just like updating any other git submodule.
 
@@ -81,12 +81,16 @@ Adding a new library with git submodules
 Run::
 
     $ cd vendor-local/src
-    $ git clone git://<REPO>
+    $ git clone <REPO>
+    $ git checkout <REV>
     $ cd ../..
     $ vendor-local/addsubmodules.sh
-    $ vim vendor-local/kitsune.pth  # Add the new library's path
-    $ git add vendor-local/kitsune.pth
-    $ git ci -m "Adding <LIBRARY>"
+    $ vim vendor-local/vendor.pth
+
+    <Add the new library's path>
+
+    $ git add vendor-local/vendor.pth
+    $ git ci -m "[bug xyz] Add <LIBRARY>"
 
 
 .. Note::
