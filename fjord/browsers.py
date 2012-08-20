@@ -19,6 +19,23 @@ WINDOWS_VERSION = {
 }
 
 
+class ParseUseragentMiddleware(object):
+
+    def process_request(self, request):
+        ua = request.META.get('HTTP_USER_AGENT', '')
+        parsed = parse_ua(ua)
+
+        request.BROWSER = parsed['browser']
+        request.BROWSER_VERSION = parsed['browser_version']
+        request.PLATFORM = parsed['platform']
+        request.PLATFORM_VERSION = parsed['platform_version']
+
+        # In case something like django-mobility has already set the mobile
+        # flag, don't clobber it, they probably know better than we do.
+        if not hasattr(request, 'MOBILE'):
+            request.MOBILE = parsed['mobile']
+
+
 def parse_ua(ua):
     """Parse user agents from Firefox and friends.
 

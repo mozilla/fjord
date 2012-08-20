@@ -2,12 +2,15 @@ import json
 import os
 from nose.tools import eq_
 
+from django import test
+
 from fjord import browsers
 
 
 class TestUserAgentDetection(object):
 
     def test_parse_ua(self):
+        """Test that a suite of should-work user agents work."""
         path = os.path.join(os.path.dirname(__file__), 'user_agent_data.json')
         with open(path) as f:
             cases = f.read()
@@ -15,13 +18,8 @@ class TestUserAgentDetection(object):
         for case in cases:
             self.check_ua(case)
 
-    def test_error_handling(self):
-        path = os.path.join(os.path.dirname(__file__), 'bad_useragents.txt')
-        with open(path) as f:
-            for ua in f:
-                self.check_error_handling(ua)
-
     def check_ua(cls, case):
+        """Check and individual user agent test case."""
         parsed = browsers.parse_ua(case['useragent'])
         assert(parsed is not None)
 
@@ -32,6 +30,32 @@ class TestUserAgentDetection(object):
         for key in keys:
             eq_(parsed[key], case[key])
 
-    def check_error_handling(cls, ua):
-        # This should not raise an exception.
-        browsers.parse_ua(ua)
+    def test_error_handling(self):
+        """Make sure that good, bad, and ugly UAs don't break the parser."""
+        path = os.path.join(os.path.dirname(__file__), 'bad_useragents.txt')
+        with open(path) as f:
+            for ua in f:
+                browsers.parse_ua(ua)
+
+    #def check(self, ua):
+    def test_middleware(self):
+        """Check that the middleware injects data properly."""
+        ua = "Mozilla/5.0 (Android; Mobile; rv:14.0) Gecko/14.0 Firefox/14.0.2"
+        d = {
+            'HTTP_USER_AGENT': ua,
+        }
+        request = test.RequestFactory().get('/', **d)
+        ret = browsers.ParseUseragentMiddleware().process_request(request)
+        assert ret is None
+
+        checks = {
+            'BROWSER': 'Firefox',
+            'BROWSER_VERSION': '14.0.2',
+            'PLATFORM': 'Android',
+            'PLATFORM_VERSION': None,
+            'MOBILE': True,
+        }
+
+        for k, v in checks.items():
+            assert(hasattr(request, k))
+            eq_(getattr(request, k), v)
