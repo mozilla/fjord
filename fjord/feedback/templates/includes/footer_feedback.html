@@ -1,0 +1,18 @@
+{% extends "includes/footer.html" %}
+
+{% block lang_switcher %}
+<form class="languages go" method="get" action="">
+  <label for="language">{{ _('Other languages:') }}</label>
+  <span class="selectbox">
+    <span>{{ LANGUAGES[LANG|lower] }}</span>
+    <select id="language" name="lang" dir="ltr">
+      {% for code, name in LANGUAGES|dictsort -%}
+        <option value="{{ code }}" {{ code|ifeq(LANG|lower, "selected") }}>
+          {{ name }}
+        </option>
+      {%- endfor %}
+    </select>
+  </span>
+  <button type="submit">{{ _('Go') }}</button>
+</form>
+{% endblock %}
