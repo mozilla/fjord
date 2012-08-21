@@ -49,13 +49,14 @@ class TestUserAgentDetection(object):
         assert ret is None
 
         checks = {
-            'BROWSER': 'Firefox',
-            'BROWSER_VERSION': '14.0.2',
-            'PLATFORM': 'Android',
-            'PLATFORM_VERSION': None,
-            'MOBILE': True,
+            'browser': 'Firefox',
+            'browser_version': '14.0.2',
+            'platform': 'Android',
+            'platform_version': None,
+            'mobile': True,
         }
 
+        assert(hasattr(request, 'BROWSER'))
         for k, v in checks.items():
-            assert(hasattr(request.client, k))
-            eq_(getattr(request.client, k), v)
+            assert(hasattr(request.BROWSER, k))
+            eq_(getattr(request.BROWSER, k), v)

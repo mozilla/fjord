@@ -20,6 +20,10 @@ WINDOWS_VERSION = {
 }
 
 
+Browser = namedtuple('Client', ['browser', 'browser_version',
+    'platform', 'platform_version', 'mobile'])
+
+
 class ParseUseragentMiddleware(object):
     """Add `request.client`, which contains information from the user agent.
 
@@ -36,15 +40,7 @@ class ParseUseragentMiddleware(object):
 
     def process_request(self, request):
         ua = request.META.get('HTTP_USER_AGENT', '')
-        parsed = parse_ua(ua)
-
-        Client = namedtuple('Client', ['BROWSER', 'BROWSER_VERSION',
-            'PLATFORM', 'PLATFORM_VERSION', 'MOBILE'])
-
-        # kwargs the dict to Client, but turn the keys to upper case. This
-        # would be a dictionary comprehension, but those don't work in
-        # Python 2.6
-        request.client = Client(**dict((k.upper(), v) for k, v in parsed.items()))
+        request.BROWSER = Browser(**parse_ua(ua))
 
 
 def parse_ua(ua):
