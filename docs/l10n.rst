@@ -4,40 +4,67 @@
 
 .. _l10n-installing-from-svn:
 
+Things to know about l10n
+=========================
+
+1. translations are done in `Verbatim
+   <https://localize.mozilla.org/>`_
+
+2. translators are looking at our -dev environment to see the strings
+   in use
+
+3. the -dev environment should have a cronjob kicking off every 10
+   minutes that updates the svn locale repository so that translators
+   can see the latest stuff
+
+:svn url:    https://svn.mozilla.org/projects/l10n-misc/trunk/input/locales
+:viewvc svn: http://viewvc.svn.mozilla.org/vc/projects/l10n-misc/trunk/input/locale/
+:
+
+
 Installing localizations from svn
 =================================
-
-TODO: Update this when we have the svn url
 
 Localizations are not stored in this repository, but are in Mozilla's SVN.
 
 To get the localizations, do::
 
-    $ svn checkout URL locale
+    $ svn checkout https://svn.mozilla.org/projects/l10n-misc/trunk/input/locales locale
 
 
 Updating strings in svn
 =======================
 
-First you have to::
+First, ping Milos and tell him we're merging strings (i.e. extracting
+them from our codebase and committing the changes to svn).
+
+Then, update the svn repository::
 
     $ cd locale
     $ svn update
     $ cd ..
 
-Then::
+Then, extract the strings from the codebase::
 
     $ ./manage.py extract
     $ ./manage.py merge
 
-Then::
+(Optional) To see changes in the project::
+
+    $ ./bin/compile-mo.sh locale/
+
+Then, commit the new strings to svn::
 
     $ cd locale
     $ svn commit -m 'String update YYYY/MM/DD'
 
-If you want to see these changes in your project::
+Then, tell Milos that the strings have been extracted. He will update
+Verbatim for all locales and post a message to dev.l10n.web about the
+new strings.
 
-    $ ./bin/compile-mo.sh locale/
+.. Note::
+
+   There are also instructions in ``./locale/README.txt``.
 
 
 Creating new localization locales
