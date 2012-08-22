@@ -25,6 +25,7 @@ INSTALLED_APPS = tuple(INSTALLED_APPS) + (
 
 MIDDLEWARE_CLASSES = tuple(MIDDLEWARE_CLASSES) + (
     'fjord.base.middleware.MobileQueryStringOverrideMiddleware',
+    'fjord.base.middleware.ParseUserAgentMiddleware',
 )
 
 LOCALE_PATHS = (
