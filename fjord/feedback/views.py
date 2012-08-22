@@ -1,7 +1,8 @@
 from mobility.decorators import mobile_template
+from django.http import HttpResponse
 from django.shortcuts import render
 
-from fjord.feedback import forms
+from fjord.feedback.forms import SimpleForm
 
 
 def feedback_router(request, *args, **kwargs):
@@ -11,9 +12,24 @@ def feedback_router(request, *args, **kwargs):
 
 @mobile_template('{mobile/}feedback.html')
 def desktop_feedback(request, template=None):
-    return render(request, template, {
-        'forms': {
-            'happy': forms.SimpleForm(),
-            'sad': forms.SimpleForm()
-        }
-    })
+    forms = {
+        'happy': SimpleForm(initial={'happy': True}),
+        'sad': SimpleForm(initial={'happy': False}),
+    }
+
+    if request.method == 'POST':
+        form = SimpleForm(request.POST)
+        if form.is_valid():
+            ret = 'Form: <ul>'
+            ret += '<li>description: %s</li>' % form.cleaned_data['description']
+            ret += '<li>url: %s</li>' % form.cleaned_data['url']
+            ret += '<li>happy: %s</li>' % form.cleaned_data['happy']
+            ret += '</ul>'
+            return HttpResponse(ret)
+        else:
+            if request.POST.get('happy'):
+                forms['happy'] = form
+            else:
+                forms['sad'] = form
+
+    return render(request, template, {'forms': forms})

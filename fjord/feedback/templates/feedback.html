@@ -7,51 +7,49 @@
     {% endcompress %}
 {% endblock %}
 {% block site_js %}
-  {% compress js %}
-  <script src="{{ static('js/lib/jquery.min.js') }}"></script>
-  <script src="{{ static('js/init.js') }}"></script>
-  <script src="{{ static('js/feedback.js') }}"></script>
-  {% endcompress %}
+    {{ super() }}
+    {% compress js %}
+    <script src="{{ static('js/lib/jquery.min.js') }}"></script>
+    <script src="{{ static('js/init.js') }}"></script>
+    <script src="{{ static('js/feedback.js') }}"></script>
+    {% endcompress %}
 {% endblock %}
 
 {% block page_title %}{{ _('Submit Feedback') }}{% endblock %}
 
+{# Remove site header. #}
 {% block site_header %}{% endblock %}
 
 
 {% block content %}
 
-  <article id="intro">
-    <header>
-      <h1>{{ _('Submit Your Feedback') }}</h1>
-      <p>{{ _('Your feedback helps us improve Firefox.') }}</p>
-    </header>
+    <article id="intro">
+        <header>
+            <h1>{{ _('Submit Your Feedback') }}</h1>
+            <p>{{ _('Your feedback helps us improve Firefox.') }}</p>
+        </header>
 
-    <section class="content">
-      <ul id="feedback-types-beta">
-        <li><a id="intro-happy" href="#happy"><span><strong></strong></span>{{ _('Firefox Made Me Happy') }}</a></li>
-        <li><a id="intro-sad" href="#sad"><span><strong></strong></span>{{ _('Firefox Made Me Sad') }}</a></li>
-      </ul>
-    </section>
+        <section class="content">
+            <ul id="feedback-types">
+                <li><a id="intro-happy" href="#happy"><span><strong></strong></span>{{ _('Firefox Made Me Happy') }}</a></li>
+                <li><a id="intro-sad" href="#sad"><span><strong></strong></span>{{ _('Firefox Made Me Sad') }}</a></li>
+            </ul>
+        </section>
 
-    <aside>
-      <span>
-        {% trans support_url='http://support.mozilla.com' %}
-        If you need help or have a problem
-        with Firefox, please visit <a href="{{ support_url }}">Firefox Support</a>.
-        {% endtrans %}
-      </span>
-    </aside>
+        <aside>
+            <span>
+                {% trans support_url='http://support.mozilla.org/' %}
+                If you need help or have a problem
+                with Firefox, please visit <a href="{{ support_url }}">Firefox Support</a>.
+                {% endtrans %}
+            </span>
+        </aside>
 
-    <span class="fade"></span>
-  </article>
+        <span class="fade"></span>
+    </article>
 
-  {% for type, form in forms.iteritems() %}
-    {% include "feedback-form.html" %}
-  {% endfor %}
+    {% for type, form in forms.iteritems() %}
+        {% include "feedback-form.html" %}
+    {% endfor %}
 
-{% endblock %}
-
-{% block site_footer %}
-{% include "includes/footer_feedback.html" %}
 {% endblock %}

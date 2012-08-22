@@ -82,7 +82,7 @@
 
     function getArticle(href) {
         var hash = (href || '').replace(/^.*#/, '') || 'intro',
-            validhashes = ['intro', 'happy', 'sad', 'idea'];
+            validhashes = ['intro', 'happy', 'sad'];
         // If passed an invalid hash, go to the intro.
         if (-1 === validhashes.indexOf(hash.toLowerCase())) {
             hash = 'intro';

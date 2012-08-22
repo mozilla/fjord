@@ -11,7 +11,6 @@ class URLInput(forms.TextInput):
 class SimpleForm(forms.Form):
     """Feedback form fields shared between feedback types."""
 
-    add_url = forms.BooleanField(initial=True, required=False)
     # NB: The class 'url' is hard-coded in the Testpilot extension to
     # accommodate pre-filling the field client-side.
     # Do not change unless you know what you are doing.
@@ -19,9 +18,5 @@ class SimpleForm(forms.Form):
     url = forms.URLField(required=False, widget=forms.TextInput(
         attrs={'placeholder': 'http://', 'class': 'url'}))
 
-    description = forms.CharField(
-        widget=forms.Textarea(),
-        label=_lazy('Please describe what you liked.'),
-        required=True
-        )
-    happy = forms.BooleanField(required=True)
+    description = forms.CharField(widget=forms.Textarea(), required=True)
+    happy = forms.BooleanField(required=True, widget=forms.HiddenInput())
