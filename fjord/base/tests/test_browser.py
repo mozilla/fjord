@@ -10,17 +10,17 @@ from fjord.base import browsers
 
 class TestUserAgentDetection(object):
 
-    def check_ua(cls, case):
+    def check_ua(self, case):
         """Check and individual user agent test case."""
         parsed = browsers.parse_ua(case['useragent'])
         assert(parsed is not None)
 
-        keys = ['browser', 'browser_version',
-                'platform', 'platform_version',
-                'mobile']
+        expected = tuple(case[key] for key in
+                         ['browser', 'browser_version',
+                          'platform', 'platform_version',
+                          'mobile'])
 
-        for key in keys:
-            eq_(parsed[key], case[key])
+        eq_(parsed, expected)
 
     def test_parse_ua(self):
         """Test that a suite of should-work user agents work."""
