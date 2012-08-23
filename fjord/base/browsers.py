@@ -20,49 +20,47 @@ WINDOWS_VERSION = {
 }
 
 
-Browser = namedtuple('Client', ['browser', 'browser_version',
+Browser = namedtuple('Browser', ['browser', 'browser_version',
     'platform', 'platform_version', 'mobile'])
 
 
 class ParseUseragentMiddleware(object):
-    """Add `request.client`, which contains information from the user agent.
+    """Add ``request.BROWSER`` which has information from the User-Agent
 
-    Contains the keys:
+    ``request.BROWSER`` has the following attributes:
 
-    - BROWSER: The user's browser, eg: "Firefox".
-    - BROWSER_VERSION: The browser's version, eg: "14.0.1"
-    - PLATFORM: The general platform the user is using, eg "Windows".
-    - PLATFORM_VERSION: The version of the platform, eg. "XP" or "10.6.2".
-    - MOBILE: If the client is using a mobile device. `True` or `False`.
+    - browser: The user's browser, eg: "Firefox".
+    - browser_version: The browser's version, eg: "14.0.1"
+    - platform: The general platform the user is using, eg "Windows".
+    - platform_version: The version of the platform, eg. "XP" or "10.6.2".
+    - mobile: If the client is using a mobile device. `True` or `False`.
 
     Any of the above may be `None` if detection fails.
     """
 
     def process_request(self, request):
         ua = request.META.get('HTTP_USER_AGENT', '')
-        request.BROWSER = Browser(**parse_ua(ua))
+        request.BROWSER = parse_ua(ua)
 
 
 def parse_ua(ua):
     """Parse user agents from Firefox and friends.
 
-    Returns a dictionary containing the key:
-    - browser: eg: "Firefox", or "Iceweasel".
-    - browser_version: Always at least 3 dotted section, eg "14.0.1" or "4.0.0".
-    - platform: eg: "Windows", "OS X", "Linux", or "Android"
-    - platform_version: On Windows returns something like "Vista", or "7".
-        On OS X returns something like "10.6.2" or "10.4.0"
-    - mobile: True if the user agent represents a mobile browser.
+    :arg ua: a User-Agent string
 
-    If detection fails, the above values will be `None`.
+    :returns: Browser with attributes:
+
+        - browser: eg: "Firefox", or "Iceweasel".
+        - browser_version: Always at least 3 dotted section, eg
+          "14.0.1" or "4.0.0".
+        - platform: eg: "Windows", "OS X", "Linux", or "Android"
+        - platform_version: On Windows returns something like "Vista",
+          or "7".  On OS X returns something like "10.6.2" or "10.4.0"
+        - mobile: True if the user agent represents a mobile browser.
+
+        If detection fails, those attributes will have None values.
     """
-    no_browser = {
-        'browser': None,
-        'browser_version': None,
-        'platform': None,
-        'platform_version': None,
-        'mobile': None
-    }
+    no_browser = Browser(None, None, None, None, None)
 
     if 'firefox' not in ua.lower():
         return no_browser
@@ -108,16 +106,12 @@ def parse_ua(ua):
                 break
         platform_version = platform_version.replace('_', '.')
 
-    # Make sure everything is at least x.y.z
+    # Make sure browser_version is at least x.y.z
     while browser_version.count('.') < 2:
         browser_version += '.0'
 
     mobile = 'mobile' in ua.lower() or bool(MOBILE_UA_RE.match(ua))
 
-    return {
-        'browser': browser,
-        'browser_version': browser_version,
-        'platform': platform,
-        'platform_version': platform_version,
-        'mobile': mobile
-    }
+    return Browser(browser, browser_version, platform, platform_version,
+                   mobile)
+
