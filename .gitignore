@@ -21,3 +21,5 @@ bin/
 man/
 lib/
 include/
+static/
+node_modules/

@@ -24,25 +24,6 @@ Browser = namedtuple('Client', ['browser', 'browser_version',
     'platform', 'platform_version', 'mobile'])
 
 
-class ParseUseragentMiddleware(object):
-    """Add `request.client`, which contains information from the user agent.
-
-    Contains the keys:
-
-    - BROWSER: The user's browser, eg: "Firefox".
-    - BROWSER_VERSION: The browser's version, eg: "14.0.1"
-    - PLATFORM: The general platform the user is using, eg "Windows".
-    - PLATFORM_VERSION: The version of the platform, eg. "XP" or "10.6.2".
-    - MOBILE: If the client is using a mobile device. `True` or `False`.
-
-    Any of the above may be `None` if detection fails.
-    """
-
-    def process_request(self, request):
-        ua = request.META.get('HTTP_USER_AGENT', '')
-        request.BROWSER = Browser(**parse_ua(ua))
-
-
 def parse_ua(ua):
     """Parse user agents from Firefox and friends.
 

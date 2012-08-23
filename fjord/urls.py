@@ -13,8 +13,8 @@ patch()
 urlpatterns = patterns(
     '',
 
-    # Example:
     (r'', include('fjord.base.urls')),
+    (r'', include('fjord.feedback.urls')),
 
     # Generate a robots.txt
     (r'^robots\.txt$', 
