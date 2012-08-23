@@ -5,7 +5,7 @@ from django import test
 
 from nose.tools import eq_
 
-from fjord.base import browsers
+from fjord.base import browsers, middleware
 
 
 class TestUserAgentDetection(object):
@@ -45,7 +45,7 @@ class TestUserAgentDetection(object):
             'HTTP_USER_AGENT': ua,
         }
         request = test.RequestFactory().get('/', **d)
-        ret = browsers.ParseUseragentMiddleware().process_request(request)
+        ret = middleware.ParseUseragentMiddleware().process_request(request)
         assert ret is None
 
         checks = {
