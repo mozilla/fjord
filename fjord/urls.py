@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.conf.urls.defaults import patterns, include
+from django.conf.urls.defaults import patterns, include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.http import HttpResponse
 
@@ -10,16 +10,19 @@ patch()
 # from django.contrib import admin
 # admin.autodiscover()
 
-urlpatterns = patterns(
-    '',
+urlpatterns = patterns('',
 
-    # Example:
+    (r'', include('fjord.analytics.urls')),
     (r'', include('fjord.base.urls')),
+    (r'', include('fjord.feedback.urls')),
+    (r'', include('fjord.search.urls')),
+
+    url(r'stub', lambda r: HttpResponse('this is a stub'), name='stub'),
 
     # Generate a robots.txt
-    (r'^robots\.txt$', 
+    (r'^robots\.txt$',
         lambda r: HttpResponse(
-            "User-agent: *\n%s: /" % 'Allow' if settings.ENGAGE_ROBOTS else 'Disallow' ,
+            "User-agent: *\n%s: /" % 'Allow' if settings.ENGAGE_ROBOTS else 'Disallow',
             mimetype="text/plain"
         )
     )
