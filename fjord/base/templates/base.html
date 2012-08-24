@@ -7,12 +7,12 @@
         <![endif]-->
 
         {% block site_css %}
-        {% compress css %}
-        <link rel="stylesheet" href="{{ static('css/lib/reset.min.css') }}">
-        <link rel="stylesheet" href="{{ static('css/lib/jquery-ui.css') }}">
-        <link rel="stylesheet" type="text/less" href="{{ static('css/fjord.less') }}">
-        {% endcompress %}
-        <!--[if IE]><link href="{{ MEDIA_URL }}css/ie.css" rel="stylesheet" type="text/css"><![endif]-->
+            {% compress css %}
+                <link rel="stylesheet" href="{{ static('css/lib/reset.min.css') }}">
+                <link rel="stylesheet" href="{{ static('css/lib/jquery-ui.css') }}">
+                <link rel="stylesheet" type="text/less" href="{{ static('css/fjord.less') }}">
+            {% endcompress %}
+            <!--[if IE]><link href="{{ MEDIA_URL }}css/ie.css" rel="stylesheet" type="text/css"><![endif]-->
         {% endblock %}
 
         <link rel="shortcut icon" type="image/png" href="{{ MEDIA_URL }}img/favicon.png"/>
@@ -28,7 +28,7 @@
         </nav>
 
         {% block site_header %}
-        <header><div class="funnel">
+        <header>
             <h1><a href="#">
                 {% trans %}
                     <strong>Firefox</strong> Input Dashboard
@@ -38,8 +38,7 @@
             <ul>
                 <li><a class="dashboard" href="{{ url('dashboard') }}"><span>{{ _('Dashboard') }}</span></a></li>
             </ul>
-
-        </div></header>
+        </header>
         {% endblock site_header %}
 
         <div id="body"><div class="funnel">
@@ -51,10 +50,10 @@
         {% endblock %}
 
         {% block site_js %}
-        {# TODO: {{ js('common') }} #}
+            {% compress js %}
+                <script src="{{ static('js/lib/jquery.min.js') }}"></script>
+            {% endcompress %}
         {% endblock %}
         {% block js %}{% endblock %}
-
-        {# TODO: {% include "includes/webtrends_desktop.html" %} #}
     </body>
 </html>
