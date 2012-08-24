@@ -59,6 +59,7 @@ For the minimum installation, you'll need the following:
 * `pip <http://www.pip-installer.org/en/latest/>`_
 * MySQL server and client headers
 * Memcached Server
+* lessc
 
 Installation for these is very system dependent. Using a package
 manager, like yum, aptitude, or brew, is encouraged.
@@ -190,9 +191,10 @@ Now install LESS using::
 
     $ sudo npm install less
 
-Ensure that lessc (might be located at /usr/lib/node_modules/less/bin) is
-accessible on your PATH.
+Make sure that ``lessc`` is available on your path. NPM probably installed it
+to ``node_modules/less/bin/lessc`` and ``node_modules/.bin/lessc``.
 
+LESS files are automatically converted by Django Compressor.
 
 .. _hacking-howto-schemas:
 

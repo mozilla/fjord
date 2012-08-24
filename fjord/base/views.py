@@ -1,7 +1,7 @@
 from mobility.decorators import mobile_template
-import jingo
+from django.shortcuts import render
 
 
 @mobile_template('{mobile/}home.html')
 def home_view(request, template=None):
-    return jingo.render(request, template)
+    return render(request, template)
