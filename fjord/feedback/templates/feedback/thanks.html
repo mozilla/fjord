@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block site_css %}
+  {% compress css %}
+  <link rel="stylesheet" type="text/less" href="{{ static('css/feedback.less') }}">
+  {% endcompress %}
+{% endblock %}
+{% block site_js %}
+  {{ super() }}
+  {% compress js %}
+  <script src="{{ static('js/init.js') }}"></script>
+  <script src="{{ static('js/feedback.js') }}"></script>
+  {% endcompress %}
+{% endblock %}
+
+{# Remove site header. #}
+{% block site_header %}{% endblock %}
+
+{% block page_title %}{{ _('Thanks') }}{% endblock %}
+
+{% block content %}
+
+<article id="thanks" class="visible">
+  <header>
+    <h1>{{ _('Thanks for Your Feedback') }}</h1>
+    <p>
+      <span>
+        {{ _('Your feedback will be used to create a better '
+             'experience in future releases of Firefox.') }}
+      </span>
+    </p>
+  </header>
+
+  <div class="content">
+    {% if opinion %}
+      <div>
+        <h3>{{ _('Share your feedback.') }}</h3>
+        <p>
+            <a href="{{ 'http://twitter.com/share'|urlparams(
+              url=absolute_url('/feedback'),
+              text='%s #fxinput' % opinion.description|truncate(100),
+              related='firefox') }}"
+              class="tweet-this" target="_blank">{{ _('Tweet feedback to your followers') }}
+            </a>
+        </p>
+      </div>
+    {% endif %}
+
+    <div id="thanks_download">
+      <h3>{{ _('Shape the future of Firefox.') }}</h3>
+      <p>
+        {% trans download_url="http://www.mozilla.org/firefox/channel" %}
+          Download
+          <a href="{{ download_url }}">the build that is right for you</a>.
+        {% endtrans %}
+      </p>
+    </div>
+
+    <div>
+      <h3>{{ _('Contribute to Mozilla.') }}</h3>
+      <p>
+        {% trans url='http://mozilla.org/contribute/' %}
+        Learn how you can <a href="{{ url }}">make Firefox and Mozilla better</a>
+        {% endtrans %}
+      </p>
+    </div>
+
+    <div>
+      <h3>{{ _('Want to see where your feedback goes?') }}</h3>
+      <p>
+        {% trans dash_url='/' %}
+        Visit the <a href="{{ dash_url }}">Firefox Feedback Dashboard</a>
+        {% endtrans %}
+      </p>
+    </div>
+
+    <div>
+      <h3>{{ _('Find the latest news about Firefox.') }}</h3>
+      <ul>
+        <li><a id="twitter" href="http://twitter.com/firefox"><span>Twitter</span></a></li>
+        <li><a id="facebook" href="http://www.facebook.com/Firefox"><span>Facebook</a></span></li>
+        <li><a id="planet" href="http://planet.mozilla.org/"><span>Planet Mozilla</a></span></li>
+      </ul>
+    </div>
+  </div>
+
+  <span class="fade"></span>
+</article>
+
+{% endblock %}

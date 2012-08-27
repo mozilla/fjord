@@ -29,7 +29,7 @@
 
     {% block site_header %}
     <header>
-      <h1><a href="#">
+      <h1 class="title"><a href="#">
         {% trans %}
           <strong>Firefox</strong> Input Dashboard
         {% endtrans %}
@@ -41,9 +41,9 @@
     </header>
     {% endblock site_header %}
 
-    <div id="content"><div class="funnel">
+    <div id="content">
       {% block content %}{% endblock %}
-    </div></div>
+    </div>
 
     {% block site_footer %}
       {% include "includes/footer.html" %}
@@ -52,6 +52,7 @@
     {% block site_js %}
       {% compress js %}
         <script src="{{ static('js/lib/jquery.min.js') }}"></script>
+        <script src="{{ static('js/init.js') }}"></script>
       {% endcompress %}
     {% endblock %}
     {% block js %}{% endblock %}

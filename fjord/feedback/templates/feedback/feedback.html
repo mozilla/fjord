@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block site_css %}
+  {% compress css %}
+  <link rel="stylesheet" type="text/less" href="{{ static('css/feedback.less') }}">
+  {% endcompress %}
+{% endblock %}
+
+{% block site_js %}
+  {{ super() }}
+  {% compress js %}
+  <script src="{{ static('js/lib/jquery.min.js') }}"></script>
+  <script src="{{ static('js/init.js') }}"></script>
+  <script src="{{ static('js/feedback.js') }}"></script>
+  {% endcompress %}
+{% endblock %}
+
+{% block page_title %}{{ _('Submit Feedback') }}{% endblock %}
+
+{# Remove site header. #}
+{% block site_header %}{% endblock %}
+
+{% block content %}
+
+  <article id="intro">
+    <header>
+      <h1>{{ _('Submit Your Feedback') }}</h1>
+      {{ _('Your feedback helps us improve Firefox.') }}
+    </header>
+
+    <section class="content" id="feedback-types">
+      <ul id="feedback-types">
+        <li><a id="intro-happy" href="#happy"><span><strong></strong></span>{{ _('Firefox Made Me Happy') }}</a></li>
+        <li><a id="intro-sad" href="#sad"><span><strong></strong></span>{{ _('Firefox Made Me Sad') }}</a></li>
+      </ul>
+    </section>
+
+    <aside>
+      <span>
+        {% trans support_url='http://support.mozilla.org/' %}
+        If you need help or have a problem
+        with Firefox, please visit <a href="{{ support_url }}">Firefox Support</a>.
+        {% endtrans %}
+      </span>
+    </aside>
+
+    <span class="fade"></span>
+  </article>
+
+  {% for type, form in forms.iteritems() %}
+    {% include "feedback/feedback-form.html" %}
+  {% endfor %}
+
+{% endblock %}

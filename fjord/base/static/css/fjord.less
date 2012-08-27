@@ -67,7 +67,7 @@ a:hover {
   text-decoration: none;
   line-height: 18px;
   padding: 0 .5em;
-  -moz-border-radius: 3px;
+  border-radius: 3px;
 
   &:hover {
     cursor: pointer;
@@ -105,17 +105,17 @@ header {
   padding: 0 20px;
   margin: 0 auto;
 
-  &, h1, ul {
+  &, .title, ul {
     height: 60px;
   }
-  h1, ul {
+  .title, ul {
     display: inline-block;
     line-height: 60px;
     vertical-align: middle;
     margin: 0px;
   }
 
-  h1 {
+  .title {
     a {
       font-family: MetaRoman, Helvetica, Arial, sans-serif;
       font-size: 24px;
@@ -160,7 +160,7 @@ header {
     a {
       margin-left: .25em;
       padding: .33em .66em;
-      -moz-border-radius: .25em;
+      border-radius: .25em;
       color: inherit;
       text-decoration: none;
 
@@ -183,7 +183,7 @@ header {
   background: #326da1;
   color: #fff;
   text-shadow: 0 1px 0 rgba(0,0,0, .5);
-  -moz-box-shadow: inset 0 1px 0 rgba(0,0,0, .5);
+  box-shadow: inset 0 1px 0 rgba(0,0,0, .5);
 }
 
 // Main content formatting
@@ -320,7 +320,6 @@ header {
 }
 
 // Footer formatting
-
 .html-rtl #footer-contents {
   text-align: right;
 }

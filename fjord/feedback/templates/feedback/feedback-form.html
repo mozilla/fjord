@@ -1,0 +1,94 @@
+<article id="{{ type }}">
+  <header>
+    <h1>
+      {% if type == 'happy' %}
+        {{ _('Firefox Made Me Happy') }}
+      {% elif type == 'sad' %}
+        {{ _('Firefox Made Me Sad') }}
+      {% endif %}
+    </h1>
+    <p>
+      {% if type == 'happy' %}
+        {{ _("Super! It's great to hear that you like our browser.") }}
+      {% elif type == 'sad' %}
+        {{ _('We are sorry that you have not had a good experience with our browser. Please tell us why, so we can fix it.') }}
+      {% endif %}
+    </p>
+    <nav>
+      <a href="#intro" title="{{ _('Go Back') }}">{{ _('Go Back') }}<strong></strong></a>
+    </nav>
+  </header>
+
+  <section class="content">
+    <form action="" method="post" autocomplete="off">
+      <div class="fields">
+        <div>
+          <label for="description">
+            {% if type == 'happy' %}
+              {{ _('Please describe what you liked.') }}
+            {% else %}
+              {{ _('Please describe your problem below.') }}
+            {% endif %}
+          </label>
+          <p>{{ form.description }}</p>
+          <div id="{{ type }}-description-counter" class="characters-remaining"></div>
+          {{ form.description.errors }}
+        </div>
+
+        <div>
+          <label for="url">
+            {{ _('If your feedback is related to a website, you can include it here.') }}
+          </label>
+          <p>{{ form.url }}</p>
+          {{ form.url.errors }}
+        </div>
+
+        {% if type == 'sad' %}
+          <div class="feedback-message">
+            {% trans %}
+              Please be as specific as you can in the allotted space.
+              For example, if you are giving feedback about slowness,
+              please tell us about relevant websites, if you notice it
+              at the beginning or later in the browsing session and if
+              there are any actions that you perform in Firefox that
+              are particularly problematic.
+            {% endtrans %}
+          </div>
+        {% endif %}
+        <div class="privacy-wrapper">
+          <p class="privacy">
+            <span>
+              {% trans %}
+              To protect your privacy, please ensure that no
+              personally identifiable information is included in
+              your feedback.
+              {% endtrans %}
+            </span>
+          </p>
+        </div>
+      </div>
+
+      {{ form.errors['__all__'] }}
+
+      {{ form.happy }}
+
+      <div id="{{ type }}-submit" class="submit">
+        <a href="#" data-waittext="{{ _('Submitting Feedback') }}">
+          <span>{{ _('Submit Feedback') }}</span>
+        </a>
+        <span></span>
+        <noscript>
+          <button type="submit">{{ _('Submit Feedback') }}</button>
+        </noscript>
+      </div>
+
+      {% for hidden in form.hidden_fields() %}
+        {{ hidden }}
+      {% endfor %}
+      {{ csrf() }}
+
+    </form>
+  </section>
+
+  <span class="fade"></span>
+</article>
