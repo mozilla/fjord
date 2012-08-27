@@ -17,9 +17,9 @@ build
 tmp/*
 *~
 *.mo
-bin/
-man/
-lib/
-include/
-static/
-node_modules/
+/bin/
+/man/
+/lib/
+/include/
+/static/
+/node_modules/
