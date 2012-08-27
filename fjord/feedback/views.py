@@ -1,1 +1,72 @@
-# Create your views here.
+import json
+from mobility.decorators import mobile_template
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render
+
+from funfactory.urlresolvers import reverse
+
+from fjord.feedback.forms import SimpleForm
+from fjord.feedback import models
+
+
+@mobile_template('feedback/{mobile/}thanks.html')
+def thanks(request, template):
+    return render(request, template)
+
+
+@mobile_template('feedback/{mobile/}feedback.html')
+def desktop_stable_feedback(request, template=None):
+    # Use two instances of the same form because the template changes the text
+    # based on the value of ``happy``.
+    forms = {
+        'happy': SimpleForm(initial={'happy': 1}),
+        'sad': SimpleForm(initial={'happy': 0}),
+    }
+    status = 200
+
+    if request.method == 'POST':
+        form = SimpleForm(request.POST)
+        if form.is_valid():
+            # Most platforms aren't different enough between versions to care.
+            # Windows is.
+            platform = request.BROWSER.platform
+            if platform == 'Windows':
+                platform += ' ' + request.BROWSER.platform_version
+
+            opinion = models.Simple(
+                # Data coming from the user
+                happy=form.cleaned_data['happy'],
+                url=form.cleaned_data['url'],
+                description=form.cleaned_data['description'],
+                # Inferred data
+                prodchan='firefox.desktop.stable',
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                browser=request.BROWSER.browser,
+                browser_version=request.BROWSER.browser_version,
+                platform=platform,
+                locale=request.locale,
+            )
+            opinion.save()
+            return HttpResponseRedirect(reverse('thanks'))
+        else:
+            # The user did something wrong. Say so.
+            status = 400
+            return HttpResponse(json.dumps([(field.name, field.errors) for field in form]), content_type='application/json')
+            if request.POST.get('happy'):
+                forms['happy'] = form
+            else:
+                forms['sad'] = form
+
+    return render(request, template, {'forms': forms}, status=status)
+
+
+feedback_routes = {
+    'firefox.desktop.stable': desktop_stable_feedback,
+    None: desktop_stable_feedback,
+}
+
+
+def feedback_router(request, formname=None, *args, **kwargs):
+    # Eventually route based on user agent. For now just go ahead.
+    view = feedback_routes[formname]
+    return view(request, *args, **kwargs)
