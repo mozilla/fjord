@@ -8,7 +8,6 @@ from fjord.feedback.forms import SimpleForm
 from fjord.feedback import models
 
 
-@mobile_template('feedback/{mobile/}thanks.html')
 def thanks(request):
     return render(request, 'feedback/thanks.html')
 
