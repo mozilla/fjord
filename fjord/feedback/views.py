@@ -1,9 +1,8 @@
-import json
-from mobility.decorators import mobile_template
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 
 from funfactory.urlresolvers import reverse
+from mobility.decorators import mobile_template
 
 from fjord.feedback.forms import SimpleForm
 from fjord.feedback import models
@@ -51,7 +50,6 @@ def desktop_stable_feedback(request, template=None):
         else:
             # The user did something wrong. Say so.
             status = 400
-            return HttpResponse(json.dumps([(field.name, field.errors) for field in form]), content_type='application/json')
             if request.POST.get('happy'):
                 forms['happy'] = form
             else:
@@ -67,6 +65,6 @@ feedback_routes = {
 
 
 def feedback_router(request, formname=None, *args, **kwargs):
-    # Eventually route based on user agent. For now just go ahead.
+    # TODO: Route based on user agent detection.
     view = feedback_routes[formname]
     return view(request, *args, **kwargs)

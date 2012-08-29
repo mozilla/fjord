@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 
 {% block site_css %}
-    {% compress css %}
-    <link rel="stylesheet" type="text/less" href="{{ static('css/feedback.less') }}">
-    {% endcompress %}
+  {% compress css %}
+  <link rel="stylesheet" type="text/less" href="{{ static('css/feedback.less') }}">
+  {% endcompress %}
 {% endblock %}
 {% block site_js %}
-    {{ super() }}
-    {% compress js %}
-    <script src="{{ static('js/init.js') }}"></script>
-    <script src="{{ static('js/feedback.js') }}"></script>
-    {% endcompress %}
+  {{ super() }}
+  {% compress js %}
+  <script src="{{ static('js/init.js') }}"></script>
+  <script src="{{ static('js/feedback.js') }}"></script>
+  {% endcompress %}
 {% endblock %}
 
 {# Remove site header. #}
@@ -27,7 +27,7 @@
       <span>
         {{ _('Your feedback will be used to create a better '
              'experience in future releases of Firefox.') }}
-    </span>
+      </span>
     </p>
   </header>
 
@@ -40,7 +40,8 @@
               url=absolute_url('/feedback'),
               text='%s #fxinput' % opinion.description|truncate(100),
               related='firefox') }}"
-              class="tweet-this" target="_blank">{{ _('Tweet feedback to your followers') }}</a>
+              class="tweet-this" target="_blank">{{ _('Tweet feedback to your followers') }}
+            </a>
         </p>
       </div>
     {% endif %}

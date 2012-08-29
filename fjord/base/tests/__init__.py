@@ -13,7 +13,6 @@ class LocalizingClient(Client):
 
     Otherwise, we'd have to hard-code locales into our tests everywhere or
     {mock out reverse() and make LocaleURLMiddleware not fire}.
-
     """
     def request(self, **request):
         """Make a request, but prepend a locale if there isn't one already."""
@@ -24,6 +23,15 @@ class LocalizingClient(Client):
             request['PATH_INFO'] = '/%s/%s' % (settings.LANGUAGE_CODE,
                                                shortened)
         return super(LocalizingClient, self).request(**request)
+
+
+class LocalizingUAClient(LocalizingClient):
+    """Client which fakes a Firefox user agent, for testin UA sniffing code."""
+
+    def __init__(self, *args, **kwargs):
+        ua = 'Mozilla/5.0 (X11; Linux x86_64; rv:10.0.1) Gecko/20100101 Firefox/10.0.1'
+        parent = super(LocalizingUAClient, self)
+        return parent.__init__(*args, HTTP_USER_AGENT=ua, **kwargs)
 
 
 class MobileTestCase(TestCase):
