@@ -7,9 +7,3 @@ import jinja2
 @register.filter
 def naturaltime(*args):
     return humanize.naturaltime(*args)
-
-
-@register.filter
-@register.function
-def yell(text):
-    return text.upper()
