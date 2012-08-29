@@ -46,7 +46,8 @@ def desktop_stable_feedback(request, template=None):
             opinion.save()
             return HttpResponseRedirect(reverse('thanks'))
         else:
-            # The user did something wrong. Say so.
+            # The user did something wrong. Update the appropriate form, so
+            # the errors show correctly.
             if request.POST.get('happy'):
                 forms['happy'] = form
             else:
