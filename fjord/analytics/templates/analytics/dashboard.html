@@ -1,11 +1,60 @@
 {% extends "base.html" %}
 
+{% macro feedback_block(feedback) -%}
+  <li class="opinion">
+    {% if feedback.happy %}
+      <span class="sprite happy">Happy</span>
+    {% else %}
+      <span class="sprite sad">Sad</span>
+    {% endif %}
+    <p>
+      {{ feedback.description }}
+    </p>
+    <ul class="meta">
+      <li>{{ feedback.created|naturaltime }}</li>
+      <li>{{ feedback.platform }}</li>
+      <li>{{ feedback.locale }}</li>
+    </ul>
+  </li>
+{% endmacro -%}
+
 {% block body_id %}dashboard{% endblock %}
 
 {% block content %}
 
-<h1>Dashboard</h1>
+<div class="col">
+  <div class="block"></div>
+</div>
 
-<p>Hello, world!</p>
+<div class="col wide">
+  <div class="block feedback">
+    <h2>Latest Feedback</h2>
+    <ul>
+    {% for opinion in opinions %}
+      {{ feedback_block(opinion) }}
+    {% endfor %}
+    </ul>
+
+    <div class="pager">
+      {% if opinions.has_next() %}
+        <a class="older" href="?page={{ opinions.next_page_number() }}">Older Messages</a>
+      {% endif %}
+      {% if opinions.has_previous() %}
+        <a class="newer" href="?page={{ opinions.previous_page_number() }}">Newer Messages</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="col">
+  <div class="block count">
+    <h3>Current search</h3>
+    <p><strong>{{ opinion_count }}</strong> messages.</p>
+    <p>
+      <em>{{ opinion_count_happy }}</em> <span class="sprite happy">happy</span>
+      <em>{{ opinion_count_sad }}</em> <span class="sprite sad">sad</span>
+    </p>
+  </div>
+</div>
 
 {% endblock %}
