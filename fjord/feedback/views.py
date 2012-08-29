@@ -9,11 +9,10 @@ from fjord.feedback import models
 
 
 @mobile_template('feedback/{mobile/}thanks.html')
-def thanks(request, template):
-    return render(request, template)
+def thanks(request):
+    return render(request, 'feedback/thanks.html')
 
 
-@mobile_template('feedback/{mobile/}feedback.html')
 def desktop_stable_feedback(request, template=None):
     # Use two instances of the same form because the template changes the text
     # based on the value of ``happy``.
@@ -53,7 +52,7 @@ def desktop_stable_feedback(request, template=None):
             else:
                 forms['sad'] = form
 
-    return render(request, template, {'forms': forms})
+    return render(request, 'feedback/feedback.html', {'forms': forms})
 
 
 feedback_routes = {

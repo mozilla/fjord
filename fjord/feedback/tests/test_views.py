@@ -1,16 +1,16 @@
-from fjord.base.tests import TestCase, LocalizingUAClient, reverse
+from fjord.base.tests import TestCase, LocalizingClient, reverse
 from nose.tools import eq_
 
 from fjord.feedback import models
 
 
 class TestFeedback(TestCase):
-    client_class = LocalizingUAClient
+    client_class = LocalizingClient
 
     def test_valid_happy(self):
         """Submitting a valid happy form creates an item in the DB.
 
-        Additionally, we should end up at the Thanks page.
+        Additionally, it should redirect to the Thanks page.
         """
         amount = models.Simple.objects.count()
 
@@ -30,9 +30,9 @@ class TestFeedback(TestCase):
         eq_(True, feedback.happy)
 
     def test_valid_sad(self):
-        """Submitting a valid happy form creates an item in the DB.
+        """Submitting a valid sad form creates an item in the DB.
 
-        Additionally, we should end up at the Thanks page.
+        Additionally, it should redirect to the Thanks page.
         """
         amount = models.Simple.objects.count()
 
@@ -51,7 +51,7 @@ class TestFeedback(TestCase):
         eq_(False, feedback.happy)
 
     def test_invalid_form(self):
-        """Submitting a bad form should return 400 and not change pages."""
+        """Submitting a bad form should return an error and not change pages."""
         url = reverse('feedback', args=('firefox.desktop.stable',))
         r = self.client.post(url, {
             'url': 'http://mozilla.org/'
@@ -64,8 +64,8 @@ class TestFeedback(TestCase):
 
     def test_feedback_router(self):
         """Requesting a generic template should give a feedback form."""
-        #TODO: This test might need to change when the router starts routing.
+        # TODO: This test might need to change when the router starts routing.
         url = reverse('feedback')
-        r = self.client.get(url)
+        r = self.client.get(url, HTTP_USER_AGENT='Firefox')
         eq_(200, r.status_code)
         self.assertTemplateUsed(r, 'feedback/feedback.html')
