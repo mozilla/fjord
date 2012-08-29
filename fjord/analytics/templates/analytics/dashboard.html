@@ -1,11 +1,45 @@
 {% extends "base.html" %}
+{#{% load humanize %}#}
+
+{% macro feedback_block(feedback) -%}
+  <li class="opinion">
+    {% if feedback.happy %}
+      <span class="happy">Happy</span>
+    {% else %}
+      <span class="sad">Sad</span>
+    {% endif %}
+    <p>
+      {{ feedback.description }}
+    </p>
+    <ul class="meta">
+      <li>{{ feedback.created|naturaltime }}</li>
+      <li>{{ feedback.platform }}</li>
+      <li>{{ feedback.locale }}</li>
+    </ul>
+  </li>
+{% endmacro -%}
 
 {% block body_id %}dashboard{% endblock %}
 
 {% block content %}
 
-<h1>Dashboard</h1>
+<div class="col">
+  <div class="block"></div>
+</div>
 
-<p>Hello, world!</p>
+<div class="col wide">
+  <div class="block">
+    <h2>Latest Feedback</h2>
+    <ul id="opinions">
+    {% for opinion in opinions %}
+      {{ feedback_block(opinion) }}
+    {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<div class="col">
+  <div class="block"></div>
+</div>
 
 {% endblock %}
