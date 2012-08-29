@@ -21,7 +21,6 @@ def desktop_stable_feedback(request, template=None):
         'happy': SimpleForm(initial={'happy': 1}),
         'sad': SimpleForm(initial={'happy': 0}),
     }
-    status = 200
 
     if request.method == 'POST':
         form = SimpleForm(request.POST)
@@ -49,13 +48,12 @@ def desktop_stable_feedback(request, template=None):
             return HttpResponseRedirect(reverse('thanks'))
         else:
             # The user did something wrong. Say so.
-            status = 400
             if request.POST.get('happy'):
                 forms['happy'] = form
             else:
                 forms['sad'] = form
 
-    return render(request, template, {'forms': forms}, status=status)
+    return render(request, template, {'forms': forms})
 
 
 feedback_routes = {

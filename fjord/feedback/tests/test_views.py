@@ -9,6 +9,7 @@ class TestFeedback(TestCase):
 
     def test_valid_happy(self):
         """Submitting a valid happy form creates an item in the DB.
+
         Additionally, we should end up at the Thanks page.
         """
         amount = models.Simple.objects.count()
@@ -30,6 +31,7 @@ class TestFeedback(TestCase):
 
     def test_valid_sad(self):
         """Submitting a valid happy form creates an item in the DB.
+
         Additionally, we should end up at the Thanks page.
         """
         amount = models.Simple.objects.count()
@@ -49,9 +51,7 @@ class TestFeedback(TestCase):
         eq_(False, feedback.happy)
 
     def test_invalid_form(self):
-        """Submitting a bad form should send us back to the same page and
-        return a 400.
-        """
+        """Submitting a bad form should return 400 and not change pages."""
         url = reverse('feedback', args=('firefox.desktop.stable',))
         r = self.client.post(url, {
             'url': 'http://mozilla.org/'
@@ -59,7 +59,7 @@ class TestFeedback(TestCase):
             # No description
         })
 
-        eq_(400, r.status_code)
+        self.assertContains(r, 'This field is required')
         self.assertTemplateUsed(r, 'feedback/feedback.html')
 
     def test_feedback_router(self):
