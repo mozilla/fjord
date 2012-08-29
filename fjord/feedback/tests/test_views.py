@@ -63,8 +63,9 @@ class TestFeedback(TestCase):
         self.assertTemplateUsed(r, 'feedback/feedback.html')
 
     def test_feedback_router(self):
-        """Requesting a generic template should give us a particular one."""
+        """Requesting a generic template should give a feedback form."""
+        #TODO: This test might need to change when the router starts routing.
         url = reverse('feedback')
         r = self.client.get(url)
         eq_(200, r.status_code)
-        # TODO How else can we confirm this?
+        self.assertTemplateUsed(r, 'feedback/feedback.html')
