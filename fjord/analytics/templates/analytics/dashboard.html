@@ -3,9 +3,9 @@
 {% macro feedback_block(feedback) -%}
   <li class="opinion">
     {% if feedback.happy %}
-      <span class="happy">Happy</span>
+      <span class="sprite happy">Happy</span>
     {% else %}
-      <span class="sad">Sad</span>
+      <span class="sprite sad">Sad</span>
     {% endif %}
     <p>
       {{ feedback.description }}
@@ -27,18 +27,34 @@
 </div>
 
 <div class="col wide">
-  <div class="block">
+  <div class="block feedback">
     <h2>Latest Feedback</h2>
-    <ul id="opinions">
+    <ul>
     {% for opinion in opinions %}
       {{ feedback_block(opinion) }}
     {% endfor %}
     </ul>
+
+    <div class="pager">
+      {% if opinions.has_next() %}
+        <a class="older" href="?page={{ opinions.next_page_number() }}">Older Messages</a>
+      {% endif %}
+      {% if opinions.has_previous() %}
+        <a class="newer" href="?page={{ opinions.previous_page_number() }}">Newer Messages</a>
+      {% endif %}
+    </div>
   </div>
 </div>
 
 <div class="col">
-  <div class="block"></div>
+  <div class="block count">
+    <h3>Current search</h3>
+    <p><strong>{{ opinion_count }}</strong> messages.</p>
+    <p>
+      <em>{{ opinion_count_happy }}</em> <span class="sprite happy">happy</span>
+      <em>{{ opinion_count_sad }}</em> <span class="sprite sad">sad</span>
+    </p>
+  </div>
 </div>
 
 {% endblock %}

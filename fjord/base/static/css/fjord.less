@@ -40,17 +40,6 @@ html {
   top: -10000px;
 }
 
-h3 {
-  margin-bottom: 7px;
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: 18px;
-  letter-spacing: 3px;
-  text-shadow: 0 1px 1px #000;
-  margin-bottom: 15px;
-  color: white;
-}
-
 p {
   margin-bottom: 10px;
 }
@@ -147,11 +136,24 @@ header {
       }
     }
   }
+
+  h3 {
+    margin-bottom: 7px;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 18px;
+    letter-spacing: 3px;
+    text-shadow: 0 1px 1px #000;
+    margin-bottom: 15px;
+    color: white;
+  }
+
   ul {
     color: #c8e0f6;
     vertical-align: middle;
     padding-left: 10px;
   }
+
   li {
     display: inline;
 
@@ -207,28 +209,38 @@ header {
   .block {
     background: white;
     padding: 15px;
-    min-height: 150px;
+    min-height: 100px;
     box-shadow: 0px 0px 3px rgba(0,0,0,0.3);
   }
 
-  h2:first-child {
+  h1:first-child,
+  h2:first-child,
+  h3:first-child {
     margin-top: 0;
   }
 }
 
-#opinions {
-  padding: 0;
+.block.feedback {
+  ul {
+    padding: 0;
+  }
 
   .opinion {
     @opinion_border: 1px dotted #B6BCC0;
     border-top: @opinion_border;
     display: block;
     list-style: none;
-    padding: 15px 40px;
+    padding: 10px 40px;
     position: relative;
 
     &:last-child {
       border-bottom: @opinion_border;
+    }
+
+    .sprite {
+      position: absolute;
+      top: 15px;
+      left: 5px;
     }
 
     p {
@@ -251,21 +263,60 @@ header {
         }
       }
     }
-
-    .happy, .sad {
-      background: url("../../img/msg-sprite.png") no-repeat scroll 0 0 transparent;
-      font-size: 0;
-      width: 24px;
-      height: 24px;
-      display: block;
-      position: absolute;
-      top: 15px;
-      left: 5px;
-    }
-
-    .sad { background-position: 0 0; }
-    .happy { background-position: 0 -30px; }
   }
+}
+
+.block.count {
+  font-weight: bold;
+
+  strong, em {
+    &:not(:first-child) {
+      margin-left: 1em;
+    }
+  }
+  strong {
+    font-size: 3em;
+    display: block;
+  }
+  em {
+    font-size: 1.75em;
+    font-style: normal;
+  }
+}
+
+.pager {
+  min-height: 16px;
+  padding-top: 4px;
+
+  .newer {
+    float: older;
+  }
+  .newer:before {
+    content: "«";
+    margin-right: 0.25em;
+  }
+
+  .older {
+    float: right;
+  }
+  .older:after {
+    content: "»";
+    margin-left: 0.25em;
+  }
+}
+
+// Sprites
+
+.sprite {
+  background: url("../../img/msg-sprite.png") no-repeat scroll 0 0 transparent;
+  font-size: 0;
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  vertical-align: top;
+
+  &.sad { background-position: 0 0; }
+  &.happy { background-position: 0 -30px; }
 }
 
 // Footer formatting
