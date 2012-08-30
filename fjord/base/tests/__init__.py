@@ -8,21 +8,35 @@ from test_utils import TestCase
 
 
 class LocalizingClient(Client):
-    """Client which prepends a locale so test requests can get through
-    LocaleURLMiddleware without resulting in a locale-prefix-adding 301.
+    """Client which rewrites urls to include locales and adds a user agent.
 
-    Otherwise, we'd have to hard-code locales into our tests everywhere or
-    {mock out reverse() and make LocaleURLMiddleware not fire}.
+    This prevents the locale middleware from returning a 301 to add the
+    prefixes, which makes tests more complicated.
+
+    It also ensures there is a user agent set in the header. The default is a
+    Firefox 14 on Linux useragent. It can be overridden by passing a
+    user_agent parameter to ``__init__``, setting ``self.user_agent`` to the
+    desired value, or by including ``HTTP_USER_AGENT`` in an individual
+    request. This behavior can be prevented by setting ``self.user_agent`` to
+    ``None``.
 
     """
+    def __init__(self, user_agent=None, *args, **kwargs):
+        self.user_agent = user_agent or ('Mozilla/5.0 (X11; Linux x86_64; '
+            'rv:14.0) Gecko/20100101 Firefox/14.0.1')
+        super(LocalizingClient, self).__init__(*args, **kwargs)
+
     def request(self, **request):
-        """Make a request, but prepend a locale if there isn't one already."""
+        """Make a request, ensuring it has a locale and a user agent."""
         # Fall back to defaults as in the superclass's implementation:
         path = request.get('PATH_INFO', self.defaults.get('PATH_INFO', '/'))
         locale, shortened = split_path(path)
         if not locale:
             request['PATH_INFO'] = '/%s/%s' % (settings.LANGUAGE_CODE,
                                                shortened)
+        if 'HTTP_USER_AGENT' not in request and self.user_agent:
+            request['HTTP_USER_AGENT'] = self.user_agent
+
         return super(LocalizingClient, self).request(**request)
 
 
