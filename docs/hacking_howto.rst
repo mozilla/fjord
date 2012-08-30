@@ -272,6 +272,17 @@ For more information, see the :ref:`test documentation
 <tests-chapter>`.
 
 
+Getting sample data
+===================
+
+You can get sample data in your db by running::
+
+    $ ./manage.py sampledata
+
+This will generate a bunch of sample data so that your Fjord instance
+has something to look at.
+
+
 Advanced install
 ================
 

@@ -19,7 +19,6 @@ Things to know about l10n
 
 :svn url:    https://svn.mozilla.org/projects/l10n-misc/trunk/input/locales
 :viewvc svn: http://viewvc.svn.mozilla.org/vc/projects/l10n-misc/trunk/input/locale/
-:
 
 
 Installing localizations from svn
