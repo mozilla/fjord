@@ -17,10 +17,11 @@ INSTALLED_APPS = tuple(INSTALLED_APPS) + (
     'django_nose',
     'test_utils',
 
-    'fjord.base',
-    'fjord.search',
-    'fjord.feedback',
     'fjord.analytics',
+    'fjord.base',
+    'fjord.feedback',
+    'fjord.sampledata',
+    'fjord.search',
 )
 
 MIDDLEWARE_CLASSES = tuple(MIDDLEWARE_CLASSES) + (
