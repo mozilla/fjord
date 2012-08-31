@@ -22,10 +22,10 @@ INSTALLED_APPS = get_apps(
 
         'adminplus',
         'django.contrib.admin',
-        'south',
         'django_nose',
-        'test_utils',
+        'djcelery',
         'jingo_minify',
+        'test_utils',
 
         'fjord.analytics',
         'fjord.base',
@@ -57,11 +57,16 @@ MINIFY_BUNDLES = {
     'css': {
         'base': (
             'css/lib/normalize.css',
-            'css/lib/jquery-ui.css',
             'css/fjord.less',
         ),
         'feedback': (
+            'css/lib/normalize.css',
             'css/feedback.less',
+        ),
+        'dashboard': (
+            'css/lib/normalize.css',
+            'css/fjord.less',
+            'css/dashboard.less',
         ),
     },
     'js': {
@@ -74,13 +79,22 @@ MINIFY_BUNDLES = {
             'js/init.js',
             'js/feedback.js',
         ),
+        'dashboard': (
+            'js/lib/jquery.min.js',
+            'js/lib/excanvas.js',
+            'js/lib/jquery.flot.js',
+            'js/lib/jquery.flot.time.js',
+            'js/lib/jquery.flot.resize.js',
+            'js/init.js',
+            'js/dashboard.js',
+        ),
     }
 }
 LESS_PREPROCESS = True
 JINGO_MINIFY_USE_STATIC = True
 
-LESS_BIN='lessc'
-JAVA_BIN='java'
+LESS_BIN = 'lessc'
+JAVA_BIN = 'java'
 
 # BrowserID configuration
 AUTHENTICATION_BACKENDS = [
@@ -131,7 +145,7 @@ DOMAIN_METHODS['messages'] = [
 #    ('media/js/**.js', 'javascript'),
 # ]
 
-LOGGING = dict(loggers=dict(playdoh = {'level': logging.DEBUG}))
+LOGGING = dict(loggers=dict(playdoh={'level': logging.DEBUG}))
 
 # When set to True, this will cause a message to be displayed on all pages
 # that this is not production.
