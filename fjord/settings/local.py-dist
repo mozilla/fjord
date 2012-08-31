@@ -80,3 +80,7 @@ ENGAGE_ROBOTS = True
 # Uncomment this line if you are running a local development install without
 # HTTPS to disable HTTPS-only cookies.
 #SESSION_COOKIE_SECURE = False
+
+# When set to True, this will cause a message to be displayed on all pages
+# that this is not production.
+STAGE=False

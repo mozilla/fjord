@@ -19,6 +19,11 @@ $(document).ready(function(){
 
         return false;
     });
+
+    // Allow elements to have a close button
+    $('.close-button').live('click', function(e) {
+        $(this).parent().fadeOut(300, function() { $(this).remove(); });
+    });
 });
 
 /* Fake the placeholder attribute since Firefox doesn't support it.
@@ -39,7 +44,7 @@ jQuery.fn.placeholder = function() {
         var $this = $(this),
             text = $this.attr('placeholder');
 
-        if ($this.val() == '') {
+        if ($this.val() === '') {
             $this.val(text).addClass('placeholder');
         }
     }).each(function(){
