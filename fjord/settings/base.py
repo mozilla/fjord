@@ -86,3 +86,8 @@ DOMAIN_METHODS['messages'] = [
 # ]
 
 LOGGING = dict(loggers=dict(playdoh = {'level': logging.DEBUG}))
+
+ES_HOSTS = ['127.0.0.1:9200']
+ES_INDEXES = {'default': 'inputindex'}
+ES_INDEX_PREFIX = 'input'
+ES_INDEXING_TIMEOUT = 30
