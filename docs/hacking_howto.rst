@@ -101,6 +101,11 @@ If you want to use your system's package manager, you'll need to go
 through ``requirements/compiled.txt`` and install the dependencies by
 hand.
 
+**OSX Mountain Lion**: One of the things in ``requirements/compiled.txt`` is
+MySQL Python library.  If you're using OSX Mountain Lion, then
+`<http://stackoverflow.com/questions/11787012/how-to-install-mysqldb-on-mountain-lion>`_
+should help you install it.
+
 
 Python Packages
 ---------------
@@ -255,10 +260,12 @@ Let's do the setup required for running tests.
 You'll need to add an extra grant in MySQL for your database user::
 
     $ mysql -u root -p
-    mysql> GRANT ALL ON test_NAME.* TO USER@localhost;
+    mysql> GRANT ALL ON test_fjord.* TO fjord@localhost;
 
-Where ``NAME`` and ``USER`` are the same as the values in your
-database configuration.
+.. Note::
+
+   If you used different values, make sure to substitute your values in the
+   correct places in the rest of the instructions.
 
 The test suite will create and use this database, to keep any data in
 your development database safe from tests.
