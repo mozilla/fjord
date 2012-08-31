@@ -1,8 +1,8 @@
 .. _vendor-chapter:
 
-==============
-Vendor Library
-==============
+==========================
+Maintaining Vendor Library
+==========================
 
 To help make setup faster and deployment easier, we pull all of our
 pure-Python dependencies into the "vendor library". This chapter talks about that.
@@ -137,10 +137,21 @@ Adding a library with pip
 Adding a new library with pip is easy using pip::
 
     $ pip install --no-install --build=vendor-local/packages \
-        --src=vendor-local/src -I <LIBRARY-DIR>
+        --src=vendor-local/src -I <LIBRARY>
     $ cd vendor-local
     $ git add packages
-    $ vim fjord.pth  # Add any new libraries' paths.
+    $ vim vendor.pth
+
+    <Add the new library's path>
+
     $ git ci -m "Adding <LIBRARY>"
 
 Make sure you add any dependencies from the new library, as well.
+
+.. Note::
+
+   Need to add a specific version of the library? You can tell pip to install
+   a specific version using ``==``. For example::
+
+       $ pip install --no-install --build=vendor-local/packages \
+           --src=vendor-local/src -I pyes==0.16
