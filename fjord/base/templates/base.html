@@ -21,25 +21,34 @@
   </head>
   <body id="{% block body_id %}{% endblock %}" class="html-{{ DIR }}">
     <nav id="nav-access">
-    <ul>
-      <li><a href="#main-content">{{ _('Proceed to main content') }}</a></li>
-      <li><a href="#footer">{{ _('Proceed to footer') }}</a></li>
-    </ul>
+      <ul>
+        <li><a href="#main-content">{{ _('Proceed to main content') }}</a></li>
+        <li><a href="#footer">{{ _('Proceed to footer') }}</a></li>
+      </ul>
     </nav>
 
     {% block site_header %}
-    <header>
-      <h1 class="title"><a href="#">
-        {% trans %}
-          <strong>Firefox</strong> Input Dashboard
-        {% endtrans %}
-      </a></h1>
+      <header>
+        <h1 class="title"><a href="#">
+          {% trans %}
+            <strong>Firefox</strong> Input Dashboard
+          {% endtrans %}
+        </a></h1>
 
-      <ul>
-        <li><a class="dashboard" href="{{ url('dashboard') }}"><span>{{ _('Dashboard') }}</span></a></li>
-      </ul>
-    </header>
+        <ul>
+          <li><a class="dashboard" href="{{ url('dashboard') }}"><span>{{ _('Dashboard') }}</span></a></li>
+        </ul>
+      </header>
     {% endblock site_header %}
+
+    {% if settings.STAGE %}
+      <div class="stage-banner">
+        <div class="close-button">X</div>
+        This is the staging site. The production site is
+        <a href="http://input.mozilla.org">here</a>.
+      </div>
+    {% endif %}
+
 
     <div id="content">
       {% block content %}{% endblock %}
