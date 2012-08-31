@@ -156,11 +156,10 @@ Copy the file ``local.py-dist`` in the ``fjord/settings`` directory to
 * Fill in a value for ``HMAC_KEYS``. This should also be a random string, the
   longer the better. It is used as a sort of 'pepper' analagous to the password
   salt. Not supplying this will make cause user generation to fail.
-* Set ``CELERY_ALWAYS_EAGER = False``, which allows running Fjord without
-  running Celery---all tasks will be done synchronously.
 * Set ``SESSION_COOKIE_SECURE = False``, unless you plan on using https.
 
-Now you can copy and modify any settings from ``settings/base.py`` into
+Now you can copy and modify any settings from ``settings/base.py`` and
+``vendor/src/funfactory/funfactory/settings_base.py`` into
 ``settings/local.py`` and the value will override the default.
 
 .. Note::
