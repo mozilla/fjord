@@ -17,7 +17,7 @@ Things to know about l10n
    minutes that updates the svn locale repository so that translators
    can see the latest stuff
 
-:svn url:    https://svn.mozilla.org/projects/l10n-misc/trunk/input/locales
+:svn url:    https://svn.mozilla.org/projects/l10n-misc/trunk/input/locale
 :viewvc svn: http://viewvc.svn.mozilla.org/vc/projects/l10n-misc/trunk/input/locale/
 
 
