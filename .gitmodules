@@ -7,3 +7,6 @@
 [submodule "vendor-local/src/django-adminplus"]
 	path = vendor-local/src/django-adminplus
 	url = git://github.com/jsocol/django-adminplus.git
+[submodule "vendor-local/src/elasticutils"]
+	path = vendor-local/src/elasticutils
+	url = git://github.com/mozilla/elasticutils.git
