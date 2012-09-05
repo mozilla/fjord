@@ -92,3 +92,10 @@ LOGGING = dict(loggers=dict(playdoh = {'level': logging.DEBUG}))
 # When set to True, this will cause a message to be displayed on all pages
 # that this is not production.
 STAGE = False
+
+# ElasticSearch settings.
+ES_HOSTS = ['127.0.0.1:9200']
+ES_INDEXES = {'default': 'inputindex'}
+ES_INDEX_PREFIX = 'input'
+ES_INDEXING_TIMEOUT = 30
+ES_TEST_SLEEP_DURATING = 0
