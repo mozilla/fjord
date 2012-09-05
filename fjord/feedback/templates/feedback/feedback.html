@@ -1,18 +1,11 @@
 {% extends "base.html" %}
 
 {% block site_css %}
-  {% compress css %}
-  <link rel="stylesheet" type="text/less" href="{{ static('css/feedback.less') }}">
-  {% endcompress %}
+  {{ css('feedback') }}
 {% endblock %}
 
 {% block site_js %}
-  {{ super() }}
-  {% compress js %}
-  <script src="{{ static('js/lib/jquery.min.js') }}"></script>
-  <script src="{{ static('js/init.js') }}"></script>
-  <script src="{{ static('js/feedback.js') }}"></script>
-  {% endcompress %}
+  {{ js('feedback') }}
 {% endblock %}
 
 {% block page_title %}{{ _('Submit Feedback') }}{% endblock %}
