@@ -1,9 +1,11 @@
 from django.db import models
-from tower import ugettext_lazy as _
 
+from elasticutils.contrib.django.models import Indexable
+from tower import ugettext_lazy as _
 
 from fjord.base.models import ModelBase
 from fjord.base.util import smart_truncate
+from fjord.search.models import register_mapping_type, FjordMappingType
 
 
 class Simple(ModelBase):
@@ -54,3 +56,38 @@ class Simple(ModelBase):
     #     return ('xxx', [str(self.id)])
 
 
+class SimpleIndex(FjordMappingType, Indexable):
+    @classmethod
+    def get_model(cls):
+        return Simple
+
+    @classmethod
+    def get_mapping(cls):
+        return {
+            'id': {'type': 'integer'},
+            'prodchan': {'type': 'string', 'index': 'not_analyzed'},
+            'happy': {'type': 'boolean'},
+            'url': {'type': 'string', 'index': 'not_analyzed'},
+            'description': {'type': 'string', 'analyzer': 'snowball'},
+            'user_agent': {'type': 'string', 'index': 'not_analyzed'},
+            'browser': {'type': 'string', 'analyzer': 'keyword'},
+            'browser_version': {'type': 'string', 'index': 'not_analyzed'},
+            'platform': {'type': 'string', 'analyzer': 'keyword'},
+            'locale': {'type': 'string', 'analyzer': 'keyword'},
+            'created': {'type': 'date'}
+            }
+
+    @classmethod
+    def extract_document(cls, obj_id, obj=None):
+        if obj is None:
+            obj = cls.get_model().objects.get(pk=obj_id)
+
+        # Cheating here because at the moment, everything is
+        # straight-forward. When that ceases to be the case,
+        # we should stop cheating.
+        mapping = cls.get_mapping()
+        return dict((field, getattr(obj, field))
+                    for field in mapping.keys())
+
+
+register_mapping_type(SimpleIndex)
