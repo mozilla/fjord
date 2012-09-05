@@ -1,8 +1,9 @@
+.. _l10n-chapter:
+
 ==================
  Maintaining l10n
 ==================
 
-.. _l10n-installing-from-svn:
 
 Things to know about l10n
 =========================

@@ -23,10 +23,10 @@ Part 1: Contributor's Guide
 
    contributors
    hacking_howto
-   advanced_installation
    conventions
    testing
    db
+   es
    l10n
    vendor
 

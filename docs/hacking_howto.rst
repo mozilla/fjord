@@ -296,5 +296,7 @@ After reading the above, you should have everything you need for a
 minimal working install which lets you run Fjord and work on many
 parts of it.
 
-However, it's missing some components. See
-:ref:`advanced-installation-chapter` for everything else.
+However, it's missing some things:
+
+* locales: See :ref:`l10n-chapter` for details.
+* ElasticSearch: See :ref:`es-chapter` for details.

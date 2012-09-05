@@ -94,8 +94,25 @@ LOGGING = dict(loggers=dict(playdoh = {'level': logging.DEBUG}))
 STAGE = False
 
 # ElasticSearch settings.
+
+# List of hostname:port strings for all the ES hosts we should connect
+# to.
 ES_HOSTS = ['127.0.0.1:9200']
+
+# Dict of mapping-type-name -> index-name to use. Input pretty much
+# uses one index, so this should be some variation of:
+# {'default': 'inputindex'}.
 ES_INDEXES = {'default': 'inputindex'}
+
+# Prefix for the index. This allows -dev and -stage to share the same
+# ES cluster, but not bump into each other.
 ES_INDEX_PREFIX = 'input'
+
+# The indexing timeout to use. 30s is good.
 ES_INDEXING_TIMEOUT = 30
-ES_TEST_SLEEP_DURATING = 0
+
+# The sleep duration between indexing and querying. If you're using a
+# VM then setting this to a positive integer like 1 or 2 might
+# alleviate problems with tests failing because ElasticSearch can't
+# keep up.
+ES_TEST_SLEEP_DURATION = 0
