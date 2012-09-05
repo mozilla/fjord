@@ -81,13 +81,14 @@ Adding a new library with git submodules
 Run::
 
     $ cd vendor-local/src
-    $ git clone <REPO>
-    $ git checkout <REV>
-    $ cd ../..
+    $ git clone <LIBRARY-REPO>
+    $ cd <LIBRARY-DIR>
+    $ git checkout <LIBRARY-REPO-REV>
+    $ cd ../../..                      # back to fjord project root
     $ vendor-local/addsubmodules.sh
     $ vim vendor-local/vendor.pth
 
-    <Add the new library's path>
+    <Add the new library's dir>
 
     $ git add vendor-local/vendor.pth
     $ git ci -m "[bug xyz] Add <LIBRARY>"
@@ -97,7 +98,6 @@ Run::
 
    Use the ``git://`` url for a repository and not the ``http://``
    one. The git protocol is more resilient and faster to clone over.
-
 
 
 Updating a library with pip
