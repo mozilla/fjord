@@ -1,2 +1,4 @@
 src/django-cache-machine
 src/django-adminplus
+src/elasticutils
+packages/pyes
