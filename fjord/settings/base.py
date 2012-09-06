@@ -13,6 +13,8 @@ PROJECT_MODULE = 'fjord'
 ROOT_URLCONF = '%s.urls' % PROJECT_MODULE
 
 INSTALLED_APPS = tuple(INSTALLED_APPS) + (
+    'adminplus',
+    'django.contrib.admin',
     'south',
     'django_nose',
     'test_utils',
@@ -37,6 +39,7 @@ LOCALE_PATHS = (
 # apps here:
 JINGO_EXCLUDE_APPS = [
     'admin',
+    'adminplus',
     'registration',
 ]
 
