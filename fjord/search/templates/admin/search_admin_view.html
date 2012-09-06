@@ -1,0 +1,103 @@
+{% extends "admin/base_site.html" %}
+{% block content_title %}
+<h1>Elastic Search - Admin View</h1>
+{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style type="text/css">
+    section {
+      margin: 1em 0em 1em 0em;
+    }
+    div#content div {
+      margin-bottom: .5em;
+    }
+    .disabled {
+      color: #ccc;
+    }
+    progress {
+      width: 400px;
+    }
+    dd {
+      margin-left: 1em;
+    }
+    input[type="submit"].DANGER {
+      border: 3px red solid;
+      font: bold 12px/14px serif;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <p>
+    Page last rendered: {{ now }} {{ settings.TIME_ZONE }}
+  </p>
+
+  {% if error_messages %}
+    <section>
+      <h1>Errors</h1>
+      {% for msg in error_messages %}
+        <p>
+          {{ msg }}
+        </p>
+      {% endfor %}
+    </section>
+  {% endif %}
+
+  <section>
+    <h1>Settings</h1>
+    <p>
+      Settings at the time this page was loaded:
+    </p>
+    <table>
+      <tr><th>ES_HOSTS</th><td>{{ settings.ES_HOSTS }}</td></tr>
+      <tr><th>ES_INDEX_PREFIX</th><td>{{ settings.ES_INDEX_PREFIX }}</td></tr>
+      <tr><th>ES_INDEXES</th><td>{{ settings.ES_INDEXES }}</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h1>Index Status</h1>
+    <p>
+      All indexes available:
+    </p>
+    <table>
+      <thead>
+        <th>index name</th>
+        <th>total documents in index</th>
+        <th></th>
+        <th></th>
+      </thead>
+      <tbody>
+        {% for index_name, index_count in indexes %}
+          <tr>
+            <td>{{ index_name }}</td><td>{{ index_count }}</td>
+            <td>
+              {% if index_name == index %}
+                IN USE
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <h2>Index ({{ index }})</h2>
+    {% if mapping_type_stats == None %}
+      <p>
+        Index does not exist.
+      </p>
+    {% else %}
+      <table>
+        <thead>
+          <th>mapping type</th>
+          <th>count</th>
+        </thead>
+        <tbody>
+          {% for stats_name, stats_count in mapping_type_stats.items %}
+            <tr><td>{{ stats_name }}</td><td>{{ stats_count }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </section>
+{% endblock %}
