@@ -12,32 +12,34 @@ PROJECT_MODULE = 'fjord'
 # Defines the views served for root URLs.
 ROOT_URLCONF = '%s.urls' % PROJECT_MODULE
 
-# Remove some built in apps we don't want.
-blacklist = ['compressor']
-INSTALLED_APPS = tuple(a for a in INSTALLED_APPS if a not in blacklist)
-# Add our apps.
-INSTALLED_APPS = INSTALLED_APPS + (
-    # south has to come early, otherwise tests fail.
-    'south',
+INSTALLED_APPS = get_apps(
+    exclude=(
+        'compressor',
+    ),
+    append=(
+        # south has to come early, otherwise tests fail.
+        'south',
 
-    'adminplus',
-    'django.contrib.admin',
-    'django_nose',
-    'djcelery',
-    'jingo_minify',
-    'test_utils',
+        'adminplus',
+        'django.contrib.admin',
+        'south',
+        'django_nose',
+        'test_utils',
+        'jingo_minify',
 
-    'fjord.analytics',
-    'fjord.base',
-    'fjord.feedback',
-    'fjord.sampledata',
-    'fjord.search',
-)
+        'fjord.analytics',
+        'fjord.base',
+        'fjord.feedback',
+        'fjord.sampledata',
+        'fjord.search',
+    ))
 
-MIDDLEWARE_CLASSES = tuple(MIDDLEWARE_CLASSES) + (
-    'fjord.base.middleware.MobileQueryStringOverrideMiddleware',
-    'fjord.base.middleware.ParseUseragentMiddleware',
-)
+MIDDLEWARE_CLASSES = get_middleware(
+    exclude=(),
+    append=(
+        'fjord.base.middleware.MobileQueryStringOverrideMiddleware',
+        'fjord.base.middleware.ParseUseragentMiddleware',
+    ))
 
 LOCALE_PATHS = (
     os.path.join(ROOT, PROJECT_MODULE, 'locale'),
@@ -91,9 +93,11 @@ LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = 'examples.home'
 LOGIN_REDIRECT_URL_FAILURE = 'examples.home'
 
-TEMPLATE_CONTEXT_PROCESSORS = list(TEMPLATE_CONTEXT_PROCESSORS) + [
-    'django_browserid.context_processors.browserid_form',
-]
+TEMPLATE_CONTEXT_PROCESSORS = get_template_context_processors(
+    exclude=(),
+    append=(
+        'django_browserid.context_processors.browserid_form',
+    ))
 
 # Should robots.txt deny everything or disallow a calculated list of URLs we
 # don't want to be crawled?  Default is false, disallow everything.
