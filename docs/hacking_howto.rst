@@ -221,7 +221,8 @@ migrations. To get an initial database set up, run::
 
 You'll now have an empty but up-to-date database!
 
-Finally, you'll probably want to create a superuser. Just use Django's
+Finally, if you weren't asked to create a superuser and created one already,
+you'll probably want to create a superuser. Just use Django's
 ``createsuperuser`` management command::
 
     $ ./manage.py createsuperuser
