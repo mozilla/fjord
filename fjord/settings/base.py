@@ -17,6 +17,8 @@ blacklist = ['compressor']
 INSTALLED_APPS = tuple(a for a in INSTALLED_APPS if a not in blacklist)
 # Add our apps.
 INSTALLED_APPS = INSTALLED_APPS + (
+    'adminplus',
+    'django.contrib.admin',
     'south',
     'django_nose',
     'test_utils',
@@ -42,6 +44,7 @@ LOCALE_PATHS = (
 # apps here:
 JINGO_EXCLUDE_APPS = [
     'admin',
+    'adminplus',
     'registration',
 ]
 
