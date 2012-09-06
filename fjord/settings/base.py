@@ -12,10 +12,15 @@ PROJECT_MODULE = 'fjord'
 # Defines the views served for root URLs.
 ROOT_URLCONF = '%s.urls' % PROJECT_MODULE
 
-INSTALLED_APPS = tuple(INSTALLED_APPS) + (
+# Remove some built in apps we don't want.
+blacklist = ['compressor']
+INSTALLED_APPS = tuple(a for a in INSTALLED_APPS if a not in blacklist)
+# Add our apps.
+INSTALLED_APPS = INSTALLED_APPS + (
     'south',
     'django_nose',
     'test_utils',
+    'jingo_minify',
 
     'fjord.analytics',
     'fjord.base',
@@ -39,6 +44,35 @@ JINGO_EXCLUDE_APPS = [
     'admin',
     'registration',
 ]
+
+MINIFY_BUNDLES = {
+    'css': {
+        'base': (
+            'css/lib/normalize.css',
+            'css/lib/jquery-ui.css',
+            'css/fjord.less',
+        ),
+        'feedback': (
+            'css/feedback.less',
+        ),
+    },
+    'js': {
+        'base': (
+            'js/lib/jquery.min.js',
+            'js/init.js',
+        ),
+        'feedback': (
+            'js/lib/jquery.min.js',
+            'js/init.js',
+            'js/feedback.js',
+        ),
+    }
+}
+LESS_PREPROCESS = True
+JINGO_MINIFY_USE_STATIC = True
+
+LESS_BIN='lessc'
+JAVA_BIN='java'
 
 # BrowserID configuration
 AUTHENTICATION_BACKENDS = [

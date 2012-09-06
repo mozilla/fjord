@@ -7,12 +7,7 @@
     <![endif]-->
 
     {% block site_css %}
-      {% compress css %}
-        <link rel="stylesheet" href="{{ static('css/lib/normalize.css') }}">
-        <link rel="stylesheet" href="{{ static('css/lib/jquery-ui.css') }}">
-        <link rel="stylesheet" type="text/less" href="{{ static('css/fjord.less') }}">
-      {% endcompress %}
-      <!--[if IE]><link href="{{ MEDIA_URL }}css/ie.css" rel="stylesheet" type="text/css"><![endif]-->
+      {{ css('base') }}
     {% endblock %}
 
     <link rel="shortcut icon" type="image/png" href="{{ MEDIA_URL }}img/favicon.png"/>
@@ -59,11 +54,7 @@
     {% endblock %}
 
     {% block site_js %}
-      {% compress js %}
-        <script src="{{ static('js/lib/jquery.min.js') }}"></script>
-        <script src="{{ static('js/init.js') }}"></script>
-      {% endcompress %}
+      {{ js('base') }}
     {% endblock %}
-    {% block js %}{% endblock %}
   </body>
 </html>
