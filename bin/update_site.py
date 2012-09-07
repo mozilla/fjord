@@ -89,8 +89,9 @@ def update_site(env, debug):
         (CHDIR, os.path.join(here)),
         (EXEC, 'python2.6 manage.py migrate --all'),
         (EXEC, 'python2.6 manage.py collectstatic --noinput'),
-        # un-comment if you haven't moved to django-compressor yet
-        #(EXEC, 'python2.6 manage.py compress_assets'),
+        # un-comment if you you're using jingo-minify and not
+        # django-compressor
+        (EXEC, 'python2.6 manage.py compress_assets'),
     ]
 
     for cmd, cmd_args in commands:
