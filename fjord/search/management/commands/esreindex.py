@@ -3,7 +3,7 @@ from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
 
-from fjord.search.utils import es_reindex_cmd
+from fjord.search.index import es_reindex_cmd
 
 
 class Command(BaseCommand):

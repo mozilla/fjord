@@ -1,7 +1,7 @@
 from nose.tools import eq_
 from test_utils import TestCase
 
-from fjord.search.utils import chunked
+from fjord.search.index import chunked
 
 
 class ChunkedTests(TestCase):

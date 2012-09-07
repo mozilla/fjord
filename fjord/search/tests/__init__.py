@@ -5,8 +5,7 @@ import pyes.exceptions
 from nose import SkipTest
 from test_utils import TestCase
 
-from fjord.search.models import get_index
-from fjord.search.utils import get_indexing_es
+from fjord.search.index import get_index, get_indexing_es
 
 
 class ElasticTestCase(TestCase):

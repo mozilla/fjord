@@ -2,7 +2,7 @@ import logging
 
 from django.core.management.base import BaseCommand, CommandError
 
-from fjord.search.utils import es_delete_cmd
+from fjord.search.index import es_delete_cmd
 
 
 class Command(BaseCommand):

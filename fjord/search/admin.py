@@ -3,12 +3,10 @@ from datetime import datetime
 
 from django.contrib import admin
 from django.shortcuts import render
-from django.template import RequestContext
 
 import pyes
 
-from fjord.search import utils
-from fjord.search.models import get_index
+from fjord.search.index import get_index, get_index_stats, get_indexes
 
 
 log = logging.getLogger('i.search')
@@ -24,10 +22,10 @@ def search_admin_view(request):
         # This gets index stats, but also tells us whether ES is in
         # a bad state.
         try:
-            stats = utils.get_index_stats()
+            stats = get_index_stats()
         except pyes.exceptions.IndexMissingException:
             stats = None
-        indexes = utils.get_indexes()
+        indexes = get_indexes()
         indexes.sort(key=lambda m: m[0])
 
     except pyes.urllib3.MaxRetryError:
