@@ -73,6 +73,14 @@ def format_time(time_to_go):
     return  "%dm %ds" % (time_to_go / 60, time_to_go % 60)
 
 
+def create_batch_id():
+    """Returns a batch_id"""
+    # TODO: This is silly, but it's a good enough way to distinguish
+    # between batches by looking at a Record. This is just over the
+    # number of seconds in a day.
+    return str(int(time.time()))[-6:]
+
+
 def chunked(iterable, n):
     """Return chunks of n length of iterable.
 

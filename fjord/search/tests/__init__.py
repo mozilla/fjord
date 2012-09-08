@@ -5,7 +5,9 @@ import pyes.exceptions
 from nose import SkipTest
 from test_utils import TestCase
 
+from fjord.base.tests import with_save
 from fjord.search.index import get_index, get_indexing_es
+from fjord.search.models import Record
 
 
 class ElasticTestCase(TestCase):
@@ -43,7 +45,6 @@ class ElasticTestCase(TestCase):
 
         super(ElasticTestCase, self).setUp()
         self.setup_indexes()
-        self.refresh(settings.ES_TEST_SLEEP_DURATION)
 
     def tearDown(self):
         super(ElasticTestCase, self).tearDown()
@@ -61,14 +62,32 @@ class ElasticTestCase(TestCase):
 
         get_indexing_es().refresh(index, timesleep=timesleep)
 
-    def setup_indexes(self):
+    def setup_indexes(self, empty=False):
         """(Re-)create ES indexes."""
-        from fjord.search.utils import es_reindex_cmd
+        from fjord.search.index import es_reindex_cmd
 
-        # This removes the previous round of indexes and creates new
-        # ones with mappings and all that.
-        es_reindex_cmd()
+        if empty:
+            # Removes the index and creates a new one with nothing in
+            # it (by abusing the percent argument).
+            es_reindex_cmd(percent=0)
+        else:
+            # Removes the index, creates a new one, and indexes
+            # existing data into it.
+            es_reindex_cmd()
+
+        self.refresh(settings.ES_TEST_SLEEP_DURATION)
 
     def teardown_indexes(self):
         es = get_indexing_es()
         es.delete_index_if_exists(get_index())
+
+
+@with_save
+def record(**kwargs):
+    """Model maker for fjord.search.models.Record."""
+    defaults = {
+        'batch_id': 'ou812',
+        'name': 'Frank'
+        }
+    defaults.update(kwargs)
+    return Record(**defaults)

@@ -31,6 +31,10 @@
 {% block content %}
   <p>
     Page last rendered: {{ now }} {{ settings.TIME_ZONE }}
+    {% if outstanding_records %}
+      (Auto-refreshing every 30 seconds)
+      <script>setTimeout("window.location.reload(true);", 30000);</script>
+    {% endif %}
   </p>
 
   {% if error_messages %}
@@ -41,6 +45,15 @@
           {{ msg }}
         </p>
       {% endfor %}
+    </section>
+  {% endif %}
+
+  {% if outstanding_records %}
+    <section>
+      <h1>{{ outstanding_records|length }} Outstanding indexing tasks</h1>
+      <p>
+        <a href="{{ request.path }}">Refresh page</a>
+      </p>
     </section>
   {% endif %}
 
@@ -99,5 +112,73 @@
         </tbody>
       </table>
     {% endif %}
+  </section>
+
+  <section>
+    <h1>Reindexing history</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>batchid :: name</th>
+          <th>status</th>
+          <th>creation time</th>
+          <th>start time</th>
+          <th>end time</th>
+          <th>delta</th>
+          <th>message</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for record in recent_records %}
+          <tr>
+            <td>{{ record.batch_id }} :: {{ record.name }}</td>
+            <td>{{ record.get_status_display }}</td>
+            <td>{{ record.creation_time }}</td>
+            <td>{{ record.start_time }}</td>
+            <td>{{ record.end_time }}</td>
+            <td>
+              {% if record.start_time and record.end_time %}
+                ({{ record.delta }})
+              {% endif %}
+            </td>
+            <td>{{ record.message }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h1>Reindex</h1>
+    {% if outstanding_records %}
+      <p class="errornote">
+        WARNING! There are outstanding index tasks! Don't launch another
+        indexing pass unless you really know you want to.
+      </p>
+    {% endif %}
+    <h2>Delete existing index, recreate it and index everything</h2>
+    <p>
+      This <strong>DELETES</strong> the existing index, recreates it
+      with the mappings, and indexes into the new index.
+    </p>
+    <form method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="delete_index" value="1">
+      <input class="DANGER" type="submit" name="reindex"
+             value="DELETE index and index into {{ index }}"
+             {% if outstanding_records %}disabled{% endif %}>
+    </form>
+
+    <h2>Mark outstanding records as failed</h2>
+    <p>
+      This marks outstanding records as fail. This allows you to run a
+      new reindexing pass.
+    </p>
+    <form method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="reset" value="1">
+      <input type="submit" name="reset"
+             value="Mark records as failed">
+    </form>
   </section>
 {% endblock %}

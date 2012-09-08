@@ -17,12 +17,15 @@ blacklist = ['compressor']
 INSTALLED_APPS = tuple(a for a in INSTALLED_APPS if a not in blacklist)
 # Add our apps.
 INSTALLED_APPS = INSTALLED_APPS + (
+    # south has to come early, otherwise tests fail.
+    'south',
+
     'adminplus',
     'django.contrib.admin',
-    'south',
     'django_nose',
-    'test_utils',
+    'djcelery',
     'jingo_minify',
+    'test_utils',
 
     'fjord.analytics',
     'fjord.base',
