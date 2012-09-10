@@ -1,51 +1,67 @@
-from django.conf import settings
+import datetime
 
-from elasticutils.contrib.django.models import DjangoMappingType
-
-
-# Note: This module should not import any Fjord modules. Otherwise we
-# get into import recursion issues.
+from django.db import models
 
 
-_mapping_types = {}
+# Note: This doesn't extend our caching ModelBase because we
+# explicitly want the livest data possible and not cached data.
 
+class Record(models.Model):
+    """Indexing record."""
+    STATUS_NEW = 0
+    STATUS_IN_PROGRESS = 1
+    STATUS_FAIL = 2
+    STATUS_SUCCESS = 3
 
-def register_mapping_type(mapping_type):
-    """Registers a mapping type.
+    STATUS_CHOICES = (
+        (STATUS_NEW, 'new'),
+        (STATUS_IN_PROGRESS, 'in progress'),
+        (STATUS_FAIL, 'done - fail'),
+        (STATUS_SUCCESS, 'done - success'),
+        )
 
-    This gives us a way to get all the registered mapping types for
-    indexing.
+    batch_id = models.CharField(max_length=10)
+    name = models.CharField(max_length=255)
+    creation_time = models.DateTimeField(auto_now_add=True)
+    start_time = models.DateTimeField(null=True)
+    end_time = models.DateTimeField(null=True)
+    status = models.IntegerField(choices=STATUS_CHOICES, default=STATUS_NEW)
+    message = models.CharField(max_length=255, blank=True)
 
-    """
-    _mapping_types[mapping_type.get_mapping_type_name()] = mapping_type
+    def delta(self):
+        """Return the timedelta."""
+        if self.start_time and self.end_time:
+            return self.end_time - self.start_time
+        return None
 
+    def _complete(self, status, msg='Done'):
+        self.end_time = datetime.datetime.now()
+        self.status = status
+        self.message = msg
 
-def get_mapping_types(mapping_types=None):
-    """Returns a dict of name -> mapping type.
+    def mark_fail(self, msg):
+        """Mark as failed.
 
-    :arg mapping_types: list of mapping type names to restrict
-        the dict to.
+        :arg msg: the error message it failed with
 
-    """
-    if mapping_types is None:
-        return _mapping_types
+        """
+        self._complete(self.STATUS_FAIL, msg)
+        self.save()
 
-    return dict((key, val) for key, val in _mapping_types.items()
-                if key in mapping_types)
+    def mark_success(self, msg='Success'):
+        """Mark as succeeded.
 
+        :arg msg: success message if any
 
-def get_index():
-    """Returns the index we're using."""
+        """
+        self._complete(self.STATUS_SUCCESS, msg)
+        self.save()
 
-    # Note: This could probably be defined in utils, but it's defined
-    # here because otherwise models imports utils and utils imports
-    # models and that turns into a mess.
-    return '%s-%s' % (settings.ES_INDEX_PREFIX, settings.ES_INDEXES['default'])
-
-
-class FjordMappingType(DjangoMappingType):
-    """DjangoMappingType with correct index."""
     @classmethod
-    def get_index(cls):
-        return get_index()
+    def outstanding(cls):
+        """Return queryset of outstanding records."""
+        return cls.objects.filter(status__in=[
+                cls.STATUS_NEW, cls.STATUS_IN_PROGRESS])
 
+    def __unicode__(self):
+        return '%s:%s%s' % (self.batch_id, self.name, self.status)

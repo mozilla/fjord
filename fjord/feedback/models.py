@@ -5,7 +5,7 @@ from tower import ugettext_lazy as _
 
 from fjord.base.models import ModelBase
 from fjord.base.util import smart_truncate
-from fjord.search.models import register_mapping_type, FjordMappingType
+from fjord.search.index import register_mapping_type, FjordMappingType
 
 
 class Simple(ModelBase):

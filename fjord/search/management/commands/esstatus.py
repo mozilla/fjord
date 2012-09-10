@@ -2,7 +2,7 @@ import logging
 
 from django.core.management.base import BaseCommand
 
-from fjord.search.utils import es_status_cmd
+from fjord.search.index import es_status_cmd
 
 
 class Command(BaseCommand):

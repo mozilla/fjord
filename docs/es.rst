@@ -101,13 +101,9 @@ See ``--help`` for more details::
 
 .. Note::
 
-   Once you've indexed everything, if you have ``ES_LIVE_INDEXING``
-   set to ``True``, you won't have to do it again unless indexing code
-   changes. The models have ``post_save`` and ``pre_delete`` hooks
-   that will update the index as the data changes.
-
-
-.. Note::
+   TODO: This doesn't work with celery 2.1, but will when we upgrade
+   to something more recent. Leaving it here in the docs because we're
+   definitely upgrading.
 
    If you kick off indexing with the admin, then indexing gets done in
    chunks by celery tasks. If you need to halt indexing, you can purge
@@ -115,11 +111,10 @@ See ``--help`` for more details::
 
        $ ./manage.py celeryctl purge
 
-   If you purge the tasks, you need to reset the Redis scoreboard.
-   Connect to the appropriate Redis and set the value for the magic
-   key to 0. For example, my Redis is running at port 6383, so I::
+   If you purge the tasks, you need to cancel outstanding records. Run
+   this sql in mysql::
 
-       $ redis-cli -p 6383 set search:outstanding_index_chunks 0
+       UPDATE search_record SET status=2 WHERE status=0 or status=1;
 
    If you do this often, it helps to write a shell script for it.
 
@@ -150,7 +145,7 @@ Maintaining your index
 ======================
 
 When you add data to the database, it needs to be added to the index.
-This happens automatically in the post_save hook as long as celery
+This happens automatically in the ``post_save`` hook as long as celery
 tasks are being handled.
 
 You can also reindex everything using the admin or using the esreindex
