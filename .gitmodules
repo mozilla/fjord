@@ -12,4 +12,4 @@
 	url = git://github.com/mozilla/elasticutils.git
 [submodule "vendor-local/src/jingo-minify"]
 	path = vendor-local/src/jingo-minify
-	url = git://github.com/willkg/jingo-minify
+	url = git://github.com/jsocol/jingo-minify
