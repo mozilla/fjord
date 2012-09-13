@@ -1,8 +1,8 @@
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from funfactory.urlresolvers import reverse
-from mobility.decorators import mobile_template
+from session_csrf import anonymous_csrf_exempt
 
 from fjord.feedback.forms import SimpleForm
 from fjord.feedback import models
@@ -61,6 +61,7 @@ feedback_routes = {
 }
 
 
+@anonymous_csrf_exempt
 def feedback_router(request, formname=None, *args, **kwargs):
     # TODO: Route based on user agent detection.
     view = feedback_routes[formname]
