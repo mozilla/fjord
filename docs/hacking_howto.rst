@@ -163,9 +163,10 @@ Copy the file ``local.py-dist`` in the ``fjord/settings`` directory to
   salt. Not supplying this will make cause user generation to fail.
 * Set ``SESSION_COOKIE_SECURE = False``, unless you plan on using https.
 
-Now you can copy and modify any settings from ``settings/base.py`` and
+Now you can copy and modify any settings from
+``fjord/settings/base.py`` and
 ``vendor/src/funfactory/funfactory/settings_base.py`` into
-``settings/local.py`` and the value will override the default.
+``fjord/settings/local.py`` and the value will override the default.
 
 .. Note::
 
@@ -173,16 +174,46 @@ Now you can copy and modify any settings from ``settings/base.py`` and
     should be taken in production.
 
 
-Memcached
----------
+Cache
+-----
 
-Make sure you have Memcached running; it is used for caching database queries.
+Cache is configured with the ``CACHES`` setting in your
+``fjord/settings/local.py`` settings file..
 
-An easy way to flush the cache if things are going funny is like this::
+If you're running a developer environment, you can use the default
+``CACHES`` settings. It probably looks something like this::
 
-   echo "flush_all" | nc localhost 11211
+    CACHES = {
+        'default': {
+            'LOCATION': '',
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
+            }
+        }
 
-Assuming you have Memcached configured to listen to 11211.
+
+It's better to use memcached since that's closer to what we run in
+production. Here's a sample ``CACHES`` setting which assumes you're
+running memcached at port 11211 on localhost::
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'caching.backends.memcached.CacheClass',
+            'LOCATION': 'localhost:11211',
+            'TIMEOUT': 600,
+            'KEY_PREFIX': 'fjord'
+            }
+        }
+
+
+.. Note::
+
+   If you're using memcached, an easy way to flush the cache if things
+   are going funny is like this::
+
+       echo "flush_all" | nc localhost 11211
+
+   Assuming you have memcached configured to listen to 11211 on
+   localhost.
 
 
 LESS

@@ -3,3 +3,4 @@ src/django-adminplus
 src/elasticutils
 src/jingo-minify
 packages/pyes
+packages/python-memcached
