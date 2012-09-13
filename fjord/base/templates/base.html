@@ -36,10 +36,10 @@
       </header>
     {% endblock site_header %}
 
-    {% if settings.STAGE %}
+    {% if settings.SHOW_STAGE_NOTICE %}
       <div class="stage-banner">
         <div class="close-button">X</div>
-        This is the staging site. The production site is
+        This is a dev/staging site. The production site is
         <a href="http://input.mozilla.org">here</a>.
       </div>
     {% endif %}

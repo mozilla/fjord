@@ -131,7 +131,7 @@ LOGGING = dict(loggers=dict(playdoh = {'level': logging.DEBUG}))
 
 # When set to True, this will cause a message to be displayed on all pages
 # that this is not production.
-STAGE = False
+SHOW_STAGE_NOTICE = False
 
 # ElasticSearch settings.
 
