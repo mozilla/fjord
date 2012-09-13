@@ -1,8 +1,8 @@
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from funfactory.urlresolvers import reverse
-from mobility.decorators import mobile_template
+from session_csrf import anonymous_csrf
 
 from fjord.feedback.forms import SimpleForm
 from fjord.feedback import models
@@ -12,6 +12,7 @@ def thanks(request):
     return render(request, 'feedback/thanks.html')
 
 
+@anonymous_csrf
 def desktop_stable_feedback(request, template=None):
     # Use two instances of the same form because the template changes the text
     # based on the value of ``happy``.
