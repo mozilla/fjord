@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block page_title %}{{ _('Input Services Monitor') }}{% endblock %}
+
+{% macro status(b) %}
+  {% if b %}info{% else %}error{% endif %}
+{% endmacro %}
+
+{% block content %}
+  <div class="col">
+  </div>
+  <div class="col wide">
+    <div class="block monitor">
+      <h1>{{ _('Input Services Monitor') }}</h1>
+
+      {% if errors %}
+        <div class="notification-box error">
+          <h2>Errors</h2>
+          <ul>
+            {% for key, exc in errors.items() %}
+              <li>{{ key }}: {{ exc }}
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <div class="notification-box {{ status(status_summary.memcache) }}">
+        <h2>[Memcache] Connection Tests</h2>
+        <ul>
+        {% for ip, port, result in memcache_results %}
+          <li>{{ ip }}:{{ port }}
+          {% if result %}
+            Success
+          {% else %}
+            <strong>Failed</strong>
+          {% endif %}
+          </li>
+        {% else %}
+          <li>There are no memcache servers!</li>
+        {% endfor %}
+        </ul>
+        <p>There must be a minimum of 2 working servers.</p>
+      </div>
+
+      <div class="notification-box {{ status(status_summary.rabbitmq) }}">
+        <h2>[RabbitMQ] Message Broker Connection</h2>
+        <p>{{ rabbitmq_results }}</p>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block outer_side %}{% endblock %}
