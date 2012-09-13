@@ -12,7 +12,6 @@ def thanks(request):
     return render(request, 'feedback/thanks.html')
 
 
-@anonymous_csrf_exempt
 def desktop_stable_feedback(request, template=None):
     # Use two instances of the same form because the template changes the text
     # based on the value of ``happy``.
@@ -62,6 +61,7 @@ feedback_routes = {
 }
 
 
+@anonymous_csrf_exempt
 def feedback_router(request, formname=None, *args, **kwargs):
     # TODO: Route based on user agent detection.
     view = feedback_routes[formname]
