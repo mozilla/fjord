@@ -1,9 +1,15 @@
-from fjord.base.tests import TestCase, LocalizingClient, reverse
 from mobility.middleware import COOKIE as MOBILE_COOKIE
 from nose.tools import eq_
 
+from fjord.base.tests import LocalizingClient, reverse
+from fjord.search.tests import ElasticTestCase
 
-class MobileQueryStringOverrideTest(TestCase):
+
+# This is an ElasticTestCase instead of a normal one because the front page
+# (which this queries) uses elastic search. Being an ElasticTestCase makes
+# sure that the testing index is properly set up, instead of trying to access
+# a possibly missing index.
+class MobileQueryStringOverrideTest(ElasticTestCase):
     client_class = LocalizingClient
 
     def test_mobile_override(self):
@@ -23,4 +29,3 @@ class MobileQueryStringOverrideTest(TestCase):
                 'mobile': 0
                 })
         eq_(resp.cookies[MOBILE_COOKIE].value, 'off')
-
