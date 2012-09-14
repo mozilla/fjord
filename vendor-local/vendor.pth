@@ -4,3 +4,5 @@ src/elasticutils
 src/jingo-minify
 packages/pyes
 packages/python-memcached
+packages/pyquery
+packages/cssselect

@@ -1,5 +1,13 @@
 {% extends "base.html" %}
 
+{% block site_css %}
+  {{ css('dashboard') }}
+{% endblock %}
+
+{% block site_js %}
+  {{ js('dashboard') }}
+{% endblock %}
+
 {% macro feedback_block(feedback) -%}
   <li class="opinion">
     {% if feedback.happy %}
@@ -11,22 +19,50 @@
       {{ feedback.description }}
     </p>
     <ul class="meta">
-      <li>{{ feedback.created|naturaltime }}</li>
+      <li><time datetime="{{ feedback.created }}Z" title="{{ feedback.created }} UTC">{{ feedback.created|naturaltime }}</time></li>
       <li>{{ feedback.platform }}</li>
-      <li>{{ feedback.locale }}</li>
+      <li>{{ feedback.locale|locale_name }}</li>
     </ul>
   </li>
 {% endmacro -%}
+
+{% macro filter_block(filter_set) %}
+  <div class="filter">
+    <h3>{{ filter_set.display }}</h3>
+    <ul class="bars" data-total="{{ opinion_count }}" name="{{ filter_set.name }}">
+      {% for item in filter_set.options %}
+        <li data-value="{{ item.count }}">
+          <input name="{{ item.name }}" type="checkbox" value="{{ item.value }}"{% if item.checked %}checked{% endif %} />
+          <label class="bar" for="{{ item.name }}">
+            <span>{{ item.display }}</span>
+          </label>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endmacro %}
 
 {% block body_id %}dashboard{% endblock %}
 
 {% block content %}
 
 <div class="col">
-  <div class="block"></div>
+  <div class="block search">
+
+    {% for filter_set in filter_data %}
+      {{ filter_block(filter_set) }}
+    {% endfor %}
+
+  </div>
 </div>
 
 <div class="col wide">
+  <div class="block graph">
+    {# A graph will be dynamically inserted in these divs by Flot. #}
+    <div class="histogram" data-histogram="{{ histogram|to_json }}"></div>
+    <div class="legend"></div>
+  </div>
+
   <div class="block feedback">
     <h2>Latest Feedback</h2>
     <ul>
@@ -36,11 +72,15 @@
     </ul>
 
     <div class="pager">
-      {% if opinions.has_next() %}
-        <a class="older" href="?page={{ opinions.next_page_number() }}">Older Messages</a>
+      {% if next_page %}
+        <a class="older" href="{{ request.get_full_path()|urlparams(page=next_page) }}">
+          Older Messages
+        </a>
       {% endif %}
-      {% if opinions.has_previous() %}
-        <a class="newer" href="?page={{ opinions.previous_page_number() }}">Newer Messages</a>
+      {% if prev_page %}
+        <a class="newer" href="{{ request.get_full_path()|urlparams(page=prev_page) }}">
+          Newer Messages
+        </a>
       {% endif %}
     </div>
   </div>
@@ -50,10 +90,6 @@
   <div class="block count">
     <h3>Current search</h3>
     <p><strong>{{ opinion_count }}</strong> messages.</p>
-    <p>
-      <em>{{ opinion_count_happy }}</em> <span class="sprite happy">happy</span>
-      <em>{{ opinion_count_sad }}</em> <span class="sprite sad">sad</span>
-    </p>
   </div>
 </div>
 

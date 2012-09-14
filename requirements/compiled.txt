@@ -1,1 +1,2 @@
 -r ../vendor/src/funfactory/funfactory/requirements/compiled.txt
+lxml==2.3.5

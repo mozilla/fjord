@@ -13,13 +13,13 @@ def create_simple(happy, description, url=u'', ua=FIREFOX_LINUX_17,
         'happy': happy,
         'url': url,
         'description': description,
-        
+
         'user_agent': ua,
         'browser': parsed.browser,
         'browser_version': parsed.browser_version,
         'platform': parsed.platform,
-        'locale': locale
-        }
+        'locale': locale,
+    }
     obj = simple(**data)
     obj.save()
     return obj
