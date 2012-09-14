@@ -66,7 +66,7 @@ def monitor_view(request):
 
             if len(memcache_results) < 2:
                 status_summary['memcache'] = False
-                log.warning('You should have at least one memcache server. '
+                log.warning('You should have at least 2 memcache servers. '
                             'You have %s.' % len(memcache_results))
 
         if not memcache_results:
