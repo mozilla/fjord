@@ -1,10 +1,9 @@
 from django.shortcuts import render
 from django.template.defaultfilters import slugify
 
+import pyes
 from elasticutils import F
-
 from mobility.decorators import mobile_template
-
 from tower import ugettext as _
 
 from fjord.feedback.models import SimpleIndex
@@ -106,15 +105,25 @@ def dashboard(request, template):
     # This is probably something EU should be doing for us. Second, it
     # restructures the data into a more convenient form.
     counts = {'happy': {}, 'platform': {}, 'locale': {}}
-    for param, terms in facets.facet_counts().items():
-        for term in terms:
-            name = term['term']
-            if name == 'T':
-                name = True
-            elif name == 'F':
-                name = False
+    try:
+        for param, terms in facets.facet_counts().items():
+            for term in terms:
+                name = term['term']
+                if name == 'T':
+                    name = True
+                elif name == 'F':
+                    name = False
 
-            counts[param][name] = term['count']
+                counts[param][name] = term['count']
+    except (pyes.urllib3.TimeoutError,
+            pyes.urllib3.MaxRetryError,
+            pyes.exceptions.IndexMissingException,
+            pyes.exceptions.ElasticSearchException):
+
+        # TODO: Fix this--we should log an error or show a message or
+        # something--anything except an HTTP 500 error on the front
+        # page.
+        pass
 
     filter_data = [
         counts_to_options(counts['happy'].items(), name='happy',
@@ -128,21 +137,34 @@ def dashboard(request, template):
     ]
 
     # Histogram data
-    histograms = search.facet_raw(
-        happy={
-            'date_histogram': {'interval': 'day', 'field': 'created'},
-            'facet_filter': (f & F(happy=True)).filters
-        },
-        sad={
-            'date_histogram': {'interval': 'day', 'field': 'created'},
-            'facet_filter': (f & F(happy=False)).filters
-        },
-    ).facet_counts()
+    happy_data = []
+    sad_data = []
 
-    # p['time'] is number of milliseconds since the epoch. Which is
-    # convenient, because that is what the front end wants.
-    happy_data = [(p['time'], p['count']) for p in histograms['happy']]
-    sad_data = [(p['time'], int(p['count'])) for p in histograms['sad']]
+    try:
+        histograms = search.facet_raw(
+            happy={
+                'date_histogram': {'interval': 'day', 'field': 'created'},
+                'facet_filter': (f & F(happy=True)).filters
+            },
+            sad={
+                'date_histogram': {'interval': 'day', 'field': 'created'},
+                'facet_filter': (f & F(happy=False)).filters
+            },
+        ).facet_counts()
+
+        # p['time'] is number of milliseconds since the epoch. Which is
+        # convenient, because that is what the front end wants.
+        happy_data = [(p['time'], p['count']) for p in histograms['happy']]
+        sad_data = [(p['time'], int(p['count'])) for p in histograms['sad']]
+    except (pyes.urllib3.TimeoutError,
+            pyes.urllib3.MaxRetryError,
+            pyes.exceptions.IndexMissingException,
+            pyes.exceptions.ElasticSearchException):
+
+        # TODO: Fix this--we should log an error or show a message or
+        # something--anything except an HTTP 500 error on the front
+        # page.
+        pass
 
     histogram = [
         {'label': 'Happy', 'data': happy_data},
@@ -155,15 +177,28 @@ def dashboard(request, template):
     page_count = 20
     start = page_count * (page - 1)
     end = start + page_count
-    opinion_page = search[start:end]
+
+    try:
+        search_count = search.count()
+        opinion_page = search[start:end]
+    except (pyes.urllib3.TimeoutError,
+            pyes.urllib3.MaxRetryError,
+            pyes.exceptions.IndexMissingException,
+            pyes.exceptions.ElasticSearchException):
+
+        # TODO: Fix this--we should log an error or show a message or
+        # something--anything except an HTTP 500 error on the front
+        # page.
+        search_count = 0
+        opinion_page = []
 
     return render(request, template, {
         'opinions': opinion_page,
-        'opinion_count': search.count(),
+        'opinion_count': search_count,
         'filter_data': filter_data,
         'histogram': histogram,
         'page': page,
         'prev_page': page - 1 if start > 0 else None,
-        'next_page': page + 1 if end < search.count() else None,
+        'next_page': page + 1 if end < search_count else None,
         'current_search': current_search,
     })
