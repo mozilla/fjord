@@ -45,6 +45,7 @@ def monitor_view(request):
 
     # Check memcached.
     memcache_results = []
+    memcache_status = False
     try:
         status_summary['memcache'] = True
         for cache_name, cache_props in settings.CACHES.items():
@@ -61,42 +62,49 @@ def monitor_view(request):
                     # TODO: this doesn't handle unix: variant
                     ip, port = loc.split(':')
                     result = test_memcached(ip, int(port))
-                    status_summary['memcache'] = result
-                    memcache_results.append((ip, port, result))
-
-            if len(memcache_results) < 2:
-                status_summary['memcache'] = False
-                log.warning('You should have at least 2 memcache servers. '
-                            'You have %s.' % len(memcache_results))
+                    memcache_results.append('%s:%s %s' % (ip, port, result))
 
         if not memcache_results:
-            status_summary['memcache'] = False
+            memcache_results.append('memcache is not configured.')
             log.warning('Memcache is not configured.')
 
+        elif len(memcache_results) < 2:
+            msg = ('You should have at least 2 memcache servers. '
+                   'You have %s.' % len(memcache_results))
+            log.warning(msg)
+            memcache_results.append(msg)
+
+        else:
+            memcache_status = True
+            memcache_results.append('memcache servers look good.')
+
     except Exception as exc:
-        status_summary['memcache'] = False
         log.exception('Exception while looking at memcache')
         errors['memcache'] = '%r %s' % (exc, exc)
 
+    status_summary['memcache'] = memcache_status
+
     # Check RabbitMQ.
     rabbitmq_results = ''
+    rabbitmq_status = False
     try:
-        rabbitmq_status = True
         rabbit_conn = establish_connection(connect_timeout=2)
-        try:
-            rabbit_conn.connect()
-            rabbitmq_results = 'Successfully connected to RabbitMQ.'
-        except (socket.error, IOError), e:
-            rabbitmq_results = ('There was an error connecting to '
-                                'RabbitMQ: %s' % str(e))
+        rabbit_conn.connect()
+        rabbitmq_results = 'Successfully connected to RabbitMQ.'
+        rabbitmq_status = True
 
-            rabbitmq_status = False
-        status_summary['rabbitmq'] = rabbitmq_status
+    except (socket.error, IOError) as exc:
+        rabbitmq_results = ('There was an error connecting to '
+                            'RabbitMQ: %s' % str(exc))
+        errors['rabbitmq'] = '%r %s' % (exc, exc)
 
     except Exception as exc:
-        status_summary['rabbitmq'] = False
         log.exception('Exception while looking at rabbitmq')
+        rabbitmq_results = ('Exception while looking at rabbitmq: %s' %
+                            str(exc))
         errors['rabbitmq'] = '%r %s' % (exc, exc)
+
+    status_summary['rabbitmq'] = rabbitmq_status
 
     if not all(status_summary.values()):
         status = 500
