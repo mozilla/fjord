@@ -7,6 +7,9 @@ from django.views.decorators.cache import never_cache
 
 from celery.messaging import establish_connection
 from mobility.decorators import mobile_template
+import pyes
+
+from fjord.search.index import get_index_stats
 
 
 log = logging.getLogger('i.services')
@@ -84,6 +87,23 @@ def monitor_view(request):
 
     status_summary['memcache'] = memcache_status
 
+    # Check ES.
+    es_results = ''
+    es_status = False
+    try:
+        get_index_stats()
+        es_results = ('Successfully connected to ElasticSearch and index '
+                      'exists.')
+        es_status = True
+
+    except pyes.urllib3.MaxRetryError as exc:
+        es_results = ('Cannot connect to ElasticSearch: %s' % str(exc))
+
+    except pyes.exceptions.IndexMissingException:
+        es_results = 'Index missing.'
+
+    status_summary['es'] = es_status
+
     # Check RabbitMQ.
     rabbitmq_results = ''
     rabbitmq_status = False
@@ -111,6 +131,7 @@ def monitor_view(request):
 
     return render(request, 'services/monitor.html',
                   {'errors': errors,
+                   'es_results': es_results,
                    'memcache_results': memcache_results,
                    'rabbitmq_results': rabbitmq_results,
                    'status_summary': status_summary},
