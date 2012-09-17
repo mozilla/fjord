@@ -2,6 +2,7 @@ from nose.tools import eq_
 
 from fjord.base import views
 from fjord.base.tests import LocalizingClient, reverse
+from fjord.base.views import IntentionalException
 from fjord.search.tests import ElasticTestCase
 
 
@@ -49,3 +50,18 @@ class MonitorViewTest(ElasticTestCase):
 
         finally:
             views.test_memcached = test_memcached
+
+
+class ErrorTesting(ElasticTestCase):
+    client_class = LocalizingClient
+
+    def test_404(self):
+        request = self.client.get('/a/path/that/should/never/exist')
+        eq_(request.status_code, 404)
+        self.assertTemplateUsed(request, '404.html')
+
+    def test_500(self):
+        with self.assertRaises(IntentionalException) as cm:
+            self.client.get('/services/throw-error')
+
+        eq_(type(cm.exception), IntentionalException)
