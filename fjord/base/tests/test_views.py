@@ -26,9 +26,16 @@ class MonitorViewTest(ElasticTestCase):
                         }
                     }):
 
+                # Mock the test_memcached function so it always returns
+                # True.
                 views.test_memcached = lambda host, port: True
+
+                # Request /services/monitor and make sure it returns
+                # HTTP 200 and that there aren't errors on the page.
                 resp = self.client.get(reverse('services-monitor'))
-                eq_(resp.status_code, 200)
+                errors = [line for line in resp.content if 'Error: ' in line]
+                eq_(resp.status_code, 400, '%s != %s (%s)' % (
+                        resp.status_code, 200, repr(errors)))
 
         finally:
             views.test_memcached = test_memcached

@@ -18,7 +18,9 @@
           <h2>Errors</h2>
           <ul>
             {% for key, exc in errors.items() %}
-              <li>{{ key }}: {{ exc }}
+              <li>
+                Error: {{ key }}: {{ exc }}
+              </li>
             {% endfor %}
           </ul>
         </div>
