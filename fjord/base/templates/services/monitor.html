@@ -13,37 +13,16 @@
     <div class="block monitor">
       <h1>{{ _('Input Services Monitor') }}</h1>
 
-      {% if errors %}
-        <div class="notification-box error">
-          <h2>Errors</h2>
+      {% for component, output in component_status|dictsort %}
+        <div class="notification-box {{ status(status_summary[component]) }}">
+          <h2>{{ component }}</h2>
           <ul>
-            {% for key, exc in errors.items() %}
-              <li>
-                Error: {{ key }}: {{ exc }}
-              </li>
+            {% for kind, text in output %}
+              <li>{{ kind }}: {{ text }}</li>
             {% endfor %}
           </ul>
         </div>
-      {% endif %}
-
-      <div class="notification-box {{ status(status_summary.memcache) }}">
-        <h2>[Memcache] Connection Tests</h2>
-        <ul>
-        {% for result in memcache_results %}
-          <li>{{ result }}</li>
-        {% endfor %}
-        </ul>
-      </div>
-
-      <div class="notification-box {{ status(status_summary.rabbitmq) }}">
-        <h2>[RabbitMQ] Message Broker Connection</h2>
-        <p>{{ rabbitmq_results }}</p>
-      </div>
-
-      <div class="notification-box {{ status(status_summary.es) }}">
-        <h2>[ElasticSearch] ElasticSearch Connection</h2>
-        <p>{{ es_results }}</p>
-      </div>
+      {% endfor %}
     </div>
   </div>
 {% endblock content %}

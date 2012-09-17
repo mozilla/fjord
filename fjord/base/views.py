@@ -9,7 +9,7 @@ from celery.messaging import establish_connection
 from mobility.decorators import mobile_template
 import pyes
 
-from fjord.search.index import get_index_stats
+from fjord.search.index import get_index, get_index_stats
 
 
 log = logging.getLogger('i.services')
@@ -38,19 +38,23 @@ def test_memcached(host, port):
         s.close()
 
 
+ERROR = 'ERROR'
+INFO = 'INFO'
+
+
 @never_cache
 def monitor_view(request):
     """View for services monitor."""
-    # For each check, a boolean pass/fail to show in the template.
-    status_summary = {}
-    errors = {}
-    status = 200
+    # Dict of infrastructure name -> list of output tuples of (INFO,
+    # msg) or (ERROR, msg)
+    status = {}
+
+    # Note: To add a new component, do your testing and then add a
+    # name -> list of output tuples map to status.
 
     # Check memcached.
     memcache_results = []
-    memcache_status = False
     try:
-        status_summary['memcache'] = True
         for cache_name, cache_props in settings.CACHES.items():
             result = True
             backend = cache_props['BACKEND']
@@ -65,75 +69,77 @@ def monitor_view(request):
                     # TODO: this doesn't handle unix: variant
                     ip, port = loc.split(':')
                     result = test_memcached(ip, int(port))
-                    memcache_results.append('%s:%s %s' % (ip, port, result))
+                    memcache_results.append(
+                        (INFO, '%s:%s %s' % (ip, port, result)))
 
         if not memcache_results:
-            memcache_results.append('memcache is not configured.')
-            log.warning('Memcache is not configured.')
+            memcache_results.append((ERROR, 'memcache is not configured.'))
 
         elif len(memcache_results) < 2:
-            msg = ('You should have at least 2 memcache servers. '
-                   'You have %s.' % len(memcache_results))
-            log.warning(msg)
-            memcache_results.append(msg)
+            memcache_results.append(
+                (ERROR, ('You should have at least 2 memcache servers. '
+                         'You have %s.' % len(memcache_results))))
 
         else:
-            memcache_status = True
-            memcache_results.append('memcache servers look good.')
+            memcache_results.append((INFO, 'memcached servers look good.'))
 
     except Exception as exc:
-        log.exception('Exception while looking at memcache')
-        errors['memcache'] = '%r %s' % (exc, exc)
+        memcache_results.append(
+            (ERROR, 'Exception while looking at memcached: %s' % str(exc)))
 
-    status_summary['memcache'] = memcache_status
+    status['memcached'] = memcache_results
 
     # Check ES.
-    es_results = ''
-    es_status = False
+    es_results = []
     try:
         get_index_stats()
-        es_results = ('Successfully connected to ElasticSearch and index '
-                      'exists.')
-        es_status = True
+        es_results.append(
+            (INFO, ('Successfully connected to ElasticSearch and index '
+                    'exists.')))
 
     except pyes.urllib3.MaxRetryError as exc:
-        es_results = ('Cannot connect to ElasticSearch: %s' % str(exc))
+        es_results.append(
+            (ERROR, 'Cannot connect to ElasticSearch: %s' % str(exc)))
 
     except pyes.exceptions.IndexMissingException:
-        es_results = 'Index missing.'
+        es_results.append(
+            (ERROR, 'Index "%s" missing.' % get_index()))
 
-    status_summary['es'] = es_status
+    except Exception as exc:
+        es_results.append(
+            (ERROR, 'Exception while looking at ElasticSearch: %s' % str(exc)))
+
+    status['ElasticSearch'] = es_results
 
     # Check RabbitMQ.
-    rabbitmq_results = ''
-    rabbitmq_status = False
+    rabbitmq_results = []
     try:
         rabbit_conn = establish_connection(connect_timeout=2)
         rabbit_conn.connect()
-        rabbitmq_results = 'Successfully connected to RabbitMQ.'
-        rabbitmq_status = True
+        rabbitmq_results.append(
+            (INFO, 'Successfully connected to RabbitMQ.'))
 
     except (socket.error, IOError) as exc:
-        rabbitmq_results = ('There was an error connecting to '
-                            'RabbitMQ: %s' % str(exc))
-        errors['rabbitmq'] = '%r %s' % (exc, exc)
+        rabbitmq_results.append(
+            (ERROR, 'Error connecting to RabbitMQ: %s' % str(exc)))
 
     except Exception as exc:
-        log.exception('Exception while looking at rabbitmq')
-        rabbitmq_results = ('Exception while looking at rabbitmq: %s' %
-                            str(exc))
-        errors['rabbitmq'] = '%r %s' % (exc, exc)
+        rabbitmq_results.append(
+            (ERROR, 'Exception while looking at RabbitMQ: %s' % str(exc)))
 
-    status_summary['rabbitmq'] = rabbitmq_status
+    status['RabbitMQ'] = rabbitmq_results
 
-    if not all(status_summary.values()):
-        errors['statii'] = repr(status_summary.values())
-        status = 500
+    status_code = 200
+
+    status_summary = {}
+    for component, output in status.items():
+        if ERROR in [item[0] for item in output]:
+            status_code = 500
+            status_summary[component] = False
+        else:
+            status_summary[component] = True
 
     return render(request, 'services/monitor.html',
-                  {'errors': errors,
-                   'es_results': es_results,
-                   'memcache_results': memcache_results,
-                   'rabbitmq_results': rabbitmq_results,
+                  {'component_status': status,
                    'status_summary': status_summary},
-                  status=status)
+                  status=status_code)

@@ -30,6 +30,14 @@ class MonitorViewTest(ElasticTestCase):
                 # True.
                 views.test_memcached = lambda host, port: True
 
+                # TODO: Replace when we get a mock library.
+                def mock_rabbitmq():
+                    class MockRabbitMQ(object):
+                        def connect(self):
+                            return True
+                    return lambda *a, **kw: MockRabbitMQ()
+                views.establish_connection = mock_rabbitmq()
+
                 # Request /services/monitor and make sure it returns
                 # HTTP 200 and that there aren't errors on the page.
                 resp = self.client.get(reverse('services-monitor'))
