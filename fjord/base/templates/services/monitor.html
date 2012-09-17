@@ -27,19 +27,10 @@
       <div class="notification-box {{ status(status_summary.memcache) }}">
         <h2>[Memcache] Connection Tests</h2>
         <ul>
-        {% for ip, port, result in memcache_results %}
-          <li>{{ ip }}:{{ port }}
-          {% if result %}
-            Success
-          {% else %}
-            <strong>Failed</strong>
-          {% endif %}
-          </li>
-        {% else %}
-          <li>There are no memcache servers!</li>
+        {% for result in memcache_results %}
+          <li>{{ result }}</li>
         {% endfor %}
         </ul>
-        <p>There must be a minimum of 2 working servers.</p>
       </div>
 
       <div class="notification-box {{ status(status_summary.rabbitmq) }}">
