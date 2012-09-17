@@ -34,6 +34,11 @@ class MonitorViewTest(ElasticTestCase):
                 # HTTP 200 and that there aren't errors on the page.
                 resp = self.client.get(reverse('services-monitor'))
                 errors = [line for line in resp.content if 'Error: ' in line]
+
+                # If there's an exception in the view code, then show that
+                # in the assertion error message.
+                if resp.status_code == 500 and not errors:
+                    errors = [resp.content]
                 eq_(resp.status_code, 200, '%s != %s (%s)' % (
                         resp.status_code, 200, repr(errors)))
 
