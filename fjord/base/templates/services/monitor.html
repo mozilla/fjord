@@ -37,6 +37,11 @@
         <h2>[RabbitMQ] Message Broker Connection</h2>
         <p>{{ rabbitmq_results }}</p>
       </div>
+
+      <div class="notification-box {{ status(status_summary.es) }}">
+        <h2>[ElasticSearch] ElasticSearch Connection</h2>
+        <p>{{ es_results }}</p>
+      </div>
     </div>
   </div>
 {% endblock content %}

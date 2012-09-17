@@ -1,10 +1,13 @@
 from nose.tools import eq_
 
 from fjord.base import views
-from fjord.base.tests import TestCase, LocalizingClient, reverse
+from fjord.base.tests import LocalizingClient, reverse
+from fjord.search.tests import ElasticTestCase
 
 
-class MonitorViewTest(TestCase):
+# Note: This needs to be an ElasticTestCase because the view does ES
+# stuff.
+class MonitorViewTest(ElasticTestCase):
     client_class = LocalizingClient
 
     def test_monitor_view(self):
