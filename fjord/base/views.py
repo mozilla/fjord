@@ -127,6 +127,7 @@ def monitor_view(request):
     status_summary['rabbitmq'] = rabbitmq_status
 
     if not all(status_summary.values()):
+        errors['statii'] = repr(status_summary.values())
         status = 500
 
     return render(request, 'services/monitor.html',
