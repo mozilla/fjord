@@ -2,7 +2,8 @@ import logging
 import socket
 
 from django.conf import settings
-from django.shortcuts import render
+from django.http import Http404
+from django.shortcuts import render, render_to_response
 from django.views.decorators.cache import never_cache
 
 from celery.messaging import establish_connection
@@ -143,3 +144,18 @@ def monitor_view(request):
                   {'component_status': status,
                    'status_summary': status_summary},
                   status=status_code)
+
+
+class IntentionalException(Exception):
+    pass
+
+
+def throw_error(request):
+    """Throw an error for testing purposes. Disabled in production."""
+
+    # If both of these are false, we are likely on a production server, where
+    # providing an end point to throw errors would be a bad thing.
+    if settings.SHOW_STAGE_NOTICE or settings.DEBUG:
+        raise IntentionalException("Error raised for testing purposes.")
+    else:
+        raise Http404

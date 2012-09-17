@@ -1,15 +1,40 @@
+{# This doesn't extend base.html, because base makes assumptions about the
+ # environment that aren't valid when rendering an exception.
+ #}
+
 <!DOCTYPE html>
-<html LANG="{{ LANG }}" dir="{{ DIR }}">
+<html lang="{{ LANG }}" dir="{{ DIR }}">
   <head>
-    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
-    <title>{{ _('Something went wrong!') }}</title>
+    <title>{{ _('Something has gone horribly wrong') }} :: Firefox Input</title>
+
+    {{ css('base') }}
+
+    {# Settings isn't available when rendering this page, so hard code the static url.
+     # If this turns out to be the wrong setting, oh well, it's just a favicon. #}
+    <link rel="shortcut icon" type="image/png" href="/static/img/favicon.png"/>
   </head>
   <body>
-    <h1>{{ _('Page not found') }}</h1>
-    <p>
-      {% trans %}
-        Sorry, but something went wrong.
-      {% endtrans %}
-    </p>
+    <header>
+      <h1 class="title"><a href="{{ url('dashboard') }}">
+        {% trans %}
+          <strong>Firefox</strong> Input
+        {% endtrans %}
+      </a></h1>
+
+      <ul>
+        <li><a class="dashboard" href="{{ url('dashboard') }}"><span>{{ _('Dashboard') }}</span></a></li>
+      </ul>
+    </header>
+
+    <div id="content">
+      <div class="col"></div>
+      <div class="col wide">
+        <div class="block">
+          <h1>{{ _('Something has gone horribly wrong.') }}</h1>
+          <p>{{ _('There was a problem on the server.') }}</p>
+          <p><a href="{{ url('dashboard') }}">{{ _('Return to the dashboard.') }}</a></p>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
