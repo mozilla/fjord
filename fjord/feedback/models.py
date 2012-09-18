@@ -6,6 +6,7 @@ from tower import ugettext_lazy as _
 from fjord.base.models import ModelBase
 from fjord.base.util import smart_truncate
 from fjord.search.index import register_mapping_type, FjordMappingType
+from fjord.search.tasks import register_live_index
 
 
 class Simple(ModelBase):
@@ -49,6 +50,10 @@ class Simple(ModelBase):
         """Shorten feedback for list display etc."""
         return smart_truncate(self.description, length=70)
 
+    @classmethod
+    def get_index(self):
+        return SimpleIndex
+
     # TODO: Implement this when we implement view
     #
     # @models.permalink
@@ -91,3 +96,4 @@ class SimpleIndex(FjordMappingType, Indexable):
 
 
 register_mapping_type(SimpleIndex)
+register_live_index(Simple)
