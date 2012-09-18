@@ -10,7 +10,7 @@
       {{ css('base') }}
     {% endblock %}
 
-    <link rel="shortcut icon" type="image/png" href="{{ MEDIA_URL }}img/favicon.png"/>
+    <link rel="shortcut icon" type="image/png" href="{{ settings.STATIC_URL }}img/favicon.png"/>
     {% block feeds %}{% endblock %}
     {% block extra_headers %}{% endblock %}
   </head>
