@@ -177,3 +177,7 @@ ES_INDEXING_TIMEOUT = 30
 # alleviate problems with tests failing because ElasticSearch can't
 # keep up.
 ES_TEST_SLEEP_DURATION = 0
+
+# When True, objects that belong in the index will get automatically indexed
+# and deindexed when created and destroyed.
+ES_LIVE_INDEX = True

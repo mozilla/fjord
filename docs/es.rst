@@ -147,15 +147,23 @@ On the command line, you can do::
     $ ./manage.py esdelete <index-name>
 
 
-Maintaining your index
-======================
+Live Indexing
+=============
 
 When you add data to the database, it needs to be added to the index.
-This happens automatically in the ``post_save`` hook as long as celery
-tasks are being handled.
+If the setting ``ES_LIVE_INDEX`` is True, then this will be handled
+automatically in the ``post_save`` hook as long as celery tasks are
+being handled.
 
-You can also reindex everything using the admin or using the esreindex
-command-line tool.
+For celery tasks to be handled, you have to either have
+``CELERY_ALWAYS_EAGER`` set to True, or have at least one celery worker
+running, and RabbitMQ working.
+
+Index Maintenance
+-----------------
+
+If you don't want live indexing, you can also reindex everything using
+the admin or using the esreindex command-line tool, as detailed above.
 
 
 Debugging tools

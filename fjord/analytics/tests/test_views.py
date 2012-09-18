@@ -94,8 +94,6 @@ class TestDashboardView(ElasticTestCase):
             # We don't need to keep this around, just need to create it.
             simple(happy=happy, platform=platform, locale=locale, save=True)
 
-        # TODO: Remove this when live indexing works.
-        self.setup_indexes()
         self.refresh()
 
     def test_front_page(self):

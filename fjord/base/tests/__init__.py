@@ -2,9 +2,10 @@ from functools import wraps
 
 from django.conf import settings
 from django.test.client import Client
+from django.test.utils import override_settings
 
 from funfactory.urlresolvers import split_path, reverse
-from test_utils import TestCase
+from test_utils import TestCase as OriginalTestCase
 
 
 class LocalizingClient(Client):
@@ -38,6 +39,13 @@ class LocalizingClient(Client):
             request['HTTP_USER_AGENT'] = self.user_agent
 
         return super(LocalizingClient, self).request(**request)
+
+
+# Include `SETTINGS_MODULE` so that tower doesn't get confused and die.
+@override_settings(ES_LIVE_INDEX=False, SETTINGS_MODULE='fjord.settings')
+class TestCase(OriginalTestCase):
+    """A modification of ``test_utils.TestCase`` that skips live indexing."""
+    pass
 
 
 class MobileTestCase(TestCase):

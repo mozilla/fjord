@@ -29,6 +29,8 @@ def register_mapping_type(mapping_type):
 
     """
     _mapping_types[mapping_type.get_mapping_type_name()] = mapping_type
+    # Enable this to be used as a decorator
+    return mapping_type
 
 
 def get_mapping_types(mapping_types=None):
@@ -69,8 +71,8 @@ def format_time(time_to_go):
     :returns: string representation of how much time to go.
     """
     if time_to_go < 60:
-        return "%ds" % time_to_go
-    return  "%dm %ds" % (time_to_go / 60, time_to_go % 60)
+        return '%ds' % time_to_go
+    return '%dm %ds' % (time_to_go / 60, time_to_go % 60)
 
 
 def create_batch_id():
@@ -374,3 +376,4 @@ def es_status_cmd(checkindex=False):
         log.info('  Index (%s):', get_index())
         for name, count in mt_stats.items():
             log.info('    %-20s: %d', name, count)
+
