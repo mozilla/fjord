@@ -24,7 +24,7 @@ RETRY_TIMES = (
 MAX_RETRIES = len(RETRY_TIMES)
 
 
-@task(ignore_result=True)
+@task
 def index_chunk_task(index, batch_id, rec_id, chunk):
     """Index a chunk of things.
 
@@ -60,7 +60,7 @@ def index_chunk_task(index, batch_id, rec_id, chunk):
         unpin_this_thread()
 
 
-@task(ignore_result=True, max_retries=MAX_RETRIES)
+@task
 def index_item_task(mapping_type, item_id):
     """Index an item given it's mapping_type and id."""
     try:
@@ -68,25 +68,25 @@ def index_item_task(mapping_type, item_id):
         mapping_type.index(doc)
 
     except Exception as exc:
-        try:
-            retries = index_item_task.request.retries
-            retry_time = RETRY_TIMES[retries]
-            index_item_task.retry(exc=exc, countdown=retry_time)
-        except:
-            raise exc
+        log.exception(str(exc))
+        retries = index_item_task.request.retries
+        if retries >= MAX_RETRIES:
+            raise
+        retry_time = RETRY_TIMES[retries]
+        index_item_task.retry(exc=exc, countdown=retry_time)
 
 
-@task(ignore_result=True, max_retries=MAX_RETRIES)
+@task
 def unindex_item_task(mapping_type, item_id):
     """Remove an item from the index, given it's mapping_type and id."""
     try:
         doc = mapping_type.extract_document(item_id)
-        mapping_type.unindex(doc)
+        mapping_type.unindex(doc['id'])
 
     except Exception as exc:
-        try:
-            retries = unindex_item_task.request.retries
-            retry_time = RETRY_TIMES[retries]
-            index_item_task.retry(exc=exc, countdown=retry_time)
-        except:
-            raise exc
+        log.exception(str(exc))
+        retries = unindex_item_task.request.retries
+        if retries >= MAX_RETRIES:
+            raise
+        retry_time = RETRY_TIMES[retries]
+        unindex_item_task.retry(exc=exc, countdown=retry_time)
