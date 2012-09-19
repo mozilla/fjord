@@ -4,8 +4,11 @@ from itertools import islice
 
 from django.conf import settings
 from django.db import reset_queries
+from django.db.models.signals import post_save, pre_delete
 
 import pyes
+
+from celery.execute import send_task
 
 from elasticutils.contrib.django import get_es, S
 from elasticutils.contrib.django.models import DjangoMappingType
@@ -29,6 +32,8 @@ def register_mapping_type(mapping_type):
 
     """
     _mapping_types[mapping_type.get_mapping_type_name()] = mapping_type
+    # Enable this to be used as a decorator
+    return mapping_type
 
 
 def get_mapping_types(mapping_types=None):
@@ -70,7 +75,7 @@ def format_time(time_to_go):
     """
     if time_to_go < 60:
         return "%ds" % time_to_go
-    return  "%dm %ds" % (time_to_go / 60, time_to_go % 60)
+    return "%dm %ds" % (time_to_go / 60, time_to_go % 60)
 
 
 def create_batch_id():
@@ -374,3 +379,28 @@ def es_status_cmd(checkindex=False):
         log.info('  Index (%s):', get_index())
         for name, count in mt_stats.items():
             log.info('    %-20s: %d', name, count)
+
+
+def _live_index_handler(sender, **kwargs):
+    if 'signal' not in kwargs or 'instance' not in kwargs:
+        return
+
+    instance = kwargs['instance']
+
+    # Call by name instead of directly calling .delay() so that we don't have
+    # to import anything. This avoids circular import problems.
+    if kwargs['signal'] == post_save:
+        send_task('fjord.search.tasks.index_item_task',
+            (instance.get_mapping_type(), instance.id))
+
+    elif kwargs['signal'] == pre_delete:
+        send_task('fjord.search.tasks.unindex_item_task',
+            (instance.get_mapping_type(), instance.id))
+
+
+def register_live_index(model_cls):
+    """Register a model and index for auto indexing."""
+    post_save.connect(_live_index_handler, model_cls)
+    pre_delete.connect(_live_index_handler, model_cls)
+    # Enable this to be used as decorator.
+    return model_cls

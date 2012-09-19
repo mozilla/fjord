@@ -2,8 +2,6 @@ import datetime
 import logging
 import sys
 
-from django.db.models.signals import post_save, pre_delete
-
 from celery.decorators import task
 from multidb.pinning import pin_this_thread, unpin_this_thread
 
@@ -14,7 +12,19 @@ from fjord.search.models import Record
 log = logging.getLogger('i.task')
 
 
-@task
+# Note: If you reduce the length of RETRY_TIMES, it affects all tasks
+# currently in the celery queue---they'll throw an IndexError.
+RETRY_TIMES = (
+    60,  # 1 minute
+    5 * 60,  # 5 minutes
+    10 * 60,  # 10 minutes
+    30 * 60,  # 30 minutes
+    60 * 60,  # 60 minutes
+    )
+MAX_RETRIES = len(RETRY_TIMES)
+
+
+@task(ignore_result=True)
 def index_chunk_task(index, batch_id, rec_id, chunk):
     """Index a chunk of things.
 
@@ -50,28 +60,33 @@ def index_chunk_task(index, batch_id, rec_id, chunk):
         unpin_this_thread()
 
 
-@task
-def index_item_task(index_cls, item_id):
-    doc = index_cls.extract_document(item_id)
-    index_cls.index(doc)
+@task(ignore_result=True, max_retries=MAX_RETRIES)
+def index_item_task(mapping_type, item_id):
+    """Index an item given it's mapping_type and id."""
+    try:
+        doc = mapping_type.extract_document(item_id)
+        mapping_type.index(doc)
+
+    except Exception as exc:
+        try:
+            retries = index_item_task.request.retries
+            retry_time = RETRY_TIMES[retries]
+            index_item_task.retry(exc=exc, countdown=retry_time)
+        except:
+            raise exc
 
 
-def _live_index_handler(sender, **kwargs):
-    if 'signal' not in kwargs or 'instance' not in kwargs:
-        return
+@task(ignore_result=True, max_retries=MAX_RETRIES)
+def unindex_item_task(mapping_type, item_id):
+    """Remove an item from the index, given it's mapping_type and id."""
+    try:
+        doc = mapping_type.extract_document(item_id)
+        mapping_type.unindex(doc)
 
-    instance = kwargs['instance']
-
-    if kwargs['signal'] == post_save:
-        index_item_task(instance.get_index(), instance.id)
-        return
-
-    if kwargs['signal'] == pre_delete:
-        # TODO: How do I delete item from the index?
-        raise NotImplemented
-
-
-def register_live_index(model_cls):
-    """Register a model and index for auto indexing."""
-    post_save.connect(_live_index_handler, model_cls)
-    pre_delete.connect(_live_index_handler, model_cls)
+    except Exception as exc:
+        try:
+            retries = unindex_item_task.request.retries
+            retry_time = RETRY_TIMES[retries]
+            index_item_task.retry(exc=exc, countdown=retry_time)
+        except:
+            raise exc

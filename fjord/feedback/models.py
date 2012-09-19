@@ -5,10 +5,10 @@ from tower import ugettext_lazy as _
 
 from fjord.base.models import ModelBase
 from fjord.base.util import smart_truncate
-from fjord.search.index import register_mapping_type, FjordMappingType
-from fjord.search.tasks import register_live_index
+from fjord.search.index import register_mapping_type, register_live_index, FjordMappingType
 
 
+@register_live_index
 class Simple(ModelBase):
     """Feedback item from Firefox Desktop stable form"""
 
@@ -51,7 +51,7 @@ class Simple(ModelBase):
         return smart_truncate(self.description, length=70)
 
     @classmethod
-    def get_index(self):
+    def get_mapping_type(self):
         return SimpleIndex
 
     # TODO: Implement this when we implement view
@@ -61,6 +61,7 @@ class Simple(ModelBase):
     #     return ('xxx', [str(self.id)])
 
 
+@register_mapping_type
 class SimpleIndex(FjordMappingType, Indexable):
     @classmethod
     def get_model(cls):
@@ -93,7 +94,3 @@ class SimpleIndex(FjordMappingType, Indexable):
         mapping = cls.get_mapping()
         return dict((field, getattr(obj, field))
                     for field in mapping.keys())
-
-
-register_mapping_type(SimpleIndex)
-register_live_index(Simple)
