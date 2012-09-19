@@ -12,6 +12,11 @@
   <div class="col wide">
     <div class="block monitor">
       <h1>{{ _('Input Services Monitor') }}</h1>
+      <p>
+        {% trans %}
+        List of components that Input uses and whether they are functioning correctly.
+        {% endtrans %}
+      </p>
 
       {% for component, output in component_status|dictsort %}
         <div class="notification-box {{ status(status_summary[component]) }}">
