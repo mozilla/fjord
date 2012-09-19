@@ -1,3 +1,5 @@
+import pdb
+
 from nose.tools import eq_
 from test_utils import TestCase
 
@@ -28,7 +30,11 @@ class TestLiveIndexing(ElasticTestCase):
     def test_live_indexing(self):
         S = SimpleIndex.search
         count_pre = S().count()
-        s = simple(save=True)
+
+        s = simple(happy=True, description="Test live indexing.", save=True)
+        self.refresh()
         eq_(count_pre + 1, S().count())
+
         s.delete()
+        self.refresh()
         eq_(count_pre, S().count())

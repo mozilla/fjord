@@ -2,6 +2,8 @@ import datetime
 import logging
 import sys
 
+from django.db.models.signals import post_save, pre_delete
+
 from celery.decorators import task
 from multidb.pinning import pin_this_thread, unpin_this_thread
 
@@ -61,32 +63,69 @@ def index_chunk_task(index, batch_id, rec_id, chunk):
 
 
 @task
-def index_item_task(mapping_type, item_id):
+def index_item_task(mapping_type, item_id, **kwargs):
     """Index an item given it's mapping_type and id."""
     try:
         doc = mapping_type.extract_document(item_id)
-        mapping_type.index(doc)
+        mapping_type.index(doc, doc['id'])
 
     except Exception as exc:
-        log.exception(str(exc))
-        retries = index_item_task.request.retries
+        retries = kwargs.get('retries', 0)
+        log.exception("Error while live indexing. " + str(exc))
         if retries >= MAX_RETRIES:
             raise
         retry_time = RETRY_TIMES[retries]
-        index_item_task.retry(exc=exc, countdown=retry_time)
+
+        args = (mapping_type, item_id)
+        if not kwargs:
+            # Celery is lame. It requires that kwargs be non empty, but when
+            # EAGER is true, it provides empty kwargs.
+            kwargs['_dummy'] = True
+        index_item_task.retry(args, kwargs, exc, countdown=retry_time)
+
+    except Exception as exc:
+        log.exception("Error while live unindexing." + str(exc))
+        unindex_item_task.retry(args=[mapping_type, item_id], kwargs=kwargs, exc=exc)
 
 
 @task
-def unindex_item_task(mapping_type, item_id):
+def unindex_item_task(mapping_type, item_id, **kwargs):
     """Remove an item from the index, given it's mapping_type and id."""
     try:
         doc = mapping_type.extract_document(item_id)
         mapping_type.unindex(doc['id'])
 
     except Exception as exc:
-        log.exception(str(exc))
-        retries = unindex_item_task.request.retries
+        retries = kwargs.get('retries', 0)
+        log.exception("Error while live indexing. " + str(exc))
         if retries >= MAX_RETRIES:
             raise
         retry_time = RETRY_TIMES[retries]
-        unindex_item_task.retry(exc=exc, countdown=retry_time)
+
+        args = (mapping_type, item_id)
+        if not kwargs:
+            # Celery is lame. It requires that kwargs be non empty, but when
+            # EAGER is true, it provides empty kwargs.
+            kwargs['_dummy'] = True
+        index_item_task.retry(args, kwargs, exc, countdown=retry_time)
+
+
+def _live_index_handler(sender, **kwargs):
+    if 'signal' not in kwargs or 'instance' not in kwargs:
+        return
+
+    instance = kwargs['instance']
+
+    if kwargs['signal'] == post_save:
+        index_item_task.delay(instance.get_mapping_type(), instance.id)
+
+    elif kwargs['signal'] == pre_delete:
+        unindex_item_task(instance.get_mapping_type(), instance.id)
+
+
+def register_live_index(model_cls):
+    """Register a model and index for auto indexing."""
+    post_save.connect(_live_index_handler, model_cls)
+    pre_delete.connect(_live_index_handler, model_cls)
+    # Enable this to be used as decorator.
+    return model_cls
