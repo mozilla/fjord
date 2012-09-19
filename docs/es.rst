@@ -24,6 +24,12 @@ http://www.elasticsearch.org/guide/reference/setup/installation.html
 
 We're currently using 0.17.x in production.
 
+.. Note::
+
+   **Don't** use versions of ElasticSearch 0.19.9 or higher. Input doesn't
+   currently work with that.
+
+
 The directory you install Elastic in will hereafter be referred to as
 ``ELASTICDIR``.
 
@@ -35,7 +41,7 @@ Start Elastic Search by::
 
     $ ELASTICDIR/bin/elasticsearch
 
-That launches Elastic Search in the background.
+That launches ElasticSearch in the background.
 
 
 Configuring ElasticUtils
@@ -122,7 +128,7 @@ See ``--help`` for more details::
 esstatus: health/statistics
 ---------------------------
 
-You can see Elastic Search index status with::
+You can see ElasticSearch index status with::
 
     $ ./manage.py esstatus
 
