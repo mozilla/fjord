@@ -47,6 +47,7 @@
 {% block content %}
 
 <div class="col">
+{% block content_leftside %}
   <div class="block search">
 
     {% for filter_set in filter_data %}
@@ -54,9 +55,11 @@
     {% endfor %}
 
   </div>
+{% endblock %}
 </div>
 
 <div class="col wide">
+{% block content_middle %}
   <div class="block graph">
     {# A graph will be dynamically inserted in these divs by Flot. #}
     <div class="histogram" data-histogram="{{ histogram|to_json }}"></div>
@@ -84,13 +87,16 @@
       {% endif %}
     </div>
   </div>
+{% endblock %}
 </div>
 
 <div class="col">
+{% block content_rightside %}
   <div class="block count">
     <h3>{{ _('Messages') }}</h3>
     <p><strong>{{ opinion_count }}</strong></p>
   </div>
+{% endblock %}
 </div>
 
 {% endblock %}
