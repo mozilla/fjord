@@ -11,9 +11,9 @@
 {% macro feedback_block(feedback) -%}
   <li class="opinion">
     {% if feedback.happy %}
-      <span class="sprite happy">Happy</span>
+      <span class="sprite happy">{{ _('Happy') }}</span>
     {% else %}
-      <span class="sprite sad">Sad</span>
+      <span class="sprite sad">{{ _('Sad') }}</span>
     {% endif %}
     <p>
       {{ feedback.description }}
@@ -64,7 +64,7 @@
   </div>
 
   <div class="block feedback">
-    <h2>Latest Feedback</h2>
+    <h2>{{ _('Latest Feedback') }}</h2>
     <ul>
     {% for opinion in opinions %}
       {{ feedback_block(opinion) }}
@@ -74,12 +74,12 @@
     <div class="pager">
       {% if next_page %}
         <a class="older" href="{{ request.get_full_path()|urlparams(page=next_page) }}">
-          Older Messages
+          {{ _('Older Messages') }}
         </a>
       {% endif %}
       {% if prev_page %}
         <a class="newer" href="{{ request.get_full_path()|urlparams(page=prev_page) }}">
-          Newer Messages
+          {{ _('Newer Messages') }}
         </a>
       {% endif %}
     </div>
@@ -88,8 +88,8 @@
 
 <div class="col">
   <div class="block count">
-    <h3>Current search</h3>
-    <p><strong>{{ opinion_count }}</strong> messages.</p>
+    <h3>{{ _('Messages') }}</h3>
+    <p><strong>{{ opinion_count }}</strong></p>
   </div>
 </div>
 
