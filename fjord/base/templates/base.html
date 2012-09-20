@@ -37,6 +37,7 @@
     {% endblock site_header %}
 
     {% if settings.SHOW_STAGE_NOTICE %}
+      {{ css('stage') }}
       <div class="stage-banner">
         <div class="close-button">X</div>
         This is a dev/staging site. The production site is

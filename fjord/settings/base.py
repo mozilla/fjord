@@ -68,6 +68,9 @@ MINIFY_BUNDLES = {
             'css/fjord.less',
             'css/dashboard.less',
         ),
+        'stage': (
+            'css/stage.less',
+        ),
     },
     'js': {
         'base': (
