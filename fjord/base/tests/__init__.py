@@ -2,6 +2,7 @@ from functools import wraps
 
 from django.conf import settings
 from django.test.client import Client
+from django.test.utils import override_settings
 
 from funfactory.urlresolvers import split_path, reverse
 from test_utils import TestCase as OriginalTestCase
@@ -40,23 +41,11 @@ class LocalizingClient(Client):
         return super(LocalizingClient, self).request(**request)
 
 
-class NoLiveIndexingTestCase(OriginalTestCase):
+# Include `SETTINGS_MODULE` so that tower doesn't get confused and die.
+@override_settings(ES_LIVE_INDEX=False, SETTINGS_MODULE='fjord.settings')
+class TestCase(OriginalTestCase):
     """A modification of ``test_utils.TestCase`` that skips live indexing."""
-
-    @classmethod
-    def setUpClass(cls):
-        super(NoLiveIndexingTestCase, cls).setUpClass()
-
-        cls._old_es_live_index = settings.ES_LIVE_INDEX
-        settings.ES_LIVE_INDEX = False
-
-    @classmethod
-    def tearDownClass(cls):
-        super(NoLiveIndexingTestCase, cls).tearDownClass()
-        settings.ES_LIVE_INDEX = cls._old_es_live_index
-
-
-TestCase = NoLiveIndexingTestCase
+    pass
 
 
 class MobileTestCase(TestCase):

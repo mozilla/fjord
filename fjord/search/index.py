@@ -7,8 +7,6 @@ from django.db import reset_queries
 
 import pyes
 
-from celery.execute import send_task
-
 from elasticutils.contrib.django import get_es, S
 from elasticutils.contrib.django.models import DjangoMappingType
 
@@ -73,8 +71,8 @@ def format_time(time_to_go):
     :returns: string representation of how much time to go.
     """
     if time_to_go < 60:
-        return "%ds" % time_to_go
-    return "%dm %ds" % (time_to_go / 60, time_to_go % 60)
+        return '%ds' % time_to_go
+    return '%dm %ds' % (time_to_go / 60, time_to_go % 60)
 
 
 def create_batch_id():

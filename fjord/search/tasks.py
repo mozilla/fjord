@@ -63,16 +63,18 @@ RETRY_TIMES = (
 MAX_RETRIES = len(RETRY_TIMES)
 
 
-@task
+@task(ignore_result=True)
 def index_item_task(mapping_type, item_id, **kwargs):
     """Index an item given it's mapping_type and id."""
+    retries = kwargs.get('task_retries', None)
+    log.debug('Index attempt #%s', retries)
     try:
         doc = mapping_type.extract_document(item_id)
-        mapping_type.index(doc, doc['id'])
+        mapping_type.index(doc, item_id)
 
     except Exception as exc:
-        retries = kwargs.get('retries', 0)
-        log.exception("Error while live indexing. " + str(exc))
+        log.exception("Error while live indexing %s %d: %s",
+                      mapping_type, item_id, exc)
         if retries >= MAX_RETRIES:
             raise
         retry_time = RETRY_TIMES[retries]
@@ -85,16 +87,16 @@ def index_item_task(mapping_type, item_id, **kwargs):
         index_item_task.retry(args, kwargs, exc, countdown=retry_time)
 
 
-@task
+@task(ignore_result=True)
 def unindex_item_task(mapping_type, item_id, **kwargs):
     """Remove an item from the index, given it's mapping_type and id."""
     try:
-        doc = mapping_type.extract_document(item_id)
-        mapping_type.unindex(doc['id'])
+        mapping_type.unindex(item_id)
 
     except Exception as exc:
-        retries = kwargs.get('retries', 0)
-        log.exception("Error while live indexing. " + str(exc))
+        retries = kwargs.get('task_retries', None)
+        log.exception("Error while live unindexing %s %d: %s",
+                      mapping_type, item_id, exc)
         if retries >= MAX_RETRIES:
             raise
         retry_time = RETRY_TIMES[retries]
@@ -109,7 +111,7 @@ def unindex_item_task(mapping_type, item_id, **kwargs):
 
 def _live_index_handler(sender, **kwargs):
     if (not settings.ES_LIVE_INDEX or
-            'signal' not in kwargs or 'instance' not in kwargs):
+        'signal' not in kwargs or 'instance' not in kwargs):
         return
 
     instance = kwargs['instance']
@@ -123,7 +125,8 @@ def _live_index_handler(sender, **kwargs):
 
 def register_live_index(model_cls):
     """Register a model and index for auto indexing."""
-    post_save.connect(_live_index_handler, model_cls)
-    pre_delete.connect(_live_index_handler, model_cls)
+    uid = str(model_cls) + 'live_indexing'
+    post_save.connect(_live_index_handler, model_cls, dispatch_uid=uid)
+    pre_delete.connect(_live_index_handler, model_cls, dispatch_uid=uid)
     # Enable this to be used as decorator.
     return model_cls
