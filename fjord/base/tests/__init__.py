@@ -4,7 +4,7 @@ from django.conf import settings
 from django.test.client import Client
 
 from funfactory.urlresolvers import split_path, reverse
-from test_utils import TestCase
+from test_utils import TestCase as OriginalTestCase
 
 
 class LocalizingClient(Client):
@@ -38,6 +38,25 @@ class LocalizingClient(Client):
             request['HTTP_USER_AGENT'] = self.user_agent
 
         return super(LocalizingClient, self).request(**request)
+
+
+class NoLiveIndexingTestCase(OriginalTestCase):
+    """A modification of ``test_utils.TestCase`` that skips live indexing."""
+
+    @classmethod
+    def setUpClass(cls):
+        super(NoLiveIndexingTestCase, cls).setUpClass()
+
+        cls._old_es_live_index = settings.ES_LIVE_INDEX
+        settings.ES_LIVE_INDEX = False
+
+    @classmethod
+    def tearDownClass(cls):
+        super(NoLiveIndexingTestCase, cls).tearDownClass()
+        settings.ES_LIVE_INDEX = cls._old_es_live_index
+
+
+TestCase = NoLiveIndexingTestCase
 
 
 class MobileTestCase(TestCase):

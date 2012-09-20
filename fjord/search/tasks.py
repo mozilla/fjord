@@ -2,6 +2,7 @@ import datetime
 import logging
 import sys
 
+from django.conf import settings
 from django.db.models.signals import post_save, pre_delete
 
 from celery.decorators import task
@@ -48,7 +49,6 @@ def index_chunk_task(index, batch_id, rec_id, chunk):
 
     finally:
         unpin_this_thread()
-
 
 
 # Note: If you reduce the length of RETRY_TIMES, it affects all tasks
@@ -108,7 +108,8 @@ def unindex_item_task(mapping_type, item_id, **kwargs):
 
 
 def _live_index_handler(sender, **kwargs):
-    if 'signal' not in kwargs or 'instance' not in kwargs:
+    if (not settings.ES_LIVE_INDEX or
+            'signal' not in kwargs or 'instance' not in kwargs):
         return
 
     instance = kwargs['instance']
