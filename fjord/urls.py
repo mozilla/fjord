@@ -34,8 +34,6 @@ urlpatterns = patterns('',
 )
 
 
-handler500 = 'fjord.base.views.error500'
-
 ## In DEBUG mode, serve media files through Django.
 if settings.DEBUG:
     urlpatterns += staticfiles_urlpatterns()

@@ -8,7 +8,10 @@
     <title>{{ _('Something has gone horribly wrong') }} :: Firefox Input</title>
 
     {{ css('base') }}
-    <link rel="shortcut icon" type="image/png" href="{{ settings.STATIC_URL }}img/favicon.png"/>
+
+    {# Settings isn't available when rendering this page, so hard code the static url.
+     # If this turns out to be the wrong setting, oh well, it's just a favicon. #}
+    <link rel="shortcut icon" type="image/png" href="/static/img/favicon.png"/>
   </head>
   <body>
     <header>

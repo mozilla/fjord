@@ -159,11 +159,3 @@ def throw_error(request):
         raise IntentionalException("Error raised for testing purposes.")
     else:
         raise Http404
-
-
-def error500(request):
-    """A custom 500 error handler that passes in a few context variables."""
-
-    # Don't use render() so as to limit the amount of code that is touched.
-    # This way we avoid triggering more errors.
-    return render_to_response('500.html', {'settings': settings})
