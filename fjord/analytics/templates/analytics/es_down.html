@@ -1,0 +1,14 @@
+{% extends "analytics/dashboard.html" %}
+
+{% block content_leftside %}{% endblock %}
+
+{% block content_middle %}
+<div class="block feedback">
+<h2>{{ _('Dashboard unavailable') }}</h2>
+<p>
+  {{ _('Dashboard is currently unavailable. Please try again in 10 minutes.') }}
+</p>
+</div>
+{% endblock %}
+
+{% block content_rightside %}{% endblock %}

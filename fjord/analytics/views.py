@@ -1,13 +1,12 @@
 from django.shortcuts import render
 from django.template.defaultfilters import slugify
 
-import pyes
-from elasticutils import F
+from elasticutils.contrib.django import F, es_required_or_50x
 from mobility.decorators import mobile_template
 from tower import ugettext as _
 
-from fjord.feedback.models import SimpleIndex
 from fjord.base.helpers import locale_name
+from fjord.feedback.models import SimpleIndex
 
 
 def counts_to_options(counts, name, display=None, display_map=None,
@@ -75,6 +74,7 @@ def counts_to_options(counts, name, display=None, display_map=None,
     return options
 
 
+@es_required_or_50x(error_template='analytics/es_down.html')
 @mobile_template('analytics/{mobile/}dashboard.html')
 def dashboard(request, template):
     page = int(request.GET.get('page', 1))
@@ -105,25 +105,15 @@ def dashboard(request, template):
     # This is probably something EU should be doing for us. Second, it
     # restructures the data into a more convenient form.
     counts = {'happy': {}, 'platform': {}, 'locale': {}}
-    try:
-        for param, terms in facets.facet_counts().items():
-            for term in terms:
-                name = term['term']
-                if name == 'T':
-                    name = True
-                elif name == 'F':
-                    name = False
+    for param, terms in facets.facet_counts().items():
+        for term in terms:
+            name = term['term']
+            if name == 'T':
+                name = True
+            elif name == 'F':
+                name = False
 
-                counts[param][name] = term['count']
-    except (pyes.urllib3.TimeoutError,
-            pyes.urllib3.MaxRetryError,
-            pyes.exceptions.IndexMissingException,
-            pyes.exceptions.ElasticSearchException):
-
-        # TODO: Fix this--we should log an error or show a message or
-        # something--anything except an HTTP 500 error on the front
-        # page.
-        pass
+            counts[param][name] = term['count']
 
     filter_data = [
         counts_to_options(counts['happy'].items(), name='happy',
@@ -141,31 +131,21 @@ def dashboard(request, template):
     happy_data = []
     sad_data = []
 
-    try:
-        histograms = search.facet_raw(
-            happy={
-                'date_histogram': {'interval': 'day', 'field': 'created'},
-                'facet_filter': (f & F(happy=True)).filters
-            },
-            sad={
-                'date_histogram': {'interval': 'day', 'field': 'created'},
-                'facet_filter': (f & F(happy=False)).filters
-            },
-        ).facet_counts()
+    histograms = search.facet_raw(
+        happy={
+            'date_histogram': {'interval': 'day', 'field': 'created'},
+            'facet_filter': (f & F(happy=True)).filters
+        },
+        sad={
+            'date_histogram': {'interval': 'day', 'field': 'created'},
+            'facet_filter': (f & F(happy=False)).filters
+        },
+    ).facet_counts()
 
-        # p['time'] is number of milliseconds since the epoch. Which is
-        # convenient, because that is what the front end wants.
-        happy_data = [(p['time'], p['count']) for p in histograms['happy']]
-        sad_data = [(p['time'], int(p['count'])) for p in histograms['sad']]
-    except (pyes.urllib3.TimeoutError,
-            pyes.urllib3.MaxRetryError,
-            pyes.exceptions.IndexMissingException,
-            pyes.exceptions.ElasticSearchException):
-
-        # TODO: Fix this--we should log an error or show a message or
-        # something--anything except an HTTP 500 error on the front
-        # page.
-        pass
+    # p['time'] is number of milliseconds since the epoch. Which is
+    # convenient, because that is what the front end wants.
+    happy_data = [(p['time'], p['count']) for p in histograms['happy']]
+    sad_data = [(p['time'], int(p['count'])) for p in histograms['sad']]
 
     histogram = [
         {'label': _('Happy'), 'data': happy_data},
@@ -179,19 +159,8 @@ def dashboard(request, template):
     start = page_count * (page - 1)
     end = start + page_count
 
-    try:
-        search_count = search.count()
-        opinion_page = search[start:end]
-    except (pyes.urllib3.TimeoutError,
-            pyes.urllib3.MaxRetryError,
-            pyes.exceptions.IndexMissingException,
-            pyes.exceptions.ElasticSearchException):
-
-        # TODO: Fix this--we should log an error or show a message or
-        # something--anything except an HTTP 500 error on the front
-        # page.
-        search_count = 0
-        opinion_page = []
+    search_count = search.count()
+    opinion_page = search[start:end]
 
     return render(request, template, {
         'opinions': opinion_page,

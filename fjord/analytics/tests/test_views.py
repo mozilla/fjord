@@ -1,9 +1,10 @@
 import logging
 
 from nose.tools import eq_
-
+import pyes
 from pyquery import PyQuery
 
+from fjord.analytics import views
 from fjord.analytics.views import counts_to_options
 from fjord.base.tests import TestCase, LocalizingClient, reverse
 from fjord.feedback.tests import simple
@@ -14,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 
 class TestCountsHelper(TestCase):
-
     def setUp(self):
         self.counts = [('apples', 5), ('bananas', 10), ('oranges', 6)]
 
@@ -98,7 +98,6 @@ class TestDashboardView(ElasticTestCase):
         self.setup_indexes()
         self.refresh()
 
-
     def test_front_page(self):
         url = reverse('dashboard')
         r = self.client.get(url)
@@ -150,3 +149,24 @@ class TestDashboardView(ElasticTestCase):
         eq_(r.status_code, 200)
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 7)
+
+    def test_frontpage_index_missing(self):
+        """If index is missing, show es_down template."""
+        self.teardown_indexes()
+        resp = self.client.get(reverse('dashboard'))
+        self.assertTemplateUsed(resp, 'analytics/es_down.html')
+
+    def test_frontpage_es_down(self):
+        """If can't connect to ES, show es_down template."""
+        # TODO: When we add a real Mock library, rewrite this.
+        old_counts_to_options = views.counts_to_options
+        try:
+            def mock_counts_to_options(*args, **kwargs):
+                raise pyes.urllib3.MaxRetryError()
+            views.counts_to_options = mock_counts_to_options
+
+            resp = self.client.get(reverse('dashboard'))
+            self.assertTemplateUsed(resp, 'analytics/es_down.html')
+
+        finally:
+            views.counts_to_options = old_counts_to_options
