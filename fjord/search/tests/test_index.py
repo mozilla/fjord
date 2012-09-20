@@ -1,5 +1,3 @@
-import pdb
-
 from nose.tools import eq_
 from test_utils import TestCase
 

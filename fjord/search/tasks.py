@@ -14,18 +14,6 @@ from fjord.search.models import Record
 log = logging.getLogger('i.task')
 
 
-# Note: If you reduce the length of RETRY_TIMES, it affects all tasks
-# currently in the celery queue---they'll throw an IndexError.
-RETRY_TIMES = (
-    60,  # 1 minute
-    5 * 60,  # 5 minutes
-    10 * 60,  # 10 minutes
-    30 * 60,  # 30 minutes
-    60 * 60,  # 60 minutes
-    )
-MAX_RETRIES = len(RETRY_TIMES)
-
-
 @task
 def index_chunk_task(index, batch_id, rec_id, chunk):
     """Index a chunk of things.
@@ -62,6 +50,19 @@ def index_chunk_task(index, batch_id, rec_id, chunk):
         unpin_this_thread()
 
 
+
+# Note: If you reduce the length of RETRY_TIMES, it affects all tasks
+# currently in the celery queue---they'll throw an IndexError.
+RETRY_TIMES = (
+    60,  # 1 minute
+    5 * 60,  # 5 minutes
+    10 * 60,  # 10 minutes
+    30 * 60,  # 30 minutes
+    60 * 60,  # 60 minutes
+    )
+MAX_RETRIES = len(RETRY_TIMES)
+
+
 @task
 def index_item_task(mapping_type, item_id, **kwargs):
     """Index an item given it's mapping_type and id."""
@@ -83,10 +84,6 @@ def index_item_task(mapping_type, item_id, **kwargs):
             kwargs['_dummy'] = True
         index_item_task.retry(args, kwargs, exc, countdown=retry_time)
 
-    except Exception as exc:
-        log.exception("Error while live unindexing." + str(exc))
-        unindex_item_task.retry(args=[mapping_type, item_id], kwargs=kwargs, exc=exc)
-
 
 @task
 def unindex_item_task(mapping_type, item_id, **kwargs):
@@ -107,7 +104,7 @@ def unindex_item_task(mapping_type, item_id, **kwargs):
             # Celery is lame. It requires that kwargs be non empty, but when
             # EAGER is true, it provides empty kwargs.
             kwargs['_dummy'] = True
-        index_item_task.retry(args, kwargs, exc, countdown=retry_time)
+        unindex_item_task.retry(args, kwargs, exc, countdown=retry_time)
 
 
 def _live_index_handler(sender, **kwargs):
