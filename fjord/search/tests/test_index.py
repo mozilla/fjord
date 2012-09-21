@@ -29,7 +29,7 @@ class TestLiveIndexing(ElasticTestCase):
         S = SimpleIndex.search
         count_pre = S().count()
 
-        s = simple(happy=True, description="Test live indexing.", save=True)
+        s = simple(happy=True, description='Test live indexing.', save=True)
         self.refresh()
         eq_(count_pre + 1, S().count())
 

@@ -63,10 +63,10 @@ RETRY_TIMES = (
 MAX_RETRIES = len(RETRY_TIMES)
 
 
-@task(ignore_result=True)
+@task
 def index_item_task(mapping_type, item_id, **kwargs):
     """Index an item given it's mapping_type and id."""
-    retries = kwargs.get('task_retries', None)
+    retries = kwargs.get('task_retries', 0)
     log.debug('Index attempt #%s', retries)
     try:
         doc = mapping_type.extract_document(item_id)
@@ -87,14 +87,14 @@ def index_item_task(mapping_type, item_id, **kwargs):
         index_item_task.retry(args, kwargs, exc, countdown=retry_time)
 
 
-@task(ignore_result=True)
+@task
 def unindex_item_task(mapping_type, item_id, **kwargs):
     """Remove an item from the index, given it's mapping_type and id."""
     try:
         mapping_type.unindex(item_id)
 
     except Exception as exc:
-        retries = kwargs.get('task_retries', None)
+        retries = kwargs.get('task_retries', 0)
         log.exception("Error while live unindexing %s %d: %s",
                       mapping_type, item_id, exc)
         if retries >= MAX_RETRIES:
