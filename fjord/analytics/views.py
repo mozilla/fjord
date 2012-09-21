@@ -127,7 +127,8 @@ def dashboard(request, template):
 
     filter_data = [
         counts_to_options(counts['happy'].items(), name='happy',
-            display=_('Sentiment'), display_map={True: 'Happy', False: 'Sad'},
+            display=_('Sentiment'),
+            display_map={True: _('Happy'), False: _('Sad')},
             value_map={True: 1, False: 0}, checked=search_happy),
         counts_to_options(counts['platform'].items(),
             name='platform', display=_('Platform'), checked=search_platform),
@@ -167,8 +168,8 @@ def dashboard(request, template):
         pass
 
     histogram = [
-        {'label': 'Happy', 'data': happy_data},
-        {'label': 'Sad', 'data': sad_data},
+        {'label': _('Happy'), 'data': happy_data},
+        {'label': _('Sad'), 'data': sad_data},
     ]
 
     # Pagination
