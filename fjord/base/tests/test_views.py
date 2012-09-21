@@ -1,3 +1,5 @@
+from django.test.utils import override_settings
+
 from nose.tools import eq_
 
 from fjord.base import views
@@ -60,6 +62,7 @@ class ErrorTesting(ElasticTestCase):
         eq_(request.status_code, 404)
         self.assertTemplateUsed(request, '404.html')
 
+    @override_settings(SHOW_STAGE_NOTICE=True, SETTINGS_MODULE='fjord.settings')
     def test_500(self):
         with self.assertRaises(IntentionalException) as cm:
             self.client.get('/services/throw-error')
