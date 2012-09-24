@@ -29,7 +29,7 @@ Localizations are not stored in this repository, but are in Mozilla's SVN.
 
 To get the localizations, do::
 
-    $ svn checkout https://svn.mozilla.org/projects/l10n-misc/trunk/input/locales locale
+    $ svn checkout https://svn.mozilla.org/projects/l10n-misc/trunk/input/locale locale
 
 
 Updating strings in svn
