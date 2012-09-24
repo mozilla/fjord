@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 
 from nose.tools import eq_
@@ -82,18 +83,18 @@ class TestDashboardView(ElasticTestCase):
         # 4 happy, 3 sad.
         # 2 Windows XP, 2 Linux, 1 OS X, 2 Windows 7
         items = [
-            (True, 'Windows XP', 'en-US', 'apple'),
-            (True, 'Windows 7', 'es', 'banana'),
-            (True, 'Linux', 'en-US', 'orange'),
-            (True, 'Linux', 'en-US', 'apple'),
-            (False, 'Windows XP', 'en-US', 'banana'),
-            (False, 'Windows 7', 'en-US', 'orange'),
-            (False, 'Linux', 'es', 'apple'),
+            (True, 'Windows XP', 'en-US', 'apple', datetime(2012, 1, 1)),
+            (True, 'Windows 7', 'es', 'banana', datetime(2012, 1, 2)),
+            (True, 'Linux', 'en-US', 'orange', datetime(2012, 1, 3)),
+            (True, 'Linux', 'en-US', 'apple', datetime(2012, 1, 4)),
+            (False, 'Windows XP', 'en-US', 'banana', datetime(2012, 1, 5)),
+            (False, 'Windows 7', 'en-US', 'orange', datetime(2012, 1, 6)),
+            (False, 'Linux', 'es', 'apple', datetime(2012, 1, 7)),
         ]
-        for happy, platform, locale, description in items:
+        for happy, platform, locale, description, created in items:
             # We don't need to keep this around, just need to create it.
             simple(happy=happy, platform=platform, locale=locale,
-                   description=description, save=True)
+                   description=description, created=created, save=True)
 
         self.refresh()
 
@@ -141,6 +142,24 @@ class TestDashboardView(ElasticTestCase):
         r = self.client.get(url, {'q': 'apple', 'happy': 1, 'locale': 'en-US'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 2)
+
+    def test_date_search(self):
+        url = reverse('dashboard')
+        # Unspecified start => (-infin, end]
+        r = self.client.get(url, {'date_end': '2012-01-05'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 5)
+        # Unspecified end => [start, +infin)
+        r = self.client.get(url, {'date_start': '2012-01-04'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 4)
+        # Both start and end => [start, end]
+        r = self.client.get(url, {
+            'date_start': '2012-01-02',
+            'date_end': '2012-01-06'
+            })
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 5)
 
     def test_invalid_search(self):
         url = reverse('dashboard')

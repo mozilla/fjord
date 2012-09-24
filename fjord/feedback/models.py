@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 
 from elasticutils.contrib.django.models import Indexable
@@ -29,7 +31,7 @@ class Simple(ModelBase):
     platform = models.CharField(max_length=30, blank=True)
     locale = models.CharField(max_length=8, blank=True)
 
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(default=datetime.now)
 
     class Meta:
         ordering = ['-created']

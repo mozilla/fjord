@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from django.shortcuts import render
 from django.template.defaultfilters import slugify
 
@@ -83,6 +85,10 @@ def dashboard(request, template):
     search_platform = request.GET.get('platform', None)
     search_locale = request.GET.get('locale', None)
     search_query = request.GET.get('q', None)
+    search_date_start = request.GET.get('date_start', None)
+    search_date_end = request.GET.get('date_end', None)
+    selected = request.GET.get('selected', None)
+
     current_search = {'page': page}
 
     search = SimpleIndex.search()
@@ -98,6 +104,29 @@ def dashboard(request, template):
     if search_locale:
         f &= F(locale=search_locale)
         current_search['locale'] = search_locale
+
+    if search_date_start:
+        try:
+            start = datetime.strptime(search_date_start, '%Y-%m-%d')
+            # This isn't a mistake. The line below *should* say `search_date_start`
+            current_search['date_start'] = search_date_start
+            f &= F(created__gte=start)
+        except ValueError:
+            # Should something happen here?
+            pass
+    if search_date_end:
+        try:
+            end = datetime.strptime(search_date_end, '%Y-%m-%d')
+            # Add one day, so that the search range includes the entire day.
+            end += timedelta(days=1)
+            # This isn't a mistake. The line below *should* say `search_date_end`
+            current_search['date_end'] = search_date_end
+            # Note 'less than', not 'less than or equal', because of the above.
+            f &= F(created__lt=end)
+        except ValueError:
+            # Should something happen here?
+            pass
+
     if search_query:
         fields = ['text', 'text_phrase', 'fuzzy']
         query = dict(('description__%s' % f, search_query) for f in fields)
@@ -179,4 +208,5 @@ def dashboard(request, template):
         'prev_page': page - 1 if start > 0 else None,
         'next_page': page + 1 if end < search_count else None,
         'current_search': current_search,
+        'selected': selected,
     })

@@ -29,7 +29,7 @@
 // General Styling
 
 html {
-  background: #fff;
+  background-color: #fff;
   color: #4B4742;
   font: 13px Helvetica, Arial, sans-serif;
   line-height: 1;
@@ -412,5 +412,39 @@ footer {
 
   #footer-links {
     font-size: 85%;
+  }
+}
+
+// UI
+
+a.button {
+  background-color: #F0F0F0;
+  padding: 3px 4px;
+  margin-right: 5px;
+  color: #000000;
+  box-shadow: 1px 1px 0px rgba(0, 0, 50, 0.2);
+  position: relative;
+  line-height: 30px;
+
+  &.selected {
+    background-color: #4497C7;
+  }
+
+  &:hover {
+    background-color: #C1DCEC;
+    text-decoration: none;
+  }
+
+  &:active {
+    box-shadow: 0 0 0.5px rgba(0, 0, 50, 0.2);
+    top: 0.5px;
+    left: 0.5px;
+  }
+}
+
+#whentext {
+  margin-top: 5px;
+  input[type=date] {
+    width: 75px;
   }
 }

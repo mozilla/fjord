@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import time
 import json
 
@@ -41,3 +42,10 @@ def locale_name(locale, native=False, default=_lazy('Unknown')):
         return product_details.languages[locale][display_locale]
     else:
         return default
+
+
+@register.function
+def date_ago(days=0):
+    now = datetime.now()
+    diff = timedelta(days=days)
+    return (now - diff).date()
