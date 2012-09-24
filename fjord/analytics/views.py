@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.shortcuts import render
 from django.template.defaultfilters import slugify
 
@@ -81,6 +83,10 @@ def dashboard(request, template):
     search_happy = request.GET.get('happy', None)
     search_platform = request.GET.get('platform', None)
     search_locale = request.GET.get('locale', None)
+    search_date_start = request.GET.get('date_start', None)
+    search_date_end = request.GET.get('date_end', None)
+    selected = request.GET.get('selected', None)
+
     current_search = {'page': page}
     search = SimpleIndex.search()
     f = F()
@@ -95,6 +101,14 @@ def dashboard(request, template):
     if search_locale:
         f &= F(locale=search_locale)
         current_search['locale'] = search_locale
+    if search_date_start:
+        current_search['date_start'] = search_date_start
+        search_date_start = datetime.strptime(search_date_start, '%Y-%m-%d')
+        f &= F(created__gt=search_date_start)
+    if search_date_end:
+        current_search['date_end'] = search_date_end
+        search_date_end = datetime.strptime(search_date_end, '%Y-%m-%d')
+        f &= F(created__lt=search_date_end)
 
     search = search.filter(f).order_by('-created')
 
@@ -171,4 +185,5 @@ def dashboard(request, template):
         'prev_page': page - 1 if start > 0 else None,
         'next_page': page + 1 if end < search_count else None,
         'current_search': current_search,
+        'selected': selected,
     })

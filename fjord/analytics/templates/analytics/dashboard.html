@@ -19,7 +19,9 @@
       {{ feedback.description }}
     </p>
     <ul class="meta">
-      <li><time datetime="{{ feedback.created }}Z" title="{{ feedback.created }} UTC">{{ feedback.created|naturaltime }}</time></li>
+      <li><time datetime="{{ feedback.created }}Z" title="{{ feedback.created }} UTC">
+        {{ feedback.created|naturaltime }}
+      </time></li>
       <li>{{ feedback.platform }}</li>
       <li>{{ feedback.locale|locale_name }}</li>
     </ul>
@@ -42,6 +44,23 @@
   </div>
 {% endmacro %}
 
+{% macro date_range_button(days, text) %}
+  {% set days_text = '%sd' % days %}
+  {% if selected == days_text %}
+    {% set sel = 'selected' %}
+  {% endif %}
+
+  {% if days == None %}
+    {% set ago = None %}
+  {% else %}
+    {% set ago = date_ago(days=days) %}
+  {% endif %}
+
+  {% set href = request.get_full_path()|urlparams(date_start=ago, date_end=None, selected=days_text) %}
+
+  <a class="button when {{ sel }}" href="{{ href }}">{{ text }}</a>
+{% endmacro %}
+
 {% block body_id %}dashboard{% endblock %}
 
 {% block content %}
@@ -49,6 +68,22 @@
 <div class="col">
 {% block content_leftside %}
   <div class="block search">
+
+    <div class="filter">
+      <h3>When</h3>
+      {{ date_range_button(1, _('1d')) }}
+      {{ date_range_button(7, _('7d')) }}
+      {{ date_range_button(30, _('30d')) }}
+      {{ date_range_button(None, _('&infin;')) }}
+
+      <a href="#" class="expander button" for="whentext">{{ _('&raquo;') }}</a>
+
+      <div class="expando" id="whentext">
+        <input type="date" name="date_start" value="{{ current_search.date_start }}" placeholder="Start"> -
+        <input type="date" name="date_end" value="{{ current_search.date_end }}" placeholder="End">
+        <a href="#" class="button" id="whensubmit">{{ _('Set') }}</a>
+      </div>
+    </div>
 
     {% for filter_set in filter_data %}
       {{ filter_block(filter_set) }}

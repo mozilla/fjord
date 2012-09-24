@@ -1,4 +1,29 @@
 $(function() {
+    // General widgets.
+    $('.expando').hide();
+    $('.expander').bind('click', function() {
+        var $this = $(this);
+        var $for = $('#' + $this.attr('for'));
+        $for.fadeToggle();
+        $this.toggleClass('selected');
+    });
+
+    // Set up the when selector.
+    var $date_start = $('#whensubmit').siblings('input[name=date_start]');
+    var $date_end = $('#whensubmit').siblings('input[name=date_end]');
+    if ($date_start.val() || $date_end.val()) {
+        $('#whentext').show();
+        $('.expander[for=whentext]').addClass('selected');
+    }
+
+    $('#whensubmit').bind('click', function() {
+        setQuerystring(getQuerystring(), {
+            date_start: $date_start.val(),
+            date_end: $date_en.val()
+        });
+    });
+
+
     // Draw bars in the left column.
     $('ul.bars').each(function() {
         var $ul = $(this);
