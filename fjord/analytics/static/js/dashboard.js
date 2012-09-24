@@ -51,8 +51,8 @@ $(function() {
         'sad': '#AA4643'
     };
     for (var i = 0; i < data.length; i++) {
-        var label = data[i]['label'].toLowerCase();
-        var color = colors[label];
+        var name = data[i]['name'];
+        var color = colors[name];
         if (color === undefined) {
             color = '#000000';
         }

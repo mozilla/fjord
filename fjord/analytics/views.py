@@ -148,8 +148,8 @@ def dashboard(request, template):
     sad_data = [(p['time'], int(p['count'])) for p in histograms['sad']]
 
     histogram = [
-        {'label': _('Happy'), 'data': happy_data},
-        {'label': _('Sad'), 'data': sad_data},
+        {'label': _('Happy'), 'name': 'happy', 'data': happy_data},
+        {'label': _('Sad'), 'name': 'sad', 'data': sad_data},
     ]
 
     # Pagination
