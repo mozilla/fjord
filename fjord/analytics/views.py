@@ -81,20 +81,27 @@ def dashboard(request, template):
     search_happy = request.GET.get('happy', None)
     search_platform = request.GET.get('platform', None)
     search_locale = request.GET.get('locale', None)
+    search_query = request.GET.get('q', None)
     current_search = {'page': page}
+
     search = SimpleIndex.search()
     f = F()
     # If search happy is '0' or '1', set it to False or True, respectively.
     search_happy = {'0': False, '1': True}.get(search_happy, None)
     if search_happy in [False, True]:
         f &= F(happy=search_happy)
-        current_search['happy'] = search_happy
+        current_search['happy'] = int(search_happy)
     if search_platform:
         f &= F(platform=search_platform)
         current_search['platform'] = search_platform
     if search_locale:
         f &= F(locale=search_locale)
         current_search['locale'] = search_locale
+    if search_query:
+        fields = ['text', 'text_phrase', 'fuzzy']
+        query = dict(('description__%s' % f, search_query) for f in fields)
+        search = search.query(or_=query)
+        current_search['q'] = search_query
 
     search = search.filter(f).order_by('-created')
 

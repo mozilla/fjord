@@ -82,17 +82,18 @@ class TestDashboardView(ElasticTestCase):
         # 4 happy, 3 sad.
         # 2 Windows XP, 2 Linux, 1 OS X, 2 Windows 7
         items = [
-            (True, 'Windows XP', 'en-US'),
-            (True, 'Windows 7', 'es'),
-            (True, 'Linux', 'en-US'),
-            (True, 'Linux', 'en-US'),
-            (False, 'Windows XP', 'en-US'),
-            (False, 'Windows 7', 'en-US'),
-            (False, 'Linux', 'es'),
+            (True, 'Windows XP', 'en-US', 'apple'),
+            (True, 'Windows 7', 'es', 'banana'),
+            (True, 'Linux', 'en-US', 'orange'),
+            (True, 'Linux', 'en-US', 'apple'),
+            (False, 'Windows XP', 'en-US', 'banana'),
+            (False, 'Windows 7', 'en-US', 'orange'),
+            (False, 'Linux', 'es', 'apple'),
         ]
-        for happy, platform, locale in items:
+        for happy, platform, locale, description in items:
             # We don't need to keep this around, just need to create it.
-            simple(happy=happy, platform=platform, locale=locale, save=True)
+            simple(happy=happy, platform=platform, locale=locale,
+                   description=description, save=True)
 
         self.refresh()
 
@@ -129,6 +130,17 @@ class TestDashboardView(ElasticTestCase):
         r = self.client.get(url, {'platform': 'Atari'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 0)
+
+    def test_text_search(self):
+        url = reverse('dashboard')
+        # Text search
+        r = self.client.get(url, {'q': 'apple'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 3)
+        # Text and filter
+        r = self.client.get(url, {'q': 'apple', 'happy': 1, 'locale': 'en-US'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 2)
 
     def test_invalid_search(self):
         url = reverse('dashboard')
