@@ -211,6 +211,7 @@ header {
     min-height: 100px;
     box-shadow: 0px 0px 3px rgba(0,0,0,0.3);
     margin-bottom: 15px;
+    position: relative;
   }
 
   h1:first-child,
@@ -275,6 +276,17 @@ header {
           padding-right: 0.5em;
         }
       }
+    }
+  }
+
+  #feedback_search {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+
+    .search_box {
+      background: url('/static/img/search.png') no-repeat scroll 4px center transparent;
+      padding-left: 16px;
     }
   }
 }
