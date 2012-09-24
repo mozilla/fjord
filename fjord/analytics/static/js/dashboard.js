@@ -19,7 +19,7 @@ $(function() {
     $('#whensubmit').bind('click', function() {
         setQuerystring(getQuerystring(), {
             date_start: $date_start.val(),
-            date_end: $date_en.val()
+            date_end: $date_end.val()
         });
     });
 
