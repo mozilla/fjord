@@ -50,12 +50,13 @@
     {% set sel = 'selected' %}
   {% endif %}
 
-  {% if days == None %}
+  {% if days is none %}
     {% set ago = None %}
   {% else %}
     {% set ago = date_ago(days=days) %}
   {% endif %}
 
+  {# date_end=None here is to remove the date_end parameter from the query string. #}
   {% set href = request.get_full_path()|urlparams(date_start=ago, date_end=None, selected=days_text) %}
 
   <a class="button when {{ sel }}" href="{{ href }}">{{ text }}</a>
@@ -71,16 +72,19 @@
 
     <div class="filter">
       <h3>When</h3>
-      {{ date_range_button(1, _('1d')) }}
-      {{ date_range_button(7, _('7d')) }}
-      {{ date_range_button(30, _('30d')) }}
-      {{ date_range_button(None, _('&infin;')) }}
+      {{ date_range_button(1, _('1d')) }}{# L10n: Short for 1 day. #}
+      {{ date_range_button(7, _('7d')) }}{# L10n: Short for 7 days. #}
+      {{ date_range_button(30, _('30d')) }}{# L10n: Short for 30 days. #}
+      {# The `None` here is to remove the start_date from the URL. #}
+      {{ date_range_button(None, _('&infin;')) }}{# L10n: Symbol for "all" date range. #}
 
       <a href="#" class="expander button" for="whentext">{{ _('&raquo;') }}</a>
 
       <div class="expando" id="whentext">
-        <input type="date" name="date_start" value="{{ current_search.date_start }}" placeholder="Start"> -
-        <input type="date" name="date_end" value="{{ current_search.date_end }}" placeholder="End">
+        <input type="date" name="date_start" value="{{ current_search.date_start }}"
+          placeholder="{{ _('Start') }}"> -
+        <input type="date" name="date_end" value="{{ current_search.date_end }}"
+          placeholder="{{ _('End') }}">
         <a href="#" class="button" id="whensubmit">{{ _('Set') }}</a>
       </div>
     </div>

@@ -101,17 +101,28 @@ def dashboard(request, template):
     if search_locale:
         f &= F(locale=search_locale)
         current_search['locale'] = search_locale
+
     if search_date_start:
-        current_search['date_start'] = search_date_start
-        search_date_start = datetime.strptime(search_date_start, '%Y-%m-%d')
-        f &= F(created__gte=search_date_start)
+        try:
+            start = datetime.strptime(search_date_start, '%Y-%m-%d')
+            # This isn't a mistake. The line below *should* say `search_date_start`
+            current_search['date_start'] = search_date_start
+            f &= F(created__gte=start)
+        except:
+            # Should something happen here?
+            pass
     if search_date_end:
-        current_search['date_end'] = search_date_end
-        search_date_end = datetime.strptime(search_date_end, '%Y-%m-%d')
-        # Add one day, so that the search range includes the entire day.
-        search_date_end += timedelta(days=1)
-        # Note 'less than', not 'less than or equal', because of the above.
-        f &= F(created__lt=search_date_end)
+        try:
+            end = datetime.strptime(search_date_end, '%Y-%m-%d')
+            # Add one day, so that the search range includes the entire day.
+            end += timedelta(days=1)
+            # This isn't a mistake. The line below *should* say `search_date_end`
+            current_search['date_end'] = search_date_end
+            # Note 'less than', not 'less than or equal', because of the above.
+            f &= F(created__lt=end)
+        except:
+            # Should something happen here?
+            pass
 
     search = search.filter(f).order_by('-created')
 

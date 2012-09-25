@@ -136,15 +136,15 @@ class TestDashboardView(ElasticTestCase):
 
     def test_date_search(self):
         url = reverse('dashboard')
-        # Open start
+        # Unspecified start => (-infin, end]
         r = self.client.get(url, {'date_end': '2012-01-05'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 5)
-        # Open end
+        # Unspecified end => [start, +infin)
         r = self.client.get(url, {'date_start': '2012-01-04'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 4)
-        # Closed range
+        # Both start and end => [start, end]
         r = self.client.get(url, {
             'date_start': '2012-01-02',
             'date_end': '2012-01-06'
