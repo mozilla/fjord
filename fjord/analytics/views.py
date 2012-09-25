@@ -108,7 +108,7 @@ def dashboard(request, template):
             # This isn't a mistake. The line below *should* say `search_date_start`
             current_search['date_start'] = search_date_start
             f &= F(created__gte=start)
-        except:
+        except ValueError:
             # Should something happen here?
             pass
     if search_date_end:
@@ -120,7 +120,7 @@ def dashboard(request, template):
             current_search['date_end'] = search_date_end
             # Note 'less than', not 'less than or equal', because of the above.
             f &= F(created__lt=end)
-        except:
+        except ValueError:
             # Should something happen here?
             pass
 
