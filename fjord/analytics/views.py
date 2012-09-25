@@ -98,7 +98,9 @@ def dashboard(request, template):
         f &= F(locale=search_locale)
         current_search['locale'] = search_locale
     if search_query:
-        search = search.query(description__text=search_query)
+        fields = ['text', 'text_phrase', 'fuzzy']
+        query = dict(('description__%s' % f, search_query) for f in fields)
+        search = search.query(or_=query)
         current_search['q'] = search_query
 
     search = search.filter(f).order_by('-created')
