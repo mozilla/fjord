@@ -6,6 +6,7 @@ from mobility.decorators import mobile_template
 from tower import ugettext as _
 
 from fjord.base.helpers import locale_name
+from fjord.base.util import smart_int
 from fjord.feedback.models import SimpleIndex
 
 
@@ -77,7 +78,7 @@ def counts_to_options(counts, name, display=None, display_map=None,
 @es_required_or_50x(error_template='analytics/es_down.html')
 @mobile_template('analytics/{mobile/}dashboard.html')
 def dashboard(request, template):
-    page = int(request.GET.get('page', 1))
+    page = smart_int(request.GET.get('page', 1), 1)
     search_happy = request.GET.get('happy', None)
     search_platform = request.GET.get('platform', None)
     search_locale = request.GET.get('locale', None)
@@ -152,7 +153,7 @@ def dashboard(request, template):
     # p['time'] is number of milliseconds since the epoch. Which is
     # convenient, because that is what the front end wants.
     happy_data = [(p['time'], p['count']) for p in histograms['happy']]
-    sad_data = [(p['time'], int(p['count'])) for p in histograms['sad']]
+    sad_data = [(p['time'], p['count']) for p in histograms['sad']]
 
     histogram = [
         {'label': _('Happy'), 'name': 'happy', 'data': happy_data},
