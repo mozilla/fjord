@@ -72,11 +72,15 @@
 
     <div class="filter">
       <h3>When</h3>
-      {{ date_range_button(1, _('1d')) }}{# L10n: Short for 1 day. #}
-      {{ date_range_button(7, _('7d')) }}{# L10n: Short for 7 days. #}
-      {{ date_range_button(30, _('30d')) }}{# L10n: Short for 30 days. #}
+      {# L10n: Short for 1 day. #}
+      {{ date_range_button(1, _('1d')) }}
+      {# L10n: Short for 7 days. #}
+      {{ date_range_button(7, _('7d')) }}
+      {# L10n: Short for 30 days. #}
+      {{ date_range_button(30, _('30d')) }}
       {# The `None` here is to remove the start_date from the URL. #}
-      {{ date_range_button(None, _('&infin;')) }}{# L10n: Symbol for "all" date range. #}
+      {# L10n: Symbol for "all" date range. #}
+      {{ date_range_button(None, _('&infin;')) }}
 
       <a href="#" class="expander button" for="whentext">{{ _('&raquo;') }}</a>
 

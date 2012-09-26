@@ -414,8 +414,12 @@ a.button {
   position: relative;
   line-height: 30px;
 
+  &.selected {
+    background-color: #4497C7;
+  }
+
   &:hover {
-    background-color: #C1DCEC !important; // Override the .selected below.
+    background-color: #C1DCEC;
     text-decoration: none;
   }
 
@@ -423,10 +427,6 @@ a.button {
     box-shadow: 0 0 0.5px rgba(0, 0, 50, 0.2);
     top: 0.5px;
     left: 0.5px;
-  }
-
-  &.selected {
-    background-color: #4497C7;
   }
 }
 
