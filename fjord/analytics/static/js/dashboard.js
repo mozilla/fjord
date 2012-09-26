@@ -1,5 +1,6 @@
 $(function() {
     // General widgets.
+    // Expandos
     $('.expando').hide();
     $('.expander').bind('click', function() {
         var $this = $(this);
@@ -7,6 +8,12 @@ $(function() {
         $for.fadeToggle();
         $this.toggleClass('selected');
     });
+
+    // Datepickers.
+    $('input[type=date]').datepicker({
+        dateFormat: 'yy-mm-dd',
+    });
+
 
     // Set up the when selector.
     var $date_start = $('#whensubmit').siblings('input[name=date_start]');
@@ -67,6 +74,7 @@ $(function() {
             });
         });
     });
+
 
     // Draw histogram in the middle column.
     var $histogram = $('.graph .histogram');

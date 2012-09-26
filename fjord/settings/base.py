@@ -64,6 +64,7 @@ MINIFY_BUNDLES = {
             'css/feedback.less',
         ),
         'dashboard': (
+            'css/ui-lightness/jquery-ui.css',
             'css/lib/normalize.css',
             'css/fjord.less',
             'css/dashboard.less',
@@ -84,6 +85,7 @@ MINIFY_BUNDLES = {
         ),
         'dashboard': (
             'js/lib/jquery.min.js',
+            'js/lib/jquery-ui.min.js',
             'js/lib/excanvas.js',
             'js/lib/jquery.flot.js',
             'js/lib/jquery.flot.time.js',
