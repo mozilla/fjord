@@ -24,13 +24,13 @@ INSTALLED_APPS = get_apps(
         'django.contrib.admin',
         'django_nose',
         'djcelery',
+        'eadred',
         'jingo_minify',
         'test_utils',
 
         'fjord.analytics',
         'fjord.base',
         'fjord.feedback',
-        'fjord.sampledata',
         'fjord.search',
     ))
 

@@ -315,7 +315,7 @@ Getting sample data
 
 You can get sample data in your db by running::
 
-    $ ./manage.py sampledata
+    $ ./manage.py generatedata
 
 This will generate a bunch of sample data so that your Fjord instance
 has something to look at.
