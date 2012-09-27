@@ -13,3 +13,6 @@
 [submodule "vendor-local/src/jingo-minify"]
 	path = vendor-local/src/jingo-minify
 	url = git://github.com/jsocol/jingo-minify
+[submodule "vendor-local/src/django-eadred"]
+	path = vendor-local/src/django-eadred
+	url = git://github.com/willkg/django-eadred.git

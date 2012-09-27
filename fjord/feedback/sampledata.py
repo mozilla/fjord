@@ -25,7 +25,7 @@ def create_simple(happy, description, url=u'', ua=FIREFOX_LINUX_17,
     return obj
 
 
-def generate_sampledata():
+def generate_sampledata(options):
     # Create 5 happy opinions.
     create_simple(True, u'Firefox is great!')
     create_simple(True, u'Made me pancakes!')
