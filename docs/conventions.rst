@@ -171,3 +171,26 @@ Be mindful of work that localizers will have to do.
 
    http://playdoh.readthedocs.org/en/latest/userguide/l10n.html#localization-l10n
      Localization (l10n) in the Playdoh docs
+
+
+Testing strings
+---------------
+
+Fjord comes with ``bin/test_locales.sh`` script which makes it pretty
+easy to test that strings in the user interface are getting gettext'd.
+It creates a faux "Swedish Chef" translation of the strings in the
+`xx` locale.
+
+You need to install polib for the script to work::
+
+    $ pip install polib
+
+After that, cd into the project directory and do::
+
+    $ bin/test_locales.sh
+
+After that runs, you can see what happened by doing::
+
+    $ ./manage.py runserver
+
+and going to `<http://localhost:8000/xx/>`_.
