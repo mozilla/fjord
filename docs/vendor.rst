@@ -19,7 +19,7 @@ The "vendor library" is composed of the ``vendor`` and
 ``vendor-local`` directories in the fjord repository.
 
 The ``vendor`` directory is `playdoh-lib
-<https://github.com/mozilla/playdoh-lib>`_. 
+<https://github.com/mozilla/playdoh-lib>`_.
 
 The ``vendor-local`` directory is specific to Fjord and is where we
 have all the vendory things that aren't in playdoh-lib. We make
@@ -88,7 +88,7 @@ Run::
     $ vendor-local/addsubmodules.sh
     $ vim vendor-local/vendor.pth
 
-    <Add the new library's dir>
+    <Add the new library's dir to vendor.pth>
 
     $ git add vendor-local/vendor.pth
     $ git ci -m "[bug xyz] Add <LIBRARY>"
