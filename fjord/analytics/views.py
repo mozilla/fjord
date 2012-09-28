@@ -8,7 +8,7 @@ from mobility.decorators import mobile_template
 from tower import ugettext as _
 
 from fjord.base.helpers import locale_name
-from fjord.base.util import smart_int
+from fjord.base.util import smart_int, smart_datetime
 from fjord.feedback.models import SimpleIndex
 
 
@@ -85,8 +85,8 @@ def dashboard(request, template):
     search_platform = request.GET.get('platform', None)
     search_locale = request.GET.get('locale', None)
     search_query = request.GET.get('q', None)
-    search_date_start = request.GET.get('date_start', None)
-    search_date_end = request.GET.get('date_end', None)
+    search_date_start = smart_datetime(request.GET.get('date_start', None), fallback=None)
+    search_date_end = smart_datetime(request.GET.get('date_end', None), fallback=None)
     selected = request.GET.get('selected', None)
 
     current_search = {'page': page}
@@ -106,26 +106,15 @@ def dashboard(request, template):
         current_search['locale'] = search_locale
 
     if search_date_start:
-        try:
-            start = datetime.strptime(search_date_start, '%Y-%m-%d')
-            # This isn't a mistake. The line below *should* say `search_date_start`
-            current_search['date_start'] = search_date_start
-            f &= F(created__gte=start)
-        except ValueError:
-            # Should something happen here?
-            pass
+        current_search['date_start'] = search_date_start.strftime('%Y-%m-%d')
+        f &= F(created__gte=search_date_start)
+
     if search_date_end:
-        try:
-            end = datetime.strptime(search_date_end, '%Y-%m-%d')
-            # Add one day, so that the search range includes the entire day.
-            end += timedelta(days=1)
-            # This isn't a mistake. The line below *should* say `search_date_end`
-            current_search['date_end'] = search_date_end
-            # Note 'less than', not 'less than or equal', because of the above.
-            f &= F(created__lt=end)
-        except ValueError:
-            # Should something happen here?
-            pass
+        current_search['date_end'] = search_date_end.strftime('%Y-%m-%d')
+        # Add one day, so that the search range includes the entire day.
+        end = search_date_end + timedelta(days=1)
+        # Note 'less than', not 'less than or equal', because of the added day above.
+        f &= F(created__lt=end)
 
     if search_query:
         fields = ['text', 'text_phrase', 'fuzzy']
