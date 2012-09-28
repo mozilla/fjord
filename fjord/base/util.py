@@ -1,3 +1,5 @@
+from datetime import datetime
+
 def smart_truncate(content, length=100, suffix='...'):
     """Truncate text at space before length bound.
 
@@ -27,3 +29,21 @@ def smart_int(string, fallback=0):
         return int(float(string))
     except (ValueError, TypeError):
         return fallback
+
+
+def smart_datetime(string, format='%Y-%m-%d', fallback=None):
+    """Convert a string to a date, with a fallback for invalid input.
+
+    Note that this won't take ``datetime``s as input, only strings. It is
+    different than ``smart_int`` in this way.
+
+    :arg string: The string to convert to a date.
+    :arg format: Format to use to parse the string into a date. Default: ``'%Y-%m-%d'``.
+    :arg fallback: Value to use in case of an error. Default: ``None``.
+
+    """
+    try:
+        return datetime.strptime(string, format)
+    except (ValueError, TypeError):
+        return fallback
+
