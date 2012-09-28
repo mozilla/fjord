@@ -180,7 +180,10 @@ class TestDashboardView(ElasticTestCase):
         eq_(len(pq('li.opinion')), 7)
         # A broken date range search shouldn't affect anything
         # Why this? Because this is the thing the fuzzer found.
-        r = self.client.get(url, {'date_start': '/etc/passwd\x00'})
+        r = self.client.get(url, {
+                'date_end': '/etc/shadow\x00',
+                'date_start': '/etc/passwd\x00'
+                })
         eq_(r.status_code, 200)
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 7)

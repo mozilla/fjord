@@ -1,5 +1,6 @@
 from datetime import datetime
 
+
 def smart_truncate(content, length=100, suffix='...'):
     """Truncate text at space before length bound.
 
