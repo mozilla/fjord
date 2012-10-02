@@ -41,8 +41,7 @@ class LocalizingClient(Client):
         return super(LocalizingClient, self).request(**request)
 
 
-# Include `SETTINGS_MODULE` so that tower doesn't get confused and die.
-@override_settings(ES_LIVE_INDEX=False, SETTINGS_MODULE='fjord.settings')
+@override_settings(ES_LIVE_INDEX=False)
 class TestCase(OriginalTestCase):
     """A modification of ``test_utils.TestCase`` that skips live indexing."""
     pass
