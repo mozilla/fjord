@@ -20,8 +20,6 @@ class MonitorViewTest(ElasticTestCase):
         test_memcached = views.test_memcached
         try:
             with self.settings(
-                # Note: tower dies if we don't set SETTINGS_MODULE.
-                SETTINGS_MODULE='fjord.settings',
                 CACHES={
                     'default': {
                         'BACKEND': 'caching.backends.memcached.CacheClass',
@@ -62,7 +60,7 @@ class ErrorTesting(ElasticTestCase):
         eq_(request.status_code, 404)
         self.assertTemplateUsed(request, '404.html')
 
-    @override_settings(SHOW_STAGE_NOTICE=True, SETTINGS_MODULE='fjord.settings')
+    @override_settings(SHOW_STAGE_NOTICE=True)
     def test_500(self):
         with self.assertRaises(IntentionalException) as cm:
             self.client.get('/services/throw-error')

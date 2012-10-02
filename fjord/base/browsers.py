@@ -95,4 +95,3 @@ def parse_ua(ua):
 
     return Browser(browser, browser_version, platform, platform_version,
                    mobile)
-
