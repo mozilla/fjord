@@ -376,4 +376,3 @@ def es_status_cmd(checkindex=False):
         log.info('  Index (%s):', get_index())
         for name, count in mt_stats.items():
             log.info('    %-20s: %d', name, count)
-

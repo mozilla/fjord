@@ -46,7 +46,8 @@ class SmartDateTest(TestCase):
         eq_('Hullaballo', smart_datetime('', fallback='Hullaballo'))
 
     def test_format(self):
-        eq_(datetime(2012, 9, 28), smart_datetime('9/28/2012', format='%m/%d/%Y'))
+        eq_(datetime(2012, 9, 28),
+            smart_datetime('9/28/2012', format='%m/%d/%Y'))
 
     def test_null_bytes(self):
         # strptime likes to barf on null bytes in strings, so test it.

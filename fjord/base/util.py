@@ -39,7 +39,8 @@ def smart_datetime(s, format='%Y-%m-%d', fallback=None):
     different than ``smart_int`` in this way.
 
     :arg s: The string to convert to a date.
-    :arg format: Format to use to parse the string into a date. Default: ``'%Y-%m-%d'``.
+    :arg format: Format to use to parse the string into a date.
+        Default: ``'%Y-%m-%d'``.
     :arg fallback: Value to use in case of an error. Default: ``None``.
 
     """
@@ -47,4 +48,3 @@ def smart_datetime(s, format='%Y-%m-%d', fallback=None):
         return datetime.strptime(s, format)
     except (ValueError, TypeError):
         return fallback
-
