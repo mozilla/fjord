@@ -23,4 +23,5 @@ tmp/*
 /include/
 /static/
 /node_modules/
+/locale/
 *.less.css
