@@ -39,6 +39,8 @@ MIDDLEWARE_CLASSES = get_middleware(
     append=(
         'fjord.base.middleware.MobileQueryStringOverrideMiddleware',
         'fjord.base.middleware.ParseUseragentMiddleware',
+        'django_statsd.middleware.GraphiteMiddleware',
+        'django_statsd.middleware.GraphiteRequestTimingMiddleware',
     ))
 
 LOCALE_PATHS = (
