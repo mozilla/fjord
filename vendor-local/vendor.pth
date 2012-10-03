@@ -1,7 +1,9 @@
 src/django-adminplus
 src/django-cache-machine
 src/django-eadred
+src/django-statsd
 src/elasticutils
+src/statsd
 packages/pyes
 packages/pyquery
 packages/python-memcached
