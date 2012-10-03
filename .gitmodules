@@ -13,3 +13,9 @@
 [submodule "vendor-local/src/django-eadred"]
 	path = vendor-local/src/django-eadred
 	url = git://github.com/willkg/django-eadred.git
+[submodule "vendor-local/src/django-statsd"]
+	path = vendor-local/src/django-statsd
+	url = https://github.com/andymckay/django-statsd.git
+[submodule "vendor-local/src/statsd"]
+	path = vendor-local/src/statsd
+	url = https://github.com/jsocol/pystatsd.git
