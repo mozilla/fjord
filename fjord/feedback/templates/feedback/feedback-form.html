@@ -55,6 +55,35 @@
             {% endtrans %}
           </div>
         {% endif %}
+
+        <label class="email-ok">
+          <p>
+            {{ form.email_ok }}
+            {{ _('Check here to let us contact you to follow up on your feedback.') }}
+          </p>
+        </label>
+
+        <div class="email">
+          <label for="id_email">
+            {{ _('Email address (optional):') }}
+          </label>
+          <p>{{ form.email }}</p>
+          {{ form.email.errors }}
+
+          <p>
+            {% trans %}
+              While your feedback will be publicly visible, email addresses
+              are kept private. We understand your privacy is important.
+            {% endtrans %}
+          </p>
+        </div>
+
+        <p>
+          {% trans url="http://support.mozilla.org" %}
+            For support requests, please go to <a href="{{ url }}">Mozilla Support</a> instead.
+          {% endtrans %}
+        </p>
+
         <div class="privacy-wrapper">
           <p class="privacy">
             <span>

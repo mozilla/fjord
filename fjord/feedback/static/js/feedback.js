@@ -145,6 +145,24 @@
 
         $('#happy-with-url').clickEnable('#happy-url');
         $('#sad-with-url').clickEnable('#sad-url');
+
+        function email_expansion(elem, time) {
+            var checked = $(elem).prop('checked');
+            var email = $(elem).parents('label').siblings('.email');
+
+            if (checked) {
+                email.show(time);
+            } else {
+                email.hide(time);
+            }
+        }
+
+        $('.email-ok input[type=checkbox]').on('change', function() {
+            email_expansion(this, 300);
+        }).each(function() {
+            email_expansion(this, 0);
+        });
+
     });
 
     $('html').addClass('js');

@@ -4,7 +4,7 @@ from datetime import datetime
 from nose.tools import eq_
 
 from fjord.base.tests import TestCase
-from fjord.base.util import smart_truncate, smart_int, smart_datetime
+from fjord.base.util import smart_truncate, smart_int, smart_datetime, smart_bool
 
 
 def test_smart_truncate():
@@ -52,3 +52,26 @@ class SmartDateTest(TestCase):
     def test_null_bytes(self):
         # strptime likes to barf on null bytes in strings, so test it.
         eq_(None, smart_datetime('/etc/passwd\x00'))
+
+
+class SmartBoolTest(TestCase):
+
+    msg_template = 'smart_bool(%r) - Expected %r, got %r'
+
+    def test_truthy(self):
+        truths = ['Yes', 'y', u'TRUE', '1', u'1']
+        for x in truths:
+            b = smart_bool(x, 'fallback')
+            assert b == True, self.msg_template % (x, True, b)
+
+    def test_falsey(self):
+        falses = ['No', 'n', u'FALSE', '0', u'0']
+        for x in falses:
+            b = smart_bool(x, 'fallback')
+            assert b == False, self.msg_template % (x, False, b)
+
+    def test_fallback(self):
+        garbages = [None, 'apple', u'']
+        for x in garbages:
+            b = smart_bool(x, 'fallback')
+            assert b == 'fallback', self.msg_template % (x, 'fallback', b)

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from django.shortcuts import render
 from django.template.defaultfilters import slugify

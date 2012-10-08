@@ -1,9 +1,10 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 
 from funfactory.urlresolvers import reverse
 from session_csrf import anonymous_csrf_exempt
 
+from fjord.base.util import smart_bool
 from fjord.feedback.forms import SimpleForm
 from fjord.feedback import models
 
@@ -23,6 +24,7 @@ def desktop_stable_feedback(request, template=None):
     if request.method == 'POST':
         form = SimpleForm(request.POST)
         if form.is_valid():
+            data = form.cleaned_data
             # Most platforms aren't different enough between versions to care.
             # Windows is.
             platform = request.BROWSER.platform
@@ -31,9 +33,9 @@ def desktop_stable_feedback(request, template=None):
 
             opinion = models.Simple(
                 # Data coming from the user
-                happy=form.cleaned_data['happy'],
-                url=form.cleaned_data['url'],
-                description=form.cleaned_data['description'],
+                happy=data['happy'],
+                url=data['url'],
+                description=data['description'],
                 # Inferred data
                 prodchan='firefox.desktop.stable',
                 user_agent=request.META.get('HTTP_USER_AGENT', ''),
@@ -43,11 +45,17 @@ def desktop_stable_feedback(request, template=None):
                 locale=request.locale,
             )
             opinion.save()
+
+            if data['email_ok'] and data['email']:
+                e = models.SimpleEmail(email=data['email'], opinion=opinion)
+                e.save()
+
             return HttpResponseRedirect(reverse('thanks'))
         else:
             # The user did something wrong. Update the appropriate form, so
             # the errors show correctly.
-            if request.POST.get('happy'):
+            happy = smart_bool(request.POST.get('happy', None))
+            if happy:
                 forms['happy'] = form
             else:
                 forms['sad'] = form
