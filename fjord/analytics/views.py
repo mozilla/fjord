@@ -1,4 +1,6 @@
-from datetime import timedelta
+import time
+from datetime import timedelta, datetime
+from math import floor
 
 from django.shortcuts import render
 from django.template.defaultfilters import slugify
@@ -105,16 +107,22 @@ def dashboard(request, template):
         f &= F(locale=search_locale)
         current_search['locale'] = search_locale
 
-    if search_date_start:
-        current_search['date_start'] = search_date_start.strftime('%Y-%m-%d')
-        f &= F(created__gte=search_date_start)
+    if search_date_start is None and search_date_end is None:
+        selected = '7d'
 
-    if search_date_end:
-        current_search['date_end'] = search_date_end.strftime('%Y-%m-%d')
-        # Add one day, so that the search range includes the entire day.
-        end = search_date_end + timedelta(days=1)
-        # Note 'less than', not 'less than or equal', because of the added day above.
-        f &= F(created__lt=end)
+    if search_date_end is None:
+        search_date_end = datetime.now()
+    if search_date_start is None:
+        search_date_start = search_date_end - timedelta(days=7)
+
+    current_search['date_end'] = search_date_end.strftime('%Y-%m-%d')
+    # Add one day, so that the search range includes the entire day.
+    end = search_date_end + timedelta(days=1)
+    # Note 'less than', not 'less than or equal', because of the added day above.
+    f &= F(created__lt=end)
+
+    current_search['date_start'] = search_date_start.strftime('%Y-%m-%d')
+    f &= F(created__gte=search_date_start)
 
     if search_query:
         fields = ['text', 'text_phrase', 'fuzzy']
@@ -170,12 +178,38 @@ def dashboard(request, template):
 
     # p['time'] is number of milliseconds since the epoch. Which is
     # convenient, because that is what the front end wants.
-    happy_data = [(p['time'], p['count']) for p in histograms['happy']]
-    sad_data = [(p['time'], p['count']) for p in histograms['sad']]
+
+    happy_data = dict((p['time'], p['count']) for p in histograms['happy'])
+    sad_data = dict((p['time'], p['count']) for p in histograms['sad'])
+
+    # Now massage the data so that every day in the range has a value, either
+    # from elastic, or 0. The method here ensure that the filled data is
+    # aligned with the same day grid as the elasticsearch data. ie: all data
+    # points are 24 hours apart.
+    epoch_milliseconds = lambda d: time.mktime(d.timetuple()) * 1000
+    start_millis = epoch_milliseconds(search_date_start)
+    end_millis = epoch_milliseconds(search_date_end)
+    day_in_millis = 24 * 60 * 60 * 1000.0
+
+    # Grab a `S`, such that `start <= S < start + 24hours`.
+    if happy_data.keys():
+        stamp = happy_data.keys()[0]
+        d = floor((stamp - start_millis) / day_in_millis)
+        stamp -= d * day_in_millis
+    else:
+        # If there no data, it doesn't matter how it aligns.
+        stamp = start_millis
+
+    while stamp <= end_millis:
+        if stamp not in happy_data:
+            happy_data[stamp] = 0
+        if stamp not in sad_data:
+            sad_data[stamp] = 0
+        stamp += day_in_millis
 
     histogram = [
-        {'label': _('Happy'), 'name': 'happy', 'data': happy_data},
-        {'label': _('Sad'), 'name': 'sad', 'data': sad_data},
+        {'label': _('Happy'), 'name': 'happy', 'data': sorted(happy_data.items())},
+        {'label': _('Sad'), 'name': 'sad', 'data': sorted(sad_data.items())},
     ]
 
     # Pagination

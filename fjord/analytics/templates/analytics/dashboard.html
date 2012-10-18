@@ -78,9 +78,8 @@
       {{ date_range_button(7, _('7d')) }}
       {# L10n: Short for 30 days. #}
       {{ date_range_button(30, _('30d')) }}
-      {# The `None` here is to remove the start_date from the URL. #}
-      {# L10n: Symbol for "all" date range. #}
-      {{ date_range_button(None, _('&infin;')) }}
+      {# L10n: Short for 90 days. #}
+      {{ date_range_button(90, _('90d')) }}
 
       <a href="#" class="expander button" for="whentext">{{ _('&raquo;') }}</a>
 
@@ -103,11 +102,13 @@
 
 <div class="col wide">
 {% block content_middle %}
-  <div class="block graph">
-    {# A graph will be dynamically inserted in these divs by Flot. #}
-    <div class="histogram" data-histogram="{{ histogram|to_json }}"></div>
-    <div class="legend"></div>
-  </div>
+  {% if selected != '1d' %}
+    <div class="block graph">
+      {# A graph will be dynamically inserted in these divs by Flot. #}
+      <div class="histogram" data-histogram="{{ histogram|to_json }}"></div>
+      <div class="legend"></div>
+    </div>
+  {% endif %}
 
   <div class="block feedback">
     <h2>{{ _('Latest Feedback') }}</h2>
