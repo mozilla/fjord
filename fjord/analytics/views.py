@@ -1,4 +1,5 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
+from math import floor
 
 from django.shortcuts import render
 from django.template.defaultfilters import slugify
@@ -8,7 +9,7 @@ from mobility.decorators import mobile_template
 from tower import ugettext as _
 
 from fjord.base.helpers import locale_name
-from fjord.base.util import smart_int, smart_datetime
+from fjord.base.util import smart_int, smart_datetime, epoch_milliseconds
 from fjord.feedback.models import SimpleIndex
 
 
@@ -77,6 +78,56 @@ def counts_to_options(counts, name, display=None, display_map=None,
     return options
 
 
+day_in_millis = 24 * 60 * 60 * 1000.0
+
+
+def _zero_fill(start, end, data_sets, spacing=day_in_millis):
+    """Given one or more histogram dicts, zero fill them in a range.
+
+    The format of the dictionaries should be {milliseconds: numeric value}. It is
+    important that the time points in the dictionary are equally spaced. If they
+    are not, extra points will be added.
+
+    This method works with milliseconds because that is the format
+    elasticsearch and Javascript use.
+
+    :arg start: Datetime to start zero filling.
+    :arg end: Datetime to stop zero filling at.
+    :arg data_sets: A list of dictionaries to zero fill.
+    :arg spacing: Number of milliseconds between data points.
+    """
+    start_millis = epoch_milliseconds(start)
+    # Date ranges are inclusive on both ends.
+    end_millis = epoch_milliseconds(end) + spacing
+
+    # `timestamp` is a loop counter that iterates over the timestamps from start
+    # to end. It can't just be `timestamp = start`, because then the zeros being
+    # adding to the data might not be aligned with the data already in the
+    # graph, since we aren't counting by 24 hours, and the data could have a
+    # timezone offset.
+    #
+    # This try/except block picks a time up to `spacing` time after `start` so
+    # that it lines up with the data. If there is no data, then we use
+    # `stamp = start`, because there is nothing to align with.
+    try:
+        # start <= timestamp < start + spacing
+        source = [d for d in data_sets if d.keys()][0]
+        timestamp = source.keys()[0]
+        d = floor((timestamp - start_millis) / spacing)
+        timestamp -= d * spacing
+    except:
+        # If there no data, it doesn't matter how it aligns.
+        timestamp = start_millis
+
+    # Iterate in the range `start` to `end`, starting from `timestamp`, increasing
+    # by `spacing` each time. This ensures there is a data point for each day.
+    while timestamp < end_millis:
+        for d in data_sets:
+            if timestamp not in d:
+                d[timestamp] = 0
+        timestamp += spacing
+
+
 @es_required_or_50x(error_template='analytics/es_down.html')
 @mobile_template('analytics/{mobile/}dashboard.html')
 def dashboard(request, template):
@@ -105,16 +156,22 @@ def dashboard(request, template):
         f &= F(locale=search_locale)
         current_search['locale'] = search_locale
 
-    if search_date_start:
-        current_search['date_start'] = search_date_start.strftime('%Y-%m-%d')
-        f &= F(created__gte=search_date_start)
+    if search_date_start is None and search_date_end is None:
+        selected = '7d'
 
-    if search_date_end:
-        current_search['date_end'] = search_date_end.strftime('%Y-%m-%d')
-        # Add one day, so that the search range includes the entire day.
-        end = search_date_end + timedelta(days=1)
-        # Note 'less than', not 'less than or equal', because of the added day above.
-        f &= F(created__lt=end)
+    if search_date_end is None:
+        search_date_end = datetime.now()
+    if search_date_start is None:
+        search_date_start = search_date_end - timedelta(days=7)
+
+    current_search['date_end'] = search_date_end.strftime('%Y-%m-%d')
+    # Add one day, so that the search range includes the entire day.
+    end = search_date_end + timedelta(days=1)
+    # Note 'less than', not 'less than or equal', because of the added day above.
+    f &= F(created__lt=end)
+
+    current_search['date_start'] = search_date_start.strftime('%Y-%m-%d')
+    f &= F(created__gte=search_date_start)
 
     if search_query:
         fields = ['text', 'text_phrase', 'fuzzy']
@@ -170,12 +227,14 @@ def dashboard(request, template):
 
     # p['time'] is number of milliseconds since the epoch. Which is
     # convenient, because that is what the front end wants.
-    happy_data = [(p['time'], p['count']) for p in histograms['happy']]
-    sad_data = [(p['time'], p['count']) for p in histograms['sad']]
+    happy_data = dict((p['time'], p['count']) for p in histograms['happy'])
+    sad_data = dict((p['time'], p['count']) for p in histograms['sad'])
+
+    _zero_fill(search_date_start, search_date_end, [happy_data, sad_data])
 
     histogram = [
-        {'label': _('Happy'), 'name': 'happy', 'data': happy_data},
-        {'label': _('Sad'), 'name': 'sad', 'data': sad_data},
+        {'label': _('Happy'), 'name': 'happy', 'data': sorted(happy_data.items())},
+        {'label': _('Sad'), 'name': 'sad', 'data': sorted(sad_data.items())},
     ]
 
     # Pagination
