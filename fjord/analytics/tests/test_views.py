@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 
 from nose.tools import eq_
@@ -82,14 +82,18 @@ class TestDashboardView(ElasticTestCase):
         # Set up some sample data
         # 4 happy, 3 sad.
         # 2 Windows XP, 2 Linux, 1 OS X, 2 Windows 7
+        now = datetime.now()
+        # The dashboard by default shows the last week of data, so these need
+        # to be relative to today. The alternative is that every test gives an
+        # explicit date range, and that is annoying and verbose.
         items = [
-            (True, 'Windows XP', 'en-US', 'apple', datetime(2012, 1, 1)),
-            (True, 'Windows 7', 'es', 'banana', datetime(2012, 1, 2)),
-            (True, 'Linux', 'en-US', 'orange', datetime(2012, 1, 3)),
-            (True, 'Linux', 'en-US', 'apple', datetime(2012, 1, 4)),
-            (False, 'Windows XP', 'en-US', 'banana', datetime(2012, 1, 5)),
-            (False, 'Windows 7', 'en-US', 'orange', datetime(2012, 1, 6)),
-            (False, 'Linux', 'es', 'apple', datetime(2012, 1, 7)),
+            (True, 'Windows XP', 'en-US', 'apple', now - timedelta(days=6)),
+            (True, 'Windows 7', 'es', 'banana', now - timedelta(days=5)),
+            (True, 'Linux', 'en-US', 'orange', now - timedelta(days=4)),
+            (True, 'Linux', 'en-US', 'apple', now - timedelta(days=3)),
+            (False, 'Windows XP', 'en-US', 'banana', now - timedelta(days=2)),
+            (False, 'Windows 7', 'en-US', 'orange', now - timedelta(days=1)),
+            (False, 'Linux', 'es', 'apple', now - timedelta(days=0)),
         ]
         for happy, platform, locale, description, created in items:
             # We don't need to keep this around, just need to create it.
@@ -145,21 +149,32 @@ class TestDashboardView(ElasticTestCase):
 
     def test_date_search(self):
         url = reverse('dashboard')
+        # These start and end dates will give known slices of the data.
+        # Silly relative dates.
+        start = (datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d'),
+        end = (datetime.now() - timedelta(days=2)).strftime('%Y-%m-%d'),
+
         # Unspecified start => (-infin, end]
-        r = self.client.get(url, {'date_end': '2012-01-05'})
-        pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 5)
-        # Unspecified end => [start, +infin)
-        r = self.client.get(url, {'date_start': '2012-01-04'})
-        pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 4)
-        # Both start and end => [start, end]
         r = self.client.get(url, {
-            'date_start': '2012-01-02',
-            'date_end': '2012-01-06'
+                'date_end': end,
             })
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 5)
+
+        # Unspecified end => [start, +infin)
+        r = self.client.get(url, {
+                'date_start': start
+            })
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 6)
+
+        # Both start and end => [start, end]
+        r = self.client.get(url, {
+                'date_start': start,
+                'date_end': end,
+            })
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 4)
 
     def test_invalid_search(self):
         url = reverse('dashboard')
@@ -193,6 +208,21 @@ class TestDashboardView(ElasticTestCase):
         self.teardown_indexes()
         resp = self.client.get(reverse('dashboard'))
         self.assertTemplateUsed(resp, 'analytics/es_down.html')
+
+    def test_zero_fill(self):
+        """If a day in a date range has no data, it should be zero filled."""
+        # Note that we request a date range that includes 3 days without data.
+        url = reverse('dashboard')
+        r = self.client.get(url, {
+                'date_start': '2012-01-05',
+                'date_end': '2012-01-10'
+            })
+        # The histogram data is of the form [d, v], where d is a number of
+        # milliseconds since the epoch, and v is the value at that time stamp.
+        dates = [d[0] for d in r.context['histogram'][0]['data']]
+        dates = [datetime.fromtimestamp(d / 1000) for d in dates]
+        days = [d.day for d in dates]
+        assert all(d in days for d in range(5, 11))
 
     def test_frontpage_es_down(self):
         """If can't connect to ES, show es_down template."""
