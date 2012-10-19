@@ -187,9 +187,10 @@ def dashboard(request, template):
     # aligned with the same day grid as the elasticsearch data. ie: all data
     # points are 24 hours apart.
     epoch_milliseconds = lambda d: time.mktime(d.timetuple()) * 1000
-    start_millis = epoch_milliseconds(search_date_start)
-    end_millis = epoch_milliseconds(search_date_end)
     day_in_millis = 24 * 60 * 60 * 1000.0
+    start_millis = epoch_milliseconds(search_date_start)
+    # Date ranges are inclusive on both ends.
+    end_millis = epoch_milliseconds(search_date_end) + day_in_millis
 
     # Grab a `S`, such that `start <= S < start + 24hours`.
     if happy_data.keys():
@@ -200,7 +201,7 @@ def dashboard(request, template):
         # If there no data, it doesn't matter how it aligns.
         stamp = start_millis
 
-    while stamp <= end_millis:
+    while stamp < end_millis:
         if stamp not in happy_data:
             happy_data[stamp] = 0
         if stamp not in sad_data:

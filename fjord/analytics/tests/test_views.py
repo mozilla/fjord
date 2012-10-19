@@ -213,16 +213,23 @@ class TestDashboardView(ElasticTestCase):
         """If a day in a date range has no data, it should be zero filled."""
         # Note that we request a date range that includes 3 days without data.
         url = reverse('dashboard')
+        start = (datetime.now() - timedelta(days=9))
+        end = (datetime.now() - timedelta(days=3))
+
         r = self.client.get(url, {
-                'date_start': '2012-01-05',
-                'date_end': '2012-01-10'
+                'date_start': start.strftime('%Y-%m-%d'),
+                'date_end': end.strftime('%Y-%m-%d'),
             })
         # The histogram data is of the form [d, v], where d is a number of
         # milliseconds since the epoch, and v is the value at that time stamp.
         dates = [d[0] for d in r.context['histogram'][0]['data']]
         dates = [datetime.fromtimestamp(d / 1000) for d in dates]
         days = [d.day for d in dates]
-        assert all(d in days for d in range(5, 11))
+
+        d = start
+        while d <= end:
+            assert d.day in days, "Day %s has no data." % d.day
+            d += timedelta(days=1)
 
     def test_frontpage_es_down(self):
         """If can't connect to ES, show es_down template."""
