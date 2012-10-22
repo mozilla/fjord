@@ -1,4 +1,5 @@
 from datetime import datetime
+import time
 
 
 def smart_truncate(content, length=100, suffix='...'):
@@ -69,3 +70,8 @@ def smart_bool(s, fallback=False):
         pass
 
     return fallback
+
+
+def epoch_milliseconds(d):
+    """Convert a datetime to a number of milliseconds since the epoch."""
+    return time.mktime(d.timetuple()) * 1000

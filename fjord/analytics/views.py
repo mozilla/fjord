@@ -1,4 +1,3 @@
-import time
 from datetime import timedelta, datetime
 from math import floor
 
@@ -10,7 +9,7 @@ from mobility.decorators import mobile_template
 from tower import ugettext as _
 
 from fjord.base.helpers import locale_name
-from fjord.base.util import smart_int, smart_datetime
+from fjord.base.util import smart_int, smart_datetime, epoch_milliseconds
 from fjord.feedback.models import SimpleIndex
 
 
@@ -77,6 +76,45 @@ def counts_to_options(counts, name, display=None, display_map=None,
         })
     options['options'].sort(key=lambda item: item['count'], reverse=True)
     return options
+
+
+day_in_millis = 24 * 60 * 60 * 1000.0
+
+
+def _zero_fill(start, end, data_sets, spacing=day_in_millis):
+    """Given one or more histogram dicts, zero fill them in a range.
+
+    The format of the dictionaries should be {milliseconds: numeric value}. It is
+    important that the time points in the dictionary are equally spaced. If they
+    are not, extra points will be added.
+
+    This method works with milliseconds because that is the format
+    elasticsearch and Javascript use.
+
+    :arg start: Datetime to start zero filling.
+    :arg end: Datetime to stop zero filling at.
+    :arg data_sets: A list of dictionaries to zero fill.
+    :arg spacing: Number of milliseconds between data points.
+    """
+    start_millis = epoch_milliseconds(start)
+    # Date ranges are inclusive on both ends.
+    end_millis = epoch_milliseconds(end) + spacing
+
+    # Grab a datetime `stamp`, such that `start <= stamp < start + 24hours`.
+    try:
+        source = [d for d in data_sets if d.keys()][0]
+        stamp = source.keys()[0]
+        d = floor((stamp - start_millis) / spacing)
+        stamp -= d * spacing
+    except:
+        # If there no data, it doesn't matter how it aligns.
+        stamp = start_millis
+
+    while stamp < end_millis:
+        for d in data_sets:
+            if stamp not in d:
+                d[stamp] = 0
+        stamp += spacing
 
 
 @es_required_or_50x(error_template='analytics/es_down.html')
@@ -178,35 +216,10 @@ def dashboard(request, template):
 
     # p['time'] is number of milliseconds since the epoch. Which is
     # convenient, because that is what the front end wants.
-
     happy_data = dict((p['time'], p['count']) for p in histograms['happy'])
     sad_data = dict((p['time'], p['count']) for p in histograms['sad'])
 
-    # Now massage the data so that every day in the range has a value, either
-    # from elastic, or 0. The method here ensure that the filled data is
-    # aligned with the same day grid as the elasticsearch data. ie: all data
-    # points are 24 hours apart.
-    epoch_milliseconds = lambda d: time.mktime(d.timetuple()) * 1000
-    day_in_millis = 24 * 60 * 60 * 1000.0
-    start_millis = epoch_milliseconds(search_date_start)
-    # Date ranges are inclusive on both ends.
-    end_millis = epoch_milliseconds(search_date_end) + day_in_millis
-
-    # Grab a `S`, such that `start <= S < start + 24hours`.
-    if happy_data.keys():
-        stamp = happy_data.keys()[0]
-        d = floor((stamp - start_millis) / day_in_millis)
-        stamp -= d * day_in_millis
-    else:
-        # If there no data, it doesn't matter how it aligns.
-        stamp = start_millis
-
-    while stamp < end_millis:
-        if stamp not in happy_data:
-            happy_data[stamp] = 0
-        if stamp not in sad_data:
-            sad_data[stamp] = 0
-        stamp += day_in_millis
+    _zero_fill(search_date_start, search_date_end, [happy_data, sad_data])
 
     histogram = [
         {'label': _('Happy'), 'name': 'happy', 'data': sorted(happy_data.items())},

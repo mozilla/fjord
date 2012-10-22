@@ -6,8 +6,9 @@ import pyes
 from pyquery import PyQuery
 
 from fjord.analytics import views
-from fjord.analytics.views import counts_to_options
+from fjord.analytics.views import counts_to_options, _zero_fill
 from fjord.base.tests import TestCase, LocalizingClient, reverse
+from fjord.base.util import epoch_milliseconds
 from fjord.feedback.tests import simple
 from fjord.search.tests import ElasticTestCase
 
@@ -72,6 +73,28 @@ class TestCountsHelper(TestCase):
         assert not options['options'][0]['checked']
         assert not options['options'][1]['checked']
         assert options['options'][2]['checked']
+
+
+class TestZeroFillHelper(TestCase):
+
+    def test_zerofill(self):
+        start = datetime(2012, 1, 1)
+        end = datetime(2012, 1, 7)
+        data1 = {
+            epoch_milliseconds(datetime(2012, 1, 3)): 1,
+            epoch_milliseconds(datetime(2012, 1, 5)): 1,
+        }
+        data2 = {
+            epoch_milliseconds(datetime(2012, 1, 2)): 1,
+            epoch_milliseconds(datetime(2012, 1, 5)): 1,
+            epoch_milliseconds(datetime(2012, 1, 10)): 1,
+        }
+        _zero_fill(start, end, [data1, data2])
+
+        for day in range(1, 8):
+            millis = epoch_milliseconds(datetime(2012, 1, day))
+            assert millis in data1, "Day %s was not zero filled." % day
+            assert millis in data2, "Day %s was not zero filled." % day
 
 
 class TestDashboardView(ElasticTestCase):
