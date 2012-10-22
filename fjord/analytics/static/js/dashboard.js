@@ -99,7 +99,6 @@ $(function() {
         },
         xaxis: {
             mode: 'time',
-            timezone: 'browser',
             timeformat: ('%b %d')
         },
         yaxis: {
