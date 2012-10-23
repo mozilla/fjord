@@ -100,21 +100,32 @@ def _zero_fill(start, end, data_sets, spacing=day_in_millis):
     # Date ranges are inclusive on both ends.
     end_millis = epoch_milliseconds(end) + spacing
 
-    # Grab a datetime `stamp`, such that `start <= stamp < start + 24hours`.
+    # `timestamp` is a loop counter that iterates over the timestamps from start
+    # to end. It can't just be `timestamp = start`, because then the zeros being
+    # adding to the data might not be aligned with the data already in the
+    # graph, since we aren countiny by 24 hours, and the data could have a
+    # timezone offset.
+    #
+    # This try/except block picks a time up to `spacing` time after `start` so
+    # that it lines up with the data. If there is no data, then we use
+    # `stamp = start`, because there is nothing to align with.
     try:
+        # start <= timestamp < start + spacing
         source = [d for d in data_sets if d.keys()][0]
-        stamp = source.keys()[0]
-        d = floor((stamp - start_millis) / spacing)
-        stamp -= d * spacing
+        timestamp = source.keys()[0]
+        d = floor((timestamp - start_millis) / spacing)
+        timestamp -= d * spacing
     except:
         # If there no data, it doesn't matter how it aligns.
-        stamp = start_millis
+        timestamp = start_millis
 
-    while stamp < end_millis:
+    # Iterate in the range `start` to `end`, starting from `timestamp`, increasing
+    # by `spacing` each time. This ensures there is a data point for each day.
+    while timestamp < end_millis:
         for d in data_sets:
-            if stamp not in d:
-                d[stamp] = 0
-        stamp += spacing
+            if timestamp not in d:
+                d[timestamp] = 0
+        timestamp += spacing
 
 
 @es_required_or_50x(error_template='analytics/es_down.html')
