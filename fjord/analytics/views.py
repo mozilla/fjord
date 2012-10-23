@@ -103,7 +103,7 @@ def _zero_fill(start, end, data_sets, spacing=day_in_millis):
     # `timestamp` is a loop counter that iterates over the timestamps from start
     # to end. It can't just be `timestamp = start`, because then the zeros being
     # adding to the data might not be aligned with the data already in the
-    # graph, since we aren countiny by 24 hours, and the data could have a
+    # graph, since we aren't counting by 24 hours, and the data could have a
     # timezone offset.
     #
     # This try/except block picks a time up to `spacing` time after `start` so
