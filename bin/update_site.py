@@ -36,7 +36,7 @@ ENV_BRANCH = {
 LOCALE_REPO_URL = 'https://svn.mozilla.org/projects/l10n-misc/trunk/input/locale'
 
 GIT_PULL = "git pull -q origin %(branch)s"
-GIT_SUBMODULE = "git submodule update --init"
+GIT_SUBMODULE = "git submodule update --init --recursive"
 SVN_CO = "svn checkout --force %(url)s locale"
 SVN_UP = "svn update"
 COMPILE_MO = "./bin/compile-mo.sh %(localedir)s %(unique)s"
@@ -83,9 +83,6 @@ def update_site(env, debug):
         ]
 
     commands += [
-        (CHDIR, os.path.join(here, 'vendor')),
-        (EXEC,  GIT_PULL % vendor_branch),
-        (EXEC,  GIT_SUBMODULE),
         (CHDIR, os.path.join(here)),
         (EXEC, 'python2.6 manage.py migrate --all'),
         (EXEC, 'python2.6 manage.py collectstatic --noinput'),
