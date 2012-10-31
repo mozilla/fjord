@@ -106,16 +106,18 @@ def _zero_fill(start, end, data_sets, spacing=day_in_millis):
     # graph, since we aren't counting by 24 hours, and the data could have a
     # timezone offset.
     #
-    # This try/except block picks a time up to `spacing` time after `start` so
-    # that it lines up with the data. If there is no data, then we use
-    # `stamp = start`, because there is nothing to align with.
-    try:
-        # start <= timestamp < start + spacing
-        source = [d for d in data_sets if d.keys()][0]
+    # This block picks a time up to `spacing` time after `start` so that it
+    # lines up with the data. If there is no data, then we use `stamp =
+    # start`, because there is nothing to align with.
+
+    # start <= timestamp < start + spacing
+    days = [d for d in data_sets if d.keys()]
+    if days:
+        source = days[0]
         timestamp = source.keys()[0]
         d = floor((timestamp - start_millis) / spacing)
         timestamp -= d * spacing
-    except:
+    else:
         # If there no data, it doesn't matter how it aligns.
         timestamp = start_millis
 
