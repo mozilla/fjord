@@ -8,7 +8,8 @@ from django.views.decorators.cache import never_cache
 
 from celery.messaging import establish_connection
 from mobility.decorators import mobile_template
-import pyes
+from pyelasticsearch.exceptions import (
+    ConnectionError, ElasticHttpNotFoundError, Timeout)
 
 from fjord.search.index import get_index, get_index_stats
 
@@ -98,11 +99,11 @@ def monitor_view(request):
             (INFO, ('Successfully connected to ElasticSearch and index '
                     'exists.')))
 
-    except pyes.urllib3.MaxRetryError as exc:
+    except (ConnectionError, Timeout) as exc:
         es_results.append(
             (ERROR, 'Cannot connect to ElasticSearch: %s' % str(exc)))
 
-    except pyes.exceptions.IndexMissingException:
+    except ElasticHttpNotFoundError:
         es_results.append(
             (ERROR, 'Index "%s" missing.' % get_index()))
 

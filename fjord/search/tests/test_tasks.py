@@ -30,6 +30,8 @@ class IndexChunkTaskTest(ElasticTestCase):
         chunk = (SimpleIndex, [item.id for item in simple_items])
         index_chunk_task.delay(get_index(), batch_id, rec.id, chunk)
 
+        SimpleIndex.refresh_index()
+
         # Verify everything is in the index now.
         eq_(len(SimpleIndex.search()), 10)
 

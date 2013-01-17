@@ -1,8 +1,10 @@
+import time
+
 from django.conf import settings
 
-import pyes.urllib3
-import pyes.exceptions
 from nose import SkipTest
+from pyelasticsearch.exceptions import (Timeout, ConnectionError,
+                                        ElasticHttpNotFoundError)
 from test_utils import TestCase
 
 from fjord.base.tests import with_save
@@ -18,14 +20,14 @@ class ElasticTestCase(TestCase):
     def setUpClass(cls):
         super(ElasticTestCase, cls).setUpClass()
 
-        if not getattr(settings, 'ES_HOSTS'):
+        if not getattr(settings, 'ES_URLS', None):
             cls.skipme = True
             return
 
         # try to connect to ES and if it fails, skip ElasticTestCases.
         try:
-            get_indexing_es().collect_info()
-        except pyes.urllib3.MaxRetryError:
+            get_indexing_es().health()
+        except (Timeout, ConnectionError):
             cls.skipme = True
             return
 
@@ -60,7 +62,9 @@ class ElasticTestCase(TestCase):
         # TODO: uncomment this when we have live indexing.
         # generate_tasks()
 
-        get_indexing_es().refresh(index, timesleep=timesleep)
+        get_indexing_es().refresh(index)
+        if timesleep > 0:
+            time.sleep(timesleep)
 
     def setup_indexes(self, empty=False):
         """(Re-)create ES indexes."""
@@ -79,7 +83,12 @@ class ElasticTestCase(TestCase):
 
     def teardown_indexes(self):
         es = get_indexing_es()
-        es.delete_index_if_exists(get_index())
+        try:
+            es.delete_index(get_index())
+        except ElasticHttpNotFoundError:
+            # If we get this error, it means the index didn't exist
+            # so there's nothing to delete.
+            pass
 
 
 @with_save

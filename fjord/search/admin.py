@@ -5,7 +5,8 @@ from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-import pyes
+from pyelasticsearch.exceptions import (
+    ConnectionError, ElasticHttpNotFoundError, Timeout)
 
 from fjord.search.index import (
     chunked, get_index, get_index_stats, get_indexes, get_indexable,
@@ -86,20 +87,18 @@ def search_admin_view(request):
         # a bad state.
         try:
             stats = get_index_stats()
-        except pyes.exceptions.IndexMissingException:
+        except ElasticHttpNotFoundError:
             stats = None
         indexes = get_indexes()
         indexes.sort(key=lambda m: m[0])
 
-    except pyes.urllib3.MaxRetryError:
+    except (ConnectionError, Timeout):
         error_messages.append('Error: Elastic Search is not set up on this '
-                              'machine or is not responding. (MaxRetryError)')
-    except pyes.exceptions.IndexMissingException:
+                              'machine or timed out trying to respond. '
+                              '(ConnectionError/Timeout)')
+    except ElasticHttpNotFoundError:
         error_messages.append('Error: Index is missing. Press the reindex '
-                              'button below. (IndexMissingException)')
-    except pyes.urllib3.TimeoutError:
-        error_messages.append('Error: Connection to Elastic Search timed out. '
-                              '(TimeoutError)')
+                              'button below. (ElasticHttpNotFoundError)')
 
     outstanding_records = Record.outstanding()
     recent_records = Record.objects.order_by('-creation_time')[:20]

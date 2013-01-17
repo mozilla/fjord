@@ -5,10 +5,10 @@ from itertools import islice
 from django.conf import settings
 from django.db import reset_queries
 
-import pyes
-
 from elasticutils.contrib.django import get_es, S
 from elasticutils.contrib.django.models import DjangoMappingType
+from pyelasticsearch.exceptions import (ConnectionError, Timeout,
+                                        ElasticHttpNotFoundError)
 
 
 # Note: This module should not import any Fjord modules. Otherwise we
@@ -134,14 +134,17 @@ def get_indexes(all_indexes=False):
     :returns: list of (name, count) tuples.
 
     """
-    es = get_indexing_es(default_indexes=['_all'])
+    es = get_indexing_es()
 
-    indexes = es.get_indices()
-    if all_indexes:
-        indexes = [(k, v['num_docs']) for k, v in indexes.items()]
-    else:
-        indexes = [(k, v['num_docs']) for k, v in indexes.items()
-                   if k.startswith(settings.ES_INDEX_PREFIX)]
+    status = es.status()
+    indexes = status['indices']
+
+    if not all_indexes:
+        indexes = dict((k, v) for k, v in indexes.items()
+                       if k.startswith(settings.ES_INDEX_PREFIX))
+
+    indexes = [(k, v['docs']['num_docs']) for k, v in indexes.items()]
+
     return indexes
 
 
@@ -151,7 +154,12 @@ def delete_index_if_exists(index):
     :arg index: The name of the index to delete.
 
     """
-    get_indexing_es(default_indexes=['_all']).delete_index_if_exists(index)
+    try:
+        get_indexing_es().delete_index(index)
+    except ElasticHttpNotFoundError:
+        # Can ignore this since it indicates the index doesn't exist
+        # and therefore there's nothing to delete.
+        pass
 
 
 def get_index_stats():
@@ -169,8 +177,12 @@ def get_index_stats():
 
     :returns: mapping type name -> count for documents indexes.
 
-    :throws pyes.urllib3.MaxRetryError: if it can't connect to ElasticSearch
-    :throws pyes.exceptions.IndexMissingException: if the index doesn't exist
+    :throws pyelasticsearch.exceptions.Timeout: if the request
+        times out
+    :throws pyelasticsearch.exceptions.ConnectionError: if there's a
+        connection error
+    :throws pyelasticsearch.exceptions.ElasticHttpNotFound: if the
+        index doesn't exist
 
     """
     stats = {}
@@ -245,29 +257,47 @@ def index_chunk(cls, chunk, reraise=False, es=None):
         if you want errors to be thrown.
     :arg es: The ES to use. Defaults to creating a new indexing ES.
 
+    .. Note::
+
+       This indexes all the documents in the chunk in one single bulk
+       indexing call. Keep that in mind when you break your indexing
+       task into chunks.
+
     """
     if es is None:
         es = get_indexing_es()
 
-    try:
-        for id_ in chunk:
-            try:
-                cls.index(cls.extract_document(id_), bulk=True, es=es)
-            except Exception:
-                log.exception('Unable to extract/index document (id: %d)', id_)
-                if reraise:
-                    raise
-
-    finally:
-        # Try to do these things, but if we fail, it's probably the
-        # case that many things are broken, so just move on.
+    documents = []
+    for id_ in chunk:
         try:
-            es.flush_bulk(forced=True)
-            es.refresh(get_index(), timesleep=0)
+            documents.append(cls.extract_document(id_))
         except Exception:
-            log.exception('Unable to flush/refresh')
+            log.exception('Unable to extract/index document (id: %d)', id_)
+            if reraise:
+                raise
+
+    cls.bulk_index(documents, id_field='id', es=es)
 
 
+def requires_good_connection(fun):
+    """Decorator that logs an error on connection issues
+
+    9 out of 10 doctors say that connection errors are usually because
+    ES_URLS is set wrong. This catches those errors and helps you out
+    with fixing it.
+
+    """
+    def _requires_good_connection(*args, **kwargs):
+        try:
+            return fun(*args, **kwargs)
+        except (ConnectionError, Timeout):
+            log.error('Either your ElasticSearch process is not quite '
+                      'ready to rumble, is not running at all, or ES_URLS'
+                      'is set wrong in your settings_local.py file.')
+    return _requires_good_connection
+
+
+@requires_good_connection
 def es_reindex_cmd(percent=100, mapping_types=None):
     """Rebuild ElasticSearch indexes.
 
@@ -324,14 +354,10 @@ def es_reindex_cmd(percent=100, mapping_types=None):
     log.info('Done! (total time: %s)', format_time(delta_time))
 
 
+@requires_good_connection
 def es_delete_cmd(index):
     """Delete a specified index."""
-    try:
-        indexes = [name for name, count in get_indexes()]
-    except pyes.urllib3.MaxRetryError:
-        log.error('Your ElasticSearch process is not running or ES_HOSTS '
-                  'is set wrong in your settings_local.py file.')
-        return
+    indexes = [name for name, count in get_indexes()]
 
     if index not in indexes:
         log.error('Index "%s" is not a valid index.', index)
@@ -350,29 +376,21 @@ def es_delete_cmd(index):
     log.info('Done!')
 
 
+@requires_good_connection
 def es_status_cmd(checkindex=False):
     """Show ElasticSearch index status."""
-    try:
-        try:
-            mt_stats = get_index_stats()
-        except pyes.exceptions.IndexMissingException:
-            mt_stats = None
-
-    except pyes.urllib3.MaxRetryError:
-        log.error('Your ElasticSearch process is not running or ES_HOSTS '
-                  'is set wrong in your settings_local.py file.')
-        return
-
     log.info('Settings:')
-    log.info('  ES_HOSTS              : %s', settings.ES_HOSTS)
+    log.info('  ES_URLS               : %s', settings.ES_URLS)
     log.info('  ES_INDEX_PREFIX       : %s', settings.ES_INDEX_PREFIX)
     log.info('  ES_INDEXES            : %s', settings.ES_INDEXES)
 
     log.info('Index (%s) stats:', get_index())
 
-    if mt_stats is None:
-        log.info('  Index does not exist. (%s)', get_index())
-    else:
+    try:
+        mt_stats = get_index_stats()
         log.info('  Index (%s):', get_index())
         for name, count in mt_stats.items():
             log.info('    %-20s: %d', name, count)
+
+    except ElasticHttpNotFoundError:
+        log.info('  Index does not exist. (%s)', get_index())

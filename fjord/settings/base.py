@@ -160,9 +160,8 @@ SHOW_STAGE_NOTICE = False
 
 # ElasticSearch settings.
 
-# List of hostname:port strings for all the ES hosts we should connect
-# to.
-ES_HOSTS = ['127.0.0.1:9200']
+# List of host urls for the ES hosts we should connect to.
+ES_URLS = ['http://localhost:9200']
 
 # Dict of mapping-type-name -> index-name to use. Input pretty much
 # uses one index, so this should be some variation of:
