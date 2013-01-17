@@ -110,12 +110,14 @@ Do::
 
     $ cd vendor-local/packages
     $ git rm -r <LIBRARY-DIR>
-    $ cd ..
+    $ cd ../..
+
+This puts you in the repository root directory.
 
 After removing the old version, go ahead and install the new one::
 
     $ pip install --no-install --build=vendor-local/packages \
-        --src=vendor-local/src -I <LIBRARY-DIR>
+        --src=vendor-local/src -I <LIBRARY>
 
 Finally, add the new library to git::
 
