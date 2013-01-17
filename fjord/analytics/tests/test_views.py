@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import logging
 
 from nose.tools import eq_
-import pyes
+from pyelasticsearch.exceptions import Timeout
 from pyquery import PyQuery
 
 from fjord.analytics import views
@@ -260,7 +260,7 @@ class TestDashboardView(ElasticTestCase):
         old_counts_to_options = views.counts_to_options
         try:
             def mock_counts_to_options(*args, **kwargs):
-                raise pyes.urllib3.MaxRetryError()
+                raise Timeout()
             views.counts_to_options = mock_counts_to_options
 
             resp = self.client.get(reverse('dashboard'))
