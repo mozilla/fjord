@@ -86,6 +86,8 @@ class ElasticTestCase(TestCase):
         try:
             es.delete_index(get_index())
         except ElasticHttpNotFoundError:
+            # If we get this error, it means the index didn't exist
+            # so there's nothing to delete.
             pass
 
 

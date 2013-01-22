@@ -157,6 +157,8 @@ def delete_index_if_exists(index):
     try:
         get_indexing_es().delete_index(index)
     except ElasticHttpNotFoundError:
+        # Can ignore this since it indicates the index doesn't exist
+        # and therefore there's nothing to delete.
         pass
 
 
@@ -179,6 +181,8 @@ def get_index_stats():
         times out
     :throws pyelasticsearch.exceptions.ConnectionError: if there's a
         connection error
+    :throws pyelasticsearch.exceptions.ElasticHttpNotFound: if the
+        index doesn't exist
 
     """
     stats = {}
@@ -263,7 +267,6 @@ def index_chunk(cls, chunk, reraise=False, es=None):
     if es is None:
         es = get_indexing_es()
 
-    # We chunkify these and bulk index them 1000 at a time.
     documents = []
     for id_ in chunk:
         try:
