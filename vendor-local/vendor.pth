@@ -4,8 +4,8 @@ src/django-eadred
 src/django-statsd
 src/elasticutils
 src/statsd
+src/pyelasticsearch
 packages/cssselect
-packages/pyelasticsearch
 packages/pyquery
 packages/python-memcached
 packages/requests
