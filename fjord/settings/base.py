@@ -175,12 +175,6 @@ ES_INDEX_PREFIX = 'input'
 # The indexing timeout to use. 30s is good.
 ES_INDEXING_TIMEOUT = 30
 
-# The sleep duration between indexing and querying. If you're using a
-# VM then setting this to a positive integer like 1 or 2 might
-# alleviate problems with tests failing because ElasticSearch can't
-# keep up.
-ES_TEST_SLEEP_DURATION = 0
-
 # When True, objects that belong in the index will get automatically indexed
 # and deindexed when created and destroyed.
 ES_LIVE_INDEX = True

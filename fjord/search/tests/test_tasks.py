@@ -17,8 +17,6 @@ class IndexChunkTaskTest(ElasticTestCase):
         # start with so we delete and recreate it.
         self.setup_indexes(empty=True)
 
-        self.refresh()
-
         # Verify there's nothing in the index.
         eq_(len(SimpleIndex.search()), 0)
 

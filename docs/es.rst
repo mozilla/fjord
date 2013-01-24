@@ -58,18 +58,6 @@ override any of the settings, do so in your
 See ``fjord/settings/base.py`` for the list of settings and what they
 do.
 
-.. Note::
-
-   If you're running Input in a vm, you'll want to set
-   ``ES_TEST_SLEEP_DURATION``. This causes the test harness to sleep a
-   bit between indexing things and querying the index.  This gives
-   ElasticSearch a chance to catch up.
-
-   For example, this sets it to 1 second::
-
-       ES_TEST_SLEEP_DURATION = 1
-
-
 Command line tools
 ==================
 
