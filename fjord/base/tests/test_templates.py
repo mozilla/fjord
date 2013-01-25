@@ -1,4 +1,4 @@
-from mobility.middleware import COOKIE as MOBILE_COOKIE
+from fjord.base.middleware import MOBILE_COOKIE
 from nose.tools import eq_
 
 from fjord.base.tests import LocalizingClient, reverse
@@ -13,8 +13,8 @@ class MobileQueryStringOverrideTest(ElasticTestCase):
     client_class = LocalizingClient
 
     def test_mobile_override(self):
-        # Doing a request without the mobile querystring parameter
-        # shouldn't try to persist the mobile-ness in a cookie.
+        # Doing a request without specifying a mobile querystring
+        # parameter should not set a cookie.
         resp = self.client.get(reverse('home_view'))
         assert MOBILE_COOKIE not in resp.cookies
 
@@ -23,9 +23,11 @@ class MobileQueryStringOverrideTest(ElasticTestCase):
         resp = self.client.get(reverse('home_view'), {
                 'mobile': 1
                 })
-        eq_(resp.cookies[MOBILE_COOKIE].value, 'on')
+        assert MOBILE_COOKIE in resp.cookies
+        eq_(resp.cookies[MOBILE_COOKIE].value, 'yes')
 
         resp = self.client.get(reverse('home_view'), {
                 'mobile': 0
                 })
-        eq_(resp.cookies[MOBILE_COOKIE].value, 'off')
+        assert MOBILE_COOKIE in resp.cookies
+        eq_(resp.cookies[MOBILE_COOKIE].value, 'no')

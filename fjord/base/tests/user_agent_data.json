@@ -102,5 +102,13 @@
        "platform": "Linux",
        "platform_version": null,
        "mobile": false
+   },
+   {
+       "useragent": "Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0",
+       "browser": "Firefox",
+       "browser_version": "18.0.0",
+       "platform": "FirefoxOS",
+       "platform_version": null,
+       "mobile": true
    }
 ]

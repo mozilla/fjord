@@ -1,8 +1,6 @@
 import re
 from collections import namedtuple
 
-from mobility.middleware import USER_AGENTS as MOBILE_UA_RE
-
 
 # From http://msdn.microsoft.com/en-us/library/ms537503(v=vs.85).aspx
 WINDOWS_VERSION = {
@@ -41,7 +39,10 @@ def parse_ua(ua):
 
         If detection fails, those attributes will have None values.
     """
-    no_browser = Browser(None, None, None, None, None)
+    mobile = 'mobile' in ua.lower()
+
+    # If we are sure something is mobile, say True. Otherwise say None.
+    no_browser = Browser(None, None, None, None, mobile or None)
 
     if 'firefox' not in ua.lower():
         return no_browser
@@ -49,14 +50,19 @@ def parse_ua(ua):
     # For reference, a normal Firefox on android useragent looks like
     # Mozilla/5.0 (Android; Mobile; rv:14.0) Gecko/14.0 Firefox/14.0.2
 
+    # Extract the part within the parenthesis, and the part after the
+    # parenthesis. Inside has information about the platform, and outside has
+    # information about the browser.
     match = re.match(r'^Mozilla[^(]+\(([^)]+)\) (.+)', ua)
 
     if match is None:
         return no_browser
 
     # The part in parenthesis is semi-colon seperated
+    # Result: ['Android', 'Mobile', 'rv:14.0']
     platform_parts = [p.strip() for p in match.group(1).split(';')]
     # The rest is space seperated A/B pairs. Pull out both sides of the slash.
+    # Result: [['Gecko', '14.0'], ['Firefox', '14.0.2']]
     browser_parts = [p.split('/') for p in match.group(2).split(' ')]
 
     browser = 'Firefox'
@@ -64,7 +70,7 @@ def parse_ua(ua):
 
     for part in browser_parts:
         if 'Firefox' in part:
-            browser_version = part[-1]
+            browser_version = part[1]
         if 'Iceweasel' in part:
             browser = 'Iceweasel'
 
@@ -87,11 +93,14 @@ def parse_ua(ua):
                 break
         platform_version = platform_version.replace('_', '.')
 
+    # Firefox OS doesn't list a platform because "The web is the platform."
+    # It is the only platform to do this, so we can still uniquely identify it.
+    if platform == 'Mobile':
+        platform = 'FirefoxOS'
+
     # Make sure browser_version is at least x.y.z
     while browser_version.count('.') < 2:
         browser_version += '.0'
-
-    mobile = 'mobile' in ua.lower() or bool(MOBILE_UA_RE.match(ua))
 
     return Browser(browser, browser_version, platform, platform_version,
                    mobile)
