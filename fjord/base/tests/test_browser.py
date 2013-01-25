@@ -12,7 +12,7 @@ class TestUserAgentDetection(object):
 
     def check_ua(self, case):
         """Check and individual user agent test case."""
-        parsed = browsers.parse_ua(case['useragent'])
+        parsed = browsers.parse_ua(case['user_agent'])
         assert(parsed is not None)
 
         expected = tuple(case[key] for key in
@@ -33,7 +33,7 @@ class TestUserAgentDetection(object):
 
     def test_error_handling(self):
         """Make sure that good, bad, and ugly UAs don't break the parser."""
-        path = os.path.join(os.path.dirname(__file__), 'bad_useragents.txt')
+        path = os.path.join(os.path.dirname(__file__), 'bad_user_agents.txt')
         with open(path) as f:
             for ua in f:
                 browsers.parse_ua(ua)
@@ -45,7 +45,7 @@ class TestUserAgentDetection(object):
             'HTTP_USER_AGENT': ua,
         }
         request = test.RequestFactory().get('/', **d)
-        ret = middleware.ParseUseragentMiddleware().process_request(request)
+        ret = middleware.UserAgentMiddleware().process_request(request)
         assert ret is None
 
         checks = {

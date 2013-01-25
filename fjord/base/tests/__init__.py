@@ -15,7 +15,7 @@ class LocalizingClient(Client):
     prefixes, which makes tests more complicated.
 
     It also ensures there is a user agent set in the header. The default is a
-    Firefox 14 on Linux useragent. It can be overridden by passing a
+    Firefox 14 on Linux user agent. It can be overridden by passing a
     user_agent parameter to ``__init__``, setting ``self.user_agent`` to the
     desired value, or by including ``HTTP_USER_AGENT`` in an individual
     request. This behavior can be prevented by setting ``self.user_agent`` to

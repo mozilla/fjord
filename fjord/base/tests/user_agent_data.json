@@ -1,6 +1,6 @@
 [
    {
-       "useragent": "Mozilla/5.0 (Android; Mobile; rv:14.0) Gecko/14.0 Firefox/14.0.2",
+       "user_agent": "Mozilla/5.0 (Android; Mobile; rv:14.0) Gecko/14.0 Firefox/14.0.2",
        "browser": "Firefox",
        "browser_version": "14.0.2",
        "platform": "Android",
@@ -8,7 +8,7 @@
        "mobile": true
    },
    {
-       "useragent": "Mozilla/5.0 (OS X; Intel Mac OS X 10.5; rv:10.0.1) Gecko/20100101 Firefox/10.0.1 SeaMonkey/2.7.1",
+       "user_agent": "Mozilla/5.0 (OS X; Intel Mac OS X 10.5; rv:10.0.1) Gecko/20100101 Firefox/10.0.1 SeaMonkey/2.7.1",
        "browser": "Firefox",
        "browser_version": "10.0.1",
        "platform": "OS X",
@@ -16,7 +16,7 @@
        "mobile": false
    },
    {
-       "useragent": "Mozilla/5.0 (OS X; Intel Mac OS X 10.6; rv:9.0) Gecko/20100101 Firefox/9.0",
+       "user_agent": "Mozilla/5.0 (OS X; Intel Mac OS X 10.6; rv:9.0) Gecko/20100101 Firefox/9.0",
        "browser": "Firefox",
        "browser_version": "9.0.0",
        "platform": "OS X",
@@ -24,7 +24,7 @@
        "mobile": false
    },
    {
-       "useragent": "Mozilla/5.0 (OS X; Intel Mac OS X 10_7_2; rv:10.0.1) Gecko/20100101 Firefox/10.0.1",
+       "user_agent": "Mozilla/5.0 (OS X; Intel Mac OS X 10_7_2; rv:10.0.1) Gecko/20100101 Firefox/10.0.1",
        "browser": "Firefox",
        "browser_version": "10.0.1",
        "platform": "OS X",
@@ -32,7 +32,7 @@
        "mobile": false
    },
    {
-       "useragent": "Mozilla/5.0 (Windows NT 5.2; rv:10.0.1) Gecko/20100101 Firefox/10.0.1 SeaMonkey/2.7.1",
+       "user_agent": "Mozilla/5.0 (Windows NT 5.2; rv:10.0.1) Gecko/20100101 Firefox/10.0.1 SeaMonkey/2.7.1",
        "browser": "Firefox",
        "browser_version": "10.0.1",
        "platform": "Windows",
@@ -40,7 +40,7 @@
        "mobile": false
    },
    {
-       "useragent": "Mozilla/5.0 (Windows NT 6.0; rv:14.0) Gecko/20100101 Firefox/14.0.1",
+       "user_agent": "Mozilla/5.0 (Windows NT 6.0; rv:14.0) Gecko/20100101 Firefox/14.0.1",
        "browser": "Firefox",
        "browser_version": "14.0.1",
        "platform": "Windows",
@@ -48,7 +48,7 @@
        "mobile": false
    },
    {
-       "useragent": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:10.0.1) Gecko/20100101 Firefox/10.0.1",
+       "user_agent": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:10.0.1) Gecko/20100101 Firefox/10.0.1",
        "browser": "Firefox",
        "browser_version": "10.0.1",
        "platform": "Windows",
@@ -56,7 +56,7 @@
        "mobile": false
    },
    {
-       "useragent": "Mozilla/5.0 (Windows NT 6.1; rv:12.0) Gecko/20120403211507 Firefox/12.0",
+       "user_agent": "Mozilla/5.0 (Windows NT 6.1; rv:12.0) Gecko/20120403211507 Firefox/12.0",
        "browser": "Firefox",
        "browser_version": "12.0.0",
        "platform": "Windows",
@@ -64,7 +64,7 @@
        "mobile": false
    },
    {
-       "useragent": "Mozilla/5.0 (X11; FreeBSD amd64; rv:5.0) Gecko/20100101 Firefox/5.0",
+       "user_agent": "Mozilla/5.0 (X11; FreeBSD amd64; rv:5.0) Gecko/20100101 Firefox/5.0",
        "browser": "Firefox",
        "browser_version": "5.0.0",
        "platform": "FreeBSD",
@@ -72,7 +72,7 @@
        "mobile": false
    },
    {
-       "useragent": "Mozilla/5.0 (X11; Linux i686 on x86_64; rv:2.0.1) Gecko/20100101 Firefox/4.0.1",
+       "user_agent": "Mozilla/5.0 (X11; Linux i686 on x86_64; rv:2.0.1) Gecko/20100101 Firefox/4.0.1",
        "browser": "Firefox",
        "browser_version": "4.0.1",
        "platform": "Linux",
@@ -80,7 +80,7 @@
        "mobile": false
    },
    {
-       "useragent": "Mozilla/5.0 (X11; Linux x86_64; rv:10.0.1) Gecko/20100101 Firefox/10.0.1",
+       "user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:10.0.1) Gecko/20100101 Firefox/10.0.1",
        "browser": "Firefox",
        "browser_version": "10.0.1",
        "platform": "Linux",
@@ -88,7 +88,7 @@
        "mobile": false
    },
    {
-       "useragent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:14.0) Gecko/20100101 Firefox/14.0.1",
+       "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:14.0) Gecko/20100101 Firefox/14.0.1",
        "browser": "Firefox",
        "browser_version": "14.0.1",
        "platform": "Linux",
@@ -96,7 +96,7 @@
        "mobile": false
    },
    {
-       "useragent": "Mozilla/5.0 (X11; Linux x86_64; rv:5.0) Gecko/20100101 Firefox/5.0 Iceweasel/5.0",
+       "user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:5.0) Gecko/20100101 Firefox/5.0 Iceweasel/5.0",
        "browser": "Iceweasel",
        "browser_version": "5.0.0",
        "platform": "Linux",
@@ -104,7 +104,7 @@
        "mobile": false
    },
    {
-       "useragent": "Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0",
+       "user_agent": "Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0",
        "browser": "Firefox",
        "browser_version": "18.0.0",
        "platform": "FirefoxOS",

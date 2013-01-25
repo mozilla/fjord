@@ -14,7 +14,7 @@ file in `settings.MIDDLEWARE_CLASSES`.
 MOBILE_COOKIE = getattr(settings, 'MOBILE_COOKIE', 'mobile')
 
 
-class UseragentMiddleware(object):
+class UserAgentMiddleware(object):
     """Add ``request.BROWSER`` which has information from the User-Agent
 
     ``request.BROWSER`` has the following attributes:

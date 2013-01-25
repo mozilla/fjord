@@ -47,7 +47,7 @@ def parse_ua(ua):
     if 'firefox' not in ua.lower():
         return no_browser
 
-    # For reference, a normal Firefox on android useragent looks like
+    # For reference, a normal Firefox on android user agent looks like
     # Mozilla/5.0 (Android; Mobile; rv:14.0) Gecko/14.0 Firefox/14.0.2
 
     # Extract the part within the parenthesis, and the part after the
