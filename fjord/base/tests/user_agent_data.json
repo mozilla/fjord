@@ -110,5 +110,21 @@
        "platform": "FirefoxOS",
        "platform_version": null,
        "mobile": true
-   }
-]
+   },
+   {
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:20.0) Gecko/20130208 Firefox/20.0",
+      "browser": "Firefox",
+      "browser_version": "20.0.0",
+      "platform": "OS X",
+      "platform_version": "10.7",
+      "mobile": false
+    },
+    {
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:18.0) Gecko/20100101 Firefox/18.0",
+      "browser": "Firefox",
+      "browser_version": "18.0.0",
+      "platform": "OS X",
+      "platform_version": "10.8",
+      "mobile": false
+    }
+  ]

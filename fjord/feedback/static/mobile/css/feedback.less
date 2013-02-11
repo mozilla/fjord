@@ -1,0 +1,59 @@
+article {
+  display: none;
+
+  section {
+    display: block;
+    margin: 0 auto;
+    max-width: 340px;
+  }
+
+  &.happy {
+    .sad {
+      display: none;
+    }
+  }
+  &.sad {
+    .happy {
+      display: none;
+    }
+  }
+}
+
+#intro {
+  section {
+    button.happy, button.sad {
+      background: 0;
+      border: 0;
+      display: inline-block;
+      margin: 10px;
+      padding-top: 100px;
+      position: relative;
+      vertical-align: bottom;
+      width: 130px;
+
+      &:before {
+        background: no-repeat url("../../img/type.png");
+        content: "";
+        display: block;
+        height: 100px;
+        left: 15px;
+        position: absolute;
+        top: 0px;
+        width: 100px;
+      }
+    }
+
+    button.sad {
+      &:before {
+        background-position: -100px 0;
+      }
+    }
+  }
+}
+
+#moreinfo {
+  .email {
+    display: none;
+  }
+}
+

@@ -256,7 +256,7 @@ class TestDashboardView(ElasticTestCase):
 
     def test_frontpage_es_down(self):
         """If can't connect to ES, show es_down template."""
-        # TODO: When we add a real Mock library, rewrite this.
+        # TODO: Rewrite this with Mock.
         old_counts_to_options = views.counts_to_options
         try:
             def mock_counts_to_options(*args, **kwargs):

@@ -81,6 +81,21 @@ MINIFY_BUNDLES = {
         'stage': (
             'css/stage.less',
         ),
+
+        'base-mobile': (
+            'css/lib/normalize.css',
+            'mobile/css/base.less',
+        ),
+        'feedback-mobile': (
+            'css/lib/normalize.css',
+            'mobile/css/base.less',
+            'mobile/css/feedback.less',
+        ),
+        'thanks-mobile': (
+            'css/lib/normalize.css',
+            'mobile/css/base.less',
+            'mobile/css/thanks.less',
+        )
     },
     'js': {
         'base': (
@@ -101,6 +116,14 @@ MINIFY_BUNDLES = {
             'js/lib/jquery.flot.time.js',
             'js/lib/jquery.flot.resize.js',
             'js/dashboard.js',
+        ),
+
+        'base-mobile': (
+            'js/lib/jquery.min.js',
+        ),
+        'feedback-mobile': (
+            'js/lib/jquery.min.js',
+            'mobile/js/feedback.js',
         ),
     }
 }
