@@ -229,7 +229,9 @@ Now install LESS using::
 Make sure that ``lessc`` is available on your path. NPM probably installed it
 to ``node_modules/less/bin/lessc`` and ``node_modules/.bin/lessc``.
 
-LESS files are automatically converted by Django Compressor.
+LESS files are automatically converted by `jingo-minify
+<https://github.com/jsocol/jingo-minify>`_.
+
 
 .. _hacking-howto-schemas:
 
