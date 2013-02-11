@@ -21,6 +21,7 @@
         <li><a href="#footer">{{ _('Proceed to footer') }}</a></li>
       </ul>
     </nav>
+    {{ browserid_info }}
 
     {% block site_header %}
       <header>
@@ -32,6 +33,13 @@
 
         <ul>
           <li><a class="dashboard" href="{{ url('dashboard') }}"><span>{{ _('Dashboard') }}</span></a></li>
+          <li>{{ browserid_button(sign_in='Sign in') }}</li>
+          {% if user.is_authenticated() %}
+            <li><span class="greeting">{{ _('Hello, {username}')|fe(username=user.username) }}</span></li>
+            {% if user.is_superuser %}
+              <li><span><a href="{{ url('admin:index') }}">Admin</a></span></li>
+            {% endif %}
+          {% endif %}
         </ul>
       </header>
     {% endblock site_header %}
@@ -57,5 +65,6 @@
     {% block site_js %}
       {{ js('base') }}
     {% endblock %}
+    {{ browserid_js() }}
   </body>
 </html>

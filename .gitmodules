@@ -22,3 +22,6 @@
 [submodule "vendor-local/src/pyelasticsearch"]
 	path = vendor-local/src/pyelasticsearch
 	url = git://github.com/rhec/pyelasticsearch.git
+[submodule "vendor-local/src/django-browserid"]
+	path = vendor-local/src/django-browserid
+	url = git://github.com/mozilla/django-browserid.git
