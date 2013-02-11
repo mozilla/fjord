@@ -107,6 +107,7 @@ header {
   &, .title, ul {
     height: 60px;
   }
+
   .title, ul {
     display: inline-block;
     line-height: 60px;
@@ -136,6 +137,14 @@ header {
     }
   }
 
+  .pull-right {
+    float: right;
+  }
+
+  .greeting {
+    font-weight: bold;
+  }
+
   h3 {
     margin-bottom: 7px;
     font-weight: bold;
@@ -156,13 +165,16 @@ header {
   li {
     display: inline;
 
+    span.greeting,
     a {
       margin-left: .25em;
       padding: .33em .66em;
       border-radius: .25em;
       color: inherit;
       text-decoration: none;
+    }
 
+    a {
       &:hover {
         background: #2a5b86;
       }

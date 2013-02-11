@@ -334,3 +334,32 @@ However, it's missing some things:
 
 * locales: See :ref:`l10n-chapter` for details.
 * ElasticSearch: See :ref:`es-chapter` for details.
+
+
+Troubleshooting
+===============
+
+Criminy! I can't get this damn Persona login working!
+-----------------------------------------------------
+
+When you log in, do you end up on the dashboard page, but not logged in?
+
+Are you seeing a "misconfigured" error?
+
+If so, make sure you have the following set in ``fjord/settings/local.py``::
+
+    DEBUG = True
+
+    # The value should be a non-empty string.
+    SECRET_KEY = 'some secret key'
+
+    # The value should be the protocol, host, and port that you use
+    # to access the site. If this doesn't match, then you'll get
+    # a "misconfigured" error.
+    SITE_URL = 'http://127.0.0.1:8000'
+
+    SESSION_COOKIE_SECURE = False
+
+See `the django-browserid troubleshooting docs
+<https://django-browserid.readthedocs.org/en/latest/details/troubleshooting.html>`_
+for more details.

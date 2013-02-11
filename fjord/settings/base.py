@@ -20,6 +20,7 @@ INSTALLED_APPS = get_apps(
         # south has to come early, otherwise tests fail.
         'south',
 
+        'django_browserid',
         'adminplus',
         'django.contrib.admin',
         'django_nose',
@@ -58,6 +59,7 @@ JINGO_EXCLUDE_APPS = [
     'admin',
     'adminplus',
     'registration',
+    'browserid',
 ]
 
 MINIFY_BUNDLES = {
@@ -84,6 +86,7 @@ MINIFY_BUNDLES = {
         'base': (
             'js/lib/jquery.min.js',
             'js/init.js',
+            'browserid/browserid.js',
         ),
         'feedback': (
             'js/lib/jquery.min.js',
@@ -91,13 +94,12 @@ MINIFY_BUNDLES = {
             'js/feedback.js',
         ),
         'dashboard': (
-            'js/lib/jquery.min.js',
+            # This inherits base, too.
             'js/lib/jquery-ui.min.js',
             'js/lib/excanvas.js',
             'js/lib/jquery.flot.js',
             'js/lib/jquery.flot.time.js',
             'js/lib/jquery.flot.resize.js',
-            'js/init.js',
             'js/dashboard.js',
         ),
     }
@@ -108,21 +110,23 @@ JINGO_MINIFY_USE_STATIC = True
 LESS_BIN = 'lessc'
 JAVA_BIN = 'java'
 
-# BrowserID configuration
 AUTHENTICATION_BACKENDS = [
     'django_browserid.auth.BrowserIDBackend',
-    'django.contrib.auth.backends.ModelBackend',
 ]
+
+# We don't want browserid to automatically create users at the present
+# time.
+BROWSERID_CREATE_USER = False
 
 SITE_URL = 'http://127.0.0.1:8000'
 LOGIN_URL = '/'
-LOGIN_REDIRECT_URL = 'examples.home'
-LOGIN_REDIRECT_URL_FAILURE = 'examples.home'
+LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL_FAILURE = '/login-failure'
 
 TEMPLATE_CONTEXT_PROCESSORS = get_template_context_processors(
     exclude=(),
     append=(
-        'django_browserid.context_processors.browserid_form',
+        'django_browserid.context_processors.browserid',
     ))
 
 # Should robots.txt deny everything or disallow a calculated list of URLs we

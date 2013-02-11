@@ -17,8 +17,8 @@ from fjord.search.index import get_index, get_index_stats
 log = logging.getLogger('i.services')
 
 
-@mobile_template('{mobile/}home.html')
-def home_view(request, template=None):
+@mobile_template('{mobile/}login_failure.html')
+def login_failure(request, template=None):
     return render(request, template)
 
 

@@ -21,6 +21,7 @@
         <li><a href="#footer">{{ _('Proceed to footer') }}</a></li>
       </ul>
     </nav>
+    {{ browserid_info }}
 
     {% block site_header %}
       <header>
@@ -32,6 +33,18 @@
 
         <ul>
           <li><a class="dashboard" href="{{ url('dashboard') }}"><span>{{ _('Dashboard') }}</span></a></li>
+        </ul>
+
+        <ul class="pull-right">
+          {% if user.is_authenticated() %}
+            <li><span class="greeting">{{ _('Hello, {username}')|fe(username=user.username) }}</span></li>
+            {% if user.is_superuser %}
+              <li><span><a href="{{ url('admin:index') }}">Admin</a></span></li>
+            {% endif %}
+          {% endif %}
+
+          <li>{{ browserid_button(sign_in=_('Sign in'), sign_out=_('Sign out')) }}</li>
+
         </ul>
       </header>
     {% endblock site_header %}
@@ -56,6 +69,7 @@
 
     {% block site_js %}
       {{ js('base') }}
+      <script type="text/javascript" src="https://login.persona.org/include.js"></script>
     {% endblock %}
   </body>
 </html>
