@@ -20,6 +20,7 @@ urlpatterns = patterns('',
     (r'', include('fjord.feedback.urls')),
     (r'', include('fjord.search.urls')),
 
+    # TODO: Remove this stub. /about and /search point to it.
     url(r'stub', lambda r: HttpResponse('this is a stub'), name='stub'),
 
     # Generate a robots.txt
@@ -36,6 +37,6 @@ urlpatterns = patterns('',
 )
 
 
-## In DEBUG mode, serve media files through Django.
+# In DEBUG mode, serve media files through Django.
 if settings.DEBUG:
     urlpatterns += staticfiles_urlpatterns()
