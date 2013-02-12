@@ -3,7 +3,7 @@ import socket
 
 from django.conf import settings
 from django.http import Http404
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 
 from celery.messaging import establish_connection
