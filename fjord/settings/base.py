@@ -86,6 +86,7 @@ MINIFY_BUNDLES = {
         'base': (
             'js/lib/jquery.min.js',
             'js/init.js',
+            'browserid/browserid.js',
         ),
         'feedback': (
             'js/lib/jquery.min.js',
@@ -93,13 +94,12 @@ MINIFY_BUNDLES = {
             'js/feedback.js',
         ),
         'dashboard': (
-            'js/lib/jquery.min.js',
+            # This inherits base, too.
             'js/lib/jquery-ui.min.js',
             'js/lib/excanvas.js',
             'js/lib/jquery.flot.js',
             'js/lib/jquery.flot.time.js',
             'js/lib/jquery.flot.resize.js',
-            'js/init.js',
             'js/dashboard.js',
         ),
     }
