@@ -33,7 +33,7 @@
 
         <ul>
           <li><a class="dashboard" href="{{ url('dashboard') }}"><span>{{ _('Dashboard') }}</span></a></li>
-          <li>{{ browserid_button(sign_in='Sign in') }}</li>
+          <li>{{ browserid_button(sign_in=_('Sign in'), sign_out=_('Sign out')) }}</li>
           {% if user.is_authenticated() %}
             <li><span class="greeting">{{ _('Hello, {username}')|fe(username=user.username) }}</span></li>
             {% if user.is_superuser %}
