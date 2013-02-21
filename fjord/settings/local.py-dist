@@ -44,6 +44,10 @@ DEV = True
 # Uncomment the following line if you prefer to access your app via localhost
 # SITE_URL = 'http://localhost:8000'
 
+# This should be False if you're running a local development install without
+# HTTPS. It disables HTTPS-only cookies.
+SESSION_COOKIE_SECURE = False
+
 # Playdoh ships with Bcrypt+HMAC by default because it's the most secure.
 # To use bcrypt, fill in a secret HMAC key. It cannot be blank.
 HMAC_KEYS = {
@@ -76,7 +80,3 @@ ENGAGE_ROBOTS = True
 # Common Event Format logging parameters
 #CEF_PRODUCT = 'Playdoh'
 #CEF_VENDOR = 'Mozilla'
-
-# Uncomment this line if you are running a local development install without
-# HTTPS to disable HTTPS-only cookies.
-#SESSION_COOKIE_SECURE = False
