@@ -359,3 +359,7 @@ If so, make sure you have the following set in ``fjord/settings/local.py``::
     SITE_URL = 'http://127.0.0.1:8000'
 
     SESSION_COOKIE_SECURE = False
+
+See `the django-browserid troubleshooting docs
+<https://django-browserid.readthedocs.org/en/latest/details/troubleshooting.html>`_
+for more details.
