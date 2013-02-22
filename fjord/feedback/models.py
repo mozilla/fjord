@@ -7,7 +7,9 @@ from tower import ugettext_lazy as _
 
 from fjord.base.models import ModelBase
 from fjord.base.util import smart_truncate
-from fjord.search.index import register_mapping_type, FjordMappingType
+from fjord.search.index import (
+    register_mapping_type, FjordMappingType,
+    boolean_type, date_type, integer_type, keyword_type, text_type)
 from fjord.search.tasks import register_live_index
 
 
@@ -30,6 +32,10 @@ class Simple(ModelBase):
     browser_version = models.CharField(max_length=30, blank=True)
     platform = models.CharField(max_length=30, blank=True)
     locale = models.CharField(max_length=8, blank=True)
+
+    # Device information for non-desktop Firefox browsers
+    manufacturer = models.CharField(max_length=255, blank=True)
+    device = models.CharField(max_length=255, blank=True)
 
     created = models.DateTimeField(default=datetime.now)
 
@@ -73,17 +79,19 @@ class SimpleIndex(FjordMappingType, Indexable):
     @classmethod
     def get_mapping(cls):
         return {
-            'id': {'type': 'integer'},
-            'prodchan': {'type': 'string', 'index': 'not_analyzed'},
-            'happy': {'type': 'boolean'},
-            'url': {'type': 'string', 'index': 'not_analyzed'},
-            'description': {'type': 'string', 'analyzer': 'snowball'},
-            'user_agent': {'type': 'string', 'index': 'not_analyzed'},
-            'browser': {'type': 'string', 'analyzer': 'keyword'},
-            'browser_version': {'type': 'string', 'index': 'not_analyzed'},
-            'platform': {'type': 'string', 'analyzer': 'keyword'},
-            'locale': {'type': 'string', 'analyzer': 'keyword'},
-            'created': {'type': 'date'}
+            'id': integer_type(),
+            'prodchan': keyword_type(),
+            'happy': boolean_type(),
+            'url': keyword_type(),
+            'description': text_type(),
+            'user_agent': keyword_type(),
+            'browser': keyword_type(),
+            'browser_version': keyword_type(),
+            'platform': keyword_type(),
+            'locale': keyword_type(),
+            'device': keyword_type(),
+            'manufacturer': keyword_type(),
+            'created': date_type()
             }
 
     @classmethod
@@ -92,8 +100,8 @@ class SimpleIndex(FjordMappingType, Indexable):
             obj = cls.get_model().objects.get(pk=obj_id)
 
         # Cheating here because at the moment, everything is
-        # straight-forward. When that ceases to be the case,
-        # we should stop cheating.
+        # straight-forward. When that ceases to be the case, we should
+        # stop cheating.
         mapping = cls.get_mapping()
         return dict((field, getattr(obj, field))
                     for field in mapping.keys())

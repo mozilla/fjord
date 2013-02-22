@@ -63,6 +63,26 @@ class FjordMappingType(DjangoMappingType):
         return get_index()
 
 
+def boolean_type():
+    return {'type': 'boolean'}
+
+
+def date_type():
+    return {'type': 'date'}
+
+
+def integer_type():
+    return {'type': 'integer'}
+
+
+def keyword_type():
+    return {'type': 'string', 'index': 'not_analyzed'}
+
+
+def text_type():
+    return {'type': 'string', 'analyzer': 'snowball'}
+
+
 def format_time(time_to_go):
     """Return minutes and seconds string for given time in seconds.
 

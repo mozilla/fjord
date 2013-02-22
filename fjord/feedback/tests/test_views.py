@@ -1,4 +1,4 @@
-from django.test.client import Client, RequestFactory
+from django.test.client import RequestFactory
 from nose.tools import eq_
 from mock import NonCallableMock
 
@@ -137,6 +137,90 @@ class TestFeedback(TestCase):
         })
         assert not models.SimpleEmail.objects.exists()
         # Bad email if the box is not checked is not an error.
+        eq_(r.status_code, 302)
+
+    def test_deprecated_firefox_for_android_feedback_works(self):
+        """Verify firefox for android can post feedback"""
+        data = {
+            '_type': 1,
+            'description': u'Firefox rocks!',
+            'add_url': 1,
+            'url': u'http://mozilla.org/',
+            'device': 'Stone tablet',
+            'manufacturer': 'Rosetta'
+            }
+
+        r = self.client.post(reverse('feedback'), data)
+        eq_(r.status_code, 302)
+        feedback = models.Simple.objects.latest(field_name='id')
+        eq_(feedback.happy, False)
+        eq_(feedback.url, data['url'])
+        eq_(feedback.description, data['description'])
+        eq_(feedback.device, data['device'])
+        eq_(feedback.manufacturer, data['manufacturer'])
+
+    def test_deprecated_firefox_for_android_ideas_are_sad(self):
+        """We treat "sad" and "ideas" as sad feedback now."""
+        data = {
+            '_type': 2,
+            'description': u'This is how to make it better...',
+            'add_url': 1,
+            'url': u'http://mozilla.org/',
+            'device': 'Stone tablet',
+            'manufacturer': 'Rosetta'
+            }
+
+        r = self.client.post(reverse('feedback'), data)
+        eq_(r.status_code, 302)
+        feedback = models.Simple.objects.latest(field_name='id')
+        eq_(feedback.happy, False)
+        eq_(feedback.url, data['url'])
+        eq_(feedback.description, data['description'])
+
+    def test_deprecated_firefox_for_android_minimal(self):
+        """Test the minimal post data from FfA works."""
+        data = {
+            '_type': 1,
+            'description': u'This is how to make it better...',
+            'device': 'Stone tablet',
+            'manufacturer': 'Rosetta'
+            }
+
+        r = self.client.post(reverse('feedback'), data)
+        eq_(r.status_code, 302)
+        feedback = models.Simple.objects.latest(field_name='id')
+        eq_(feedback.happy, False)
+        eq_(feedback.url, u'')
+        eq_(feedback.description, data['description'])
+
+
+class TestCSRF(TestCase):
+    def setUp(self):
+        super(TestCSRF, self).setUp()
+        self.factory = RequestFactory()
+        self.client = LocalizingClient(enforce_csrf_checks=True)
+
+    def test_no_csrf_regular_form_fails(self):
+        """No csrf token in post data from anonymous user yields 403."""
+        url = reverse('feedback', args=('firefox.desktop.stable',))
+        r = self.client.post(url, {
+            'happy': 1,
+            'description': u'Firefox rocks!',
+            'url': u'http://mozilla.org/'
+        })
+
+        eq_(r.status_code, 403)
+
+    def test_firefox_for_android(self):
+        """No csrf token for a FfA post works fine."""
+        url = reverse('feedback')
+        print url
+        r = self.client.post(url, {
+            '_type': 1,
+            'description': u'Firefox rocks!',
+            'add_url': 1,
+            'url': u'http://mozilla.org/'
+        })
         eq_(r.status_code, 302)
 
 

@@ -23,6 +23,13 @@ class SimpleForm(forms.Form):
     email_ok = forms.BooleanField(required=False)
     email = forms.EmailField(required=False)
 
+    # These are hidden fields on the form which we have here so we can
+    # abuse the fields for data validation.
+    manufacturer = forms.CharField(required=False, widget=forms.HiddenInput(
+            attrs={'class': 'manufacturer'}))
+    device = forms.CharField(required=False, widget=forms.HiddenInput(
+            attrs={'class': 'device'}))
+
     def clean(self):
         cleaned_data = super(SimpleForm, self).clean()
 
