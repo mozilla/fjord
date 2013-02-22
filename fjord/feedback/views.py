@@ -1,4 +1,4 @@
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from funfactory.urlresolvers import reverse
@@ -25,9 +25,18 @@ def _handle_feedback_post(request):
         if platform == 'Windows':
             platform += ' ' + request.BROWSER.platform_version
 
+        if '_type' in request.POST:
+            # If _type is in the POST data then, this is coming from
+            # Firefox for Android which posted directly to the old
+            # site which used _type. Feedback from Firefox for Android
+            # is always sad. I kid you not.
+            happy = False
+        else:
+            happy = data['happy']
+
         opinion = models.Simple(
             # Data coming from the user
-            happy=data['happy'],
+            happy=happy,
             url=data['url'],
             description=data['description'],
             # Inferred data
@@ -37,6 +46,9 @@ def _handle_feedback_post(request):
             browser_version=request.BROWSER.browser_version,
             platform=platform,
             locale=request.locale,
+            # Data from mobile devices
+            manufacturer=data.get('manufacturer', ''),
+            device=data.get('device', ''),
         )
         opinion.save()
 
@@ -132,6 +144,7 @@ def feedback_router(request, formname=None, *args, **kwargs):
     page.
     """
     view = feedback_routes.get(formname)
+
     if view is None:
         if request.BROWSER.mobile:
             view = mobile_stable_feedback
