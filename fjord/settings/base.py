@@ -82,19 +82,19 @@ MINIFY_BUNDLES = {
             'css/stage.less',
         ),
 
-        'base-mobile': (
+        'mobile/base': (
             'css/lib/normalize.css',
-            'mobile/css/base.less',
+            'css/mobile/base.less',
         ),
-        'feedback-mobile': (
+        'mobile/feedback': (
             'css/lib/normalize.css',
-            'mobile/css/base.less',
-            'mobile/css/feedback.less',
+            'css/mobile/base.less',
+            'css/mobile/feedback.less',
         ),
-        'thanks-mobile': (
+        'mobile/thanks': (
             'css/lib/normalize.css',
-            'mobile/css/base.less',
-            'mobile/css/thanks.less',
+            'css/mobile/base.less',
+            'css/mobile/thanks.less',
         )
     },
     'js': {
@@ -118,12 +118,12 @@ MINIFY_BUNDLES = {
             'js/dashboard.js',
         ),
 
-        'base-mobile': (
+        'mobile/base': (
             'js/lib/jquery.min.js',
         ),
-        'feedback-mobile': (
+        'mobile/feedback': (
             'js/lib/jquery.min.js',
-            'mobile/js/feedback.js',
+            'js/mobile/feedback.js',
         ),
     }
 }
