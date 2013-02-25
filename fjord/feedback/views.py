@@ -1,8 +1,8 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
 from funfactory.urlresolvers import reverse
-from session_csrf import anonymous_csrf_exempt
 from mobility.decorators import mobile_template
 
 from fjord.base.util import smart_bool
@@ -133,8 +133,12 @@ feedback_routes = {
 }
 
 
-@anonymous_csrf_exempt
-def feedback_router(request, formname=None, *args, **kwargs):
+@csrf_protect
+def csrf_checked_feedback_router(request, *args, **kwargs):
+    return feedback_router_actual(request, *args, **kwargs)
+
+
+def feedback_router_actual(request, formname=None, *args, **kwargs):
     """Determine a view to use, and call it.
 
     If formname is given, reference `feedback_routes` to look up a view.
@@ -151,3 +155,21 @@ def feedback_router(request, formname=None, *args, **kwargs):
         else:
             view = desktop_stable_feedback
     return view(request, *args, **kwargs)
+
+
+@csrf_exempt
+def feedback_router(request, *args, **kwargs):
+    """Handles the feedback view"""
+    # Checks to see if `_type` is in the POST data and if so this is
+    # coming from Firefox for Android which doesn't know anything
+    # about csrf tokens. If that's the case, we just let it through.
+    # Otherwise we pass it to csrf_checked_feedback_router to check
+    # for csrf and deny if appropriate.
+    #
+    # FIXME: Remove this hairbrained monstrosity when we don't need to
+    # support the method that Firefox for Android currently uses to
+    # post feedback which worked with the old input.mozilla.org.
+    if '_type' in request.POST:
+        return feedback_router_actual(request, *args, **kwargs)
+
+    return csrf_checked_feedback_router(request, *args, **kwargs)
