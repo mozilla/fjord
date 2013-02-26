@@ -37,6 +37,7 @@ LOCALE_REPO_URL = 'https://svn.mozilla.org/projects/l10n-misc/trunk/input/locale
 
 GIT_PULL = "git pull -q origin %(branch)s"
 GIT_SUBMODULE = "git submodule update --init --recursive"
+GIT_LOG3 = "git log -3"
 SVN_CO = "svn checkout --force %(url)s locale"
 SVN_UP = "svn update"
 COMPILE_MO = "./bin/compile-mo.sh %(localedir)s %(unique)s"
@@ -55,8 +56,10 @@ def update_site(env, debug):
     vendor_branch = {'branch': ENV_BRANCH[env][VENDOR]}
 
     commands = [
+        (EXEC,  'date'),
         (CHDIR, here),
         (EXEC,  GIT_PULL % project_branch),
+        (EXEC,  GIT_LOG3),
         (EXEC,  GIT_SUBMODULE),
     ]
 
@@ -111,7 +114,7 @@ def update_site(env, debug):
 
 
 def main():
-    """ Handels command line args. """
+    """Handles command line args."""
     debug = False
     usage = dedent("""\
         %prog [options]
