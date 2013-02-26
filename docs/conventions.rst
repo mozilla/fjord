@@ -1,5 +1,5 @@
 =====================================
-Conventions (git, l10n, python, etc.)
+Conventions (git, l10n, Python, etc.)
 =====================================
 
 This document contains coding conventions, and things to watch out
@@ -77,9 +77,9 @@ Strings
 
 (Copied from Playdoh docs.)
 
-You can localize strings both in python code as well as Jinja templates.
+You can localize strings both in Python code as well as Jinja templates.
 
-In python::
+In Python::
 
     from tower import ugettext as _, ugettext_lazy as _lazy
 
@@ -133,7 +133,7 @@ This has a few problems, however:
    .po files or buy all your localizers a nice gift because of all the
    pain you’re inflicting upon them.
 
-3.  If the URL changes, your localizer has to update everything.
+3. If the URL changes, your localizer has to update everything.
 
 Here’s an alternative::
 
