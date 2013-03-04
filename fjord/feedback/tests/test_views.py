@@ -16,7 +16,7 @@ class TestFeedback(TestCase):
 
         Additionally, it should redirect to the Thanks page.
         """
-        amount = models.Simple.objects.count()
+        amount = models.Response.objects.count()
 
         url = reverse('feedback', args=('firefox.desktop.stable',))
         r = self.client.post(url, {
@@ -26,9 +26,9 @@ class TestFeedback(TestCase):
         })
 
         self.assertRedirects(r, reverse('thanks'))
-        eq_(amount + 1, models.Simple.objects.count())
+        eq_(amount + 1, models.Response.objects.count())
 
-        feedback = models.Simple.objects.latest(field_name='id')
+        feedback = models.Response.objects.latest(field_name='id')
         eq_(u'Firefox rocks!', feedback.description)
         eq_(u'http://mozilla.org/', feedback.url)
         eq_(True, feedback.happy)
@@ -38,7 +38,7 @@ class TestFeedback(TestCase):
 
         Additionally, it should redirect to the Thanks page.
         """
-        amount = models.Simple.objects.count()
+        amount = models.Response.objects.count()
 
         url = reverse('feedback', args=('firefox.desktop.stable',))
         r = self.client.post(url, {
@@ -47,9 +47,9 @@ class TestFeedback(TestCase):
         })
 
         self.assertRedirects(r, reverse('thanks'))
-        eq_(amount + 1, models.Simple.objects.count())
+        eq_(amount + 1, models.Response.objects.count())
 
-        feedback = models.Simple.objects.latest(field_name='id')
+        feedback = models.Response.objects.latest(field_name='id')
         eq_(u"Firefox doesn't make me sandwiches. :(", feedback.description)
         eq_(u'', feedback.url)
         eq_(False, feedback.happy)
@@ -84,7 +84,7 @@ class TestFeedback(TestCase):
             'email': 'bob@example.com',
             'email_ok': 1,
         })
-        eq_(models.SimpleEmail.objects.count(), 1)
+        eq_(models.ResponseEmail.objects.count(), 1)
         eq_(r.status_code, 302)
 
     def test_email_privacy(self):
@@ -97,7 +97,7 @@ class TestFeedback(TestCase):
             'email': 'bob@example.com',
             'email_ok': 0,
         })
-        assert not models.SimpleEmail.objects.exists()
+        assert not models.ResponseEmail.objects.exists()
         eq_(r.status_code, 302)
 
     def test_email_missing(self):
@@ -109,7 +109,7 @@ class TestFeedback(TestCase):
             'description': u'Can you fix it?',
             'email_ok': 1,
         })
-        assert not models.SimpleEmail.objects.exists()
+        assert not models.ResponseEmail.objects.exists()
         # No redirect to thank you page, since there is a form error.
         eq_(r.status_code, 200)
         self.assertContains(r, 'Please enter a valid email')
@@ -124,7 +124,7 @@ class TestFeedback(TestCase):
             'email_ok': 1,
             'email': '/dev/sda1\0',
         })
-        assert not models.SimpleEmail.objects.exists()
+        assert not models.ResponseEmail.objects.exists()
         # No redirect to thank you page, since there is a form error.
         eq_(r.status_code, 200)
         self.assertContains(r, 'Please enter a valid email')
@@ -135,7 +135,7 @@ class TestFeedback(TestCase):
             'email_ok': 0,
             'email': "huh what's this for?",
         })
-        assert not models.SimpleEmail.objects.exists()
+        assert not models.ResponseEmail.objects.exists()
         # Bad email if the box is not checked is not an error.
         eq_(r.status_code, 302)
 
@@ -152,7 +152,7 @@ class TestFeedback(TestCase):
 
         r = self.client.post(reverse('feedback'), data)
         eq_(r.status_code, 302)
-        feedback = models.Simple.objects.latest(field_name='id')
+        feedback = models.Response.objects.latest(field_name='id')
         eq_(feedback.happy, False)
         eq_(feedback.url, data['url'])
         eq_(feedback.description, data['description'])
@@ -172,7 +172,7 @@ class TestFeedback(TestCase):
 
         r = self.client.post(reverse('feedback'), data)
         eq_(r.status_code, 302)
-        feedback = models.Simple.objects.latest(field_name='id')
+        feedback = models.Response.objects.latest(field_name='id')
         eq_(feedback.happy, False)
         eq_(feedback.url, data['url'])
         eq_(feedback.description, data['description'])
@@ -188,7 +188,7 @@ class TestFeedback(TestCase):
 
         r = self.client.post(reverse('feedback'), data)
         eq_(r.status_code, 302)
-        feedback = models.Simple.objects.latest(field_name='id')
+        feedback = models.Response.objects.latest(field_name='id')
         eq_(feedback.happy, False)
         eq_(feedback.url, u'')
         eq_(feedback.description, data['description'])

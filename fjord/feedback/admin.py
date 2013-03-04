@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.core.exceptions import PermissionDenied
 
-from fjord.feedback.models import Simple
+from fjord.feedback.models import Response
 
 
-class SimpleFeedbackAdmin(admin.ModelAdmin):
+class ResponseFeedbackAdmin(admin.ModelAdmin):
     list_display = ('created', 'prodchan', 'happy', 'description',
                     'user_agent', 'locale')
     list_filter = ('prodchan', 'happy', 'locale')
@@ -27,8 +27,8 @@ class SimpleFeedbackAdmin(admin.ModelAdmin):
         if request.method == 'POST':
             raise PermissionDenied()
 
-        return super(SimpleFeedbackAdmin, self).change_view(
+        return super(ResponseFeedbackAdmin, self).change_view(
             request, *args, **kwargs)
 
 
-admin.site.register(Simple, SimpleFeedbackAdmin)
+admin.site.register(Response, ResponseFeedbackAdmin)

@@ -14,8 +14,8 @@ from fjord.search.tasks import register_live_index
 
 
 @register_live_index
-class Simple(ModelBase):
-    """Feedback item from Firefox Desktop stable form"""
+class Response(ModelBase):
+    """Basic feedback response"""
 
     # This is the product/channel.
     # e.g. "firefox.desktop.stable", "firefox.mobile.aurora", etc.
@@ -61,20 +61,14 @@ class Simple(ModelBase):
 
     @classmethod
     def get_mapping_type(self):
-        return SimpleIndex
-
-    # TODO: Implement this when we implement view
-    #
-    # @models.permalink
-    # def get_absolute_url(self):
-    #     return ('xxx', [str(self.id)])
+        return ResponseMappingType
 
 
 @register_mapping_type
-class SimpleIndex(FjordMappingType, Indexable):
+class ResponseMappingType(FjordMappingType, Indexable):
     @classmethod
     def get_model(cls):
-        return Simple
+        return Response
 
     @classmethod
     def get_mapping(cls):
@@ -107,6 +101,6 @@ class SimpleIndex(FjordMappingType, Indexable):
                     for field in mapping.keys())
 
 
-class SimpleEmail(ModelBase):
-    opinion = models.ForeignKey(Simple)
+class ResponseEmail(ModelBase):
+    opinion = models.ForeignKey(Response)
     email = models.EmailField()

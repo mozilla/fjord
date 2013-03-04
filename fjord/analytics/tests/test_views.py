@@ -9,7 +9,7 @@ from fjord.analytics import views
 from fjord.analytics.views import counts_to_options, _zero_fill
 from fjord.base.tests import TestCase, LocalizingClient, reverse
 from fjord.base.util import epoch_milliseconds
-from fjord.feedback.tests import simple
+from fjord.feedback.tests import response
 from fjord.search.tests import ElasticTestCase
 
 
@@ -120,8 +120,8 @@ class TestDashboardView(ElasticTestCase):
         ]
         for happy, platform, locale, description, created in items:
             # We don't need to keep this around, just need to create it.
-            simple(happy=happy, platform=platform, locale=locale,
-                   description=description, created=created, save=True)
+            response(happy=happy, platform=platform, locale=locale,
+                     description=description, created=created, save=True)
 
         self.refresh()
 
