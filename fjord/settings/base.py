@@ -100,34 +100,36 @@ MINIFY_BUNDLES = {
     'js': {
         'base': (
             'js/lib/jquery.min.js',
-            'js/init.js',
             'browserid/browserid.js',
-            'js/analytics.js',
+            'js/init.js',
+            'js/ga.js',
         ),
         'feedback': (
             'js/lib/jquery.min.js',
             'js/init.js',
             'js/feedback.js',
-            'js/analytics.js',
+            'js/ga.js',
         ),
         'dashboard': (
-            # This inherits base, too.
+            'js/lib/jquery.min.js',
             'js/lib/jquery-ui.min.js',
+            'js/init.js',
             'js/lib/excanvas.js',
             'js/lib/jquery.flot.js',
             'js/lib/jquery.flot.time.js',
             'js/lib/jquery.flot.resize.js',
             'js/dashboard.js',
+            'browserid/browserid.js',
+            'js/ga.js',
         ),
-
         'mobile/base': (
             'js/lib/jquery.min.js',
-            'js/analytics.js',
+            'js/ga.js',
         ),
         'mobile/feedback': (
             'js/lib/jquery.min.js',
             'js/mobile/feedback.js',
-            'js/analytics.js',
+            'js/ga.js',
         ),
     }
 }
