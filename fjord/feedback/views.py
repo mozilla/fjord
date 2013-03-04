@@ -6,7 +6,7 @@ from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
 
 from fjord.base.util import smart_bool
-from fjord.feedback.forms import SimpleForm
+from fjord.feedback.forms import ResponseForm
 from fjord.feedback import models
 
 
@@ -16,7 +16,7 @@ def thanks(request, template):
 
 
 def _handle_feedback_post(request):
-    form = SimpleForm(request.POST)
+    form = ResponseForm(request.POST)
     if form.is_valid():
         data = form.cleaned_data
         # Most platforms aren't different enough between versions to care.
@@ -34,7 +34,7 @@ def _handle_feedback_post(request):
         else:
             happy = data['happy']
 
-        opinion = models.Simple(
+        opinion = models.Response(
             # Data coming from the user
             happy=happy,
             url=data['url'],
@@ -53,7 +53,7 @@ def _handle_feedback_post(request):
         opinion.save()
 
         if data['email_ok'] and data['email']:
-            e = models.SimpleEmail(email=data['email'], opinion=opinion)
+            e = models.ResponseEmail(email=data['email'], opinion=opinion)
             e.save()
 
         return HttpResponseRedirect(reverse('thanks')), form
@@ -90,8 +90,8 @@ def desktop_stable_feedback(request):
     # Use two instances of the same form because the template changes the text
     # based on the value of ``happy``.
     forms = {
-        'happy': SimpleForm(initial={'happy': 1}),
-        'sad': SimpleForm(initial={'happy': 0}),
+        'happy': ResponseForm(initial={'happy': 1}),
+        'sad': ResponseForm(initial={'happy': 0}),
     }
 
     if request.method == 'POST':
@@ -109,7 +109,7 @@ def desktop_stable_feedback(request):
 
 
 def mobile_stable_feedback(request):
-    form = SimpleForm()
+    form = ResponseForm()
     happy = None
 
     if request.method == 'POST':

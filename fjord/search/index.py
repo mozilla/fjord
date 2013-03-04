@@ -188,7 +188,7 @@ def get_index_stats():
     For example:
 
     >>> get_index_stats()
-    {'simple': 122233}
+    {'response': 122233}
 
     .. Note::
 

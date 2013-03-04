@@ -10,7 +10,7 @@ from tower import ugettext as _
 
 from fjord.base.helpers import locale_name
 from fjord.base.util import smart_int, smart_datetime, epoch_milliseconds
-from fjord.feedback.models import SimpleIndex
+from fjord.feedback.models import ResponseMappingType
 
 
 def counts_to_options(counts, name, display=None, display_map=None,
@@ -150,7 +150,7 @@ def dashboard(request, template):
 
     current_search = {'page': page}
 
-    search = SimpleIndex.search()
+    search = ResponseMappingType.search()
     f = F()
     # If search happy is '0' or '1', set it to False or True, respectively.
     search_happy = {'0': False, '1': True}.get(search_happy, None)

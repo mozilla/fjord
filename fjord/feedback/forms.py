@@ -8,8 +8,8 @@ class URLInput(forms.TextInput):
     input_type = 'url'
 
 
-class SimpleForm(forms.Form):
-    """Feedback form fields shared between feedback types."""
+class ResponseForm(forms.Form):
+    """Basic response feedback form."""
 
     # NB: The class 'url' is hard-coded in the Testpilot extension to
     # accommodate pre-filling the field client-side.
@@ -17,7 +17,8 @@ class SimpleForm(forms.Form):
         attrs={'placeholder': 'http://', 'class': 'url'}))
 
     description = forms.CharField(widget=forms.Textarea(), required=True)
-    # required=False means this allowed to be False, not that it can be blank.
+    # required=False means this allowed to be False, not that it can
+    # be blank.
     happy = forms.BooleanField(required=False, widget=forms.HiddenInput())
 
     email_ok = forms.BooleanField(required=False)
@@ -31,7 +32,7 @@ class SimpleForm(forms.Form):
             attrs={'class': 'device'}))
 
     def clean(self):
-        cleaned_data = super(SimpleForm, self).clean()
+        cleaned_data = super(ResponseForm, self).clean()
 
         email_ok = cleaned_data.get('email_ok')
         email = cleaned_data.get('email')
