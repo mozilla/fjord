@@ -111,12 +111,15 @@ MINIFY_BUNDLES = {
             'js/analytics.js',
         ),
         'dashboard': (
-            # This inherits base, too.
+            'js/lib/jquery.min.js',
             'js/lib/jquery-ui.min.js',
             'js/lib/excanvas.js',
             'js/lib/jquery.flot.js',
             'js/lib/jquery.flot.time.js',
             'js/lib/jquery.flot.resize.js',
+            'browserid/browserid.js',
+            'js/init.js',
+            'js/analytics.js',
             'js/dashboard.js',
         ),
 
