@@ -102,11 +102,13 @@ MINIFY_BUNDLES = {
             'js/lib/jquery.min.js',
             'js/init.js',
             'browserid/browserid.js',
+            'js/analytics.js',
         ),
         'feedback': (
             'js/lib/jquery.min.js',
             'js/init.js',
             'js/feedback.js',
+            'js/analytics.js',
         ),
         'dashboard': (
             # This inherits base, too.
@@ -120,10 +122,12 @@ MINIFY_BUNDLES = {
 
         'mobile/base': (
             'js/lib/jquery.min.js',
+            'js/analytics.js',
         ),
         'mobile/feedback': (
             'js/lib/jquery.min.js',
             'js/mobile/feedback.js',
+            'js/analytics.js',
         ),
     }
 }
