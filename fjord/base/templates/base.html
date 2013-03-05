@@ -21,7 +21,7 @@
         <li><a href="#footer">{{ _('Proceed to footer') }}</a></li>
       </ul>
     </nav>
-    {{ browserid_info }}
+    {{ browserid_info() }}
 
     {% block site_header %}
       <header>
@@ -41,10 +41,10 @@
             {% if user.is_superuser %}
               <li><span><a href="{{ url('admin:index') }}">Admin</a></span></li>
             {% endif %}
+            <li>{{ browserid_logout(text=_('Sign out')) }}</li>
+          {% else %}
+            <li>{{ browserid_login(text=_('Sign in')) }}</li>
           {% endif %}
-
-          <li>{{ browserid_button(sign_in=_('Sign in'), sign_out=_('Sign out')) }}</li>
-
         </ul>
       </header>
     {% endblock site_header %}
