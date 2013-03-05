@@ -81,10 +81,10 @@ def counts_to_options(counts, name, display=None, display_map=None,
     return options
 
 
-day_in_millis = 24 * 60 * 60 * 1000.0
+DAY_IN_MILLIS = 24 * 60 * 60 * 1000.0
 
 
-def _zero_fill(start, end, data_sets, spacing=day_in_millis):
+def _zero_fill(start, end, data_sets, spacing=DAY_IN_MILLIS):
     """Given one or more histogram dicts, zero fill them in a range.
 
     The format of the dictionaries should be {milliseconds: numeric
