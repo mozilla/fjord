@@ -18,8 +18,9 @@ WINDOWS_VERSION = {
 }
 
 
-Browser = namedtuple('Browser', ['browser', 'browser_version',
-    'platform', 'platform_version', 'mobile'])
+Browser = namedtuple('Browser', [
+    'browser', 'browser_version', 'platform', 'platform_version',
+    'mobile'])
 
 
 def parse_ua(ua):
@@ -27,17 +28,23 @@ def parse_ua(ua):
 
     :arg ua: a User-Agent string
 
-    :returns: Browser with attributes:
+    :returns: Browser namedtuple with attributes:
 
         - browser: eg: "Firefox", or "Iceweasel".
-        - browser_version: Always at least 3 dotted section, eg
-          "14.0.1" or "4.0.0".
+        - browser_version: None or a 3 dotted section, eg "14.0.1" or
+          "4.0.0".
         - platform: eg: "Windows", "OS X", "Linux", or "Android"
         - platform_version: On Windows returns something like "Vista",
           or "7".  On OS X returns something like "10.6.2" or "10.4.0"
         - mobile: True if the user agent represents a mobile browser.
 
         If detection fails, those attributes will have None values.
+
+    .. Note::
+
+       This should never throw an exception. If it does, that's
+       a bug.
+
     """
     mobile = 'mobile' in ua.lower()
 
@@ -51,8 +58,8 @@ def parse_ua(ua):
     # Mozilla/5.0 (Android; Mobile; rv:14.0) Gecko/14.0 Firefox/14.0.2
 
     # Extract the part within the parenthesis, and the part after the
-    # parenthesis. Inside has information about the platform, and outside has
-    # information about the browser.
+    # parenthesis. Inside has information about the platform, and
+    # outside has information about the browser.
     match = re.match(r'^Mozilla[^(]+\(([^)]+)\) (.+)', ua)
 
     if match is None:
@@ -61,17 +68,18 @@ def parse_ua(ua):
     # The part in parenthesis is semi-colon seperated
     # Result: ['Android', 'Mobile', 'rv:14.0']
     platform_parts = [p.strip() for p in match.group(1).split(';')]
-    # The rest is space seperated A/B pairs. Pull out both sides of the slash.
+    # The rest is space seperated A/B pairs. Pull out both sides of
+    # the slash.
     # Result: [['Gecko', '14.0'], ['Firefox', '14.0.2']]
     browser_parts = [p.split('/') for p in match.group(2).split(' ')]
 
     browser = 'Firefox'
-    browser_version = '0.0.0'
+    browser_version = None
 
     for part in browser_parts:
-        if 'Firefox' in part:
+        if 'Firefox' in part and len(part) > 1:
             browser_version = part[1]
-        if 'Iceweasel' in part:
+        elif 'Iceweasel' in part:
             browser = 'Iceweasel'
 
     platform = platform_parts.pop(0)
@@ -86,21 +94,27 @@ def parse_ua(ua):
         platform = 'Linux'
     elif platform.startswith('FreeBSD'):
         platform = 'FreeBSD'
-    elif platform == 'OS X':
+    elif platform in ('OS X', 'Macintosh'):
         for part in platform_parts:
             if 'OS X' in part:
+                # If OS X is in one of the parts, then we normalize
+                # the platform to 'OS X'.
+                platform = 'OS X'
                 platform_version = part.split(' ')[-1]
                 break
-        platform_version = platform_version.replace('_', '.')
+        if platform_version:
+            platform_version = platform_version.replace('_', '.')
 
-    # Firefox OS doesn't list a platform because "The web is the platform."
-    # It is the only platform to do this, so we can still uniquely identify it.
+    # Firefox OS doesn't list a platform because "The web is the
+    # platform."  It is the only platform to do this, so we can still
+    # uniquely identify it.
     if platform == 'Mobile':
         platform = 'FirefoxOS'
 
     # Make sure browser_version is at least x.y.z
-    while browser_version.count('.') < 2:
-        browser_version += '.0'
+    if browser_version:
+        while browser_version.count('.') < 2:
+            browser_version += '.0'
 
     return Browser(browser, browser_version, platform, platform_version,
                    mobile)
