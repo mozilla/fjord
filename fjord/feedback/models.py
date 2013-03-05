@@ -102,5 +102,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
 
 
 class ResponseEmail(ModelBase):
+    """Holds email addresses related to Responses."""
+
     opinion = models.ForeignKey(Response)
     email = models.EmailField()
