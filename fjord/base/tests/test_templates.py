@@ -5,14 +5,15 @@ from fjord.base.tests import LocalizingClient
 from fjord.search.tests import ElasticTestCase
 
 
-# This is an ElasticTestCase instead of a normal one because the front page
-# (which this queries) uses elastic search. Being an ElasticTestCase makes
-# sure that the testing index is properly set up, instead of trying to access
-# a possibly missing index.
+# This is an ElasticTestCase instead of a normal one because the front
+# page (which this queries) uses ElasticSearch. Being an
+# ElasticTestCase makes sure that the testing index is properly set
+# up, instead of trying to access a possibly missing index.
 class MobileQueryStringOverrideTest(ElasticTestCase):
     client_class = LocalizingClient
 
     def test_mobile_override(self):
+        """Test mobile override and cookie behavior."""
         # Doing a request without specifying a mobile querystring
         # parameter should not set a cookie.
         resp = self.client.get('/')
