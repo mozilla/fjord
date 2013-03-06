@@ -1,4 +1,12 @@
 $(function() {
+    var $histogram = $('.graph .histogram');
+
+    // If the histogram isn't on the page, then we're probably looking
+    // at the es_down template and none of this will work.
+    if ($histogram.length === 0) {
+        return;
+    }
+
     // General widgets.
     // Expandos
     $('.expando').hide();
@@ -77,7 +85,6 @@ $(function() {
 
 
     // Draw histogram in the middle column.
-    var $histogram = $('.graph .histogram');
     var data = $histogram.data('histogram');
     colors = {
         'happy': '#72BF3E',
