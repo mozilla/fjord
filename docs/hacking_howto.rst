@@ -319,8 +319,16 @@ You can get sample data in your db by running::
 
     $ ./manage.py generatedata
 
-This will generate a bunch of sample data so that your Fjord instance
-has something to look at.
+This will generate 5 happy things and 5 sad things so that your Fjord
+instance has something to look at.
+
+If you want to generate a lot of random sample data, then do::
+
+    $ ./manage.py generatedata --with=samplesize=1000
+
+That'll generate 1000 random responses. You can re-run that and also pass
+it different amounts. It'll generate random sample data starting at
+now and working backwards.
 
 
 Advanced install
