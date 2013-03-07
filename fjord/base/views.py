@@ -22,6 +22,11 @@ def login_failure(request, template=None):
     return render(request, template)
 
 
+@mobile_template('{mobile/}about.html')
+def about_view(request, template=None):
+    return render(request, template)
+
+
 def test_memcached(host, port):
     """Connect to memcached.
 
