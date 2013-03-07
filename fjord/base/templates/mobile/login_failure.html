@@ -1,12 +1,11 @@
-{% extends "base.html" %}
+{% extends "mobile/base.html" %}
 
 {% block page_title %}{{ _('Login Failure') }}{% endblock %}
 
 {% block content %}
-  <div class="col"></div>
-  <div class="col wide">
-    <div class="block">
+  <article>
+    <section>
       {% include "includes/login_failure_text.html" %}
-    </div>
-  </div>
+    </section>
+  </article>
 {% endblock %}
