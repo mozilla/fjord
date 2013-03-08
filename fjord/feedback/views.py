@@ -1,3 +1,5 @@
+from functools import wraps
+
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
@@ -10,9 +12,31 @@ from fjord.feedback.forms import ResponseForm
 from fjord.feedback import models
 
 
+@mobile_template('feedback/{mobile/}download_firefox.html')
+def download_firefox(request, template):
+    return render(request, template)
+
+
 @mobile_template('feedback/{mobile/}thanks.html')
 def thanks(request, template):
     return render(request, template)
+
+
+def requires_firefox(func):
+    """Redirects to "download firefox" page if not firefox.
+
+    If it isn't a Firefox browser, then we don't want to deal with it.
+
+    This is a temporary solution. See bug #848568.
+
+    """
+
+    @wraps(func)
+    def _requires_firefox(request, *args, **kwargs):
+        if not request.BROWSER.platform:
+            return HttpResponseRedirect(reverse('download-firefox'))
+        return func(request, *args, **kwargs)
+    return _requires_firefox
 
 
 def _handle_feedback_post(request):
@@ -86,6 +110,7 @@ def _get_prodchan(request):
     return '{0}.{1}.{2}'.format(product, platform, channel)
 
 
+@requires_firefox
 def desktop_stable_feedback(request):
     # Use two instances of the same form because the template changes the text
     # based on the value of ``happy``.
@@ -108,6 +133,7 @@ def desktop_stable_feedback(request):
     return render(request, 'feedback/feedback.html', {'forms': forms})
 
 
+@requires_firefox
 def mobile_stable_feedback(request):
     form = ResponseForm()
     happy = None
