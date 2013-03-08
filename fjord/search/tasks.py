@@ -5,7 +5,7 @@ import sys
 from django.conf import settings
 from django.db.models.signals import post_save, pre_delete
 
-from celery.decorators import task
+from celery.task import task
 from multidb.pinning import pin_this_thread, unpin_this_thread
 
 from fjord.search.index import index_chunk
