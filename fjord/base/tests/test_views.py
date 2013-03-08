@@ -38,6 +38,7 @@ class MonitorViewTest(ElasticTestCase):
         test_memcached = views.test_memcached
         try:
             with self.settings(
+                SHOW_STAGE_NOTICE=True,
                 CACHES={
                     'default': {
                         'BACKEND': 'caching.backends.memcached.CacheClass',

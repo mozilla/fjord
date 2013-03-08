@@ -1,5 +1,6 @@
 import logging
 import socket
+from functools import wraps
 
 from django.conf import settings
 from django.http import Http404
@@ -45,10 +46,24 @@ def test_memcached(host, port):
         s.close()
 
 
+def dev_or_authorized(func):
+    """Show view for admin and developer instances, else 404"""
+    @wraps(func)
+    def _dev_or_authorized(request, *args, **kwargs):
+        if (request.user.is_superuser or settings.SHOW_STAGE_NOTICE
+            or settings.DEBUG):
+
+            return func(request, *args, **kwargs)
+
+        raise Http404
+    return _dev_or_authorized
+
+
 ERROR = 'ERROR'
 INFO = 'INFO'
 
 
+@dev_or_authorized
 @never_cache
 def monitor_view(request):
     """View for services monitor."""
@@ -156,12 +171,7 @@ class IntentionalException(Exception):
     pass
 
 
+@dev_or_authorized
 def throw_error(request):
-    """Throw an error for testing purposes. Disabled in production."""
-
-    # If both of these are false, we are likely on a production server, where
-    # providing an end point to throw errors would be a bad thing.
-    if settings.SHOW_STAGE_NOTICE or settings.DEBUG:
-        raise IntentionalException("Error raised for testing purposes.")
-    else:
-        raise Http404
+    """Throw an error for testing purposes."""
+    raise IntentionalException("Error raised for testing purposes.")
