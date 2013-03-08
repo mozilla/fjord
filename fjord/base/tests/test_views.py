@@ -13,6 +13,24 @@ from fjord.search.tests import ElasticTestCase
 class MonitorViewTest(ElasticTestCase):
     client_class = LocalizingClient
 
+    def test_about_view(self):
+        r = self.client.get(reverse('about-view'))
+        eq_(200, r.status_code)
+        self.assertTemplateUsed(r, 'about.html')
+
+        r = self.client.get(reverse('about-view'), {'mobile': 1})
+        eq_(200, r.status_code)
+        self.assertTemplateUsed(r, 'mobile/about.html')
+
+    def test_login_failure_view(self):
+        r = self.client.get(reverse('login-failure'))
+        eq_(200, r.status_code)
+        self.assertTemplateUsed(r, 'login_failure.html')
+
+        r = self.client.get(reverse('login-failure'), {'mobile': 1})
+        eq_(200, r.status_code)
+        self.assertTemplateUsed(r, 'mobile/login_failure.html')
+
     def test_monitor_view(self):
         """Tests for the monitor view."""
         # TODO: When we add a mocking framework, we can mock this
