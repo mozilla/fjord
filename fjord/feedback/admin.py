@@ -10,6 +10,11 @@ class ResponseFeedbackAdmin(admin.ModelAdmin):
     list_filter = ('prodchan', 'happy', 'locale')
     search_fields = ('description',)
 
+    def queryset(self, request):
+        # Note: This ignores the super() queryset and uses the
+        # uncached manager.
+        return Response.uncached.all()
+
     def has_add_permission(self, request, obj=None):
         # Prevent anyone from adding feedback in the admin.
         return False
