@@ -70,9 +70,22 @@ class TestFeedback(TestCase):
         """Requesting a generic template should give a feedback form."""
         # TODO: This test might need to change when the router starts routing.
         url = reverse('feedback')
-        r = self.client.get(url, HTTP_USER_AGENT='Firefox')
+        ua = ('Mozilla/5.0 (X11; Linux x86_64; rv:21.0) Gecko/20130212 '
+              'Firefox/21.0')
+
+        r = self.client.get(url, HTTP_USER_AGENT=ua)
         eq_(200, r.status_code)
         self.assertTemplateUsed(r, 'feedback/feedback.html')
+
+    def test_reject_non_firefox(self):
+        """Using non-Firefox browser lands you on download-firefox page."""
+        # TODO: This test might need to change when the router starts routing.
+        url = reverse('feedback')
+        ua = ('Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 '
+              '(KHTML, like Gecko) Chrome/24.0.1312.68 Safari/537.17')
+
+        r = self.client.get(url, HTTP_USER_AGENT=ua)
+        self.assertRedirects(r, reverse('download-firefox'))
 
     def test_email_collection(self):
         """If the user enters an email and checks the box, collect the email."""

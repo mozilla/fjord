@@ -1,0 +1,35 @@
+{% extends "mobile/base.html" %}
+
+{% block site_css %}
+  {{ css('mobile/thanks') }}
+{% endblock %}
+
+{% block page_title %}{{ _('Download Firefox') }}{% endblock %}
+
+{# Remove site header. #}
+{% block site_header %}{% endblock %}
+
+{% block content %}
+
+  <article id="thanks">
+    <header>
+      <h1>{{ _('Please Download Firefox!') }}</h1>
+    </header>
+
+    <section>
+      <p>
+        {% trans %}
+        Oh! So, you want to offer us feedback on Firefox. Thank you, but you'll need
+        to be on the latest version.
+        {% endtrans %}
+      </p>
+      <p>
+        {% trans url=('http://www.mozilla.org/') %}
+        To do that, simply go to our download page and install/update to the
+        <a href="{{ url }}">latest version of Firefox!</a>
+        {% endtrans %}
+      </p>
+    </section>
+  </article>
+
+{% endblock %}
