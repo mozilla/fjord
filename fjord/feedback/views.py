@@ -1,6 +1,7 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.views.decorators.http import require_POST
 
 from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
@@ -25,18 +26,9 @@ def _handle_feedback_post(request):
         if platform == 'Windows':
             platform += ' ' + request.BROWSER.platform_version
 
-        if '_type' in request.POST:
-            # If _type is in the POST data then, this is coming from
-            # Firefox for Android which posted directly to the old
-            # site which used _type. Feedback from Firefox for Android
-            # is always sad. I kid you not.
-            happy = False
-        else:
-            happy = data['happy']
-
         opinion = models.Response(
             # Data coming from the user
-            happy=happy,
+            happy=data['happy'],
             url=data['url'],
             description=data['description'],
             # Inferred data
@@ -86,6 +78,7 @@ def _get_prodchan(request):
     return '{0}.{1}.{2}'.format(product, platform, channel)
 
 
+@csrf_protect
 def desktop_stable_feedback(request):
     # Use two instances of the same form because the template changes the text
     # based on the value of ``happy``.
@@ -108,6 +101,7 @@ def desktop_stable_feedback(request):
     return render(request, 'feedback/feedback.html', {'forms': forms})
 
 
+@csrf_protect
 def mobile_stable_feedback(request):
     form = ResponseForm()
     happy = None
@@ -124,6 +118,34 @@ def mobile_stable_feedback(request):
     })
 
 
+@csrf_exempt
+@require_POST
+def android_about_feedback(request):
+    """A view specifically for Firefox for Android.
+
+    Firefox for Android has a feedback form built in that generates
+    POSTS directly to Input, and is always sad or ideas. Since Input no
+    longer supports idea feedbacks, everything is Sad.
+    """
+
+    # Firefox for Android only sends up sad and idea responses, but it
+    # uses the old `_type` variable from old Input. Tweak the data to do
+    # what FfA means, not what it says.
+
+    # Make `request.GET` mutable.
+    request.GET = request.GET.copy()
+    request.GET['happy'] = 0
+
+    response, form = _handle_feedback_post(request)
+
+    if response:
+        return response
+
+    # This means there was an error. Since FfA doesn't care about the
+    # contents anyways, return an error code.
+    return HttpResponse('', status=400)
+
+
 # Mapping of prodchan values to views. If the parameter `formname` is passed to
 # `feedback_router`, it will key into this dict.
 feedback_routes = {
@@ -133,12 +155,8 @@ feedback_routes = {
 }
 
 
-@csrf_protect
-def csrf_checked_feedback_router(request, *args, **kwargs):
-    return feedback_router_actual(request, *args, **kwargs)
-
-
-def feedback_router_actual(request, formname=None, *args, **kwargs):
+@csrf_exempt
+def feedback_router(request, formname=None, *args, **kwargs):
     """Determine a view to use, and call it.
 
     If formname is given, reference `feedback_routes` to look up a view.
@@ -149,27 +167,22 @@ def feedback_router_actual(request, formname=None, *args, **kwargs):
     """
     view = feedback_routes.get(formname)
 
-    if view is None:
-        if request.BROWSER.mobile:
-            view = mobile_stable_feedback
-        else:
-            view = desktop_stable_feedback
-    return view(request, *args, **kwargs)
-
-
-@csrf_exempt
-def feedback_router(request, *args, **kwargs):
-    """Handles the feedback view"""
     # Checks to see if `_type` is in the POST data and if so this is
     # coming from Firefox for Android which doesn't know anything
-    # about csrf tokens. If that's the case, we just let it through.
-    # Otherwise we pass it to csrf_checked_feedback_router to check
-    # for csrf and deny if appropriate.
+    # about csrf tokens. If that's the case, we send it to a view
+    # specifically for FfA Otherwise we pass it to one of the normal
+    # views, which enforces CSRF.
     #
     # FIXME: Remove this hairbrained monstrosity when we don't need to
     # support the method that Firefox for Android currently uses to
     # post feedback which worked with the old input.mozilla.org.
     if '_type' in request.POST:
-        return feedback_router_actual(request, *args, **kwargs)
+        view = android_about_feedback
 
-    return csrf_checked_feedback_router(request, *args, **kwargs)
+    if view is None:
+        if request.BROWSER.mobile:
+            view = mobile_stable_feedback
+        else:
+            view = desktop_stable_feedback
+
+    return view(request, *args, **kwargs)
