@@ -11,8 +11,8 @@ Summary
 This chapter helps you get a minimal installation of Fjord up and
 running so as to make it easier for contributing.
 
-If you're interested in setting up Fjord for a production
-deployment, this is not the chapter for you---look elsewhere.
+If you're interested in setting up Fjord for a production deployment,
+this is not the chapter for you---look elsewhere.
 
 If you have any problems getting Fjord running, let us know. See the
 :ref:`project-details`.
@@ -87,8 +87,8 @@ Installing dependencies
 Compiled Packages
 -----------------
 
-There are a small number of packages that need compiling, including the MySQL
-Python client.
+There are a small number of packages that need compiling, including
+the MySQL Python client.
 
 You can install these either with your system's package manager or
 with ``pip``.
@@ -101,8 +101,9 @@ If you want to use your system's package manager, you'll need to go
 through ``requirements/compiled.txt`` and install the dependencies by
 hand.
 
-**OSX Mountain Lion**: One of the things in ``requirements/compiled.txt`` is
-MySQL Python library.  If you're using OSX Mountain Lion, then
+**OSX Mountain Lion**: One of the things in
+``requirements/compiled.txt`` is MySQL Python library.  If you're
+using OSX Mountain Lion, then
 `<http://stackoverflow.com/questions/11787012/how-to-install-mysqldb-on-mountain-lion>`_
 should help you install it.
 
@@ -133,6 +134,12 @@ instructions assume you use:
 :username: fjord
 :password: password
 
+.. Note::
+
+   If you use different values, make sure to substitute your values in
+   the correct places in the rest of the instructions.
+
+
 In a terminal, do::
 
     $ mysql -u root -p
@@ -141,37 +148,48 @@ In a terminal, do::
     mysql> GRANT ALL ON fjord.* TO 'fjord'@'localhost';
 
 
-.. Note::
-
-   If you use different values, make sure to substitute your values in the
-   correct places in the rest of the instructions.
-
-
 .. _hacking-howto-configuration:
 
 Configuration
 =============
 
 Copy the file ``local.py-dist`` in the ``fjord/settings`` directory to
-``local.py``, and edit it to fit your needs. In particular, you should:
+``local.py``, and edit it to fit your needs. In particular, you
+should:
 
-* Set the database options to fit what you configured above in ``DATABASES``.
-* Fill in a value for ``SECRET_KEY``. This should be some random string. It
-  will be used to seed hashing algorithms.
-* Fill in a value for ``HMAC_KEYS``. This should also be a random string, the
-  longer the better. It is used as a sort of 'pepper' analagous to the password
-  salt. Not supplying this will make cause user generation to fail.
-* Set ``SESSION_COOKIE_SECURE = False``, unless you plan on using https.
+* Set the database options to fit what you configured above in
+  ``DATABASES``.
+* Fill in a value for ``SECRET_KEY``. This should be some random
+  string. It will be used to seed hashing algorithms.
+* Fill in a value for ``HMAC_KEYS``. This should also be a random
+  string, the longer the better. It is used as a sort of 'pepper'
+  analagous to the password salt. Not supplying this will make cause
+  user generation to fail.
+* Set::
+
+      SESSION_COOKIE_SECURE = False
+
+  unless you plan on using https.
+* Set ``SITE_URL`` to the protocol, host and port you're going to run
+  your fjord instance on. By default, when you type::
+
+      ./manage.py runserver
+
+  it launches the server on ``http://127.0.0.1:8000``. If you're going
+  to do that, set::
+
+      SITE_URL = 'http://127.0.0.1:8000'
+
 
 Now you can copy and modify any settings from
 ``fjord/settings/base.py`` and
 ``vendor/src/funfactory/funfactory/settings_base.py`` into
 ``fjord/settings/local.py`` and the value will override the default.
 
-.. Note::
+.. Warning::
 
-    These instructions are to set up a development environment; more care
-    should be taken in production.
+   These instructions are to set up a development environment; more
+   care should be taken in production.
 
 
 Cache
@@ -226,8 +244,9 @@ Now install LESS using::
 
     $ sudo npm install less
 
-Make sure that ``lessc`` is available on your path. NPM probably installed it
-to ``node_modules/less/bin/lessc`` and ``node_modules/.bin/lessc``.
+Make sure that ``lessc`` is available on your path. NPM probably
+installed it to ``node_modules/less/bin/lessc`` and
+``node_modules/.bin/lessc``.
 
 LESS files are automatically converted by `jingo-minify
 <https://github.com/jsocol/jingo-minify>`_.
@@ -238,15 +257,11 @@ LESS files are automatically converted by `jingo-minify
 Database Schemas
 ----------------
 
-Note the two settings ``TEST_CHARSET`` and ``TEST_COLLATION``. Without
-these, the test suite will use MySQL's (moronic) defaults when
-creating the test database (see below) and lots of tests will
-fail. Hundreds.
-
-For details on how to create the database, see :ref:`hacking-howto-db`.
+For instructions on how to create the database, see
+:ref:`hacking-howto-db`.
 
 Fjord uses `South <http://south.aeracode.org>`_ for database
-migrations. To get an initial database set up, run::
+migrations.  To get an initial database set up, run::
 
     $ ./manage.py syncdb         # To get South ready
     $ ./manage.py migrate --all  # To run the initial migrations
@@ -254,13 +269,23 @@ migrations. To get an initial database set up, run::
 
 You'll now have an empty but up-to-date database!
 
-Finally, if you weren't asked to create a superuser and created one already,
-you'll probably want to create a superuser. Just use Django's
+Finally, if you weren't asked to create a superuser and created one
+already, you'll probably want to create a superuser. Just use Django's
 ``createsuperuser`` management command::
 
     $ ./manage.py createsuperuser
 
 and follow the prompts.
+
+.. Note::
+
+   Fjord uses `Persona <https://login.persona.org/>`_ for
+   authentication. When you log into your local fjord instance, you'll
+   be using the email address that you set up with
+   ``createsuperuser``.
+
+   Make sure it's a valid email address that you have set up with
+   Persona.
 
 
 Product Details Initialization
@@ -278,7 +303,7 @@ Testing it out
 ==============
 
 To start the dev server, run ``./manage.py runserver``, then open up
-``http://localhost:8000``.
+``http://127.0.0.1:8000``.
 
 If everything's working, you should see a somewhat empty version of
 the Input home page!
@@ -298,8 +323,8 @@ You'll need to add an extra grant in MySQL for your database user::
 
 .. Note::
 
-   If you used different values, make sure to substitute your values in the
-   correct places in the rest of the instructions.
+   If you used different values, make sure to substitute your values
+   in the correct places in the rest of the instructions.
 
 The test suite will create and use this database, to keep any data in
 your development database safe from tests.
@@ -326,9 +351,9 @@ If you want to generate a lot of random sample data, then do::
 
     $ ./manage.py generatedata --with=samplesize=1000
 
-That'll generate 1000 random responses. You can re-run that and also pass
-it different amounts. It'll generate random sample data starting at
-now and working backwards.
+That'll generate 1000 random responses. You can re-run that and also
+pass it different amounts. It'll generate random sample data starting
+at now and working backwards.
 
 
 Advanced install
@@ -350,11 +375,13 @@ Troubleshooting
 Criminy! I can't get this damn Persona login working!
 -----------------------------------------------------
 
-When you log in, do you end up on the dashboard page, but not logged in?
+When you log in, do you end up on the dashboard page, but not logged
+in?
 
 Are you seeing a "misconfigured" error?
 
-If so, make sure you have the following set in ``fjord/settings/local.py``::
+If so, make sure you have the following set in
+``fjord/settings/local.py``::
 
     DEBUG = True
 
@@ -367,6 +394,7 @@ If so, make sure you have the following set in ``fjord/settings/local.py``::
     SITE_URL = 'http://127.0.0.1:8000'
 
     SESSION_COOKIE_SECURE = False
+
 
 See `the django-browserid troubleshooting docs
 <https://django-browserid.readthedocs.org/en/latest/details/troubleshooting.html>`_

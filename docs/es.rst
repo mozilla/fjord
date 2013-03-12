@@ -95,10 +95,6 @@ See ``--help`` for more details::
 
 .. Note::
 
-   TODO: This doesn't work with celery 2.1, but will when we upgrade
-   to something more recent. Leaving it here in the docs because we're
-   definitely upgrading.
-
    If you kick off indexing with the admin, then indexing gets done in
    chunks by celery tasks. If you need to halt indexing, you can purge
    the tasks with::
@@ -144,8 +140,9 @@ automatically in the ``post_save`` hook as long as celery tasks are
 being handled.
 
 For celery tasks to be handled, you have to either have
-``CELERY_ALWAYS_EAGER`` set to True, or have at least one celery worker
-running, and RabbitMQ working.
+``CELERY_ALWAYS_EAGER`` set to True, or have at least one celery
+worker running, and RabbitMQ working.
+
 
 Index Maintenance
 -----------------

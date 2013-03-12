@@ -14,8 +14,11 @@ bootcamp guide
 <http://mozweb.readthedocs.org/en/latest/coding.html>`_.
 
 If you don't have an editor that checks PEP-8 issues and runs pyflakes
-for you, it's worth setting it up. Use `check.py
-<https://github.com/jbalogh/check>`_ because it's awesome.
+for you, it's worth setting it up. Use `flake8
+<https://flake8.readthedocs.org/en/latest/>`_ because it's awesome.
+
+Additionally, use `jshint <http://www.jshint.com/>`_ for JavaScript
+code.
 
 
 Git conventions
@@ -77,7 +80,8 @@ Strings
 
 (Copied from Playdoh docs.)
 
-You can localize strings both in Python code as well as Jinja templates.
+You can localize strings both in Python code as well as Jinja
+templates.
 
 In Python::
 
@@ -102,7 +106,7 @@ In Jinja we can use the following syntax for localized strings::
     <h1>{{ _('Hello') }}</h1>
 
     {% trans link='http://mozilla.org' %}
-        <p>Go to this <a href="{{ link }}">site</a>.</p>
+      <p>Go to this <a href="{{ link }}">site</a>.</p>
     {% endtrans %}
 
 
@@ -115,19 +119,25 @@ Let’s say you have some template::
 
     <h1>Hello</h1>
 
-    <p>Is it <a href="http://about.me/lionel.richie">me</a> you're looking for?</p>
+    <p>
+      Is it <a href="http://about.me/lionel.richie">me</a> you're
+      looking for?
+    </p>
 
 Let’s say you are told to translate this. You could do the following::
 
     {% trans %}
-        <h1>Hello</h1>
+      <h1>Hello</h1>
 
-        <p>Is it <a href="http://about.me/yo">me</a> you're looking for?</p>
+      <p>
+        Is it <a href="http://about.me/yo">me</a> you're looking for?
+      </p>
     {% endtrans %}
 
 This has a few problems, however:
 
-1. It forces every localizer to mimic your HTML, potentially breaking it.
+1. It forces every localizer to mimic your HTML, potentially breaking
+   it.
 
 2. If you decide to change the HTML, you need to either update your
    .po files or buy all your localizers a nice gift because of all the
@@ -141,7 +151,7 @@ Here’s an alternative::
 
     <p>
     {% trans about_url='http://about.me/lionel.richie' %}
-        Is it <a href="{{ about_url }}">me</a> you're looking for?
+      Is it <a href="{{ about_url }}">me</a> you're looking for?
     {% endtrans %}
     </p>
 
@@ -151,10 +161,10 @@ or if you have multiple paragraphs::
 
     {% trans about_url='http://about.me/lionel.richie' %}
     <p>
-        Is it <a href="{{ about_url }}">me</a> you're looking for?
+      Is it <a href="{{ about_url }}">me</a> you're looking for?
     </p>
     <p>
-        I can see it in your eyes.
+      I can see it in your eyes.
     </p>
     {% endtrans %}
 
@@ -193,4 +203,4 @@ After that runs, you can see what happened by doing::
 
     $ ./manage.py runserver
 
-and going to `<http://localhost:8000/xx/>`_.
+and going to `<http://127.0.0.1:8000/xx/>`_.
