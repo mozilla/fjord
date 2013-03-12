@@ -72,7 +72,7 @@ def index_item_task(mapping_type, item_id, **kwargs):
     log.debug('Index attempt #%s', retries)
     try:
         doc = mapping_type.extract_document(item_id)
-        mapping_type.index(dock, item_id)
+        mapping_type.index(doc, item_id)
 
     except Exception as exc:
         log.exception("Error while live indexing %s %d: %s",
