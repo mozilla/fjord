@@ -25,6 +25,7 @@ def index_chunk_task(index, batch_id, rec_id, chunk):
     :arg chunk: a (class, id_list) of things to index
     """
     cls, id_list = chunk
+    rec = None
 
     try:
         # Pin to master db to avoid replication lag issues and stale
@@ -43,8 +44,9 @@ def index_chunk_task(index, batch_id, rec_id, chunk):
         rec.mark_success()
 
     except Exception:
-        rec.mark_fail(u'Errored out %s %s' % (
-                sys.exc_type, sys.exc_value))
+        if rec is not None:
+            rec.mark_fail(u'Errored out %s %s' % (
+                    sys.exc_type, sys.exc_value))
         raise
 
     finally:
@@ -70,7 +72,7 @@ def index_item_task(mapping_type, item_id, **kwargs):
     log.debug('Index attempt #%s', retries)
     try:
         doc = mapping_type.extract_document(item_id)
-        mapping_type.index(doc, item_id)
+        mapping_type.index(dock, item_id)
 
     except Exception as exc:
         log.exception("Error while live indexing %s %d: %s",
