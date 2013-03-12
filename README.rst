@@ -2,7 +2,7 @@
  Fjord
 =======
 
-Fjord will be the new `<http://input.mozilla.org/>`_ but isn't, yet.
+Fjord is the new `<http://input.mozilla.org/>`_.
 
 
 Project details
