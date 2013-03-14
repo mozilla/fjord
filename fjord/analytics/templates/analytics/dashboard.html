@@ -116,7 +116,7 @@
 
     <form id="feedback_search" action="{{ request.get_full_path() }}" method="get">
       <input class="search_box" type="text" name="q"
-        placeholder="{{ _('Search by keyboard') }}" value="{{ current_search.q }}" />
+        placeholder="{{ _('Search by keyword') }}" value="{{ current_search.q }}" />
 
       {% for key, value in current_search.items() %}
         {% if key != 'q' %}
