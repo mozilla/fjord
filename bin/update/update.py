@@ -1,5 +1,5 @@
 """
-Deploy this project in dev/stage/production.
+Deploys fjord for input.mozilla.org
 
 Requires commander_ which is installed on the systems that need it.
 
@@ -38,15 +38,12 @@ def update_locales(ctx):
         ctx.local('svn up')
         ctx.local('./compile-mo.sh .')
 
-
 @task
 def update_assets(ctx):
     with ctx.lcd(settings.SRC_DIR):
+        
         ctx.local("python2.6 manage.py collectstatic --noinput")
-        # un-comment if you haven't moved to django-compressor yet
-        ## LANG=en_US.UTF-8 is sometimes necessary for the YUICompressor.
-        #ctx.local('LANG=en_US.UTF8 python2.6 manage.py compress_assets')
-
+        ctx.local("")
 
 @task
 def update_db(ctx):
@@ -56,22 +53,7 @@ def update_db(ctx):
 
     """
     with ctx.lcd(settings.SRC_DIR):
-        ctx.local('python2.6 ./vendor/src/schematic/schematic migrations')
-
-
-@task
-def install_cron(ctx):
-    """Use gen-crons.py method to install new crontab.
-
-    Ops will need to adjust this to put it in the right place.
-
-    """
-    with ctx.lcd(settings.SRC_DIR):
-        ctx.local('python2.6 ./bin/crontab/gen-crons.py -w %s -u apache > '
-                  '/etc/cron.d/.%' % (settings.WWW_DIR, settings.CRON_NAME))
-        ctx.local('mv /etc/cron.d/.%s /etc/cron.d/%s' %
-                  (settings.CRON_NAME,  settings.CRON_NAME))
-
+        ctx.local("python2.6 manage.py migrate --all")
 
 @task
 def checkin_changes(ctx):
@@ -116,7 +98,6 @@ def pre_update(ctx, ref=settings.UPDATE_REF):
     update_code(ref)
     update_info()
 
-
 @task
 def update(ctx):
     update_assets()
@@ -126,7 +107,6 @@ def update(ctx):
 
 @task
 def deploy(ctx):
-    install_cron()
     checkin_changes()
     deploy_app()
     update_celery()
