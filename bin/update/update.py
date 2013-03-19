@@ -41,9 +41,9 @@ def update_locales(ctx):
 @task
 def update_assets(ctx):
     with ctx.lcd(settings.SRC_DIR):
-        
+
         ctx.local("python2.6 manage.py collectstatic --noinput")
-        ctx.local("")
+        ctx.local("python2.6 manage.py compress_assets")
 
 @task
 def update_db(ctx):
