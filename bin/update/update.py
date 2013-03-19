@@ -84,7 +84,6 @@ def update_info(ctx):
         ctx.local('git log -3')
         ctx.local('git status')
         ctx.local('git submodule status')
-        ctx.local('python2.6 ./vendor/src/schematic/schematic -v migrations/')
         with ctx.lcd('locale'):
             ctx.local('svn info')
             ctx.local('svn status')
