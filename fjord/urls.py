@@ -20,10 +20,6 @@ urlpatterns = patterns('',
     (r'', include('fjord.analytics.urls')),
     (r'', include('fjord.base.urls')),
     (r'', include('fjord.feedback.urls')),
-    (r'', include('fjord.search.urls')),
-
-    # TODO: Remove this stub. /about and /search point to it.
-    url(r'stub', lambda r: HttpResponse('this is a stub'), name='stub'),
 
     # Generate a robots.txt
     (r'^robots\.txt$',
