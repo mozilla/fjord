@@ -210,9 +210,6 @@ ES_INDEXES = {'default': 'inputindex'}
 # ES cluster, but not bump into each other.
 ES_INDEX_PREFIX = 'input'
 
-# The indexing timeout to use. 30s is good.
-ES_INDEXING_TIMEOUT = 30
-
 # When True, objects that belong in the index will get automatically indexed
 # and deindexed when created and destroyed.
 ES_LIVE_INDEX = True

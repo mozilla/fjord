@@ -8,7 +8,7 @@ from pyelasticsearch.exceptions import (Timeout, ConnectionError,
 from test_utils import TestCase
 
 from fjord.base.tests import with_save
-from fjord.search.index import get_index, get_indexing_es
+from fjord.search.index import get_index, get_es
 from fjord.search.models import Record
 
 
@@ -26,7 +26,7 @@ class ElasticTestCase(TestCase):
 
         # try to connect to ES and if it fails, skip ElasticTestCases.
         try:
-            get_indexing_es().health()
+            get_es().health()
         except (Timeout, ConnectionError):
             cls.skipme = True
             return
@@ -62,7 +62,7 @@ class ElasticTestCase(TestCase):
         # TODO: uncomment this when we have live indexing.
         # generate_tasks()
 
-        get_indexing_es().refresh(index)
+        get_es().refresh(index)
         if timesleep > 0:
             time.sleep(timesleep)
 
@@ -81,10 +81,10 @@ class ElasticTestCase(TestCase):
 
         self.refresh()
         if wait:
-            get_indexing_es().health(wait_for_status='yellow')
+            get_es().health(wait_for_status='yellow')
 
     def teardown_indexes(self):
-        es = get_indexing_es()
+        es = get_es()
         try:
             es.delete_index(get_index())
         except ElasticHttpNotFoundError:

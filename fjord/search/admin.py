@@ -116,4 +116,4 @@ def search_admin_view(request):
 
 
 admin.site.register_view('search-admin-view', search_admin_view,
-                         'Search - Index Maintenance')
+                         'ElasticSearch - Index Maintenance')

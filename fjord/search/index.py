@@ -128,22 +128,6 @@ def chunked(iterable, n):
             return
 
 
-def get_indexing_es(**kwargs):
-    """Return ES instance with 30s timeout for indexing.
-
-    :arg kwargs: any settings to override.
-
-    :returns: an ES
-
-    """
-    defaults = {
-        'timeout': settings.ES_INDEXING_TIMEOUT
-        }
-    defaults.update(kwargs)
-
-    return get_es(**defaults)
-
-
 def get_indexes(all_indexes=False):
     """Return list of (name, count) tuples for indexes.
 
@@ -154,7 +138,7 @@ def get_indexes(all_indexes=False):
     :returns: list of (name, count) tuples.
 
     """
-    es = get_indexing_es()
+    es = get_es()
 
     status = es.status()
     indexes = status['indices']
@@ -175,7 +159,7 @@ def delete_index_if_exists(index):
 
     """
     try:
-        get_indexing_es().delete_index(index)
+        get_es().delete_index(index)
     except ElasticHttpNotFoundError:
         # Can ignore this since it indicates the index doesn't exist
         # and therefore there's nothing to delete.
@@ -219,7 +203,7 @@ def recreate_index(es=None):
 
     """
     if es is None:
-        es = get_indexing_es()
+        es = get_es()
 
     mappings = {}
     for name, mt in get_mapping_types().items():
@@ -285,7 +269,7 @@ def index_chunk(cls, chunk, reraise=False, es=None):
 
     """
     if es is None:
-        es = get_indexing_es()
+        es = get_es()
 
     documents = []
     for id_ in chunk:
@@ -325,7 +309,7 @@ def es_reindex_cmd(percent=100, mapping_types=None):
     :arg mapping_types: list of mapping types to index
 
     """
-    es = get_indexing_es()
+    es = get_es()
 
     log.info('Wiping and recreating %s....', get_index())
     recreate_index(es=es)
