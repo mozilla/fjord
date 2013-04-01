@@ -126,5 +126,21 @@
       "platform": "OS X",
       "platform_version": "10.8",
       "mobile": false
+    },
+    {
+      "user_agent": "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9.2.17) Gecko/20110420 Firefox/3.6.17 GTB7.1 ( .NET CLR 3.5.30729; .NET4.0C) FBSMTWB",
+      "browser": "Firefox",
+      "browser_version": "3.6.17",
+      "platform": "Windows",
+      "platform_version": "Vista",
+      "mobile": false
+    },
+    {
+      "user_agent":  "Mozilla/5.0 (Windows; U; Windows NT 5.1; es-ES; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11 (.NET CLR 3.5.30729)",
+      "browser": "Firefox",
+      "browser_version": "3.6.11",
+      "platform": "Windows",
+      "platform_version": "XP",
+      "mobile": false
     }
-  ]
+]

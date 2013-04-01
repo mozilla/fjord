@@ -81,11 +81,23 @@ class TestFeedback(TestCase):
         """Using non-Firefox browser lands you on download-firefox page."""
         # TODO: This test might need to change when the router starts routing.
         url = reverse('feedback')
-        ua = ('Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 '
-              '(KHTML, like Gecko) Chrome/24.0.1312.68 Safari/537.17')
 
-        r = self.client.get(url, HTTP_USER_AGENT=ua)
-        self.assertRedirects(r, reverse('download-firefox'))
+        for ua in (
+            ('Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; '
+             'Trident/5.0)'),
+            ('Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 '
+             '(KHTML, like Gecko) Chrome/24.0.1312.68 Safari/537.17'),
+            ('Mozilla/5.0 (Linux; U; Android 4.0.2; en-us; Galaxy Nexus '
+             'Build/ICL53F) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 '
+             'Mobile Safari/534.30'),
+            ('Mozilla/5.0 (Linux; U; Android 4.0.4; en-us; Xoom Build/IMM76) '
+             'AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 '
+             'Safari/534.30'),
+            ('Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.22 (KHTML, like '
+             'Gecko) Chrome/25.0.1364.97 Safari/537.22')):
+
+            r = self.client.get(url, HTTP_USER_AGENT=ua)
+            self.assertRedirects(r, reverse('download-firefox'))
 
     def test_email_collection(self):
         """If the user enters an email and checks the box, collect the email."""
