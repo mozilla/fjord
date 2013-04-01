@@ -88,6 +88,15 @@ def parse_ua(ua):
     while platform in ['X11', 'Ubuntu', 'U']:
         platform = platform_parts.pop(0)
 
+    if platform == 'Windows':
+        # Firefox 3.6 has the Windows version later in the parts. So
+        # skim the parts to find a version that's in WINDOWS_VERSION.
+        # If we don't find anything, just leave things as is.
+        possible_platforms = [p for p in platform_parts
+                              if p in WINDOWS_VERSION]
+        if possible_platforms:
+            platform = possible_platforms[0]
+
     if platform in WINDOWS_VERSION.keys():
         platform, platform_version = WINDOWS_VERSION[platform]
     elif platform.startswith('Linux'):
