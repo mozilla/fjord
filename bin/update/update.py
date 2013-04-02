@@ -53,7 +53,7 @@ def update_product_details(ctx):
     NOTE: We can nix this from deployment once we add it in a cron job.
     """
     with ctx.lcd(settings.SRC_DIR):
-        ctx.local("python2.6 manage.py update-product-details")
+        ctx.local("python2.6 manage.py update_product_details")
 
 
 @task
