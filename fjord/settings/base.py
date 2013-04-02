@@ -213,3 +213,9 @@ ES_INDEX_PREFIX = 'input'
 # When True, objects that belong in the index will get automatically indexed
 # and deindexed when created and destroyed.
 ES_LIVE_INDEX = True
+
+# Set PROD_LANGUAGES to DEV_LANGUAGES which is computed by funfactory
+# based on the things in locale.
+# TODO: We might actually want to compute this based on product details
+# instead of translated locales.
+PROD_LANGUAGES = DEV_LANGUAGES
