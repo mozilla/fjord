@@ -17,7 +17,6 @@ build
 tmp/*
 *~
 *.mo
-/bin/
 /man/
 /lib/
 /include/

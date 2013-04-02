@@ -38,12 +38,23 @@ def update_locales(ctx):
         ctx.local('svn up')
         ctx.local('./compile-mo.sh .')
 
+
 @task
 def update_assets(ctx):
     with ctx.lcd(settings.SRC_DIR):
-
         ctx.local("python2.6 manage.py collectstatic --noinput")
         ctx.local("python2.6 manage.py compress_assets")
+
+
+@task
+def update_product_details(ctx):
+    """Update product details.
+
+    NOTE: We can nix this from deployment once we add it in a cron job.
+    """
+    with ctx.lcd(settings.SRC_DIR):
+        ctx.local("python2.6 manage.py update_product_details")
+
 
 @task
 def update_db(ctx):
@@ -54,6 +65,7 @@ def update_db(ctx):
     """
     with ctx.lcd(settings.SRC_DIR):
         ctx.local("python2.6 manage.py migrate --all")
+
 
 @task
 def checkin_changes(ctx):
@@ -97,9 +109,11 @@ def pre_update(ctx, ref=settings.UPDATE_REF):
     update_code(ref)
     update_info()
 
+
 @task
 def update(ctx):
     update_assets()
+    update_product_details()
     update_locales()
     update_db()
 
