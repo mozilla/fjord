@@ -12,6 +12,12 @@ PROJECT_MODULE = 'fjord'
 # Defines the views served for root URLs.
 ROOT_URLCONF = '%s.urls' % PROJECT_MODULE
 
+PROD_LANGUAGES = [
+    'he', 'nb-NO', 'bg', 'vi', 'sq', 'zh-TW', 'fy-NL', 'gl', 'ca', 'ar',
+    'fy', 'it', 'sl', 'hu', 'sk', 'id', 'pl', 'pt-PT', 'el', 'da', 'nl',
+    'tr', 'lt', 'sr', 'pt-BR', 'ja', 'hr', 'cs', 'pt', 'ko', 'ga-IE',
+    'en-US', 'zh-CN', 'uk', 'ga', 'de', 'ro', 'fr', 'es', 'ru']
+
 INSTALLED_APPS = get_apps(
     exclude=(
         'compressor',
