@@ -107,6 +107,11 @@ using OSX Mountain Lion, then
 `<http://stackoverflow.com/questions/11787012/how-to-install-mysqldb-on-mountain-lion>`_
 should help you install it.
 
+In addition, if you encounter an error stating
+``Library not loaded: libmysqlclient.18.dylib``, then
+`<http://stackoverflow.com/questions/6383310/python-mysqldb-library-not-loaded-libmysqlclient-18-dylib>`_
+explains how to fix this.
+
 
 Python Packages
 ---------------
@@ -195,11 +200,11 @@ Now you can copy and modify any settings from
 Cache
 -----
 
-Cache is configured with the ``CACHES`` setting in your
+Cache is optionally configured with the ``CACHES`` setting in your
 ``fjord/settings/local.py`` settings file..
 
-If you're running a developer environment, you can use the default
-``CACHES`` settings. It probably looks something like this::
+If you're running a developer environment, you can omit this setting
+and accept the the default, which will look something like this::
 
     CACHES = {
         'default': {
