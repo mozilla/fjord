@@ -47,16 +47,6 @@ def update_assets(ctx):
 
 
 @task
-def update_product_details(ctx):
-    """Update product details.
-
-    NOTE: We can nix this from deployment once we add it in a cron job.
-    """
-    with ctx.lcd(settings.SRC_DIR):
-        ctx.local("python2.6 manage.py update_product_details")
-
-
-@task
 def update_db(ctx):
     """Update the database schema, if necessary.
 
@@ -113,7 +103,6 @@ def pre_update(ctx, ref=settings.UPDATE_REF):
 @task
 def update(ctx):
     update_assets()
-    update_product_details()
     update_locales()
     update_db()
 
