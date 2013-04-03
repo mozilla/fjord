@@ -39,6 +39,7 @@ PROD_LANGUAGES = [
     'ja',
     'ko',
     'lt',
+    'my',
     'nb-NO',
     'nl',
     'pl',
