@@ -2,6 +2,7 @@ from functools import wraps
 
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
+from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.decorators.http import require_POST
 
@@ -182,6 +183,7 @@ feedback_routes = {
 
 
 @csrf_exempt
+@never_cache
 def feedback_router(request, formname=None, *args, **kwargs):
     """Determine a view to use, and call it.
 
@@ -190,6 +192,8 @@ def feedback_router(request, formname=None, *args, **kwargs):
     asssume the user is either a stable desktop Firefox or a stable
     mobile Firefox based on the parsed UA, and serve them the appropriate
     page.
+
+    Note: We never want to cache this view.
     """
     view = feedback_routes.get(formname)
 
