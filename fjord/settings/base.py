@@ -12,11 +12,51 @@ PROJECT_MODULE = 'fjord'
 # Defines the views served for root URLs.
 ROOT_URLCONF = '%s.urls' % PROJECT_MODULE
 
+# This is the list of languages that are active for non-DEV
+# environments. Add languages here to allow users to see the site in
+# that locale and additionally submit feedback in that locale.
 PROD_LANGUAGES = [
-    'he', 'nb-NO', 'bg', 'vi', 'sq', 'zh-TW', 'fy-NL', 'gl', 'ca', 'ar',
-    'fy', 'it', 'sl', 'hu', 'sk', 'id', 'pl', 'pt-PT', 'el', 'da', 'nl',
-    'tr', 'lt', 'sr', 'pt-BR', 'ja', 'hr', 'cs', 'pt', 'ko', 'ga-IE',
-    'en-US', 'zh-CN', 'uk', 'ga', 'de', 'ro', 'fr', 'es', 'ru']
+    'ar',
+    'bg',
+    'ca',
+    'cs',
+    'da',
+    'de',
+    'el',
+    'en-US',
+    'es',
+    'fr',
+    'fy',
+    'fy-NL',
+    'ga',
+    'ga-IE',
+    'gl',
+    'he',
+    'hr',
+    'hu',
+    'id',
+    'it',
+    'ja',
+    'ko',
+    'lt',
+    'nb-NO',
+    'nl',
+    'pl',
+    'pt',
+    'pt-BR',
+    'pt-PT',
+    'ro',
+    'ru',
+    'sk',
+    'sl',
+    'sq',
+    'sr',
+    'tr',
+    'uk',
+    'vi',
+    'zh-CN',
+    'zh-TW',
+]
 
 INSTALLED_APPS = get_apps(
     exclude=(
