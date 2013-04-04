@@ -20,6 +20,10 @@ and so that people can submit feedback:
 
 3. add the locale code to ``PROD_LANGUAGES`` in ``fjord/settings/base.py``
 
+4. commit the changes to ``fjord/settings/base.py`` and product details stuff
+   to git
+
+
 .. Note::
 
    To test this in a local instance, you need to have::
