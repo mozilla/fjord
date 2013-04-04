@@ -36,3 +36,11 @@ and so that people can submit feedback:
    After making that change, you can go to
    ``https://127.0.0.1:8000/%NEWLOCALE%`` and it won't redirect to
    ``https://127.0.0.1:8000/en-US/%NEWLOCALE%``.
+
+
+.. Note::
+
+   https://input-dev.allizom.org/ uses ``DEV_LANGUAGES``, so any changes
+   you make to ``PROD_LANGUAGES`` won't affect the -dev environment.
+
+   You'll have to do the testing on the staging environment.
