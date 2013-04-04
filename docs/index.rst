@@ -29,6 +29,7 @@ Part 1: Contributor's Guide
    es
    l10n
    vendor
+   maintain
    sla
 
 
