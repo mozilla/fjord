@@ -14,6 +14,11 @@ Fjord is the software that runs http://input.mozilla.org/ .
 :new bugs: https://bugzilla.mozilla.org/enter_bug.cgi?product=Input&rep_platform=all&op_sys=all
 :irc:      #input on irc.mozilla.org
 
+.. Note::
+
+   If you're interested in helping out, please see `our GetInolved page
+   <https://wiki.mozilla.org/Webdev/GetInvolved/input.mozilla.org>`_
+
 
 Part 1: Contributor's Guide
 ===========================
