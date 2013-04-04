@@ -20,7 +20,10 @@
       {{ feedback.description }}
     </p>
     <ul class="meta">
-      <li><time datetime="{{ feedback.created }}Z" title="{{ feedback.created }} UTC">
+{# Note: This next line says it's -0800/PST, but the server time is
+   Pacific and "celebrates" daylight savings so it's a villainous lie
+   for all datetimes in PDT. #}
+      <li><time datetime="{{ feedback.created }}-08:00" title="{{ feedback.created }} PST">
         {{ feedback.created|naturaltime }}
       </time></li>
       <li>{{ feedback.platform }}</li>
@@ -108,6 +111,7 @@
       {# A graph will be dynamically inserted in these divs by Flot. #}
       <div class="histogram" data-histogram="{{ histogram|to_json }}"></div>
       <div class="legend"></div>
+      <div class="note">Note: All dates and times are in Pacific Time.</div>
     </div>
   {% endif %}
 
