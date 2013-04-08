@@ -24,7 +24,8 @@
    Pacific and "celebrates" daylight savings so it's a villainous lie
    for all datetimes in PDT. #}
       <li>
-        <a href="{{ request.get_full_path()|urlparams(date_start=feedback.created) }}">
+        {% set feedback_date = convert_date_string(feedback.created) %}
+        <a href="{{ request.get_full_path()|urlparams(date_start=feedback_date) }}">
           <time datetime="{{ feedback.created }}-08:00" title="{{ feedback.created }} PST">
             {{ feedback.created|naturaltime }}
           </time>
