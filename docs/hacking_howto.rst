@@ -158,8 +158,8 @@ In a terminal, do::
 Configuration
 =============
 
-Copy the file ``local.py-dist`` in the ``fjord/settings`` directory to
-``local.py``, and edit it to fit your needs. In particular, you
+In the ``fjord/settings/`` directory, copy ``local.py-dist`` to
+``local.py`` and edit it to fit your needs. In particular, you
 should:
 
 * Set the database options to fit what you configured above in
@@ -170,18 +170,13 @@ should:
   string, the longer the better. It is used as a sort of 'pepper'
   analagous to the password salt. Not supplying this will make cause
   user generation to fail.
-* Set::
-
-      SESSION_COOKIE_SECURE = False
-
-  unless you plan on using https.
 * Set ``SITE_URL`` to the protocol, host and port you're going to run
   your fjord instance on. By default, when you type::
 
       ./manage.py runserver
 
   it launches the server on ``http://127.0.0.1:8000``. If you're going
-  to do that, set::
+  to use that then set::
 
       SITE_URL = 'http://127.0.0.1:8000'
 
@@ -197,26 +192,53 @@ Now you can copy and modify any settings from
    care should be taken in production.
 
 
-Cache
------
+LESS
+----
+
+To install LESS you will first need to `install Node.js and NPM
+<https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager>`_.
+
+Install LESS site-wide this way::
+
+    $ sudo npm install less
+
+Or alternatively, install it locally this way::
+
+    $ npm install less
+
+Make sure that ``lessc`` is available on your path. NPM probably
+installed it to ``node_modules/less/bin/lessc`` and
+``node_modules/.bin/lessc``.
+
+If it's not, add::
+
+    LESS_BIN = '/path/to/lessc'
+
+to your ``fjord/settings/local.py`` file.
+
+LESS files are automatically converted by `jingo-minify
+<https://github.com/jsocol/jingo-minify>`_.
+
+.. Note::
+
+   If you try to run fjord, but don't have lessc installed
+   or fjord looks for lessc in the wrong place, you may have
+   to do this so that the .css files get regenerated::
+
+       $ rm static/css/*.css
+
+
+Cache (optional)
+----------------
 
 Cache is optionally configured with the ``CACHES`` setting in your
 ``fjord/settings/local.py`` settings file..
 
-If you're running a developer environment, you can omit this setting
-and accept the the default, which will look something like this::
+``CACHES`` uses the Django defaults if you haven't set it.
 
-    CACHES = {
-        'default': {
-            'LOCATION': '',
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
-            }
-        }
-
-
-It's better to use memcached since that's closer to what we run in
-production. Here's a sample ``CACHES`` setting which assumes you're
-running memcached at port 11211 on localhost::
+In production, we use memcached. If you want a system that's closer to
+what we have in production, set ``CACHES`` in
+``fjord/settings/local.py`` to something like this:
 
     CACHES = {
         'default': {
@@ -227,6 +249,8 @@ running memcached at port 11211 on localhost::
             }
         }
 
+Actual configuration depends on your system and how you have memcached
+installed and configured.
 
 .. Note::
 
@@ -237,24 +261,6 @@ running memcached at port 11211 on localhost::
 
    Assuming you have memcached configured to listen to 11211 on
    localhost.
-
-
-LESS
-----
-
-To install LESS you will first need to `install Node.js and NPM
-<https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager>`_.
-
-Now install LESS using::
-
-    $ sudo npm install less
-
-Make sure that ``lessc`` is available on your path. NPM probably
-installed it to ``node_modules/less/bin/lessc`` and
-``node_modules/.bin/lessc``.
-
-LESS files are automatically converted by `jingo-minify
-<https://github.com/jsocol/jingo-minify>`_.
 
 
 .. _hacking-howto-schemas:
@@ -291,17 +297,6 @@ and follow the prompts.
 
    Make sure it's a valid email address that you have set up with
    Persona.
-
-
-Product Details Initialization
-------------------------------
-
-One of the packages Fjord uses, ``product_details``, needs to fetch
-JSON files containing historical Firefox version data and write them
-within its package directory. To set this up, run this command to do
-the initial fetch::
-
-    $ ./manage.py update_product_details
 
 
 Testing it out
