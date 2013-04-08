@@ -1,11 +1,12 @@
 """
 This is imported as the DJANGO_SETTINGS_MODULE. It imports local.py
-which imports base.py which imports funfactory.settings_base. Thus,
-the override order is this:
+which imports base.py which imports funfactory.settings_base.
 
-* funfactory.settings_base     - funfactory defaults
-* base.py                      - fjord defaults
-* local.py                     - instance specific settings
+Thus:
+
+1. base.py overrides funfactory.settings_base
+2. local.py overrides everything
+
 """
 
 try:
