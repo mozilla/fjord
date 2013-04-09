@@ -18,17 +18,13 @@ ElasticSearch.
 Installing ElasticSearch
 ========================
 
-There's an installation guide on the ElasticSearch site.
+There's an installation guide on the ElasticSearch site:
 
 http://www.elasticsearch.org/guide/reference/setup/installation.html
 
-We're currently using 0.17.x in production.
+Use version 0.20.5:
 
-.. Note::
-
-   **Don't** use versions of ElasticSearch 0.19.9 or higher. Input doesn't
-   currently work with that.
-
+http://www.elasticsearch.org/downloads/version-0-20-5/
 
 The directory you install Elastic in will hereafter be referred to as
 ``ELASTICDIR``.
