@@ -23,11 +23,16 @@
 {# Note: This next line says it's -0800/PST, but the server time is
    Pacific and "celebrates" daylight savings so it's a villainous lie
    for all datetimes in PDT. #}
-      <li><time datetime="{{ feedback.created }}-08:00" title="{{ feedback.created }} PST">
-        {{ feedback.created|naturaltime }}
-      </time></li>
-      <li>{{ feedback.platform }}</li>
-      <li>{{ feedback.locale|locale_name }}</li>
+      <li>
+        {% set feedback_date = convert_date_string(feedback.created) %}
+        <a href="{{ request.get_full_path()|urlparams(date_start=feedback_date) }}">
+          <time datetime="{{ feedback.created }}-08:00" title="{{ feedback.created }} PST">
+            {{ feedback.created|naturaltime }}
+          </time>
+        </a>
+      </li>
+      <li><a href="{{ request.get_full_path()|urlparams(platform=feedback.platform) }}">{{ feedback.platform }}</a></li>
+      <li><a href="{{ request.get_full_path()|urlparams(locale=feedback.locale) }}">{{ feedback.locale|locale_name }}</a></li>
     </ul>
   </li>
 {% endmacro -%}
