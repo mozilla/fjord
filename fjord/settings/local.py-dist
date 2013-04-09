@@ -13,8 +13,8 @@ DATABASES = {
         'HOST': 'localhost',
         'OPTIONS': {
             'init_command': 'SET storage_engine=InnoDB',
-            'charset' : 'utf8',
-            'use_unicode' : True,
+            'charset': 'utf8',
+            'use_unicode': True,
         },
         'TEST_CHARSET': 'utf8',
         'TEST_COLLATION': 'utf8_general_ci',
@@ -62,3 +62,8 @@ SECRET_KEY = ''
 # languages to be computed based on the contents of your locale/
 # directory.
 DEV_LANGUAGES = ('en-US',)
+
+# The hacking howto considers ElasticSearch advanced setup. If you
+# don't have it installed and running, then leave this False. If you
+# do have it installed and running, then set this to True.
+ES_LIVE_INDEXING = False
