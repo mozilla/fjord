@@ -25,17 +25,16 @@ def thanks(request, template):
 
 
 def requires_firefox(func):
-    """Redirects to "download firefox" page if not firefox.
+    """Redirects to "download firefox" page if not Firefox.
 
     If it isn't a Firefox browser, then we don't want to deal with it.
 
     This is a temporary solution. See bug #848568.
 
     """
-
     @wraps(func)
     def _requires_firefox(request, *args, **kwargs):
-        if not request.BROWSER.platform:
+        if request.BROWSER.platform == 'Unknown':
             return HttpResponseRedirect(reverse('download-firefox'))
         return func(request, *args, **kwargs)
     return _requires_firefox
@@ -45,6 +44,7 @@ def _handle_feedback_post(request):
     form = ResponseForm(request.POST)
     if form.is_valid():
         data = form.cleaned_data
+
         # Most platforms aren't different enough between versions to care.
         # Windows is.
         platform = request.BROWSER.platform
