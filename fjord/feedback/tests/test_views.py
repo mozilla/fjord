@@ -218,6 +218,27 @@ class TestFeedback(TestCase):
         eq_(feedback.url, u'')
         eq_(feedback.description, data['description'])
 
+    def test_deprecated_firefox_for_android_phony_ua(self):
+        """Test that phony user agents works. bug 855671."""
+        data = {
+            '_type': 1,
+            'description': u'This is how to make it better...',
+            'device': 'Stone tablet',
+            'manufacturer': 'Rosetta'
+            }
+
+        ua = ('Mozilla/5.0 (Linux; U; Android 4.0.4; en-us; Xoom '
+              'Build/IMM76) AppleWebKit/534.30 (KHTML, like Gecko) '
+              'Version/4.0 Safari/534.30')
+
+        r = self.client.post(reverse('feedback'), data,
+                             HTTP_USER_AGENT=ua)
+        eq_(r.status_code, 302)
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(feedback.browser, 'Unknown')
+        eq_(feedback.browser_version, 'Unknown')
+        eq_(feedback.platform, 'Unknown')
+
 
 class TestCSRF(TestCase):
     def setUp(self):

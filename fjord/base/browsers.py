@@ -16,7 +16,7 @@ WINDOWS_VERSION = {
     'Windows 98': ('Windows', '98'),
     'Windows 95': ('Windows', '95'),
 }
-
+UNKNOWN = 'Unknown'
 
 Browser = namedtuple('Browser', [
     'browser', 'browser_version', 'platform', 'platform_version',
@@ -30,15 +30,16 @@ def parse_ua(ua):
 
     :returns: Browser namedtuple with attributes:
 
-        - browser: eg: "Firefox", or "Iceweasel".
-        - browser_version: None or a 3 dotted section, eg "14.0.1" or
-          "4.0.0".
-        - platform: eg: "Windows", "OS X", "Linux", or "Android"
-        - platform_version: On Windows returns something like "Vista",
-          or "7".  On OS X returns something like "10.6.2" or "10.4.0"
+        - browser: "Unknown" or a browser like "Firefox", "Iceweasel", etc.
+        - browser_version: "Unknown" or a 3 dotted section like "14.0.1",
+          "4.0.0", etc.
+        - platform: "Unknown" or a platform like "Windows", "OS X",
+          "Linux", "Android", etc.
+        - platform_version: "Unknown or something like "Vista" or "7" for
+          Windows or something like "10.6.2" or "10.4.0" for OSX.
         - mobile: True if the user agent represents a mobile browser.
-
-        If detection fails, those attributes will have None values.
+          False if it's definitely not a mobile browser. None if we
+          don't know.
 
     .. Note::
 
@@ -48,8 +49,10 @@ def parse_ua(ua):
     """
     mobile = 'mobile' in ua.lower()
 
-    # If we are sure something is mobile, say True. Otherwise say None.
-    no_browser = Browser(None, None, None, None, mobile or None)
+    # Unknown values are UNKNOWN. If we are sure something is mobile,
+    # say True. Otherwise say None.
+    no_browser = Browser(UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
+                         mobile or None)
 
     if 'firefox' not in ua.lower():
         return no_browser
@@ -74,7 +77,7 @@ def parse_ua(ua):
     browser_parts = [p.split('/') for p in match.group(2).split(' ')]
 
     browser = 'Firefox'
-    browser_version = None
+    browser_version = UNKNOWN
 
     for part in browser_parts:
         if 'Firefox' in part and len(part) > 1:
@@ -83,7 +86,7 @@ def parse_ua(ua):
             browser = 'Iceweasel'
 
     platform = platform_parts.pop(0)
-    platform_version = None
+    platform_version = UNKNOWN
 
     while platform in ['X11', 'Ubuntu', 'U']:
         platform = platform_parts.pop(0)
@@ -121,7 +124,7 @@ def parse_ua(ua):
         platform = 'FirefoxOS'
 
     # Make sure browser_version is at least x.y.z
-    if browser_version:
+    if browser_version != UNKNOWN:
         while browser_version.count('.') < 2:
             browser_version += '.0'
 
