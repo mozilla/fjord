@@ -34,7 +34,11 @@ def requires_firefox(func):
     """
     @wraps(func)
     def _requires_firefox(request, *args, **kwargs):
-        if request.BROWSER.platform == 'Unknown':
+        # Note: This is sort of a lie. What's going on here is that
+        # parse_ua only parses Firefox-y browsers. So if it's
+        # "Unknown" at this point, then it's not Firefox-y. If
+        # parse_ua ever changes, then this will cease to be true.
+        if request.BROWSER.browser == 'Unknown':
             return HttpResponseRedirect(reverse('download-firefox'))
         return func(request, *args, **kwargs)
     return _requires_firefox
