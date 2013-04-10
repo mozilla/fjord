@@ -10,9 +10,8 @@ Things to know about ElasticSearch
 Input uses `ElasticSearch <http://www.elasticsearch.org/>`_ to power
 search.
 
-Input uses the `ElasticUtils
-<https://github.com/mozilla/elasticutils>`_ library to interface with
-ElasticSearch.
+Input uses `ElasticUtils <https://github.com/mozilla/elasticutils>`_
+to interface with ElasticSearch.
 
 
 Installing ElasticSearch
