@@ -32,7 +32,6 @@ fi
 
 source $VENV/bin/activate
 pip install -q -r requirements/compiled.txt
-pip install -q -r requirements/dev.txt
 
 cat > fjord/settings/local.py <<SETTINGS
 from fjord.settings.base import *
