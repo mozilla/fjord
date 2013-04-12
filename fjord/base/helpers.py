@@ -56,7 +56,7 @@ def convert_date_string(datetime_string, in_fmt='%Y-%m-%dT%H:%M:%S',
                         out_fmt='%Y-%m-%d'):
     """Converts date/datetime string from in_fmt to out_fmt
 
-    :arg date: string represnting datetime
+    :arg date: string representing datetime
     :arg in_fmt: the format the datetime_string is in
     :arg out_fmt: the format to return
 
