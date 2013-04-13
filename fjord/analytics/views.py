@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime
 from math import floor
 
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.template.defaultfilters import slugify
 
 from elasticutils.contrib.django import F, es_required_or_50x
@@ -10,7 +10,7 @@ from tower import ugettext as _
 
 from fjord.base.helpers import locale_name
 from fjord.base.util import smart_int, smart_datetime, epoch_milliseconds
-from fjord.feedback.models import ResponseMappingType
+from fjord.feedback.models import Response, ResponseMappingType
 
 
 def counts_to_options(counts, name, display=None, display_map=None,
@@ -132,6 +132,16 @@ def _zero_fill(start, end, data_sets, spacing=DAY_IN_MILLIS):
             if timestamp not in d:
                 d[timestamp] = 0
         timestamp += spacing
+
+
+@mobile_template('analytics/{mobile/}response.html')
+def response_view(request, responseid, template):
+    response = get_object_or_404(Response, id=responseid)
+
+    return render(request, template, {
+        'response': response,
+        'response_created': response.created.strftime('%Y-%m-%dT%H:%M:%S'),
+    })
 
 
 @es_required_or_50x(error_template='analytics/es_down.html')

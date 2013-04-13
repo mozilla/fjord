@@ -132,7 +132,7 @@ class TestDashboardView(ElasticTestCase):
         self.assertTemplateUsed(r, 'analytics/dashboard.html')
 
         pq = PyQuery(r.content)
-        # Make sure that each opinion is show, and that the count is correct.
+        # Make sure that each opinion is shown and that the count is correct.
         eq_(pq('.block.count strong').text(), '7')
         eq_(len(pq('li.opinion')), 7)
 
@@ -268,3 +268,27 @@ class TestDashboardView(ElasticTestCase):
 
         finally:
             views.counts_to_options = old_counts_to_options
+
+
+class TestResponseview(ElasticTestCase):
+    client_class = LocalizingClient
+
+    def test_response_view(self):
+        """Test dashboard link goes to response view"""
+        resp = response(happy=True, description=u'the best!', save=True)
+
+        self.refresh()
+
+        url = reverse('dashboard')
+        r = self.client.get(url)
+        eq_(200, r.status_code)
+        self.assertTemplateUsed(r, 'analytics/dashboard.html')
+
+        pq = PyQuery(r.content)
+        # Get the permalink
+        permalink = pq('li.opinion a[href*="response"]').attr('href')
+
+        r = self.client.get(permalink)
+        eq_(200, r.status_code)
+        self.assertTemplateUsed(r, 'analytics/response.html')
+        assert str(resp.description) in r.content
