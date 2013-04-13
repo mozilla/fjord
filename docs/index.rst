@@ -34,13 +34,13 @@ Part 1: Contributor's Guide
    es
    l10n
    vendor
+
+
+Part 2: Maintaining The Site
+============================
+
+.. toctree::
+   :maxdepth: 1
+
    maintain
    sla
-
-
-Indices and tables
-------------------
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

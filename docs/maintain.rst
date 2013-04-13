@@ -8,20 +8,36 @@ Adding a new locale
 To add a new locale so that ``https://input.mozilla.org/%NEWLOCALE%`` works
 and so that people can submit feedback:
 
-1. in your local repository, run::
+1. In your local repository, run::
 
        $ ./manage.py update_product_details
 
-2. check ``lib/product_details_json/languages.json`` to see if the language is
+2. Check ``lib/product_details_json/languages.json`` to see if the language is
    there.
 
-   1. if not, you need to file a bug to get it added
-   2. if it is, proceed
+   1. If not, you need to file a bug to get it added. See
+      https://bugzilla.mozilla.org/show_bug.cgi?id=839506 for example.
 
-3. add the locale code to ``PROD_LANGUAGES`` in ``fjord/settings/base.py``
+   Once the locale is listed in
+   ``lib/product_details_json/languages.json``, proceed.
 
-4. commit the changes to ``fjord/settings/base.py`` and product details stuff
-   to git
+3. Update ``locale/`` and check to see if the locale is listed there.
+
+   1. If you don't have a ``locale/`` directory or don't know how to update it,
+      see :ref:`l10n-chapter`.
+   2. If the locale isn't in the ``locale/`` directory, ask Milos to
+      add Input to the list of translated projects for that
+      locale. See https://bugzilla.mozilla.org/show_bug.cgi?id=860754
+      for better language because I only vaguely understand how the
+      Verbatim side works.
+
+   Once the locale is in svn and ``locale/``, proceed.
+
+4. Add the locale code to the ``PROD_LANGUAGES`` list in
+   ``fjord/settings/base.py``.
+
+5. Commit the changes to ``fjord/settings/base.py`` and product details stuff
+   to git.
 
 
 .. Note::

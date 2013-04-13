@@ -238,7 +238,7 @@ Cache is optionally configured with the ``CACHES`` setting in your
 
 In production, we use memcached. If you want a system that's closer to
 what we have in production, set ``CACHES`` in
-``fjord/settings/local.py`` to something like this:
+``fjord/settings/local.py`` to something like this::
 
     CACHES = {
         'default': {
@@ -248,6 +248,7 @@ what we have in production, set ``CACHES`` in
             'KEY_PREFIX': 'fjord'
             }
         }
+
 
 Actual configuration depends on your system and how you have memcached
 installed and configured.
