@@ -1,13 +1,11 @@
-from datetime import datetime, timedelta
 import time
 import json
+from datetime import datetime, timedelta
 
 from django.contrib.humanize.templatetags import humanize
 
 from jingo import register
-
 from tower import ugettext_lazy as _lazy
-
 from product_details import product_details
 
 
@@ -17,10 +15,10 @@ def naturaltime(*args):
 
 
 def json_handle_datetime(obj):
-    """Convert a datetime obj to a number of milliseconds since the epoch.
+    """Convert a datetime obj to a number of milliseconds since epoch.
 
-    This uses milliseconds since this is probably going to be used to feed JS,
-    and JS timestamps use milliseconds.
+    This uses milliseconds since this is probably going to be used to
+    feed JS, and JS timestamps use milliseconds.
 
     """
     try:
@@ -70,7 +68,5 @@ def convert_date_string(datetime_string, in_fmt='%Y-%m-%dT%H:%M:%S',
     >>> to_date_string('2013-04-03T14:42:15')
     '2013-04-03'
 
-
     """
-    # u'2013-04-03T14:42:15'
     return datetime.strptime(datetime_string, in_fmt).strftime(out_fmt)
