@@ -8,6 +8,18 @@ from fjord.feedback import models
 from fjord.feedback.views import _get_prodchan
 
 
+class TestRedirectFeedback(TestCase):
+    client_class = LocalizingClient
+
+    def test_happy_redirect(self):
+        r = self.client.get(reverse('happy-redirect'))
+        self.assertRedirects(r, reverse('feedback') + '#happy')
+
+    def test_sad_redirect(self):
+        r = self.client.get(reverse('sad-redirect'))
+        self.assertRedirects(r, reverse('feedback') + '#sad')
+
+
 class TestFeedback(TestCase):
     client_class = LocalizingClient
 

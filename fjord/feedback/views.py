@@ -14,6 +14,18 @@ from fjord.feedback.forms import ResponseForm
 from fjord.feedback import models
 
 
+def happy_redirect(request):
+    # TODO: Remove this when the addon gets fixed and is pointing to
+    # the correct urls.
+    return HttpResponseRedirect(reverse('feedback') + '#happy')
+
+
+def sad_redirect(request):
+    # TODO: Remove this when the addon gets fixed and is pointing to
+    # the correct urls.
+    return HttpResponseRedirect(reverse('feedback') + '#sad')
+
+
 @mobile_template('feedback/{mobile/}download_firefox.html')
 def download_firefox(request, template):
     return render(request, template)
