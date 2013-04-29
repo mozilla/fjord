@@ -25,7 +25,13 @@ Onboarding a new developer
    :manual: http://fjord.rtfd.org/
    :wiki page: https://wiki.mozilla.org/Firefox/Input
 
-8. Bask in the tranquil rhythmic sounds of the Fjord
+8. Set up your development environment by reading through and doing all
+   the things in the :ref:`hacking-howto-chapter`
+
+9. If you haven't read through the `Webdev Bootcamp
+   <http://mozweb.readthedocs.org/en/latest/>`_, now is a good time
+
+10. Bask in the tranquil rhythmic sounds of the Fjord
 
 
 Adding a new locale
