@@ -2,6 +2,32 @@
  Maintaining Fjord and Input
 =============================
 
+Onboarding a new developer
+==========================
+
+1. Watch the "Input" product and "__Any__" component in Bugzilla in your
+   `Bugzilla Component Watching preferences
+   <https://bugzilla.mozilla.org/userprefs.cgi?tab=component_watch>`_
+
+2. Hop on the ``#input`` IRC channel on irc.mozilla.org
+
+3. Create an IT bug for getting added to error email lists
+
+4. Ask an existing developer with an admin account on Input to create an
+   admin account for you
+
+5. Get access to push changes to ``https://github.com/mozilla/fjord``
+
+6. Update the `wiki page <https://wiki.mozilla.org/Firefox/Input>`_
+
+7. Read the documentation:
+
+   :manual: http://fjord.rtfd.org/
+   :wiki page: https://wiki.mozilla.org/Firefox/Input
+
+8. Bask in the tranquil rhythmic sounds of the Fjord
+
+
 Adding a new locale
 ===================
 
