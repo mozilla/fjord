@@ -101,6 +101,8 @@ LOCALE_PATHS = (
     os.path.join(ROOT, PROJECT_MODULE, 'locale'),
 )
 
+SUPPORTED_NONLOCALES += ('robots.txt',)
+
 # Because Jinja2 is the default template loader, add any non-Jinja
 # templated apps here:
 JINGO_EXCLUDE_APPS = [

@@ -3,7 +3,7 @@ from django.test.utils import override_settings
 from nose.tools import eq_
 
 from fjord.base import views
-from fjord.base.tests import LocalizingClient, reverse
+from fjord.base.tests import LocalizingClient, reverse, TestCase
 from fjord.base.views import IntentionalException
 from fjord.search.tests import ElasticTestCase
 
@@ -85,3 +85,10 @@ class ErrorTesting(ElasticTestCase):
             self.client.get('/services/throw-error')
 
         eq_(type(cm.exception), IntentionalException)
+
+
+class TestRobots(TestCase):
+    def test_robots(self):
+        resp = self.client.get('/robots.txt')
+        eq_(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'robots.txt')
