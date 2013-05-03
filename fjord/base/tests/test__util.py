@@ -33,6 +33,9 @@ class SmartIntTestCase(TestCase):
         eq_(0, smart_int(None))
         eq_(10, smart_int([], 10))
 
+    def test_overflow(self):
+        eq_(0, smart_int('1e309'))
+
 
 class SmartDateTest(TestCase):
     def test_sanity(self):
