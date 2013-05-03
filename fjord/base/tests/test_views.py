@@ -7,12 +7,7 @@ from fjord.base.tests import LocalizingClient, reverse, TestCase
 from fjord.base.views import IntentionalException
 from fjord.search.tests import ElasticTestCase
 
-
-# Note: This needs to be an ElasticTestCase because the view does ES
-# stuff.
-class MonitorViewTest(ElasticTestCase):
-    client_class = LocalizingClient
-
+class TestAbout(TestCase):
     def test_about_view(self):
         r = self.client.get(reverse('about-view'))
         eq_(200, r.status_code)
@@ -22,6 +17,8 @@ class MonitorViewTest(ElasticTestCase):
         eq_(200, r.status_code)
         self.assertTemplateUsed(r, 'mobile/about.html')
 
+
+class TestLoginFailure(TestCase):
     def test_login_failure_view(self):
         r = self.client.get(reverse('login-failure'))
         eq_(200, r.status_code)
@@ -31,6 +28,10 @@ class MonitorViewTest(ElasticTestCase):
         eq_(200, r.status_code)
         self.assertTemplateUsed(r, 'mobile/login_failure.html')
 
+ 
+# Note: This needs to be an ElasticTestCase because the view does ES
+# stuff.
+class MonitorViewTest(ElasticTestCase):
     def test_monitor_view(self):
         """Tests for the monitor view."""
         # TODO: When we add a mocking framework, we can mock this
@@ -70,6 +71,13 @@ class MonitorViewTest(ElasticTestCase):
         finally:
             views.test_memcached = test_memcached
 
+    @override_settings(SHOW_STAGE_NOTICE=True)
+    def test_500(self):
+        with self.assertRaises(IntentionalException) as cm:
+            self.client.get('/services/throw-error')
+
+        eq_(type(cm.exception), IntentionalException)
+
 
 class ErrorTesting(ElasticTestCase):
     client_class = LocalizingClient
@@ -78,13 +86,6 @@ class ErrorTesting(ElasticTestCase):
         request = self.client.get('/a/path/that/should/never/exist')
         eq_(request.status_code, 404)
         self.assertTemplateUsed(request, '404.html')
-
-    @override_settings(SHOW_STAGE_NOTICE=True)
-    def test_500(self):
-        with self.assertRaises(IntentionalException) as cm:
-            self.client.get('/services/throw-error')
-
-        eq_(type(cm.exception), IntentionalException)
 
 
 class TestRobots(TestCase):
