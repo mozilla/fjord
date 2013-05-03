@@ -3,7 +3,7 @@ import socket
 from functools import wraps
 
 from django.conf import settings
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 
@@ -26,6 +26,12 @@ def login_failure(request, template=None):
 @mobile_template('{mobile/}about.html')
 def about_view(request, template=None):
     return render(request, template)
+
+
+def robots_view(request):
+    """Generate a robots.txt."""
+    template = render(request, 'robots.txt')
+    return HttpResponse(template, mimetype='text/plain')
 
 
 def test_memcached(host, port):

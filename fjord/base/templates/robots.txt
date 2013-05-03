@@ -1,0 +1,3 @@
+# robots.txt for input.mozilla.org
+User-Agent: *
+Disallow: /

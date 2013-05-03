@@ -7,5 +7,6 @@ urlpatterns = patterns('fjord.base.views',
     url(r'^services/monitor$', 'monitor_view', name='services-monitor'),
     url(r'^services/throw-error$', 'throw_error', name='throw-error'),
 
-    url(r'^about$', 'about_view', name='about-view')
+    url(r'^about$', 'about_view', name='about-view'),
+    url(r'^robots.txt$', 'robots_view', name='robots-view')
 )
