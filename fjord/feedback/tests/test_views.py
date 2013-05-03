@@ -272,7 +272,6 @@ class TestCSRF(TestCase):
     def test_firefox_for_android(self):
         """No csrf token for a FfA post works fine."""
         url = reverse('feedback')
-        print url
         r = self.client.post(url, {
             '_type': 1,
             'description': u'Firefox rocks!',
