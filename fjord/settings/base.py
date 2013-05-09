@@ -4,6 +4,7 @@
 
 from funfactory.settings_base import *
 
+
 # Name of the top-level module where you put all your apps.  If you
 # did not install Playdoh with the funfactory installer script you may
 # need to edit this value. See the docs about installing from a clone.
@@ -240,8 +241,6 @@ DOMAIN_METHODS['messages'] = [
 #    # libraries you may use.
 #    ('media/js/**.js', 'javascript'),
 # ]
-
-LOGGING = dict(loggers=dict(playdoh={'level': logging.DEBUG}))
 
 # When set to True, this will cause a message to be displayed on all
 # pages that this is not production.
