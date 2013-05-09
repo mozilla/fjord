@@ -116,7 +116,7 @@ class TestDashboardView(ElasticTestCase):
             (True, 'Linux', 'en-US', 'apple', now - timedelta(days=3)),
             (False, 'Windows XP', 'en-US', 'banana', now - timedelta(days=2)),
             (False, 'Windows 7', 'en-US', 'orange', now - timedelta(days=1)),
-            (False, 'Linux', 'es', 'apple', now - timedelta(days=0)),
+            (False, 'Linux', 'es', u'\u2713 apple', now - timedelta(days=0)),
         ]
         for happy, platform, locale, description, created in items:
             # We don't need to keep this around, just need to create it.
@@ -169,6 +169,13 @@ class TestDashboardView(ElasticTestCase):
         r = self.client.get(url, {'q': 'apple', 'happy': 1, 'locale': 'en-US'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 2)
+
+    def test_text_search_unicode(self):
+        """Unicode in the search field shouldn't kick up errors"""
+        url = reverse('dashboard')
+        # Text search
+        r = self.client.get(url, {'q': u'\u2713'})
+        eq_(r.status_code, 200)
 
     def test_date_search(self):
         url = reverse('dashboard')

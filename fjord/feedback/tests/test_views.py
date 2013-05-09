@@ -78,6 +78,50 @@ class TestFeedback(TestCase):
         self.assertContains(r, 'This field is required')
         self.assertTemplateUsed(r, 'feedback/feedback.html')
 
+        # Test happy sans description
+        url = reverse('feedback', args=('firefox.desktop.stable',))
+        r = self.client.post(url, {
+            'url': 'http://mozilla.org/',
+            'happy': 0
+            # No description
+        })
+
+        self.assertContains(r, 'This field is required')
+
+        # Test sad sans description
+        url = reverse('feedback', args=('firefox.desktop.stable',))
+        r = self.client.post(url, {
+            'url': 'http://mozilla.org/',
+            'happy': 1
+            # No description
+        })
+
+        self.assertContains(r, 'This field is required')
+
+    def test_unicode_in_description(self):
+        """Description should accept unicode data"""
+        url = reverse('feedback', args=('firefox.desktop.stable',))
+        r = self.client.post(url, {
+            'url': 'http://mozilla.org/',
+            'happy': 0,
+            'description': u'\u2713 this works'
+        })
+
+        self.assertRedirects(r, reverse('thanks'))
+        eq_(models.Response.objects.count(), 1)
+
+    def test_unicode_in_url(self):
+        """URL should accept unicode data"""
+        url = reverse('feedback', args=('firefox.desktop.stable',))
+        r = self.client.post(url, {
+            'url': u'http://mozilla.org/\u2713',
+            'happy': 0,
+            'description': u'foo'
+        })
+
+        self.assertRedirects(r, reverse('thanks'))
+        eq_(models.Response.objects.count(), 1)
+
     def test_feedback_router(self):
         """Requesting a generic template should give a feedback form."""
         # TODO: This test might need to change when the router starts routing.
