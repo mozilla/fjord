@@ -299,3 +299,15 @@ class TestResponseview(ElasticTestCase):
         eq_(200, r.status_code)
         self.assertTemplateUsed(r, 'analytics/response.html')
         assert str(resp.description) in r.content
+
+    def test_response_view_mobile(self):
+        """Test response mobile view doesn't die"""
+        resp = response(happy=True, description=u'the best!', save=True)
+
+        self.refresh()
+
+        r = self.client.get(reverse('response_view', args=(resp.id,)),
+                            {'mobile': 1})
+        eq_(200, r.status_code)
+        self.assertTemplateUsed(r, 'analytics/mobile/response.html')
+        assert str(resp.description) in r.content
