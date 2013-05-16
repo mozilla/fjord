@@ -1,5 +1,6 @@
-from datetime import datetime, timedelta
+import json
 import logging
+from datetime import datetime, timedelta
 
 from nose.tools import eq_
 from pyelasticsearch.exceptions import Timeout
@@ -136,6 +137,19 @@ class TestDashboardView(ElasticTestCase):
         eq_(pq('.block.count strong').text(), '7')
         eq_(len(pq('li.opinion')), 7)
 
+    def test_dashboard_has_atom_link(self):
+        """Lazy test to make sure there's a proper atom link"""
+        r = self.client.get(reverse('dashboard'))
+        eq_(200, r.status_code)
+        assert '/en-US/?format=atom' in r.content
+
+        r = self.client.get(reverse('dashboard'), {'happy': 1})
+        eq_(200, r.status_code)
+        # The querystring can come out either way, so check to see if
+        # either possibility is there.
+        assert ('/en-US/?happy=1&amp;format=atom' in r.content
+                or '/en-US/?format=atom&amp;happy=1' in r.content)
+
     def test_search(self):
         url = reverse('dashboard')
         # Happy
@@ -176,6 +190,26 @@ class TestDashboardView(ElasticTestCase):
         # Text search
         r = self.client.get(url, {'q': u'\u2713'})
         eq_(r.status_code, 200)
+
+    def test_search_format_json(self):
+        """JSON output works"""
+        url = reverse('dashboard')
+        # Text search
+        r = self.client.get(url, {'q': u'apple', 'format': 'json'})
+        eq_(r.status_code, 200)
+
+        content = json.loads(r.content)
+        eq_(content['total'], 3)
+        eq_(len(content['results']), 3)
+
+    def test_search_format_atom(self):
+        """Atom output works"""
+        url = reverse('dashboard')
+        # Text search
+        r = self.client.get(url, {'q': u'apple', 'format': 'atom'})
+        eq_(r.status_code, 200)
+
+        assert 'http://www.w3.org/2005/Atom' in r.content
 
     def test_date_search(self):
         url = reverse('dashboard')
