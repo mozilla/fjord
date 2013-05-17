@@ -1,10 +1,14 @@
+import json
 from datetime import timedelta, datetime
 from math import floor
 
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.template.defaultfilters import slugify
+from django.utils import feedgenerator
 
 from elasticutils.contrib.django import F, es_required_or_50x
+from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
 from tower import ugettext as _
 
@@ -144,10 +148,91 @@ def response_view(request, responseid, template):
     })
 
 
+def generate_json_feed(request, search):
+    """Generates JSON feed for first 100 results"""
+    search_query = request.GET.get('q', None)
+    responses = search.values_dict()[:100]
+    json_data = {
+        'total': len(responses),
+        'results': list(responses),
+        'query': search_query
+    }
+    return HttpResponse(
+        json.dumps(json_data), mimetype='application/json')
+
+
+def generate_atom_feed(request, search):
+    """Generates ATOM feed for first 100 results"""
+    search_query = request.GET.get('q', None)
+
+    if search_query:
+        title = _(u'Firefox Input: {query}').format(query=search_query)
+    else:
+        title = _(u'Firefox Input')
+
+    # Build the non-atom dashboard url and maintain all the
+    # querystring stuff we have
+    dashboard_url = request.build_absolute_uri()
+    dashboard_url = dashboard_url.replace('format=atom', '')
+    dashboard_url = dashboard_url.replace('&&', '&')
+    if dashboard_url.endswith(('?', '&')):
+        dashboard_url = dashboard_url[:-1]
+
+    feed = feedgenerator.Atom1Feed(
+        title=title,
+        link=dashboard_url,
+        description=_('Search Results From Firefox Input'),
+        author_name=_('Firefox Input'),
+    )
+    for response in search[:100]:
+        # TODO: Remove this after we pick up the fixes in the latest
+        # elasticutils that causes results to come back as Python
+        # datetimes rather than strings.
+        created = datetime.strptime(response.created, '%Y-%m-%dT%H:%M:%S')
+        categories = {
+            'sentiment': _('Happy') if response.happy else _('Sad'),
+            'platform': response.platform,
+            'locale': response.locale
+        }
+        categories = (':'.join(item) for item in categories.items())
+
+        link_url = reverse('response_view', args=(response.id,))
+        link_url = request.build_absolute_uri(link_url)
+
+        feed.add_item(
+            title=_('Response id: {id}').format(id=response.id),
+            description=response.description,
+            link=link_url,
+            pubdate=created,
+            categories=categories
+        )
+    return HttpResponse(
+        feed.writeString('utf-8'), mimetype='application/atom+xml')
+
+
+def generate_dashboard_atom_url(request):
+    """For a given request, generates the dashboard atom url"""
+    qd = request.GET.copy()
+
+    # Remove anything from the querystring that isn't good for a feed:
+    # page, start_date, end_date, etc.
+    for mem in qd.keys():
+        if mem not in ('happy', 'locale', 'platform', 'q'):
+            del qd[mem]
+
+    qd['format'] = 'atom'
+
+    return reverse('dashboard') + '?' + qd.urlencode()
+
+
 @es_required_or_50x(error_template='analytics/es_down.html')
 @mobile_template('analytics/{mobile/}dashboard.html')
 def dashboard(request, template):
+    output_format = request.GET.get('format', None)
     page = smart_int(request.GET.get('page', 1), 1)
+
+    # Note: If we add additional querystring fields, we need to add
+    # them to generate_dashboard_url.
     search_happy = request.GET.get('happy', None)
     search_platform = request.GET.get('platform', None)
     search_locale = request.GET.get('locale', None)
@@ -200,8 +285,26 @@ def dashboard(request, template):
 
     search = search.filter(f).order_by('-created')
 
+    # If the user asked for a feed, give him/her a feed!
+    if output_format == 'atom':
+        return generate_atom_feed(request, search)
+
+    elif output_format == 'json':
+        return generate_json_feed(request, search)
+
+    # Search results and pagination
+    if page < 1:
+        page = 1
+    page_count = 20
+    start = page_count * (page - 1)
+    end = start + page_count
+
+    search_count = search.count()
+    opinion_page = search[start:end]
+
+    # Navigation facet data
     facets = search.facet('happy', 'platform', 'locale',
-        filtered=bool(f.filters))
+                          filtered=bool(f.filters))
 
     # This loop does two things. First it maps 'T' -> True and 'F' ->
     # False.  This is probably something EU should be doing for
@@ -219,13 +322,16 @@ def dashboard(request, template):
             counts[param][name] = term['count']
 
     filter_data = [
-        counts_to_options(counts['happy'].items(), name='happy',
+        counts_to_options(
+            counts['happy'].items(), name='happy',
             display=_('Sentiment'),
             display_map={True: _('Happy'), False: _('Sad')},
             value_map={True: 1, False: 0}, checked=search_happy),
-        counts_to_options(counts['platform'].items(),
+        counts_to_options(
+            counts['platform'].items(),
             name='platform', display=_('Platform'), checked=search_platform),
-        counts_to_options(counts['locale'].items(),
+        counts_to_options(
+            counts['locale'].items(),
             name='locale', display=_('Locale'), checked=search_locale,
             display_map=locale_name)
     ]
@@ -258,16 +364,6 @@ def dashboard(request, template):
          'data': sorted(sad_data.items())},
     ]
 
-    # Pagination
-    if page < 1:
-        page = 1
-    page_count = 20
-    start = page_count * (page - 1)
-    end = start + page_count
-
-    search_count = search.count()
-    opinion_page = search[start:end]
-
     return render(request, template, {
         'opinions': opinion_page,
         'opinion_count': search_count,
@@ -278,4 +374,5 @@ def dashboard(request, template):
         'next_page': page + 1 if end < search_count else None,
         'current_search': current_search,
         'selected': selected,
+        'atom_url': generate_dashboard_atom_url(request)
     })

@@ -9,6 +9,12 @@
   <script type="text/javascript" src="https://login.persona.org/include.js"></script>
 {% endblock %}
 
+{% block feeds %}
+  <link href="{{ atom_url }}"
+    type="application/atom+xml" rel="alternate"
+    title="{{ _('Atom feed for this search') }}" />
+{% endblock %}
+
 {% macro feedback_block(feedback) -%}
   <li class="opinion">
     {% if feedback.happy %}
