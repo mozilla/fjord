@@ -252,11 +252,11 @@ def get_indexable(percent=100, mapping_types=None):
     return to_index
 
 
-def index_chunk(cls, chunk, reraise=False, es=None):
+def index_chunk(cls, id_list, reraise=False, es=None):
     """Index a chunk of documents.
 
     :arg cls: The MappingType class.
-    :arg chunk: Iterable of ids of that MappingType to index.
+    :arg id_list: Iterable of ids of that MappingType to index.
     :arg reraise: False if you want errors to be swallowed and True
         if you want errors to be thrown.
     :arg es: The ES to use. Defaults to creating a new indexing ES.
@@ -271,16 +271,23 @@ def index_chunk(cls, chunk, reraise=False, es=None):
     if es is None:
         es = get_es()
 
-    documents = []
-    for id_ in chunk:
-        try:
-            documents.append(cls.extract_document(id_))
-        except Exception:
-            log.exception('Unable to extract/index document (id: %d)', id_)
-            if reraise:
-                raise
+    for ids in chunked(id_list, 80):
+        documents = []
+        for id_ in ids:
+            try:
+                documents.append(cls.extract_document(id_))
+            except Exception:
+                log.exception('Unable to extract/index document (id: %d)',
+                              id_)
+                if reraise:
+                    raise
+        if documents:
+            cls.bulk_index(documents, id_field='id', es=es)
 
-    cls.bulk_index(documents, id_field='id', es=es)
+        if settings.DEBUG:
+            # Nix queries so that this doesn't become a complete
+            # memory hog and make Will's computer sad when DEBUG=True.
+            reset_queries()
 
 
 def requires_good_connection(fun):
@@ -320,7 +327,6 @@ def es_reindex_cmd(percent=100, mapping_types=None):
         indexable = get_indexable(percent)
 
     start_time = time.time()
-
     for cls, indexable in indexable:
         cls_start_time = time.time()
         total = len(indexable)
@@ -333,24 +339,24 @@ def es_reindex_cmd(percent=100, mapping_types=None):
 
         i = 0
         for chunk in chunked(indexable, 1000):
+            chunk_start_time = time.time()
             index_chunk(cls, chunk, es=es)
 
             i += len(chunk)
-            time_to_go = (total - i) * ((time.time() - start_time) / i)
-            per_1000 = (time.time() - start_time) / (i / 1000.0)
-            log.info('%s/%s... (%s to go, %s per 1000 docs)', i, total,
-                     format_time(time_to_go),
-                     format_time(per_1000))
+            time_to_go = (total - i) * ((time.time() - cls_start_time) / i)
+            per_1000 = (time.time() - cls_start_time) / (i / 1000.0)
+            this_1000 = time.time() - chunk_start_time
 
-            # We call this every 1000 or so because we're
-            # essentially loading the whole db and if DEBUG=True,
-            # then Django saves every sql statement which causes
-            # our memory to go up up up. So we reset it and that
-            # makes things happier even in DEBUG environments.
-            reset_queries()
+            log.info('   %s/%s %s... (%s/1000 avg, %s ETA)',
+                     i,
+                     total,
+                     format_time(this_1000),
+                     format_time(per_1000),
+                     format_time(time_to_go)
+            )
 
         delta_time = time.time() - cls_start_time
-        log.info('Done! (%s, %s per 1000 docs)',
+        log.info('   done! (%s total, %s/1000 avg)',
                  format_time(delta_time),
                  format_time(delta_time / (total / 1000.0)))
 
