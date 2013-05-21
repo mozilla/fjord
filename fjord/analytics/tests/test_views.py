@@ -215,6 +215,23 @@ class TestDashboardView(ElasticTestCase):
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 0)
 
+    def test_browser_version_noop(self):
+        """browser_version has no effect if browser isn't set"""
+        url = reverse('dashboard')
+
+        # Filter on product and version--both filters affect the
+        # results
+        r = self.client.get(
+            url, {'browser': 'Firefox', 'browser_version': '18.0.0'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 0)
+
+        # Filter on version--filter has no effect on results
+        r = self.client.get(
+            url, {'browser_version': '18.0.0'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 7)
+
     def test_text_search(self):
         url = reverse('dashboard')
         # Text search

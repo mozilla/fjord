@@ -264,9 +264,12 @@ def dashboard(request, template):
     if search_product:
         f &= F(browser=search_product)
         current_search['browser'] = search_product
-    if search_version:
-        f &= F(browser_version=search_version)
-        current_search['browser_version'] = search_version
+
+        if search_version:
+            # Note: We only filter on version if we're filtering on
+            # product.
+            f &= F(browser_version=search_version)
+            current_search['browser_version'] = search_version
 
     if search_date_start is None and search_date_end is None:
         selected = '7d'
