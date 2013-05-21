@@ -237,7 +237,7 @@ def dashboard(request, template):
     search_happy = request.GET.get('happy', None)
     search_platform = request.GET.get('platform', None)
     search_locale = request.GET.get('locale', None)
-    search_product = request.GET.get('browser', None)
+    search_product = request.GET.get('product', None)
     search_version = request.GET.get('browser_version', None)
     search_query = request.GET.get('q', None)
     search_date_start = smart_datetime(request.GET.get('date_start', None),
@@ -262,8 +262,8 @@ def dashboard(request, template):
         f &= F(locale=search_locale)
         current_search['locale'] = search_locale
     if search_product:
-        f &= F(browser=search_product)
-        current_search['browser'] = search_product
+        f &= F(product=search_product)
+        current_search['product'] = search_product
 
         if search_version:
             # Note: We only filter on version if we're filtering on
@@ -316,7 +316,7 @@ def dashboard(request, template):
 
     # Navigation facet data
     facets = search.facet(
-        'happy', 'platform', 'locale', 'browser', 'browser_version',
+        'happy', 'platform', 'locale', 'product', 'browser_version',
         filtered=bool(f.filters))
 
     # This loop does two things. First it maps 'T' -> True and 'F' ->
@@ -327,7 +327,7 @@ def dashboard(request, template):
         'happy': {},
         'platform': {},
         'locale': {},
-        'browser': {},
+        'product': {},
         'browser_version': {}
     }
     for param, terms in facets.facet_counts().items():
@@ -349,8 +349,8 @@ def dashboard(request, template):
             value_map={True: 1, False: 0},
             checked=search_happy),
         counts_to_options(
-            counts['browser'].items(),
-            name='browser',
+            counts['product'].items(),
+            name='product',
             display=_('Product'),
             checked=search_product)
     ]
