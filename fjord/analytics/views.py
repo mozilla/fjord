@@ -217,7 +217,8 @@ def generate_dashboard_atom_url(request):
     # Remove anything from the querystring that isn't good for a feed:
     # page, start_date, end_date, etc.
     for mem in qd.keys():
-        if mem not in ('happy', 'locale', 'platform', 'q'):
+        if mem not in ('happy', 'locale', 'platform', 'browser',
+                       'browser_version', 'q'):
             del qd[mem]
 
     qd['format'] = 'atom'
@@ -236,6 +237,8 @@ def dashboard(request, template):
     search_happy = request.GET.get('happy', None)
     search_platform = request.GET.get('platform', None)
     search_locale = request.GET.get('locale', None)
+    search_product = request.GET.get('browser', None)
+    search_version = request.GET.get('browser_version', None)
     search_query = request.GET.get('q', None)
     search_date_start = smart_datetime(request.GET.get('date_start', None),
                                        fallback=None)
@@ -258,6 +261,12 @@ def dashboard(request, template):
     if search_locale:
         f &= F(locale=search_locale)
         current_search['locale'] = search_locale
+    if search_product:
+        f &= F(browser=search_product)
+        current_search['browser'] = search_product
+    if search_version:
+        f &= F(browser_version=search_version)
+        current_search['browser_version'] = search_version
 
     if search_date_start is None and search_date_end is None:
         selected = '7d'
@@ -303,14 +312,21 @@ def dashboard(request, template):
     opinion_page = search[start:end]
 
     # Navigation facet data
-    facets = search.facet('happy', 'platform', 'locale',
-                          filtered=bool(f.filters))
+    facets = search.facet(
+        'happy', 'platform', 'locale', 'browser', 'browser_version',
+        filtered=bool(f.filters))
 
     # This loop does two things. First it maps 'T' -> True and 'F' ->
     # False.  This is probably something EU should be doing for
     # us. Second, it restructures the data into a more convenient
     # form.
-    counts = {'happy': {}, 'platform': {}, 'locale': {}}
+    counts = {
+        'happy': {},
+        'platform': {},
+        'locale': {},
+        'browser': {},
+        'browser_version': {}
+    }
     for param, terms in facets.facet_counts().items():
         for term in terms:
             name = term['term']
@@ -323,18 +339,44 @@ def dashboard(request, template):
 
     filter_data = [
         counts_to_options(
-            counts['happy'].items(), name='happy',
+            counts['happy'].items(),
+            name='happy',
             display=_('Sentiment'),
             display_map={True: _('Happy'), False: _('Sad')},
-            value_map={True: 1, False: 0}, checked=search_happy),
+            value_map={True: 1, False: 0},
+            checked=search_happy),
         counts_to_options(
-            counts['platform'].items(),
-            name='platform', display=_('Platform'), checked=search_platform),
-        counts_to_options(
-            counts['locale'].items(),
-            name='locale', display=_('Locale'), checked=search_locale,
-            display_map=locale_name)
+            counts['browser'].items(),
+            name='browser',
+            display=_('Product'),
+            checked=search_product)
     ]
+    # Only show the browser_version if we're showing a specific
+    # product.
+    if search_product:
+        filter_data.append(
+            counts_to_options(
+                counts['browser_version'].items(),
+                name='browser_version',
+                display=_('Version'),
+                checked=search_version)
+        )
+
+    filter_data.extend(
+        [
+            counts_to_options(
+                counts['platform'].items(),
+                name='platform',
+                display=_('Platform'),
+                checked=search_platform),
+            counts_to_options(
+                counts['locale'].items(),
+                name='locale',
+                display=_('Locale'),
+                checked=search_locale,
+                display_map=locale_name),
+        ]
+    )
 
     # Histogram data
     happy_data = []

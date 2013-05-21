@@ -6,6 +6,8 @@ from nose.tools import eq_
 from pyelasticsearch.exceptions import Timeout
 from pyquery import PyQuery
 
+from django.http import QueryDict
+
 from fjord.analytics import views
 from fjord.analytics.views import counts_to_options, _zero_fill
 from fjord.base.tests import TestCase, LocalizingClient, reverse
@@ -22,7 +24,8 @@ class TestCountsHelper(TestCase):
         self.counts = [('apples', 5), ('bananas', 10), ('oranges', 6)]
 
     def test_basic(self):
-        """The right options should be set, and the values should be sorted."""
+        """Correct options should be set and values should be sorted.
+        """
         options = counts_to_options(self.counts, 'fruit', 'Fruit')
         eq_(options['name'], 'fruit')
         eq_(options['display'], 'Fruit')
@@ -77,7 +80,6 @@ class TestCountsHelper(TestCase):
 
 
 class TestZeroFillHelper(TestCase):
-
     def test_zerofill(self):
         start = datetime(2012, 1, 1)
         end = datetime(2012, 1, 7)
@@ -107,9 +109,10 @@ class TestDashboardView(ElasticTestCase):
         # 4 happy, 3 sad.
         # 2 Windows XP, 2 Linux, 1 OS X, 2 Windows 7
         now = datetime.now()
-        # The dashboard by default shows the last week of data, so these need
-        # to be relative to today. The alternative is that every test gives an
-        # explicit date range, and that is annoying and verbose.
+        # The dashboard by default shows the last week of data, so
+        # these need to be relative to today. The alternative is that
+        # every test gives an explicit date range, and that is
+        # annoying and verbose.
         items = [
             (True, 'Windows XP', 'en-US', 'apple', now - timedelta(days=6)),
             (True, 'Windows 7', 'es', 'banana', now - timedelta(days=5)),
@@ -137,18 +140,31 @@ class TestDashboardView(ElasticTestCase):
         eq_(pq('.block.count strong').text(), '7')
         eq_(len(pq('li.opinion')), 7)
 
-    def test_dashboard_has_atom_link(self):
-        """Lazy test to make sure there's a proper atom link"""
+    def test_dashboard_atom_links(self):
+        """Test dashboard atom links are correct"""
         r = self.client.get(reverse('dashboard'))
         eq_(200, r.status_code)
         assert '/en-US/?format=atom' in r.content
 
-        r = self.client.get(reverse('dashboard'), {'happy': 1})
+        r = self.client.get(
+            reverse('dashboard'),
+            {'happy': 1})
         eq_(200, r.status_code)
-        # The querystring can come out either way, so check to see if
-        # either possibility is there.
-        assert ('/en-US/?happy=1&amp;format=atom' in r.content
-                or '/en-US/?format=atom&amp;happy=1' in r.content)
+        pq = PyQuery(r.content)
+        pq = pq('link[type="application/atom+xml"]')
+        qs = QueryDict(pq[0].attrib['href'].split('?')[1])
+        eq_(qs['happy'], u'1')
+        eq_(qs['format'], u'atom')
+
+        r = self.client.get(
+            reverse('dashboard'),
+            {'browser': 'Firefox', 'browser_version': '20.0.0'})
+        eq_(200, r.status_code)
+        pq = PyQuery(r.content)
+        pq = pq('link[type="application/atom+xml"]')
+        qs = QueryDict(pq[0].attrib['href'].split('?')[1])
+        eq_(qs['browser'], u'Firefox')
+        eq_(qs['browser_version'], u'20.0.0')
 
     def test_search(self):
         url = reverse('dashboard')
@@ -156,18 +172,44 @@ class TestDashboardView(ElasticTestCase):
         r = self.client.get(url, {'happy': 1})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 4)
+
         # Sad
         r = self.client.get(url, {'happy': 0})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 3)
+
         # Locale
         r = self.client.get(url, {'locale': 'es'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 2)
+
         # Platform and happy
         r = self.client.get(url, {'happy': 1, 'platform': 'Linux'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 2)
+
+        # Product
+        r = self.client.get(url, {'browser': 'Firefox'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 7)
+
+        # Product
+        r = self.client.get(url, {'browser': 'Firefox for android'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 0)
+
+        # Product version
+        r = self.client.get(
+            url, {'browser': 'Firefox', 'browser_version': '17.0.0'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 7)
+
+        # Product version
+        r = self.client.get(
+            url, {'browser': 'Firefox', 'browser_version': '18.0.0'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 0)
+
         # Empty search
         r = self.client.get(url, {'platform': 'Atari'})
         pq = PyQuery(r.content)
