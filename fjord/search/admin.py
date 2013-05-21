@@ -18,7 +18,7 @@ from fjord.search.tasks import index_chunk_task
 log = logging.getLogger('i.search')
 
 
-CHUNK_SIZE = 50000
+CHUNK_SIZE = 10000
 
 
 def handle_reset(request):
