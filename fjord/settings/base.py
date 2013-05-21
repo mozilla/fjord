@@ -263,3 +263,7 @@ ES_INDEX_PREFIX = 'input'
 # When True, objects that belong in the index will get automatically
 # indexed and deindexed when created and destroyed.
 ES_LIVE_INDEX = True
+
+# Time in seconds before celery.exceptions.SoftTimeLimitExceeded is raised.
+# The task can catch that and recover but should exit ASAP.
+CELERYD_TASK_SOFT_TIME_LIMIT = 60 * 10
