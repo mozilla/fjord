@@ -79,6 +79,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'url': keyword_type(),
             'description': text_type(),
             'user_agent': keyword_type(),
+            'product': keyword_type(),
             'browser': keyword_type(),
             'browser_version': keyword_type(),
             'platform': keyword_type(),
@@ -86,19 +87,35 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'device': keyword_type(),
             'manufacturer': keyword_type(),
             'created': date_type()
-            }
+        }
 
     @classmethod
     def extract_document(cls, obj_id, obj=None):
         if obj is None:
             obj = cls.get_model().objects.get(pk=obj_id)
 
-        # Cheating here because at the moment, everything is
-        # straight-forward. When that ceases to be the case, we should
-        # stop cheating.
-        mapping = cls.get_mapping()
-        return dict((field, getattr(obj, field))
-                    for field in mapping.keys())
+        # TODO: This is a hack.
+        if obj.platform == u'Android':
+            product = u'Firefox for Android'
+        else:
+            product = u'Firefox'
+
+        return {
+            'id': obj.id,
+            'prodchan': obj.prodchan,
+            'happy': obj.happy,
+            'url': obj.url,
+            'description': obj.description,
+            'user_agent': obj.user_agent,
+            'product': product,
+            'browser': obj.browser,
+            'browser_version': obj.browser_version,
+            'platform': obj.platform,
+            'locale': obj.locale,
+            'device': obj.device,
+            'manufacturer': obj.manufacturer,
+            'created': obj.created,
+        }
 
 
 class ResponseEmail(ModelBase):

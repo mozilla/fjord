@@ -189,24 +189,24 @@ class TestDashboardView(ElasticTestCase):
         eq_(len(pq('li.opinion')), 2)
 
         # Product
-        r = self.client.get(url, {'browser': 'Firefox'})
+        r = self.client.get(url, {'product': 'Firefox'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 7)
 
         # Product
-        r = self.client.get(url, {'browser': 'Firefox for android'})
+        r = self.client.get(url, {'product': 'Firefox for Android'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 0)
 
         # Product version
         r = self.client.get(
-            url, {'browser': 'Firefox', 'browser_version': '17.0.0'})
+            url, {'product': 'Firefox', 'browser_version': '17.0.0'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 7)
 
         # Product version
         r = self.client.get(
-            url, {'browser': 'Firefox', 'browser_version': '18.0.0'})
+            url, {'product': 'Firefox', 'browser_version': '18.0.0'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 0)
 
@@ -222,7 +222,7 @@ class TestDashboardView(ElasticTestCase):
         # Filter on product and version--both filters affect the
         # results
         r = self.client.get(
-            url, {'browser': 'Firefox', 'browser_version': '18.0.0'})
+            url, {'product': 'Firefox', 'browser_version': '18.0.0'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 0)
 
