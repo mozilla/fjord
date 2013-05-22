@@ -217,7 +217,7 @@ def generate_dashboard_atom_url(request):
     # Remove anything from the querystring that isn't good for a feed:
     # page, start_date, end_date, etc.
     for mem in qd.keys():
-        if mem not in ('happy', 'locale', 'platform', 'browser',
+        if mem not in ('happy', 'locale', 'platform', 'product',
                        'browser_version', 'q'):
             del qd[mem]
 

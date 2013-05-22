@@ -158,12 +158,12 @@ class TestDashboardView(ElasticTestCase):
 
         r = self.client.get(
             reverse('dashboard'),
-            {'browser': 'Firefox', 'browser_version': '20.0.0'})
+            {'product': 'Firefox', 'browser_version': '20.0.0'})
         eq_(200, r.status_code)
         pq = PyQuery(r.content)
         pq = pq('link[type="application/atom+xml"]')
         qs = QueryDict(pq[0].attrib['href'].split('?')[1])
-        eq_(qs['browser'], u'Firefox')
+        eq_(qs['product'], u'Firefox')
         eq_(qs['browser_version'], u'20.0.0')
 
     def test_search(self):
