@@ -12,6 +12,7 @@ from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
 from tower import ugettext as _
 
+from fjord.analytics.tools import JSONDatetimeEncoder
 from fjord.base.helpers import locale_name
 from fjord.base.util import smart_int, smart_datetime, epoch_milliseconds
 from fjord.feedback.models import Response, ResponseMappingType
@@ -158,7 +159,8 @@ def generate_json_feed(request, search):
         'query': search_query
     }
     return HttpResponse(
-        json.dumps(json_data), mimetype='application/json')
+        json.dumps(json_data, cls=JSONDatetimeEncoder),
+        mimetype='application/json')
 
 
 def generate_atom_feed(request, search):
@@ -185,10 +187,6 @@ def generate_atom_feed(request, search):
         author_name=_('Firefox Input'),
     )
     for response in search[:100]:
-        # TODO: Remove this after we pick up the fixes in the latest
-        # elasticutils that causes results to come back as Python
-        # datetimes rather than strings.
-        created = datetime.strptime(response.created, '%Y-%m-%dT%H:%M:%S')
         categories = {
             'sentiment': _('Happy') if response.happy else _('Sad'),
             'platform': response.platform,
@@ -203,7 +201,7 @@ def generate_atom_feed(request, search):
             title=_('Response id: {id}').format(id=response.id),
             description=response.description,
             link=link_url,
-            pubdate=created,
+            pubdate=response.created,
             categories=categories
         )
     return HttpResponse(
@@ -317,7 +315,7 @@ def dashboard(request, template):
     # Navigation facet data
     facets = search.facet(
         'happy', 'platform', 'locale', 'product', 'browser_version',
-        filtered=bool(f.filters))
+        filtered=bool(search._process_filters(f.filters)))
 
     # This loop does two things. First it maps 'T' -> True and 'F' ->
     # False.  This is probably something EU should be doing for
@@ -385,14 +383,16 @@ def dashboard(request, template):
     happy_data = []
     sad_data = []
 
+    happy_f = f & F(happy=True)
+    sad_f = f & F(happy=False)
     histograms = search.facet_raw(
         happy={
             'date_histogram': {'interval': 'day', 'field': 'created'},
-            'facet_filter': (f & F(happy=True)).filters
+            'facet_filter': search._process_filters(happy_f.filters)
         },
         sad={
             'date_histogram': {'interval': 'day', 'field': 'created'},
-            'facet_filter': (f & F(happy=False)).filters
+            'facet_filter': search._process_filters(sad_f.filters)
         },
     ).facet_counts()
 

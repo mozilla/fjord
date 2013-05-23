@@ -50,23 +50,12 @@ def date_ago(days=0):
 
 
 @register.function
-def convert_date_string(datetime_string, in_fmt='%Y-%m-%dT%H:%M:%S',
-                        out_fmt='%Y-%m-%d'):
-    """Converts date/datetime string from in_fmt to out_fmt
+def to_datetime_string(dt):
+    """Converts date/datetime to '%Y-%m-%dT%H:%M:%S'"""
+    return dt.strftime('%Y-%m-%dT%H:%M:%S')
 
-    :arg date: string representing datetime
-    :arg in_fmt: the format the datetime_string is in
-    :arg out_fmt: the format to return
 
-    :returns: date in YYYY-MM-DD or format specified by out_fmt
-
-    :raises TypeError, ValueError: bad datetime_string input (None,
-        empty string, doesn't match in_fmt, ...)
-
-    Example:
-
-    >>> to_date_string('2013-04-03T14:42:15')
-    '2013-04-03'
-
-    """
-    return datetime.strptime(datetime_string, in_fmt).strftime(out_fmt)
+@register.function
+def to_date_string(dt):
+    """Converts date/datetime to '%Y-%m-%d'"""
+    return dt.strftime('%Y-%m-%d')
