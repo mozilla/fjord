@@ -12,3 +12,4 @@ packages/python-memcached
 packages/requests
 packages/simplejson
 packages/mock
+packages/six
