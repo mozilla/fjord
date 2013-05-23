@@ -12,7 +12,7 @@ from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
 from tower import ugettext as _
 
-from fjord.analytics.tools import JSONDatetimeEncoder
+from fjord.analytics.tools import JSONDatetimeEncoder, generate_query_parsed
 from fjord.base.helpers import locale_name
 from fjord.base.util import smart_int, smart_datetime, epoch_milliseconds
 from fjord.feedback.models import Response, ResponseMappingType
@@ -288,10 +288,9 @@ def dashboard(request, template):
     f &= F(created__gte=search_date_start)
 
     if search_query:
-        fields = ['text', 'text_phrase', 'fuzzy']
-        query = dict(('description__%s' % f, search_query) for f in fields)
-        search = search.query(or_=query)
         current_search['q'] = search_query
+        es_query = generate_query_parsed('description', search_query)
+        search = search.query_raw(es_query)
 
     search = search.filter(f).order_by('-created')
 

@@ -15,9 +15,8 @@ def to_tokens(text):
     for c in text:
         if c == u'\\':
             escape = True
+            token.append(c)
             continue
-
-        escape = False
 
         if in_quotes:
             if not escape and c == u'"':
@@ -35,6 +34,8 @@ def to_tokens(text):
 
         else:
             token.append(c)
+
+        escape = False
 
     if in_quotes:
         # Finish off a missing quote
@@ -54,12 +55,38 @@ class ParseError(Exception):
     pass
 
 
+def unescape(text):
+    """Unescapes text
+
+    >>> unescape(u'abc')
+    u'abc'
+    >>> unescape(u'\\abc')
+    u'abc'
+    >>> unescape(u'\\\\abc')
+    u'\\abc'
+
+    """
+    # Note: We can ditch this and do it in tokenizing if tokenizing
+    # returned typed tokens rather than a list of strings.
+    new_text = []
+    escape = False
+    for c in text:
+        if not escape and c == u'\\':
+            escape = True
+            continue
+
+        new_text.append(c)
+        escape = False
+
+    return u''.join(new_text)
+
+
 def build_match(field, token):
-    return {'match': {field: token}}
+    return {'match': {field: unescape(token)}}
 
 
 def build_match_phrase(field, token):
-    return {'match_phrase': {field: token}}
+    return {'match_phrase': {field: unescape(token)}}
 
 
 def build_or(clauses):
