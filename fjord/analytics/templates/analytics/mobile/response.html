@@ -27,10 +27,11 @@
    Pacific and "celebrates" daylight savings so it's a villainous lie
    for all datetimes in PDT. #}
           <li>
-            {% set response_date = convert_date_string(response_created) %}
-            <a href="{{ url('dashboard')|urlparams(date_start=response_date) }}">
-              <time datetime="{{ response_created }}-08:00" title="{{ response_created }} PST">
-                {{ response_created|naturaltime }}
+            {% set created_date = to_date_string(response.created) %}
+            {% set created_dt = to_datetime_string(response.created) %}
+            <a href="{{ url('dashboard')|urlparams(date_start=created_dt) }}">
+              <time datetime="{{ created_date }}-08:00" title="{{ created_date }} PST">
+                {{ response.created|naturaltime }}
               </time>
             </a>
           </li>
