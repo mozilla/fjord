@@ -5,8 +5,7 @@ from itertools import islice
 from django.conf import settings
 from django.db import reset_queries
 
-from elasticutils.contrib.django import get_es, S
-from elasticutils.contrib.django.models import DjangoMappingType
+from elasticutils.contrib.django import get_es, S, MappingType
 from pyelasticsearch.exceptions import (ConnectionError, Timeout,
                                         ElasticHttpNotFoundError)
 
@@ -56,7 +55,7 @@ def get_index():
     return '%s-%s' % (settings.ES_INDEX_PREFIX, settings.ES_INDEXES['default'])
 
 
-class FjordMappingType(DjangoMappingType):
+class FjordMappingType(MappingType):
     """DjangoMappingType with correct index."""
     @classmethod
     def get_index(cls):

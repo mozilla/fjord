@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.db import models
 
-from elasticutils.contrib.django.models import Indexable
+from elasticutils.contrib.django import Indexable
 from tower import ugettext_lazy as _
 
 from fjord.base.models import ModelBase
