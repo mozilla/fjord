@@ -51,11 +51,11 @@ class TestQueryParsed(TestCase):
     def test_query_parsed(self):
         self.assertEqual(
             generate_query_parsed('foo', u'abc'),
-            {'match': {'foo': u'abc'}})
+            {'text': {'foo': u'abc'}})
 
         self.assertEqual(
             generate_query_parsed('foo', u'abc def'),
-            {'match': {'foo': u'abc def'}},
+            {'text': {'foo': u'abc def'}},
         )
 
         self.assertEqual(
@@ -64,9 +64,9 @@ class TestQueryParsed(TestCase):
                 'bool': {
                     'minimum_should_match': 1,
                     'should': [
-                        {'match': {'foo': u'abc'}},
-                        {'match_phrase': {'foo': u'def'}},
-                        {'match': {'foo': u'ghi'}},
+                        {'text': {'foo': u'abc'}},
+                        {'text_phrase': {'foo': u'def'}},
+                        {'text': {'foo': u'ghi'}},
                     ]
                 }
             }
@@ -77,8 +77,8 @@ class TestQueryParsed(TestCase):
             {
                 'bool': {
                     'must': [
-                        {'match': {'foo': u'abc'}},
-                        {'match_phrase': {'foo': u'def'}},
+                        {'text': {'foo': u'abc'}},
+                        {'text_phrase': {'foo': u'def'}},
                     ]
                 }
             }
@@ -90,11 +90,11 @@ class TestQueryParsed(TestCase):
                 'bool': {
                     'minimum_should_match': 1,
                     'should': [
-                        {'match': {'foo': u'abc'}},
+                        {'text': {'foo': u'abc'}},
                         {'bool': {
                                 'must': [
-                                    {'match_phrase': {'foo': u'def'}},
-                                    {'match': {'foo': u'ghi'}},
+                                    {'text_phrase': {'foo': u'def'}},
+                                    {'text': {'foo': u'ghi'}},
                                 ]
                         }}
                     ]
@@ -107,12 +107,12 @@ class TestQueryParsed(TestCase):
             {
                 'bool': {
                     'must': [
-                        {'match': {'foo': u'abc'}},
+                        {'text': {'foo': u'abc'}},
                         {'bool': {
                                 'minimum_should_match': 1,
                                 'should': [
-                                    {'match_phrase': {'foo': u'def'}},
-                                    {'match': {'foo': u'ghi'}},
+                                    {'text_phrase': {'foo': u'def'}},
+                                    {'text': {'foo': u'ghi'}},
                                 ]
                         }}
                     ]
@@ -122,7 +122,7 @@ class TestQueryParsed(TestCase):
 
         self.assertEqual(
             generate_query_parsed('foo', u'14.1\\" screen'),
-            {'match': {'foo': u'14.1" screen'}}
+            {'text': {'foo': u'14.1" screen'}}
         )
 
     def test_query_parsed_edge_cases(self):
@@ -131,7 +131,7 @@ class TestQueryParsed(TestCase):
             {
                 'bool': {
                     'must': [
-                        {'match_phrase': {'foo': u'def'}}
+                        {'text_phrase': {'foo': u'def'}}
                     ]
                 }
             }
@@ -142,7 +142,7 @@ class TestQueryParsed(TestCase):
             {
                 'bool': {
                     'must': [
-                        {'match_phrase': {'foo': u'def'}}
+                        {'text_phrase': {'foo': u'def'}}
                     ]
                 }
             }
@@ -150,10 +150,10 @@ class TestQueryParsed(TestCase):
 
         self.assertEqual(
             generate_query_parsed('foo', u'foo\\bar'),
-            {'match': {'foo': u'foobar'}}
+            {'text': {'foo': u'foobar'}}
         )
 
         self.assertEqual(
             generate_query_parsed('foo', u'foo\\\\bar'),
-            {'match': {'foo': u'foo\\bar'}}
+            {'text': {'foo': u'foo\\bar'}}
         )

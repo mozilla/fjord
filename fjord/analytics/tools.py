@@ -82,11 +82,11 @@ def unescape(text):
 
 
 def build_match(field, token):
-    return {'match': {field: unescape(token)}}
+    return {'text': {field: unescape(token)}}
 
 
 def build_match_phrase(field, token):
-    return {'match_phrase': {field: unescape(token)}}
+    return {'text_phrase': {field: unescape(token)}}
 
 
 def build_or(clauses):
