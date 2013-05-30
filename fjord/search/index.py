@@ -5,6 +5,7 @@ from itertools import islice
 from django.conf import settings
 from django.db import reset_queries
 
+import requests
 from elasticutils.contrib.django import get_es, S, MappingType
 from pyelasticsearch.exceptions import (ConnectionError, Timeout,
                                         ElasticHttpNotFoundError)
@@ -386,12 +387,18 @@ def es_delete_cmd(index):
 
 
 @requires_good_connection
-def es_status_cmd(checkindex=False):
+def es_status_cmd(checkindex=False, log=log):
     """Show ElasticSearch index status."""
     log.info('Settings:')
     log.info('  ES_URLS               : %s', settings.ES_URLS)
     log.info('  ES_INDEX_PREFIX       : %s', settings.ES_INDEX_PREFIX)
     log.info('  ES_INDEXES            : %s', settings.ES_INDEXES)
+
+    try:
+        es_deets = requests.get(settings.ES_URLS[0]).json()
+        log.info('  Elasticsearch version : %s', es_deets['version']['number'])
+    except requests.exceptions.RequestException:
+        log.info('  Could not connect to Elasticsearch')
 
     log.info('Index (%s) stats:', get_index())
 
