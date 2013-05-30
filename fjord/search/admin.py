@@ -1,10 +1,12 @@
 import logging
 from datetime import datetime
 
+from django.conf import settings
 from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
+import requests
 from pyelasticsearch.exceptions import (
     ConnectionError, ElasticHttpNotFoundError, Timeout)
 
@@ -66,6 +68,7 @@ def search_admin_view(request):
     """Render the admin view containing search tools"""
     error_messages = []
     stats = None
+    es_deets = None
     indexes = []
 
     reset_requested = 'reset' in request.POST
@@ -89,9 +92,14 @@ def search_admin_view(request):
             stats = get_index_stats()
         except ElasticHttpNotFoundError:
             stats = None
+
         indexes = get_indexes()
         indexes.sort(key=lambda m: m[0])
 
+        # TODO: Input has a single ES_URL and that's the ZLB and does
+        # the balancing. If that ever changes and we have multiple
+        # ES_URLs, then this should get fixed.
+        es_deets = requests.get(settings.ES_URLS[0]).json()
     except (ConnectionError, Timeout):
         error_messages.append('Error: Elastic Search is not set up on this '
                               'machine or timed out trying to respond. '
@@ -105,6 +113,7 @@ def search_admin_view(request):
 
     return render(request, 'admin/search_admin_view.html', {
             'title': 'Search',
+            'es_deets': es_deets,
             'mapping_type_stats': stats,
             'indexes': indexes,
             'index': get_index(),
