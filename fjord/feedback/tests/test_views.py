@@ -234,16 +234,33 @@ class TestFeedback(TestCase):
         r = self.client.post(reverse('feedback'), data)
         eq_(r.status_code, 302)
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(feedback.happy, False)
+        eq_(feedback.happy, True)
         eq_(feedback.url, data['url'])
         eq_(feedback.description, data['description'])
         eq_(feedback.device, data['device'])
         eq_(feedback.manufacturer, data['manufacturer'])
 
+    def test_deprecated_firefox_for_android_sad_is_sad(self):
+        data = {
+            '_type': 2,
+            'description': u'This is how to make it better...',
+            'add_url': 1,
+            'url': u'http://mozilla.org/',
+            'device': 'Stone tablet',
+            'manufacturer': 'Rosetta'
+            }
+
+        r = self.client.post(reverse('feedback'), data)
+        eq_(r.status_code, 302)
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(feedback.happy, False)
+        eq_(feedback.url, data['url'])
+        eq_(feedback.description, data['description'])
+
     def test_deprecated_firefox_for_android_ideas_are_sad(self):
         """We treat "sad" and "ideas" as sad feedback now."""
         data = {
-            '_type': 2,
+            '_type': 3,
             'description': u'This is how to make it better...',
             'add_url': 1,
             'url': u'http://mozilla.org/',

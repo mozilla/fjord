@@ -177,7 +177,14 @@ def android_about_feedback(request):
 
     # Make `request.GET` mutable.
     request.GET = request.GET.copy()
-    request.GET['happy'] = 0
+
+    # For _type, 1 is happy, 2 is sad, 3 is idea. We convert that so
+    # that _type = 1 -> happy = 1 and everything else -> happy = 0.
+    if request.POST.get('_type') == '1':
+        happy = 1
+    else:
+        happy = 0
+    request.POST['happy'] = happy
 
     response, form = _handle_feedback_post(request)
 
