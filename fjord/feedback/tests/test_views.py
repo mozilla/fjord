@@ -287,7 +287,7 @@ class TestFeedback(TestCase):
         r = self.client.post(reverse('feedback'), data)
         eq_(r.status_code, 302)
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(feedback.happy, False)
+        eq_(feedback.happy, True)
         eq_(feedback.url, u'')
         eq_(feedback.description, data['description'])
 
