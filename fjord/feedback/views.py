@@ -175,8 +175,8 @@ def android_about_feedback(request):
     # uses the old `_type` variable from old Input. Tweak the data to do
     # what FfA means, not what it says.
 
-    # Make `request.GET` mutable.
-    request.GET = request.GET.copy()
+    # Make `request.POST` mutable.
+    request.POST = request.POST.copy()
 
     # For _type, 1 is happy, 2 is sad, 3 is idea. We convert that so
     # that _type = 1 -> happy = 1 and everything else -> happy = 0.
