@@ -2,7 +2,10 @@ from functools import wraps
 
 from django.conf import settings
 from django.test.client import Client
+from django.test import LiveServerTestCase
 from django.test.utils import override_settings
+
+from selenium import webdriver
 
 from funfactory.urlresolvers import split_path, reverse
 from test_utils import TestCase as OriginalTestCase
@@ -53,6 +56,18 @@ class MobileTestCase(TestCase):
         super(MobileTestCase, self).setUp()
         self.client.cookies[settings.MOBILE_COOKIE] = 'on'
 
+
+class SeleniumTestCase(LiveServerTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.webdriver = webdriver.Firefox()
+        super(SeleniumTestCase, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.webdriver.quit()
+        super(SeleniumTestCase, cls).tearDownClass()
 
 def with_save(func):
     """Decorate a model maker to add a `save` kwarg.
