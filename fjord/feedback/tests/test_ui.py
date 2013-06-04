@@ -17,7 +17,6 @@ class TestFeedback(SeleniumTestCase):
         """
         url = self.live_server_url + reverse('feedback') + '#happy'
         self.webdriver.get(url)
-        sleep(1)
         assert self.happy_elem().is_displayed()
         assert not self.sad_elem().is_displayed()
 
@@ -27,6 +26,5 @@ class TestFeedback(SeleniumTestCase):
         """
         url = self.live_server_url + reverse('feedback') + '#sad'
         self.webdriver.get(url)
-        sleep(1)
         assert self.sad_elem().is_displayed()
         assert not self.happy_elem().is_displayed()
