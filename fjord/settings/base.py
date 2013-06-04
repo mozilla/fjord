@@ -155,6 +155,8 @@ PROD_LANGUAGES = [
     'zu'
 ]
 
+DEV_LANGUAGES = PROD_LANGUAGES
+
 INSTALLED_APPS = get_apps(
     exclude=(
         'compressor',
