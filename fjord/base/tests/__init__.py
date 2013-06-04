@@ -69,6 +69,11 @@ class SeleniumTestCase(LiveServerTestCase):
         cls.webdriver.quit()
         super(SeleniumTestCase, cls).tearDownClass()
 
+    def setUp(self):
+        # Go to an empty page before every test.
+        self.webdriver.get('')
+
+
 def with_save(func):
     """Decorate a model maker to add a `save` kwarg.
 
