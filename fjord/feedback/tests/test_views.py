@@ -98,6 +98,18 @@ class TestFeedback(TestCase):
 
         self.assertContains(r, 'This field is required')
 
+    def test_whitespace_description(self):
+        """Descriptions should have more than just whitespace"""
+        url = reverse('feedback', args=('firefox.desktop.stable',))
+        r = self.client.post(url, {
+            'url': 'http://mozilla.org/',
+            'happy': 0,
+            'description': u'      '
+        })
+
+        self.assertContains(r, 'This field is required')
+        self.assertTemplateUsed(r, 'feedback/feedback.html')
+
     def test_unicode_in_description(self):
         """Description should accept unicode data"""
         url = reverse('feedback', args=('firefox.desktop.stable',))
