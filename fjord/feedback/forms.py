@@ -38,12 +38,22 @@ class ResponseForm(forms.Form):
         email = cleaned_data.get('email')
 
         if email_ok and not email or 'email' in self._errors:
-            self._errors['email'] = self.error_class([_(
-                u'Please enter a valid email address, or uncheck the box '
-                 'allowing us to contact you.')])
+            self._errors['email'] = self.error_class([
+                    _(u'Please enter a valid email address, or uncheck the '
+                      'box allowing us to contact you.')
+            ])
 
         # If email_ok is not checked, ignore errors on email.
         if not email_ok and 'email' in self._errors:
             del self._errors['email']
 
         return cleaned_data
+
+    def clean_description(self):
+        # If the response description consists solely of whitespace,
+        # kick up an error.
+        description = self.cleaned_data.get('description')
+        if not description or not description.strip():
+            raise forms.ValidationError(_(u'This field is required.'))
+
+        return description
