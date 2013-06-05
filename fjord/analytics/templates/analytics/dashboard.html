@@ -136,7 +136,7 @@
         placeholder="{{ _('Search by keyword') }}" value="{{ current_search.q }}" />
 
       {% for key, value in current_search.items() %}
-        {% if key != 'q' %}
+        {% if key not in ('q', 'page') %}
           <input type="hidden" name="{{ key }}" value="{{ value }}" />
         {% endif %}
       {% endfor %}
