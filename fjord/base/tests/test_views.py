@@ -7,7 +7,10 @@ from fjord.base.tests import LocalizingClient, reverse, TestCase
 from fjord.base.views import IntentionalException
 from fjord.search.tests import ElasticTestCase
 
+
 class TestAbout(TestCase):
+    client_class = LocalizingClient
+
     def test_about_view(self):
         r = self.client.get(reverse('about-view'))
         eq_(200, r.status_code)
@@ -28,7 +31,7 @@ class TestLoginFailure(TestCase):
         eq_(200, r.status_code)
         self.assertTemplateUsed(r, 'mobile/login_failure.html')
 
- 
+
 # Note: This needs to be an ElasticTestCase because the view does ES
 # stuff.
 class MonitorViewTest(ElasticTestCase):

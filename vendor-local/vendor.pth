@@ -13,3 +13,4 @@ packages/requests
 packages/simplejson
 packages/mock
 packages/six
+packages/selenium/py
