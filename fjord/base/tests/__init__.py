@@ -6,6 +6,8 @@ from django.test import LiveServerTestCase
 from django.test.utils import override_settings
 
 from selenium import webdriver
+from selenium.common.exceptions import WebDriverException
+from nose import SkipTest
 
 from funfactory.urlresolvers import split_path, reverse
 from test_utils import TestCase as OriginalTestCase
@@ -59,17 +61,27 @@ class MobileTestCase(TestCase):
 
 class SeleniumTestCase(LiveServerTestCase):
 
+    skipme = False
+
     @classmethod
     def setUpClass(cls):
-        cls.webdriver = webdriver.Firefox()
+        try:
+            cls.webdriver = webdriver.Firefox()
+        except (RuntimeError, WebDriverException):
+            cls.skipme = True
+
         super(SeleniumTestCase, cls).setUpClass()
 
     @classmethod
     def tearDownClass(cls):
-        cls.webdriver.quit()
+        if not cls.skipme:
+            cls.webdriver.quit()
         super(SeleniumTestCase, cls).tearDownClass()
 
     def setUp(self):
+        # Don't run if Selenium isn't available.
+        if self.skipme:
+            raise SkipTest('Selenium unavailable.')
         # Go to an empty page before every test.
         self.webdriver.get('')
 

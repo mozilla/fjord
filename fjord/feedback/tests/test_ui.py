@@ -1,4 +1,3 @@
-from time import sleep
 
 from fjord.base.tests import SeleniumTestCase, reverse
 

@@ -9,6 +9,8 @@ from fjord.search.tests import ElasticTestCase
 
 
 class TestAbout(TestCase):
+    client_class = LocalizingClient
+
     def test_about_view(self):
         r = self.client.get(reverse('about-view'))
         eq_(200, r.status_code)
