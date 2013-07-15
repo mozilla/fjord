@@ -1,5 +1,4 @@
 README
-setup.cfg
 setup.py
 South.egg-info/PKG-INFO
 South.egg-info/SOURCES.txt
