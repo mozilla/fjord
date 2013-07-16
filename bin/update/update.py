@@ -29,14 +29,27 @@ def update_code(ctx, tag):
 def update_locales(ctx):
     """Update a locale directory from SVN.
 
-    Assumes localizations 1) exist, 2) are in SVN, 3) are in SRC_DIR/locale and
-    4) have a compile-mo.sh script. This should all be pretty standard, but
-    change it if you need to.
+    Assumes localizations:
+
+    1) exist,
+    2) are in SVN,
+    3) are in SRC_DIR/locale, and
+    4) have a compile-mo.sh script
+
+    This should all be pretty standard, but change it if you need to.
 
     """
+    # Do an svn up to get the latest .po files.
     with ctx.lcd(os.path.join(settings.SRC_DIR, 'locale')):
         ctx.local('svn up')
-        ctx.local('./compile-mo.sh .')
+
+    # Run the script that lints the .po files and compiles to .mo the
+    # the ones that don't have egregious errors in them. This prints
+    # stdout to the deploy log and also to media/postatus.txt so
+    # others can see what happened.
+    with ctx.lcd(settings.SRC_DIR):
+        ctx.local('date > media/postatus.txt')
+        ctx.local('bin/compile-linted-mo.sh | /usr/bin/tee -a media/postatus.txt')
 
 
 @task
