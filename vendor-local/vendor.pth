@@ -3,6 +3,7 @@ src/django-adminplus
 src/django-browserid
 src/django-cache-machine
 src/django-eadred
+src/django-rest-framework
 src/django-statsd
 src/elasticutils
 src/pyelasticsearch
