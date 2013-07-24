@@ -63,6 +63,19 @@ class Response(ModelBase):
     def get_mapping_type(self):
         return ResponseMappingType
 
+    @property
+    def product(self):
+        """The product for this response"""
+
+        # TODO: This is a hack.
+        if self.platform == u'FirefoxOS':
+            product = u'Firefox OS'
+        elif self.platform == u'Android':
+            product = u'Firefox for Android'
+        else:
+            product = u'Firefox'
+        return product
+
 
 @register_mapping_type
 class ResponseMappingType(FjordMappingType, Indexable):
@@ -94,12 +107,6 @@ class ResponseMappingType(FjordMappingType, Indexable):
         if obj is None:
             obj = cls.get_model().objects.get(pk=obj_id)
 
-        # TODO: This is a hack.
-        if obj.platform == u'Android':
-            product = u'Firefox for Android'
-        else:
-            product = u'Firefox'
-
         return {
             'id': obj.id,
             'prodchan': obj.prodchan,
@@ -107,7 +114,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'url': obj.url,
             'description': obj.description,
             'user_agent': obj.user_agent,
-            'product': product,
+            'product': obj.product,
             'browser': obj.browser,
             'browser_version': obj.browser_version,
             'platform': obj.platform,
