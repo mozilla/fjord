@@ -195,7 +195,11 @@ LOCALE_PATHS = (
     os.path.join(ROOT, PROJECT_MODULE, 'locale'),
 )
 
-SUPPORTED_NONLOCALES += ('robots.txt', 'services')
+SUPPORTED_NONLOCALES += (
+    'robots.txt',
+    'services',
+    'api',
+)
 
 # Because Jinja2 is the default template loader, add any non-Jinja
 # templated apps here:
@@ -360,3 +364,13 @@ ES_LIVE_INDEX = True
 # Time in seconds before celery.exceptions.SoftTimeLimitExceeded is raised.
 # The task can catch that and recover but should exit ASAP.
 CELERYD_TASK_SOFT_TIME_LIMIT = 60 * 10
+
+# Configuration for API views.
+REST_FRAMEWORK = {
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.AnonRateThrottle',
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/hour',
+    }
+}

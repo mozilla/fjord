@@ -8,6 +8,7 @@ from django.views.decorators.http import require_POST
 
 from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
+from rest_framework import generics
 
 from fjord.base.util import smart_bool
 from fjord.feedback.forms import ResponseForm
@@ -263,3 +264,7 @@ def feedback_router(request, formname=None, *args, **kwargs):
             view = desktop_stable_feedback
 
     return view(request, *args, **kwargs)
+
+
+class PostFeedbackAPI(generics.CreateAPIView):
+    serializer_class = models.ResponseSerializer
