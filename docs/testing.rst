@@ -85,7 +85,7 @@ You can specify specific tests::
 See the output of ``./manage.py test --help`` for more arguments.
 
 
-Running tests with xvfb
+Running tests with Xvfb
 -----------------------
 
 Because Selenium opens real browser windows, it can be kind of
@@ -98,13 +98,13 @@ OSX.
 
 On Linux:
 
-    Install XVFB_ and run the tests with it's xvfb-run binary. For
+    Install Xvfb and run the tests with it's xvfb-run binary. For
     example, if you run tests like::
 
         ./manage.py test -s --noinput --logging-clear-handlers
 
 
-    You can switch to this to run with XVFB::
+    You can switch to this to run with Xvfb::
 
         xvfb-run ./manage.py test -s --noinput --logging-clear-handlers
 
@@ -119,9 +119,9 @@ On OSX:
 
     The same method can be used for OSX, but it requires some
     fiddliness.  The default version of Firefox for OSX does not use X
-    as it's graphic's backend, so by default XVFB can't help. You can
+    as it's graphic's backend, so by default Xvfb can't help. You can
     however run an X11 enabled version of OSX and a OSX version of
-    XVFB. You can find more details `here
+    Xvfb. You can find more details `here
     <http://afitnerd.com/2011/09/06/headless-browser-testing-on-mac/>`_.
 
     .. Note::
