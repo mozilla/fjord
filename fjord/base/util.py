@@ -1,6 +1,9 @@
 from datetime import datetime
 import time
 
+from rest_framework.throttling import AnonRateThrottle
+from statsd import statsd
+
 
 def smart_truncate(content, length=100, suffix='...'):
     """Truncate text at space before length bound.
@@ -102,3 +105,9 @@ class FakeLogger(object):
 
     def error(self, msg, *args):
         self._out('ERROR', msg, *args)
+
+
+class MeasuredAnonRateThrottle(AnonRateThrottle):
+    """On throttle failure, does a statsd call"""
+    def throttle_failure(self):
+        statsd.incr('api.throttle.failure')

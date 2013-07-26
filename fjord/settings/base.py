@@ -368,7 +368,7 @@ CELERYD_TASK_SOFT_TIME_LIMIT = 60 * 10
 # Configuration for API views.
 REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_CLASSES': (
-        'rest_framework.throttling.AnonRateThrottle',
+        'fjord.base.util.MeasuredAnonRateThrottle',
     ),
     'DEFAULT_THROTTLE_RATES': {
         'anon': '100/hour',
