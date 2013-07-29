@@ -18,7 +18,7 @@ class TestPOLint(TestCase):
         # some way that prevents it from working correctly.
 
         try:
-            call_command('polint')
+            call_command('polint', '--version')
         except SystemExit:
             # WOAH! WTF ARE YOU DOING? The lint command calls
             # sys.exit() because it needs to return correct exit codes
