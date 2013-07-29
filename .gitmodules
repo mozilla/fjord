@@ -25,3 +25,6 @@
 [submodule "vendor-local/src/django-browserid"]
 	path = vendor-local/src/django-browserid
 	url = git://github.com/mozilla/django-browserid.git
+[submodule "vendor-local/src/dennis"]
+	path = vendor-local/src/dennis
+	url = https://github.com/willkg/dennis.git

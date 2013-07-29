@@ -1,3 +1,4 @@
+src/dennis
 src/django-adminplus
 src/django-browserid
 src/django-cache-machine
@@ -7,11 +8,12 @@ src/elasticutils
 src/pyelasticsearch
 src/statsd
 packages/cssselect
+packages/mock
+packages/polib
 packages/pyquery
 packages/python-memcached
 packages/requests
-packages/simplejson
-packages/mock
-packages/six
 packages/selenium/py
+packages/simplejson
+packages/six
 packages/South
