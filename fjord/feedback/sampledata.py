@@ -5,6 +5,7 @@ import time
 from django.conf import settings
 from eadred.helpers import sentence_generator
 
+from fjord.feedback.models import Response
 from fjord.feedback.tests import response
 
 
@@ -83,11 +84,16 @@ def generate_sampledata(options):
     if samplesize not in (None, True):
         samplesize = int(samplesize)
 
+        print 'Working on generating {0} feedback responses....'.format(
+            samplesize)
+
         happy_feedback = sentence_generator(HAPPY_FEEDBACK)
         sad_feedback = sentence_generator(SAD_FEEDBACK)
         urls = sentence_generator(URLS)
         user_agents = sentence_generator(USER_AGENTS)
         locales = sentence_generator(settings.DEV_LANGUAGES)
+
+        objs = []
 
         now = time.time()
         for i in range(samplesize):
@@ -101,14 +107,29 @@ def generate_sampledata(options):
                 description = sad_feedback.next()
                 url = urls.next()
 
-            response(
-                happy=happy,
-                description=description,
-                url=url,
-                ua=user_agents.next(),
-                locale=locales.next(),
-                created=datetime.datetime.fromtimestamp(now),
-                save=True)
+            objs.append(
+                response(
+                    happy=happy,
+                    description=description,
+                    url=url,
+                    ua=user_agents.next(),
+                    locale=locales.next(),
+                    created=datetime.datetime.fromtimestamp(now))
+            )
+
+            # Bulk-save the objects to the db 500 at a time and
+            # print something to stdout about it.
+            if i % 500 == 0:
+                Response.objects.bulk_create(objs)
+                objs = []
+                print '  {0}...'.format(i)
+
+        if objs:
+            print '  {0}...'.format(samplesize)
+            Response.objects.bulk_create(objs)
+            objs = []
+
+        print 'Done!  Please reindex to pick up db changes.'
         return
 
     # Create 5 happy responses.
