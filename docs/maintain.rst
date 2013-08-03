@@ -70,3 +70,25 @@ and so that people can see the site in that language and submit feedback:
 
 5. Commit the changes to ``fjord/settings/base.py`` and product details stuff
    to git.
+
+
+Dealing with errors in translated strings
+=========================================
+
+When we deploy a new version of Fjord, it updates the ``.po`` files and
+picks up newly translated strings.
+
+If ``.po`` files have errors, then those errors are noted in the
+postatus.txt files:
+
+* dev: https://input-dev.allizom.org/media/postatus.txt
+* stage: https://input.allizom.org/media/postatus.txt
+* prod: https://input.mozilla.org/media/postatus.txt
+
+If there are errors in those files, we need to open up a bug in
+**Mozilla Localizations** -> *locale code* with the specifics.
+
+.. Note::
+
+   ``.po`` files that have errors will not get compiled to ``.mo`` files
+   and thus won't go to production and thus won't cause fires.
