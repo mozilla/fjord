@@ -158,13 +158,13 @@ class TestDashboardView(ElasticTestCase):
 
         r = self.client.get(
             reverse('dashboard'),
-            {'product': 'Firefox', 'browser_version': '20.0.0'})
+            {'product': 'Firefox', 'version': '20.0.0'})
         eq_(200, r.status_code)
         pq = PyQuery(r.content)
         pq = pq('link[type="application/atom+xml"]')
         qs = QueryDict(pq[0].attrib['href'].split('?')[1])
         eq_(qs['product'], u'Firefox')
-        eq_(qs['browser_version'], u'20.0.0')
+        eq_(qs['version'], u'20.0.0')
 
     def test_search(self):
         url = reverse('dashboard')
@@ -200,13 +200,13 @@ class TestDashboardView(ElasticTestCase):
 
         # Product version
         r = self.client.get(
-            url, {'product': 'Firefox', 'browser_version': '17.0.0'})
+            url, {'product': 'Firefox', 'version': '17.0.0'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 7)
 
         # Product version
         r = self.client.get(
-            url, {'product': 'Firefox', 'browser_version': '18.0.0'})
+            url, {'product': 'Firefox', 'version': '18.0.0'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 0)
 
@@ -215,20 +215,20 @@ class TestDashboardView(ElasticTestCase):
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 0)
 
-    def test_browser_version_noop(self):
-        """browser_version has no effect if browser isn't set"""
+    def test_version_noop(self):
+        """version has no effect if product isn't set"""
         url = reverse('dashboard')
 
         # Filter on product and version--both filters affect the
         # results
         r = self.client.get(
-            url, {'product': 'Firefox', 'browser_version': '18.0.0'})
+            url, {'product': 'Firefox', 'version': '18.0.0'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 0)
 
         # Filter on version--filter has no effect on results
         r = self.client.get(
-            url, {'browser_version': '18.0.0'})
+            url, {'version': '18.0.0'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 7)
 

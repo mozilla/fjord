@@ -15,7 +15,23 @@ from fjord.search.tasks import register_live_index
 
 @register_live_index
 class Response(ModelBase):
-    """Basic feedback response"""
+    """Basic feedback response
+
+    This consists of a bunch of information some of which is inferred
+    and some of which comes from the source.
+
+    Some fields are "sacrosanct" and should never be edited after the
+    response was created:
+
+    * happy
+    * url
+    * description
+    * user_agent
+    * manufacturer
+    * device
+    * created
+
+    """
 
     # This is the product/channel.
     # e.g. "firefox.desktop.stable", "firefox.mobile.aurora", etc.
@@ -26,16 +42,23 @@ class Response(ModelBase):
     url = models.URLField(verify_exists=False, blank=True)
     description = models.TextField(blank=True)
 
-    # Inferred data
+    # Translation into English of the description
+    translated_description = models.TextField(blank=True)
+
+    # Data inferred from urls or explicitly stated by the thing saving
+    # the data (webform, client of the api, etc)
+    product = models.CharField(max_length=30, blank=True)
+    channel = models.CharField(max_length=30, blank=True)
+    version = models.CharField(max_length=30, blank=True)
+    locale = models.CharField(max_length=8, blank=True)
+    manufacturer = models.CharField(max_length=255, blank=True)
+    device = models.CharField(max_length=255, blank=True)
+
+    # User agent and inferred data from the user agent
     user_agent = models.CharField(max_length=255, blank=True)
     browser = models.CharField(max_length=30, blank=True)
     browser_version = models.CharField(max_length=30, blank=True)
     platform = models.CharField(max_length=30, blank=True)
-    locale = models.CharField(max_length=8, blank=True)
-
-    # Device information for non-desktop Firefox browsers
-    manufacturer = models.CharField(max_length=255, blank=True)
-    device = models.CharField(max_length=255, blank=True)
 
     created = models.DateTimeField(default=datetime.now)
 
@@ -63,18 +86,18 @@ class Response(ModelBase):
     def get_mapping_type(self):
         return ResponseMappingType
 
-    @property
-    def product(self):
-        """The product for this response"""
+    @classmethod
+    def infer_product(cls, platform):
+        if platform == u'FirefoxOS':
+            return u'Firefox OS'
 
-        # TODO: This is a hack.
-        if self.platform == u'FirefoxOS':
-            product = u'Firefox OS'
-        elif self.platform == u'Android':
-            product = u'Firefox for Android'
-        else:
-            product = u'Firefox'
-        return product
+        elif platform == u'Android':
+            return u'Firefox for Android'
+
+        elif platform == u'Unknown':
+            return u'Unknown'
+
+        return u'Firefox'
 
 
 @register_mapping_type
@@ -93,6 +116,8 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'description': text_type(),
             'user_agent': keyword_type(),
             'product': keyword_type(),
+            'channel': keyword_type(),
+            'version': keyword_type(),
             'browser': keyword_type(),
             'browser_version': keyword_type(),
             'platform': keyword_type(),
@@ -115,6 +140,8 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'description': obj.description,
             'user_agent': obj.user_agent,
             'product': obj.product,
+            'channel': obj.channel,
+            'version': obj.version,
             'browser': obj.browser,
             'browser_version': obj.browser_version,
             'platform': obj.platform,

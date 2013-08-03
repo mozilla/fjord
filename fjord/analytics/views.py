@@ -216,7 +216,7 @@ def generate_dashboard_atom_url(request):
     # page, start_date, end_date, etc.
     for mem in qd.keys():
         if mem not in ('happy', 'locale', 'platform', 'product',
-                       'browser_version', 'q'):
+                       'version', 'q'):
             del qd[mem]
 
     qd['format'] = 'atom'
@@ -236,7 +236,7 @@ def dashboard(request, template):
     search_platform = request.GET.get('platform', None)
     search_locale = request.GET.get('locale', None)
     search_product = request.GET.get('product', None)
-    search_version = request.GET.get('browser_version', None)
+    search_version = request.GET.get('version', None)
     search_query = request.GET.get('q', None)
     search_date_start = smart_datetime(request.GET.get('date_start', None),
                                        fallback=None)
@@ -266,8 +266,8 @@ def dashboard(request, template):
         if search_version:
             # Note: We only filter on version if we're filtering on
             # product.
-            f &= F(browser_version=search_version)
-            current_search['browser_version'] = search_version
+            f &= F(version=search_version)
+            current_search['version'] = search_version
 
     if search_date_start is None and search_date_end is None:
         selected = '7d'
@@ -313,7 +313,7 @@ def dashboard(request, template):
 
     # Navigation facet data
     facets = search.facet(
-        'happy', 'platform', 'locale', 'product', 'browser_version',
+        'happy', 'platform', 'locale', 'product', 'version',
         filtered=bool(search._process_filters(f.filters)))
 
     # This loop does two things. First it maps 'T' -> True and 'F' ->
@@ -325,7 +325,7 @@ def dashboard(request, template):
         'platform': {},
         'locale': {},
         'product': {},
-        'browser_version': {}
+        'version': {}
     }
     for param, terms in facets.facet_counts().items():
         for term in terms:
@@ -351,13 +351,13 @@ def dashboard(request, template):
             display=_('Product'),
             checked=search_product)
     ]
-    # Only show the browser_version if we're showing a specific
+    # Only show the version if we're showing a specific
     # product.
     if search_product:
         filter_data.append(
             counts_to_options(
-                counts['browser_version'].items(),
-                name='browser_version',
+                counts['version'].items(),
+                name='version',
                 display=_('Version'),
                 checked=search_version)
         )

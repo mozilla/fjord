@@ -45,6 +45,13 @@ class TestFeedback(TestCase):
         eq_(u'http://mozilla.org/', feedback.url)
         eq_(True, feedback.happy)
 
+        # This comes from the client.post url.
+        eq_(u'en-US', feedback.locale)
+        # Note: This comes from the user agent from the LocalizingClient
+        eq_(u'Firefox', feedback.product)
+        eq_(u'stable', feedback.channel)
+        eq_(u'14.0.1', feedback.version)
+
     def test_valid_sad(self):
         """Submitting a valid sad form creates an item in the DB.
 
@@ -65,6 +72,13 @@ class TestFeedback(TestCase):
         eq_(u"Firefox doesn't make me sandwiches. :(", feedback.description)
         eq_(u'', feedback.url)
         eq_(False, feedback.happy)
+
+        # This comes from the client.post url.
+        eq_(u'en-US', feedback.locale)
+        # Note: This comes from the user agent from the LocalizingClient
+        eq_(u'Firefox', feedback.product)
+        eq_(u'stable', feedback.channel)
+        eq_(u'14.0.1', feedback.version)
 
     def test_invalid_form(self):
         """Submitting a bad form should return an error and not change pages."""
@@ -243,7 +257,9 @@ class TestFeedback(TestCase):
             'manufacturer': 'Rosetta'
             }
 
-        r = self.client.post(reverse('feedback'), data)
+        ua = 'Mozilla/5.0 (Android; Tablet; rv:24.0) Gecko/24.0 Firefox/24.0'
+
+        r = self.client.post(reverse('feedback'), data, HTTP_USER_AGENT=ua)
         eq_(r.status_code, 302)
         feedback = models.Response.objects.latest(field_name='id')
         eq_(feedback.happy, True)
@@ -251,6 +267,13 @@ class TestFeedback(TestCase):
         eq_(feedback.description, data['description'])
         eq_(feedback.device, data['device'])
         eq_(feedback.manufacturer, data['manufacturer'])
+
+        # This comes from the client.post url.
+        eq_(u'en-US', feedback.locale)
+        # Note: This comes from the user agent from the LocalizingClient
+        eq_(u'Firefox for Android', feedback.product)
+        eq_(u'stable', feedback.channel)
+        eq_(u'24.0.0', feedback.version)
 
     def test_deprecated_firefox_for_android_sad_is_sad(self):
         data = {
@@ -262,12 +285,21 @@ class TestFeedback(TestCase):
             'manufacturer': 'Rosetta'
             }
 
-        r = self.client.post(reverse('feedback'), data)
+        ua = 'Mozilla/5.0 (Android; Tablet; rv:24.0) Gecko/24.0 Firefox/24.0'
+
+        r = self.client.post(reverse('feedback'), data, HTTP_USER_AGENT=ua)
         eq_(r.status_code, 302)
         feedback = models.Response.objects.latest(field_name='id')
         eq_(feedback.happy, False)
         eq_(feedback.url, data['url'])
         eq_(feedback.description, data['description'])
+
+        # This comes from the client.post url.
+        eq_(u'en-US', feedback.locale)
+        # Note: This comes from the user agent from the LocalizingClient
+        eq_(u'Firefox for Android', feedback.product)
+        eq_(u'stable', feedback.channel)
+        eq_(u'24.0.0', feedback.version)
 
     def test_deprecated_firefox_for_android_ideas_are_sad(self):
         """We treat "sad" and "ideas" as sad feedback now."""
@@ -280,12 +312,21 @@ class TestFeedback(TestCase):
             'manufacturer': 'Rosetta'
             }
 
-        r = self.client.post(reverse('feedback'), data)
+        ua = 'Mozilla/5.0 (Android; Tablet; rv:24.0) Gecko/24.0 Firefox/24.0'
+
+        r = self.client.post(reverse('feedback'), data, HTTP_USER_AGENT=ua)
         eq_(r.status_code, 302)
         feedback = models.Response.objects.latest(field_name='id')
         eq_(feedback.happy, False)
         eq_(feedback.url, data['url'])
         eq_(feedback.description, data['description'])
+
+        # This comes from the client.post url.
+        eq_(u'en-US', feedback.locale)
+        # Note: This comes from the user agent from the LocalizingClient
+        eq_(u'Firefox for Android', feedback.product)
+        eq_(u'stable', feedback.channel)
+        eq_(u'24.0.0', feedback.version)
 
     def test_deprecated_firefox_for_android_minimal(self):
         """Test the minimal post data from FfA works."""
@@ -296,12 +337,21 @@ class TestFeedback(TestCase):
             'manufacturer': 'Rosetta'
             }
 
-        r = self.client.post(reverse('feedback'), data)
+        ua = 'Mozilla/5.0 (Android; Tablet; rv:24.0) Gecko/24.0 Firefox/24.0'
+
+        r = self.client.post(reverse('feedback'), data, HTTP_USER_AGENT=ua)
         eq_(r.status_code, 302)
         feedback = models.Response.objects.latest(field_name='id')
         eq_(feedback.happy, True)
         eq_(feedback.url, u'')
         eq_(feedback.description, data['description'])
+
+        # This comes from the client.post url.
+        eq_(u'en-US', feedback.locale)
+        # Note: This comes from the user agent from the LocalizingClient
+        eq_(u'Firefox for Android', feedback.product)
+        eq_(u'stable', feedback.channel)
+        eq_(u'24.0.0', feedback.version)
 
     def test_deprecated_firefox_for_android_phony_ua(self):
         """Test that phony user agents works. bug 855671."""
@@ -323,6 +373,13 @@ class TestFeedback(TestCase):
         eq_(feedback.browser, 'Unknown')
         eq_(feedback.browser_version, 'Unknown')
         eq_(feedback.platform, 'Unknown')
+
+        # This comes from the client.post url.
+        eq_(u'en-US', feedback.locale)
+        # Note: This comes from the user agent from the LocalizingClient
+        eq_(u'Unknown', feedback.product)
+        eq_(u'Unknown', feedback.channel)
+        eq_(u'Unknown', feedback.version)
 
 
 class TestCSRF(TestCase):
