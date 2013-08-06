@@ -22,6 +22,10 @@ def response(**kwargs):
         'browser': parsed.browser,
         'browser_version': parsed.browser_version,
         'platform': parsed.platform,
+
+        'product': Response.infer_product(parsed.platform),
+        'channel': u'stable',
+        'version': parsed.browser_version,
         'locale': u'en-US',
     }
 

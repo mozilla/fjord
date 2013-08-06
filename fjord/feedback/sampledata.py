@@ -65,6 +65,9 @@ USER_AGENTS = (
 
     # Android
     'Mozilla/5.0 (Android; Mobile; rv:14.0) Gecko/14.0 Firefox/14.0.2',
+
+    # Firefox OS
+    'Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0',
 )
 
 

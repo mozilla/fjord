@@ -72,17 +72,41 @@ def _handle_feedback_post(request):
             happy=data['happy'],
             url=data['url'],
             description=data['description'],
-            # Inferred data
+
+            # Inferred data from user agent
             prodchan=_get_prodchan(request),
             user_agent=request.META.get('HTTP_USER_AGENT', ''),
             browser=request.BROWSER.browser,
             browser_version=request.BROWSER.browser_version,
             platform=platform,
-            locale=request.locale,
+
+            # Data that comes form the user or is inferred
+            locale=data.get('locale', request.locale),
+
             # Data from mobile devices
             manufacturer=data.get('manufacturer', ''),
             device=data.get('device', ''),
         )
+
+        # This data is coming from the web form where we infer many
+        # things from the user agent. If the user agent is bogus, then
+        # the browser is 'Unknown'. If that's the case, then we can't
+        # infer anything useful for product, channel or version so we
+        # set them accordingly.
+        if opinion.browser == u'Unknown':
+            opinion.product = u'Unknown'
+            opinion.channel = u'Unknown'
+            opinion.version = u'Unknown'
+
+        else:
+            opinion.product = data.get(
+                'product', models.Response.infer_product(platform))
+            # For now, we assume everything is stable because we don't
+            # know otherwise.
+            opinion.channel = u'stable'
+            opinion.version = data.get(
+                'version', request.BROWSER.browser_version)
+
         opinion.save()
 
         if data['email_ok'] and data['email']:
