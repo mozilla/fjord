@@ -5,9 +5,9 @@ from fjord.feedback.models import Response
 
 
 class ResponseFeedbackAdmin(admin.ModelAdmin):
-    list_display = ('created', 'prodchan', 'happy', 'description',
-                    'user_agent', 'locale')
-    list_filter = ('prodchan', 'happy', 'locale')
+    list_display = ('created', 'product', 'channel', 'version', 'happy',
+                    'description', 'user_agent', 'locale')
+    list_filter = ('happy', 'product', 'locale')
     search_fields = ('description',)
 
     def queryset(self, request):
