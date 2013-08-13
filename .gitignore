@@ -24,3 +24,4 @@ tmp/*
 /node_modules/
 /locale/
 *.less.css
+james.ini
