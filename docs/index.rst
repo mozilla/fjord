@@ -23,6 +23,9 @@ Fjord is the software that runs http://input.mozilla.org/ .
 Part 1: Contributor's Guide
 ===========================
 
+Want to contribute to Input? Planning to hack on Input code? This is
+the section for you!
+
 .. toctree::
    :maxdepth: 1
 
@@ -36,8 +39,23 @@ Part 1: Contributor's Guide
    vendor
 
 
-Part 2: Maintaining The Site
+Part 2: Using the Site
+======================
+
+Are you an Input user? This is the section for you!
+
+.. toctree::
+   :maxdepth: 1
+
+   api
+
+
+Part 3: Maintaining The Site
 ============================
+
+Are you one of those super sekret gnomes that maintain the site
+through wintry blizzards and fiery summers? This is the section for
+you!
 
 .. toctree::
    :maxdepth: 1

@@ -28,3 +28,6 @@
 [submodule "vendor-local/src/dennis"]
 	path = vendor-local/src/dennis
 	url = https://github.com/willkg/dennis.git
+[submodule "vendor-local/src/django-rest-framework"]
+	path = vendor-local/src/django-rest-framework
+	url = https://github.com/tomchristie/django-rest-framework.git

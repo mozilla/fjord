@@ -3,6 +3,7 @@ from datetime import datetime
 from django.db import models
 
 from elasticutils.contrib.django import Indexable
+from rest_framework import serializers
 from tower import ugettext_lazy as _
 
 from fjord.base.models import ModelBase
@@ -157,3 +158,77 @@ class ResponseEmail(ModelBase):
 
     opinion = models.ForeignKey(Response)
     email = models.EmailField()
+
+
+class ResponseSerializer(serializers.Serializer):
+    """This handles incoming feedback
+
+    This handles responses as well as the additional data for response
+    emails.
+
+    """
+    happy = serializers.BooleanField(required=True)
+    url = serializers.URLField(required=False, default=u'')
+    description = serializers.CharField(required=True)
+
+    # Note: API clients don't provide a user_agent, so we skip that and
+    # browser since those don't make sense.
+
+    # product, channel, version, locale, platform
+    product = serializers.CharField(max_length=30, required=True)
+    channel = serializers.CharField(max_length=30, required=False, default=u'')
+    version = serializers.CharField(max_length=30, required=False, default=u'')
+    locale = serializers.CharField(max_length=8, required=False, default=u'')
+    platform = serializers.CharField(max_length=30, required=False, default=u'')
+
+    # device information
+    manufacturer = serializers.CharField(required=False, default=u'')
+    device = serializers.CharField(required=False, default=u'')
+
+    # user's email address
+    email = serializers.EmailField(required=False)
+
+    def restore_object(self, attrs, instance=None):
+        # Note: instance should never be anything except None here
+        # since we only accept POST and not PUT/PATCH.
+
+        # prodchan is composed of product + channel. This is a little
+        # goofy, but we can fix it later if we bump into issues with
+        # the contents.
+        prodchan = u'.'.join([
+            attrs['product'].lower().replace(' ', '') or 'unknown',
+            attrs['channel'].lower().replace(' ', '') or 'unknown'])
+
+        opinion = Response(
+            prodchan=prodchan,
+            happy=attrs['happy'],
+            url=attrs['url'].strip(),
+            description=attrs['description'].strip(),
+            user_agent=u'api',  # Hard-coded
+            product=attrs['product'].strip(),
+            channel=attrs['channel'].strip(),
+            version=attrs['version'].strip(),
+            platform=attrs['platform'].strip(),
+            locale=attrs['locale'].strip(),
+            manufacturer=attrs['manufacturer'].strip(),
+            device=attrs['device'].strip()
+        )
+
+        # If there is an email address, stash it on this instance so
+        # we can save it later in .save() and so it gets returned
+        # correctly in the response. This doesn't otherwise affect the
+        # Response model instance.
+        opinion.email = attrs.get('email', '').strip()
+
+        return opinion
+
+    def save(self, *args, **kwargs):
+        saved_obj = super(ResponseSerializer, self).save(*args, **kwargs)
+        if saved_obj.email:
+            opinion_email = ResponseEmail(
+                email=saved_obj.email,
+                opinion=saved_obj
+            )
+            opinion_email.save()
+
+        return saved_obj
