@@ -222,13 +222,14 @@ class ResponseSerializer(serializers.Serializer):
 
         return opinion
 
-    def save(self, *args, **kwargs):
-        saved_obj = super(ResponseSerializer, self).save(*args, **kwargs)
-        if saved_obj.email:
-            opinion_email = ResponseEmail(
-                email=saved_obj.email,
-                opinion=saved_obj
-            )
-            opinion_email.save()
+    def save_object(self, obj, **kwargs):
+        obj.save(**kwargs)
 
-        return saved_obj
+        if obj.email:
+            opinion_email = ResponseEmail(
+                email=obj.email,
+                opinion=obj
+            )
+            opinion_email.save(**kwargs)
+
+        return obj
