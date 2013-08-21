@@ -78,6 +78,17 @@ Dealing with errors in translated strings
 When we deploy a new version of Fjord, it updates the ``.po`` files and
 picks up newly translated strings.
 
+``.po`` files that have errors will not get compiled to ``.mo`` files
+and thus won't go to production and thus won't cause fires.
+
+Note that this doesn't mean that this locale will have no
+translations---we'll use the previously compiled ``.mo`` file.
+
+If there is no ``.mo`` file, then the deployment will compile
+a ``.mo`` file even if there are errors with the figuring that
+a problematic ``.mo`` file is better than nothing and that this
+should be an exceedingly rare occurrence.
+
 If ``.po`` files have errors, then those errors are noted in the
 postatus.txt files:
 
@@ -88,7 +99,14 @@ postatus.txt files:
 If there are errors in those files, we need to open up a bug in
 **Mozilla Localizations** -> *locale code* with the specifics.
 
-.. Note::
+Bug description template::
 
-   ``.po`` files that have errors will not get compiled to ``.mo`` files
-   and thus won't go to production and thus won't cause fires.
+    We found errors in the translated strings for Input. The
+    errors are as follows:
+
+    <paste errors here>
+
+    Until these errors are fixed, we can't deploy updates to
+    the strings for this locale.
+
+    If you have any questions, let me know.
