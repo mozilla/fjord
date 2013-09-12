@@ -13,7 +13,7 @@ from mobility.decorators import mobile_template
 from tower import ugettext as _
 
 from fjord.analytics.tools import JSONDatetimeEncoder, generate_query_parsed
-from fjord.base.helpers import locale_name
+from fjord.base.helpers import locale_name, to_date_string, to_datetime_string
 from fjord.base.util import smart_int, smart_datetime, epoch_milliseconds
 from fjord.feedback.models import Response, ResponseMappingType
 
@@ -143,9 +143,20 @@ def _zero_fill(start, end, data_sets, spacing=DAY_IN_MILLIS):
 def response_view(request, responseid, template):
     response = get_object_or_404(Response, id=responseid)
 
+    # We don't pass the response directly to the template and instead
+    # do some data tweaks here to make it more palatable for viewing.
     return render(request, template, {
-        'response': response,
-        'response_created': response.created.strftime('%Y-%m-%dT%H:%M:%S'),
+        'id': response.id,
+        'happy': response.happy,
+        'description': response.description,
+        'created_date': to_date_string(response.created),
+        'created_dt': to_datetime_string(response.created),
+        'created': response.created,
+        # TODO: These are not localized because they're both shown to
+        # the user and are used as a filter for search. We might want
+        # to fix that, but it's tricky.
+        'platform': response.platform or 'Unknown',
+        'locale': response.locale or 'Unknown',
     })
 
 

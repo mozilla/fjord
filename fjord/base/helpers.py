@@ -33,8 +33,8 @@ def to_json(data):
 
 
 @register.filter
-def locale_name(locale, native=False, default=_lazy('Unknown')):
-    """Convert a locale code into a human readable locale name."""
+def locale_name(locale, native=False, default=_lazy(u'Unknown')):
+    """Convert a locale code into a human readable locale name"""
     if locale in product_details.languages:
         display_locale = 'native' if native else 'English'
         return product_details.languages[locale][display_locale]

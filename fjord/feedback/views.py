@@ -10,6 +10,7 @@ from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
 from rest_framework import generics
 
+from fjord.base.browsers import UNKNOWN
 from fjord.base.util import smart_bool
 from fjord.feedback.forms import ResponseForm
 from fjord.feedback import models
@@ -48,10 +49,10 @@ def requires_firefox(func):
     @wraps(func)
     def _requires_firefox(request, *args, **kwargs):
         # Note: This is sort of a lie. What's going on here is that
-        # parse_ua only parses Firefox-y browsers. So if it's
-        # "Unknown" at this point, then it's not Firefox-y. If
-        # parse_ua ever changes, then this will cease to be true.
-        if request.BROWSER.browser == 'Unknown':
+        # parse_ua only parses Firefox-y browsers. So if it's UNKNOWN
+        # at this point, then it's not Firefox-y. If parse_ua ever
+        # changes, then this will cease to be true.
+        if request.BROWSER.browser == UNKNOWN:
             return HttpResponseRedirect(reverse('download-firefox'))
         return func(request, *args, **kwargs)
     return _requires_firefox
@@ -91,13 +92,13 @@ def _handle_feedback_post(request):
 
         # This data is coming from the web form where we infer many
         # things from the user agent. If the user agent is bogus, then
-        # the browser is 'Unknown'. If that's the case, then we can't
+        # the browser is UNKNOWN. If that's the case, then we can't
         # infer anything useful for product, channel or version so we
-        # set them accordingly.
-        if opinion.browser == u'Unknown':
-            opinion.product = u'Unknown'
-            opinion.channel = u'Unknown'
-            opinion.version = u'Unknown'
+        # set them to empty strings.
+        if opinion.browser == UNKNOWN:
+            opinion.product = u''
+            opinion.channel = u''
+            opinion.version = u''
 
         else:
             opinion.product = data.get(

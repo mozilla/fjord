@@ -55,7 +55,7 @@ class TestUserAgentDetection(object):
             'browser': 'Firefox',
             'browser_version': '14.0.2',
             'platform': 'Android',
-            'platform_version': 'Unknown',
+            'platform_version': '',
             'mobile': True,
         }
 

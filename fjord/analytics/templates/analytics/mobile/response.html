@@ -10,34 +10,32 @@
 {% block content %}
 <div class="col full">
   <div class="block feedback">
-    <h2>{{ _('Response id: {id}')|f(id=response.id) }}</h2>
+    <h2>{{ _('Response id: {id}')|f(id=id) }}</h2>
 
     <ul>
       <li class="opinion">
-        {% if response.happy %}
+        {% if happy %}
         <span class="sprite happy">{{ _('Happy') }}</span>
         {% else %}
         <span class="sprite sad">{{ _('Sad') }}</span>
         {% endif %}
         <p>
-          {{ response.description }}
+          {{ description }}
         </p>
         <ul class="meta">
 {# Note: This next line says it's -0800/PST, but the server time is
    Pacific and "celebrates" daylight savings so it's a villainous lie
    for all datetimes in PDT. #}
           <li>
-            {% set created_date = to_date_string(response.created) %}
-            {% set created_dt = to_datetime_string(response.created) %}
             <a href="{{ url('dashboard')|urlparams(date_start=created_dt) }}">
               <time datetime="{{ created_date }}-08:00" title="{{ created_date }} PST">
-                {{ response.created|naturaltime }}
+                {{ created|naturaltime }}
               </time>
             </a>
           </li>
-          <li><a href="{{ url('dashboard')|urlparams(platform=response.platform) }}">{{ response.platform }}</a></li>
-          <li><a href="{{ url('dashboard')|urlparams(locale=response.locale) }}">{{ response.locale|locale_name }}</a></li>
-          <li><a href="{{ url('response_view', responseid=response.id) }}">{{ _('Permalink') }}</a></li>
+          <li><a href="{{ url('dashboard')|urlparams(platform=platform) }}">{{ platform }}</a></li>
+          <li><a href="{{ url('dashboard')|urlparams(locale=locale) }}">{{ locale|locale_name }}</a></li>
+          <li><a href="{{ url('response_view', responseid=id) }}">{{ _('Permalink') }}</a></li>
         </ul>
       </li>
     </ul>

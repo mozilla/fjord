@@ -95,8 +95,8 @@ class Response(ModelBase):
         elif platform == u'Android':
             return u'Firefox for Android'
 
-        elif platform == u'Unknown':
-            return u'Unknown'
+        elif platform in (u'', u'Unknown'):
+            return u''
 
         return u'Firefox'
 
@@ -133,6 +133,9 @@ class ResponseMappingType(FjordMappingType, Indexable):
         if obj is None:
             obj = cls.get_model().objects.get(pk=obj_id)
 
+        def empty_to_unknown(text):
+            return u'Unknown' if text == u'' else text
+
         return {
             'id': obj.id,
             'prodchan': obj.prodchan,
@@ -140,15 +143,15 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'url': obj.url,
             'description': obj.description,
             'user_agent': obj.user_agent,
-            'product': obj.product,
-            'channel': obj.channel,
-            'version': obj.version,
-            'browser': obj.browser,
-            'browser_version': obj.browser_version,
-            'platform': obj.platform,
-            'locale': obj.locale,
-            'device': obj.device,
-            'manufacturer': obj.manufacturer,
+            'product': empty_to_unknown(obj.product),
+            'channel': empty_to_unknown(obj.channel),
+            'version': empty_to_unknown(obj.version),
+            'browser': empty_to_unknown(obj.browser),
+            'browser_version': empty_to_unknown(obj.browser_version),
+            'platform': empty_to_unknown(obj.platform),
+            'locale': empty_to_unknown(obj.locale),
+            'device': empty_to_unknown(obj.device),
+            'manufacturer': empty_to_unknown(obj.manufacturer),
             'created': obj.created,
         }
 
