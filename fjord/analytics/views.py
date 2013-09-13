@@ -257,7 +257,7 @@ def dashboard(request, template):
 
     def unknown_to_empty(text):
         """Convert "Unknown" to "" to support old links"""
-        return u'' if text.lower() == u'Unknown' else text
+        return u'' if text.lower() == u'unknown' else text
 
     if search_platform is not None:
         f &= F(platform=unknown_to_empty(search_platform))
