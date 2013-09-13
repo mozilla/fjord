@@ -16,7 +16,7 @@ WINDOWS_VERSION = {
     'Windows 98': ('Windows', '98'),
     'Windows 95': ('Windows', '95'),
 }
-UNKNOWN = 'Unknown'
+UNKNOWN = ''
 
 Browser = namedtuple('Browser', [
     'browser', 'browser_version', 'platform', 'platform_version',
@@ -66,6 +66,8 @@ def parse_ua(ua):
     match = re.match(r'^Mozilla[^(]+\(([^)]+)\) (.+)', ua)
 
     if match is None:
+        # If match is None here, then this is not a UA we can infer
+        # browser information from, so we return unknown.
         return no_browser
 
     # The part in parenthesis is semi-colon seperated

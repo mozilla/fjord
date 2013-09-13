@@ -370,16 +370,16 @@ class TestFeedback(TestCase):
                              HTTP_USER_AGENT=ua)
         eq_(r.status_code, 302)
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(feedback.browser, 'Unknown')
-        eq_(feedback.browser_version, 'Unknown')
-        eq_(feedback.platform, 'Unknown')
+        eq_(feedback.browser, u'')
+        eq_(feedback.browser_version, u'')
+        eq_(feedback.platform, u'')
 
         # This comes from the client.post url.
-        eq_(u'en-US', feedback.locale)
-        # Note: This comes from the user agent from the LocalizingClient
-        eq_(u'Unknown', feedback.product)
-        eq_(u'Unknown', feedback.channel)
-        eq_(u'Unknown', feedback.version)
+        eq_(u'en-US', feedback.locale, u'en-US')
+        # This comes from the user agent from the LocalizingClient
+        eq_(feedback.product, u'')
+        eq_(feedback.channel, u'')
+        eq_(feedback.version, u'')
 
 
 class TestCSRF(TestCase):

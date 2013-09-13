@@ -95,8 +95,8 @@ class Response(ModelBase):
         elif platform == u'Android':
             return u'Firefox for Android'
 
-        elif platform == u'Unknown':
-            return u'Unknown'
+        elif platform in (u'', u'Unknown'):
+            return u''
 
         return u'Firefox'
 
@@ -132,6 +132,9 @@ class ResponseMappingType(FjordMappingType, Indexable):
     def extract_document(cls, obj_id, obj=None):
         if obj is None:
             obj = cls.get_model().objects.get(pk=obj_id)
+
+        def empty_to_unknown(text):
+            return u'Unknown' if text == u'' else text
 
         return {
             'id': obj.id,

@@ -4,7 +4,7 @@
        "browser": "Firefox",
        "browser_version": "14.0.2",
        "platform": "Android",
-       "platform_version": "Unknown",
+       "platform_version": "",
        "mobile": true
    },
    {
@@ -68,7 +68,7 @@
        "browser": "Firefox",
        "browser_version": "5.0.0",
        "platform": "FreeBSD",
-       "platform_version": "Unknown",
+       "platform_version": "",
        "mobile": false
    },
    {
@@ -76,7 +76,7 @@
        "browser": "Firefox",
        "browser_version": "4.0.1",
        "platform": "Linux",
-       "platform_version": "Unknown",
+       "platform_version": "",
        "mobile": false
    },
    {
@@ -84,7 +84,7 @@
        "browser": "Firefox",
        "browser_version": "10.0.1",
        "platform": "Linux",
-       "platform_version": "Unknown",
+       "platform_version": "",
        "mobile": false
    },
    {
@@ -92,7 +92,7 @@
        "browser": "Firefox",
        "browser_version": "14.0.1",
        "platform": "Linux",
-       "platform_version": "Unknown",
+       "platform_version": "",
        "mobile": false
    },
    {
@@ -100,7 +100,7 @@
        "browser": "Iceweasel",
        "browser_version": "5.0.0",
        "platform": "Linux",
-       "platform_version": "Unknown",
+       "platform_version": "",
        "mobile": false
    },
    {
@@ -108,7 +108,7 @@
        "browser": "Firefox",
        "browser_version": "18.0.0",
        "platform": "FirefoxOS",
-       "platform_version": "Unknown",
+       "platform_version": "",
        "mobile": true
    },
    {
