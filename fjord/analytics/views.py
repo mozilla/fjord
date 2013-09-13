@@ -146,17 +146,7 @@ def response_view(request, responseid, template):
     # We don't pass the response directly to the template and instead
     # do some data tweaks here to make it more palatable for viewing.
     return render(request, template, {
-        'id': response.id,
-        'happy': response.happy,
-        'description': response.description,
-        'created_date': to_date_string(response.created),
-        'created_dt': to_datetime_string(response.created),
-        'created': response.created,
-        # TODO: These are not localized because they're both shown to
-        # the user and are used as a filter for search. We might want
-        # to fix that, but it's tricky.
-        'platform': response.platform or 'Unknown',
-        'locale': response.locale or 'Unknown',
+        'response': response,
     })
 
 
@@ -264,20 +254,25 @@ def dashboard(request, template):
     if search_happy in [False, True]:
         f &= F(happy=search_happy)
         current_search['happy'] = int(search_happy)
-    if search_platform:
-        f &= F(platform=search_platform)
+
+    def unknown_to_empty(text):
+        """Convert "Unknown" to "" to support old links"""
+        return u'' if text.lower() == u'Unknown' else text
+
+    if search_platform is not None:
+        f &= F(platform=unknown_to_empty(search_platform))
         current_search['platform'] = search_platform
-    if search_locale:
-        f &= F(locale=search_locale)
+    if search_locale is not None:
+        f &= F(locale=unknown_to_empty(search_locale))
         current_search['locale'] = search_locale
-    if search_product:
-        f &= F(product=search_product)
+    if search_product is not None:
+        f &= F(product=unknown_to_empty(search_product))
         current_search['product'] = search_product
 
-        if search_version:
+        if search_version is not None:
             # Note: We only filter on version if we're filtering on
             # product.
-            f &= F(version=search_version)
+            f &= F(version=unknown_to_empty(search_version))
             current_search['version'] = search_version
 
     if search_date_start is None and search_date_end is None:
@@ -348,6 +343,9 @@ def dashboard(request, template):
 
             counts[param][name] = term['count']
 
+    def empty_to_unknown(text):
+        return _('Unknown') if text == u'' else text
+
     filter_data = [
         counts_to_options(
             counts['happy'].items(),
@@ -360,6 +358,7 @@ def dashboard(request, template):
             counts['product'].items(),
             name='product',
             display=_('Product'),
+            display_map=empty_to_unknown,
             checked=search_product)
     ]
     # Only show the version if we're showing a specific
@@ -370,6 +369,7 @@ def dashboard(request, template):
                 counts['version'].items(),
                 name='version',
                 display=_('Version'),
+                display_map=empty_to_unknown,
                 checked=search_version)
         )
 
@@ -379,6 +379,7 @@ def dashboard(request, template):
                 counts['platform'].items(),
                 name='platform',
                 display=_('Platform'),
+                display_map=empty_to_unknown,
                 checked=search_platform),
             counts_to_options(
                 counts['locale'].items(),

@@ -114,7 +114,8 @@ class TestDashboardView(ElasticTestCase):
         # every test gives an explicit date range, and that is
         # annoying and verbose.
         items = [
-            (True, 'Windows XP', 'en-US', 'apple', now - timedelta(days=6)),
+            # happy, platform, locale, description, created
+            (True, '', 'en-US', 'apple', now - timedelta(days=6)),
             (True, 'Windows 7', 'es', 'banana', now - timedelta(days=5)),
             (True, 'Linux', 'en-US', 'orange', now - timedelta(days=4)),
             (True, 'Linux', 'en-US', 'apple', now - timedelta(days=3)),
@@ -215,6 +216,21 @@ class TestDashboardView(ElasticTestCase):
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 0)
 
+    def test_empty_and_unknown(self):
+        url = reverse('dashboard')
+
+        # Empty value should work
+        r = self.client.get(url, {'platform': ''})
+        eq_(r.status_code, 200)
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 1)
+
+        # "Unknown" value should also work
+        r = self.client.get(url, {'platform': ''})
+        eq_(r.status_code, 200)
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 1)
+
     def test_version_noop(self):
         """version has no effect if product isn't set"""
         url = reverse('dashboard')
@@ -308,11 +324,6 @@ class TestDashboardView(ElasticTestCase):
         eq_(len(pq('li.opinion')), 7)
         # Unknown parameters should be ignored.
         r = self.client.get(url, {'apples': 'oranges'})
-        eq_(r.status_code, 200)
-        pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 7)
-        # An empty query string shouldn't be treated like a search.
-        r = self.client.get(url, {'platform': ''})
         eq_(r.status_code, 200)
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 7)
