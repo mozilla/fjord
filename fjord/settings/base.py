@@ -17,7 +17,6 @@ ROOT_URLCONF = '%s.urls' % PROJECT_MODULE
 # Note: When you change this, please change the API docs, too!
 VALID_PRODUCTS = [
     # (Value to store, Human readable)
-    (u'', u'Unknown'),
     (u'Firefox OS', u'Firefox OS'),
     (u'Firefox for Android', u'Firefox for Android'),
     (u'Firefox', u'Firefox'),
