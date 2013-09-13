@@ -151,6 +151,21 @@ class TestFeedbackAPI(TestCase):
         eq_(r.status_code, 400)
         assert 'product' in r.content
 
+    def test_invalid_product_returns_400(self):
+        data = {
+            'happy': True,
+            'channel': u'stable',
+            'version': u'1.1',
+            'description': u'Great!',
+            'product': u'Nurse Kitty',
+            'platform': u'FirefoxOS',
+            'locale': 'en-US',
+        }
+
+        r = self.client.post(reverse('api-post-feedback'), data)
+        eq_(r.status_code, 400)
+        assert 'product' in r.content
+
     def test_throttle(self):
         # This test is a little goofy. Essentially we figure out what
         # the throttle trigger is, post that many times, then post

@@ -13,16 +13,18 @@ Testing clients using the API
 .. Warning::
 
    **DO NOT TEST YOUR CLIENT AGAINST OUR PRODUCTION SERVER. IT WILL
-   MAKE CHENG CROSS.**
+   MAKE CHENG, MATT, TYLER AND I CROSS.**
 
 
 Seriously. Please don't test your client against our production
 server.
 
 Test your client against our stage server which runs the same code
-that our production server does. The url for the our stage server is:
+that our production server does. The url for the our stage server is::
 
     https://input.allizom.org/
+                  ^^^^^^^
+
 
 Please make sure to use the right domain!
 
@@ -53,6 +55,16 @@ Posting feedback
         String. The name of the product the user is giving feedback on.
 
         Examples: ``"Firefox for Android"``, ``"Firefox OS"``
+
+        Current valid choices are:
+
+        * `''` (empty string)
+        * `'Firefox OS'`
+        * `'Firefox for Android'`
+        * `'Firefox'`
+
+        Those changes are case-sensitive and must appear exactly like
+        that.
 
 
 **Optional fields**

@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.conf import settings
 from django.db import models
 
 from elasticutils.contrib.django import Indexable
@@ -178,7 +179,8 @@ class ResponseSerializer(serializers.Serializer):
     # browser since those don't make sense.
 
     # product, channel, version, locale, platform
-    product = serializers.CharField(max_length=30, required=True)
+    product = serializers.ChoiceField(choices=settings.VALID_PRODUCTS,
+                                      required=True)
     channel = serializers.CharField(max_length=30, required=False, default=u'')
     version = serializers.CharField(max_length=30, required=False, default=u'')
     locale = serializers.CharField(max_length=8, required=False, default=u'')
