@@ -226,7 +226,7 @@ class TestDashboardView(ElasticTestCase):
         eq_(len(pq('li.opinion')), 1)
 
         # "Unknown" value should also work
-        r = self.client.get(url, {'platform': ''})
+        r = self.client.get(url, {'platform': 'Unknown'})
         eq_(r.status_code, 200)
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 1)
