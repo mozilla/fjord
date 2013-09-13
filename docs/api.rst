@@ -63,7 +63,7 @@ Posting feedback
         * `'Firefox for Android'`
         * `'Firefox'`
 
-        Those changes are case-sensitive and must appear exaclty like
+        Those changes are case-sensitive and must appear exactly like
         that.
 
 
