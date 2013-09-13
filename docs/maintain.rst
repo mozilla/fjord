@@ -2,6 +2,10 @@
  Maintaining Fjord and Input
 =============================
 
+.. contents::
+   :local:
+
+
 Onboarding a new developer
 ==========================
 
@@ -32,6 +36,15 @@ Onboarding a new developer
    <http://mozweb.readthedocs.org/en/latest/>`_, now is a good time
 
 10. Bask in the tranquil rhythmic sounds of the Fjord
+
+
+Adding a new product choice to the API
+======================================
+
+To add a new product choice to the API, do this:
+
+1. Add the new value to ``VALID_PRODUCTS`` in ``fjord/settings/base.py``
+2. Add the value to the docs at ``docs/api.rst``
 
 
 Adding a new locale
