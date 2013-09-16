@@ -4,10 +4,26 @@ from django.core.exceptions import PermissionDenied
 from fjord.feedback.models import Response
 
 
+class EmptyFriendlyAVFLF(admin.AllValuesFieldListFilter):
+    def choices(self, cl):
+        """Displays empty string as <Empty>
+
+        This makes it possible to choose Empty in the filter
+        list. Otherwise empty strings display as '' and don't get any
+        height and thus aren't selectable.
+
+        """
+        for choice in super(EmptyFriendlyAVFLF, self).choices(cl):
+            if choice.get('display') == '':
+                choice['display'] = '<Empty>'
+            yield choice
+
+
 class ResponseFeedbackAdmin(admin.ModelAdmin):
     list_display = ('created', 'product', 'channel', 'version', 'happy',
                     'description', 'user_agent', 'locale')
-    list_filter = ('happy', 'product', 'locale')
+    list_filter = ('happy', ('product', EmptyFriendlyAVFLF),
+                   ('locale', EmptyFriendlyAVFLF))
     search_fields = ('description',)
 
     def queryset(self, request):
