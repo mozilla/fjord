@@ -8,13 +8,13 @@ class Migration(DataMigration):
     def forwards(self, orm):
         # Change "Unknown" to "" in version column
 
-        print 'version', orm.Response.objects.filter(version=u'Unknown').update(version=u'')
+        print '0011: version updated', orm.Response.objects.filter(version=u'Unknown').update(version=u'')
 
     def backwards(self, orm):
         # NB: This is technically not a perfect backwards migration since
         # we don't have the original values for those columns.
 
-        print 'version', orm.Response.objects.filter(version=u'').update(version=u'Unknown')
+        print '0011: version updated', orm.Response.objects.filter(version=u'').update(version=u'Unknown')
 
     models = {
         'feedback.response': {

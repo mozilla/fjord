@@ -11,7 +11,7 @@ class Migration(DataMigration):
 
         for col in ('platform', 'product', 'channel', 'browser',
                     'browser_version'):
-            print col, orm.Response.objects.filter(**{col: u'Unknown'}).update(**{col: u''})
+            print '0010:', col, orm.Response.objects.filter(**{col: u'Unknown'}).update(**{col: u''})
 
     def backwards(self, orm):
         # NB: This is technically not a perfect backwards migration since
@@ -19,7 +19,7 @@ class Migration(DataMigration):
 
         for col in ('platform', 'product', 'channel', 'browser',
                     'browser_version'):
-            print col, orm.Response.objects.filter(**{col: u''}).update(**{col: u'Unknown'})
+            print '0010:', col, orm.Response.objects.filter(**{col: u''}).update(**{col: u'Unknown'})
 
     models = {
         'feedback.response': {

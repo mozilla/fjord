@@ -52,7 +52,7 @@ class Migration(DataMigration):
                         resp.browser_version = fxos_version
                         resp.save()
 
-        print '{0} fixed'.format(working_set.count())
+        print '0012: {0} fixed'.format(working_set.count())
 
     def backwards(self, orm):
         working_set = orm.Response.objects.filter(product=u'Firefox OS')
@@ -69,7 +69,7 @@ class Migration(DataMigration):
                         resp.browser_version = fx_version
                         resp.save()
 
-        print '{0} fixed'.format(working_set.count())
+        print '0012: {0} fixed'.format(working_set.count())
 
     models = {
         'feedback.response': {
