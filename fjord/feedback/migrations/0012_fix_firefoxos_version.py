@@ -1,20 +1,66 @@
 # -*- coding: utf-8 -*-
-import datetime
+import re
+
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
 
+
+# copied and slimmed down from fjord/base/browsers.py
+GECKO_TO_FIREFOXOS_VERSION = {
+    '18.0': '1.0',
+    '18.1': '1.1',
+    '26.0': '1.2'
+}
+
+
+def get_browser_parts(ua):
+    """Return browser parts portion of user agent"""
+    match = re.match(r'^Mozilla[^(]+\(([^)]+)\) (.+)', ua)
+
+    if match is None:
+        return []
+
+    # The rest is space seperated A/B pairs. Pull out both sides of
+    # the slash.
+    # Result: [['Gecko', '14.0'], ['Firefox', '14.0.2']]
+    browser_parts = [p.split('/') for p in match.group(2).split(' ')]
+
+    return browser_parts
+
+
 class Migration(DataMigration):
     def forwards(self, orm):
-        # Change "Unknown" to "" in version column
+        working_set = orm.Response.objects.filter(product=u'Firefox OS')
 
-        print '0011: version updated', orm.Response.objects.filter(version=u'Unknown').update(version=u'')
+        for resp in working_set:
+            parts = get_browser_parts(resp.user_agent)
+            for part in parts:
+                if 'Gecko' in part and len(part) > 1:
+                    fxos_version = GECKO_TO_FIREFOXOS_VERSION.get(part[1])
+                    if fxos_version is not None:
+                        resp.version = fxos_version
+                        resp.browser_version = fxos_version
+                        resp.save()
+
+        print '0012: {0} fixed'.format(working_set.count())
 
     def backwards(self, orm):
-        # NB: This is technically not a perfect backwards migration since
-        # we don't have the original values for those columns.
+        working_set = orm.Response.objects.filter(product=u'Firefox OS')
 
-        print '0011: version updated', orm.Response.objects.filter(version=u'').update(version=u'Unknown')
+        for resp in working_set:
+            parts = get_browser_parts(resp.user_agent)
+            for part in parts:
+                if 'Firefox' in part and len(part) > 1:
+                    fx_version = part[1]
+                    if fx_version is not None:
+                        if len(fx_version.split('.')) == 2:
+                            fx_version = fx_version + '.0'
+                        resp.version = fx_version
+                        resp.browser_version = fx_version
+                        resp.save()
+
+        print '0012: {0} unfixed'.format(working_set.count())
 
     models = {
         'feedback.response': {

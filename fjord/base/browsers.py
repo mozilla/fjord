@@ -16,6 +16,13 @@ WINDOWS_VERSION = {
     'Windows 98': ('Windows', '98'),
     'Windows 95': ('Windows', '95'),
 }
+
+GECKO_TO_FIREFOXOS_VERSION = {
+    '18.0': '1.0',
+    '18.1': '1.1',
+    '26.0': '1.2'
+}
+
 UNKNOWN = ''
 
 Browser = namedtuple('Browser', [
@@ -124,6 +131,17 @@ def parse_ua(ua):
     # uniquely identify it.
     if platform == 'Mobile':
         platform = 'FirefoxOS'
+
+        # Now try to infer the FirefoxOS version from the Gecko
+        # version. If we can, then we set the browser,
+        # browser_version and platform_version.
+        for part in browser_parts:
+            if 'Gecko' in part and len(part) > 1:
+                fxos_version = GECKO_TO_FIREFOXOS_VERSION.get(part[1])
+                if fxos_version is not None:
+                    browser = "Firefox OS"
+                    browser_version = fxos_version
+                    platform_version = fxos_version
 
     # Make sure browser_version is at least x.y.z
     if browser_version != UNKNOWN:

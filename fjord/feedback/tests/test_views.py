@@ -80,6 +80,33 @@ class TestFeedback(TestCase):
         eq_(u'stable', feedback.channel)
         eq_(u'14.0.1', feedback.version)
 
+    def test_valid_happy_firefoxos(self):
+        """Happy feedback from FirefoxOS works"""
+        amount = models.Response.objects.count()
+
+        url = reverse('feedback')
+        ua = 'Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0'
+
+        data = {
+            'happy': 1,
+            'description': u'Firefox rocks!',
+            'url': u'http://mozilla.org/'
+        }
+
+        r = self.client.post(url, data, HTTP_USER_AGENT=ua)
+
+        self.assertRedirects(r, reverse('thanks'))
+        eq_(amount + 1, models.Response.objects.count())
+
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(u'Firefox rocks!', feedback.description)
+        eq_(u'http://mozilla.org/', feedback.url)
+        eq_(True, feedback.happy)
+
+        # Make sure product and inferred version are correct
+        eq_(u'Firefox OS', feedback.product)
+        eq_(u'1.0.0', feedback.version)
+
     def test_invalid_form(self):
         """Submitting a bad form should return an error and not change pages."""
         url = reverse('feedback', args=('firefox.desktop.stable',))
