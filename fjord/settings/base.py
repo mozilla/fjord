@@ -13,15 +13,6 @@ PROJECT_MODULE = 'fjord'
 # Defines the views served for root URLs.
 ROOT_URLCONF = '%s.urls' % PROJECT_MODULE
 
-# List of valid products accepted by the Input API
-# Note: When you change this, please change the API docs, too!
-VALID_PRODUCTS = [
-    # (Value to store, Human readable)
-    (u'Firefox OS', u'Firefox OS'),
-    (u'Firefox for Android', u'Firefox for Android'),
-    (u'Firefox', u'Firefox'),
-]
-
 # This is the list of languages that are active for non-DEV
 # environments. Add languages here to allow users to see the site in
 # that locale and additionally submit feedback in that locale.
