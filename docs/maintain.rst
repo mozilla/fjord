@@ -43,7 +43,7 @@ Adding a new product choice to the API
 
 To add a new product choice to the API, do this:
 
-1. Add the new value to ``VALID_PRODUCTS`` in ``fjord/settings/base.py``
+1. Add the new value to ``PRODUCTS`` in ``fjord/feedback/config.py``
 2. Add the value to the docs at ``docs/api.rst``
 
 

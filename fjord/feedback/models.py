@@ -9,6 +9,7 @@ from tower import ugettext_lazy as _
 
 from fjord.base.models import ModelBase
 from fjord.base.util import smart_truncate
+from fjord.feedback import config
 from fjord.search.index import (
     register_mapping_type, FjordMappingType,
     boolean_type, date_type, integer_type, keyword_type, text_type)
@@ -179,8 +180,7 @@ class ResponseSerializer(serializers.Serializer):
     # browser since those don't make sense.
 
     # product, channel, version, locale, platform
-    product = serializers.ChoiceField(choices=settings.VALID_PRODUCTS,
-                                      required=True)
+    product = serializers.ChoiceField(choices=config.PRODUCTS, required=True)
     channel = serializers.CharField(max_length=30, required=False, default=u'')
     version = serializers.CharField(max_length=30, required=False, default=u'')
     locale = serializers.CharField(max_length=8, required=False, default=u'')
