@@ -1,18 +1,9 @@
 # -*- coding: utf-8 -*-
 import re
-from collections import namedtuple
 
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
-
-
-# copied from fjord/feedback/config.py
-GECKO_TO_FIREFOXOS_VERSION = {
-    '18.0': '1.0',
-    '18.1': '1.1',
-    '26.0': '1.2'
-}
 
 
 # copied and slimmed down from fjord/base/browsers.py
@@ -28,7 +19,7 @@ def get_browser_parts(ua):
     match = re.match(r'^Mozilla[^(]+\(([^)]+)\) (.+)', ua)
 
     if match is None:
-        return None
+        return []
 
     # The rest is space seperated A/B pairs. Pull out both sides of
     # the slash.
@@ -69,7 +60,7 @@ class Migration(DataMigration):
                         resp.browser_version = fx_version
                         resp.save()
 
-        print '0012: {0} fixed'.format(working_set.count())
+        print '0012: {0} unfixed'.format(working_set.count())
 
     models = {
         'feedback.response': {
