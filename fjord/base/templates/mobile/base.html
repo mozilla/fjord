@@ -33,9 +33,11 @@
       </header>
     {% endblock site_header %}
 
-    <div class="content">
-      {% block content %}{% endblock %}
-    </div>
+    {% block content_block %}
+      <div class="content">
+        {% block content %}{% endblock %}
+      </div>
+    {% endblock content_block %}
 
     {% block site_js %}
       {{ js('base') }}

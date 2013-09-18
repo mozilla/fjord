@@ -54,6 +54,9 @@ class Response(ModelBase):
     channel = models.CharField(max_length=30, blank=True)
     version = models.CharField(max_length=30, blank=True)
     locale = models.CharField(max_length=8, blank=True)
+    country = models.CharField(max_length=4, blank=True, null=True,
+                               default=u'')
+
     manufacturer = models.CharField(max_length=255, blank=True)
     device = models.CharField(max_length=255, blank=True)
 

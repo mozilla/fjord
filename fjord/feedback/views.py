@@ -13,6 +13,7 @@ from rest_framework import generics
 from fjord.base.browsers import UNKNOWN
 from fjord.base.util import smart_bool
 from fjord.feedback.forms import ResponseForm
+from fjord.feedback import config
 from fjord.feedback import models
 
 
@@ -187,6 +188,14 @@ def mobile_stable_feedback(request):
     })
 
 
+@requires_firefox
+def firefox_os_stable_feedback(request):
+    return render(request, 'feedback/mobile/fxos_feedback.html', {
+        'countries': config.FIREFOX_OS_COUNTRIES,
+        'devices': config.FIREFOX_OS_DEVICES,
+    })
+
+
 @csrf_exempt
 @require_POST
 def android_about_feedback(request):
@@ -227,7 +236,7 @@ def android_about_feedback(request):
 feedback_routes = {
     'firefox.desktop.stable': desktop_stable_feedback,
     'firefox.android.stable': mobile_stable_feedback,
-    'firefox.fxos.stable': mobile_stable_feedback,
+    'firefox.fxos.stable': firefox_os_stable_feedback,
 }
 
 

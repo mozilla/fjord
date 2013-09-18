@@ -1,0 +1,221 @@
+{% extends "mobile/base.html" %}
+
+{% block site_css %}
+  {{ css('mobile/fxos_feedback') }}
+{% endblock %}
+
+{% block site_js %}
+  <script src="{{ settings.STATIC_URL }}js/lib/brick-1.0beta8.byob.min.js"></script>
+  {{ js('mobile/fxos_feedback') }}
+{% endblock %}
+
+{% block page_title %}{{ _('Submit Your Feedback') }}{% endblock %}
+
+{% block site_header %}{% endblock %}
+
+{% block content_block %}
+<x-deck>
+  <x-card id="intro">
+    <x-appbar>
+      <header>{{ _('Submit your feedback') }}</header>
+    </x-appbar>
+
+    <section>
+      <p>{{ _('Your feedback helps us improve Firefox OS.') }}</p>
+      <button class="happy">{{ _('Firefox OS made me happy') }}</button>
+      <button class="sad">{{ _('Firefox OS made me sad') }}</button>
+
+      <aside>
+        <span>
+        {% trans support_url='http://support.mozilla.org/' %}
+        If you need help or have a problem
+        with Firefox OS, please visit <a href="{{ support_url }}">Mozilla Support</a>.
+        {% endtrans %}
+        </span>
+      </aside>
+
+      <input type="hidden" name="happy" id="happy" value="0"/>
+    </section>
+  </x-card>
+
+  <x-card id="country">
+    <x-appbar>
+      <button class="back"></button>
+      <header>{{ _('Country') }}</header>
+    </x-appbar>
+
+    <section>
+      <p>
+        {{ _('In what country did you purchase your Firefox OS device?') }}
+      </p>
+      {% for value, display in countries %}
+        <label class="country">
+          <input type="radio" name="country" value="{{ value }}"/>
+          {{ display }}
+        </label>
+      {% endfor %}
+      <label class="country">
+        <input type="radio" name="country" value=""/>
+        {{ _('Other') }}
+      </label>
+      <button class="next btn submit">{{ _('Next') }}</button>
+      <input type="hidden" id="locale" name="locale" value="{{ request.locale }}"/>
+    </section>
+  </x-card>
+
+  <x-card id="device">
+    <x-appbar>
+      <button class="back"></button>
+      <header>{{ _('Device') }}</header>
+    </x-appbar>
+
+    <section>
+      <p>
+        {{ _('What Firefox OS device are you using?') }}
+      </p>
+      {% for value, display in devices %}
+        <label class="device">
+          <input type="radio" name="device" value="{{ value }}"/>
+          {{ display }}
+        </label>
+      {% endfor %}
+      <label class="device">
+        <input type="radio" name="device" value=""/>
+        {{ _('Other') }}
+      </label>
+      <button class="next btn submit">{{ _('Next') }}</button>
+    </section>
+  </x-card>
+
+  <x-card id="moreinfo">
+    <x-appbar>
+      <button class="back"></button>
+      <header>{{ _('Details') }}</header>
+    </x-appbar>
+
+    <section>
+      <label class="happy" for="description">
+        {{ _('Please describe what you liked.') }}
+      </label>
+      <label class="sad" for="description">
+        {{ _('Please describe your problem below and be as specific as you can.') }}
+      </label>
+
+      <p>
+        <textarea id="description" name="description" cols="40" rows="4"></textarea>
+      </p>
+
+      <p>
+        {% trans %}
+        The content of your feedback will be public, so please be
+        sure not to include any personal information.
+        {% endtrans %}
+      </p>
+      <button class="next btn submit">{{ _('Next') }}</button>
+    </section>
+  </x-card>
+
+  <x-card id="email">
+    <x-appbar>
+      <button class="back"></button>
+      <header>{{ _('Can we contact you?') }}</header>
+    </x-appbar>
+
+    <section>
+      <label class="email-ok">
+        <p>
+          <input id="email-ok" type="checkbox" name="email_ok"/>
+          {{ _('Check here to let us contact you to follow up on your feedback.') }}
+        </p>
+      </label>
+
+      <div class="email">
+        <label for="id_email">
+          {{ _('Email address (optional):') }}
+        </label>
+        <input type="text" id="email-input" name="email"/>
+        <p id="email-error" class="error">
+          {{ _('Please enter a valid email address.') }}
+        </p>
+      </div>
+
+      <p>
+        <span id="privacy-email">
+          {{ _("Don't worry, your email will always be kept private.") }}
+        </span>
+      </p>
+
+      <button class="complete btn submit">{{ _('Send Feedback') }}</button>
+    </section>
+  </x-card>
+
+  <x-card id="submitting">
+    <x-appbar>
+      <header>{{ _('Submitting!') }}</header>
+    </x-appbar>
+
+    <section>
+      <p>
+        {% trans %}
+        Submitting your feedback now. This may take a moment.
+        {% endtrans %}
+      </p>
+    </section>
+  </x-card>
+
+  <x-card id="thanks">
+    <x-appbar>
+      <header>{{ _('Success!') }}</header>
+    </x-appbar>
+
+    <section>
+      <p>
+        {% trans %}
+        Thank you for your feedback! We will use it to help us create a better
+        experience in future versions of Firefox OS.
+        {% endtrans %}
+      </p>
+      <p>
+        {% trans url='http://www.mozilla.org/contribute' %}
+        Learn how you can <a href="{{ url }}">make Firefox OS and Mozilla
+        better</a>.
+        {% endtrans %}
+      </p>
+    </section>
+  </x-card>
+
+  <x-card id="failure">
+    <x-appbar>
+      <header>{{ _('We\'re sorry!') }}</header>
+    </x-appbar>
+
+    <section>
+      <p>
+        {% trans %}
+        Something has happened and we can't submit your feedback. Feedback will
+        be saved on your device so you can try sending it again later.
+        {% endtrans %}
+      </p>
+      <button class="complete btn submit">{{ _('Try again') }}</button>
+      <button class="cancel btn submit">{{ _('Cancel') }}</button>
+    </section>
+  </x-card>
+
+  <x-card id="tryagain">
+    <x-appbar>
+      <header>{{ _('Try again') }}</header>
+    </x-appbar>
+
+    <section>
+      <p>
+        {% trans %}
+        You have unsubmitted feedback data. Would you like to try submitting
+        it again?
+        {% endtrans %}
+      </p>
+      <button class="complete btn submit">{{ _('Try again') }}</button>
+      <button class="cancel btn submit">{{ _('Cancel') }}</button>
+    </section>
+  </x-card>
+</x-deck>
+{% endblock %}
