@@ -64,6 +64,14 @@
        "mobile": false
    },
    {
+       "user_agent": "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0",
+       "browser": "Firefox",
+       "browser_version": "24.0.0",
+       "platform": "Windows",
+       "platform_version": "8.1",
+       "mobile": false
+   },
+   {
        "user_agent": "Mozilla/5.0 (X11; FreeBSD amd64; rv:5.0) Gecko/20100101 Firefox/5.0",
        "browser": "Firefox",
        "browser_version": "5.0.0",
