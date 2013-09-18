@@ -130,21 +130,29 @@ def parse_ua(ua):
     # platform."  It is the only platform to do this, so we can still
     # uniquely identify it.
     if platform == 'Mobile':
-        platform = 'FirefoxOS'
+        platform = 'Firefox OS'
+        browser = 'Firefox OS'
 
-        # Now try to infer the FirefoxOS version from the Gecko
-        # version. If we can, then we set the browser,
-        # browser_version and platform_version.
+        # Set versions to UNKNOWN. This handles the case where the
+        # version of Gecko doesn't line up with a Firefox OS product
+        # release.
+        browser_version = UNKNOWN
+        platform_version = UNKNOWN
+
+        # Now try to infer the Firefox OS version from the Gecko
+        # version. If we can, then we set the browser_version and
+        # platform_version.
         for part in browser_parts:
             if 'Gecko' in part and len(part) > 1:
                 fxos_version = GECKO_TO_FIREFOXOS_VERSION.get(part[1])
                 if fxos_version is not None:
-                    browser = "Firefox OS"
                     browser_version = fxos_version
                     platform_version = fxos_version
+                    break
 
-    # Make sure browser_version is at least x.y.z
-    if browser_version != UNKNOWN:
+    # Make sure browser_version is at least x.y.z for non-Firefox OS
+    # browsers.
+    if browser != 'Firefox OS' and browser_version != UNKNOWN:
         while browser_version.count('.') < 2:
             browser_version += '.0'
 

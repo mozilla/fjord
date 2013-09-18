@@ -106,9 +106,33 @@
    {
        "user_agent": "Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0",
        "browser": "Firefox OS",
-       "browser_version": "1.0.0",
-       "platform": "FirefoxOS",
+       "browser_version": "1.0",
+       "platform": "Firefox OS",
        "platform_version": "1.0",
+       "mobile": true
+   },
+   {
+       "user_agent": "Mozilla/5.0 (Mobile; rv:18.1) Gecko/18.1 Firefox/18.1",
+       "browser": "Firefox OS",
+       "browser_version": "1.1",
+       "platform": "Firefox OS",
+       "platform_version": "1.1",
+       "mobile": true
+   },
+   {
+       "user_agent": "Mozilla/5.0 (Mobile; rv:26.0) Gecko/26.0 Firefox/26.0",
+       "browser": "Firefox OS",
+       "browser_version": "1.2",
+       "platform": "Firefox OS",
+       "platform_version": "1.2",
+       "mobile": true
+   },
+   {
+       "user_agent": "Mozilla/5.0 (Mobile; rv:22.0) Gecko/22.0 Firefox/22.0",
+       "browser": "Firefox OS",
+       "browser_version": "",
+       "platform": "Firefox OS",
+       "platform_version": "",
        "mobile": true
    },
    {

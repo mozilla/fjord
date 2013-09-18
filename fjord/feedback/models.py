@@ -91,7 +91,7 @@ class Response(ModelBase):
 
     @classmethod
     def infer_product(cls, platform):
-        if platform == u'FirefoxOS':
+        if platform == u'Firefox OS':
             return u'Firefox OS'
 
         elif platform == u'Android':
