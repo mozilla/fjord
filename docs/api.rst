@@ -84,7 +84,7 @@ Posting feedback
         String. The name of the operating system/platform the product
         is running on.
 
-        Examples: ``"OS X"``, ``"Windows 8"``, ``"FirefoxOS"``,
+        Examples: ``"OS X"``, ``"Windows 8"``, ``"Firefox OS"``,
         ``"Android"``, ``"Linux"``
 
     **locale**

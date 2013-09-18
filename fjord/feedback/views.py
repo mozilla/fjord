@@ -135,7 +135,7 @@ def _get_prodchan(request):
 
     if meta.platform == 'Android':
         platform = 'android'
-    elif meta.platform == 'FirefoxOS':
+    elif meta.platform == 'Firefox OS':
         platform = 'fxos'
     elif product == 'firefox':
         platform = 'desktop'

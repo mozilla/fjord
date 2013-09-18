@@ -80,8 +80,8 @@ class TestFeedback(TestCase):
         eq_(u'stable', feedback.channel)
         eq_(u'14.0.1', feedback.version)
 
-    def test_valid_happy_firefoxos(self):
-        """Happy feedback from FirefoxOS works"""
+    def test_valid_happy_firefox_os(self):
+        """Happy feedback from Firefox OS works"""
         amount = models.Response.objects.count()
 
         url = reverse('feedback')
@@ -105,7 +105,9 @@ class TestFeedback(TestCase):
 
         # Make sure product and inferred version are correct
         eq_(u'Firefox OS', feedback.product)
-        eq_(u'1.0.0', feedback.version)
+        eq_(u'Firefox OS', feedback.platform)
+        eq_(u'1.0', feedback.version)
+        eq_(u'1.0', feedback.browser_version)
 
     def test_invalid_form(self):
         """Submitting a bad form should return an error and not change pages."""

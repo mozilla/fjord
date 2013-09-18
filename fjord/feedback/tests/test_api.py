@@ -33,7 +33,7 @@ class TestFeedbackAPI(TestCase):
             'product': u'Firefox OS',
             'channel': u'stable',
             'version': u'1.1',
-            'platform': u'FirefoxOS',
+            'platform': u'Firefox OS',
             'locale': 'en-US',
             'email': 'foo@example.com'
         }
@@ -63,7 +63,7 @@ class TestFeedbackAPI(TestCase):
             'product': u'Firefox OS',
             'channel': u'stable',
             'version': u'1.1',
-            'platform': u'FirefoxOS',
+            'platform': u'Firefox OS',
             'locale': 'en-US',
             'email': 'foo@example'
         }
@@ -80,7 +80,7 @@ class TestFeedbackAPI(TestCase):
             'product': u'Firefox OS',
             'channel': u'stable',
             'version': u'1.1',
-            'platform': u'FirefoxOS',
+            'platform': u'Firefox OS',
             'locale': 'en-US',
         }
 
@@ -96,7 +96,7 @@ class TestFeedbackAPI(TestCase):
             'description': u'Great!',
             'product': u'Firefox OS',
             'version': u'1.1',
-            'platform': u'FirefoxOS',
+            'platform': u'Firefox OS',
             'locale': 'en-US',
         }
 
@@ -115,7 +115,7 @@ class TestFeedbackAPI(TestCase):
     #     data = {
     #         'description': u'Great!',
     #         'version': u'1.1',
-    #         'platform': u'FirefoxOS',
+    #         'platform': u'Firefox OS',
     #         'locale': 'en-US',
     #     }
     #
@@ -129,7 +129,7 @@ class TestFeedbackAPI(TestCase):
             'product': u'Firefox OS',
             'channel': u'stable',
             'version': u'1.1',
-            'platform': u'FirefoxOS',
+            'platform': u'Firefox OS',
             'locale': 'en-US',
         }
 
@@ -143,7 +143,7 @@ class TestFeedbackAPI(TestCase):
             'channel': u'stable',
             'version': u'1.1',
             'description': u'Great!',
-            'platform': u'FirefoxOS',
+            'platform': u'Firefox OS',
             'locale': 'en-US',
         }
 
@@ -158,7 +158,7 @@ class TestFeedbackAPI(TestCase):
             'version': u'1.1',
             'description': u'Great!',
             'product': u'Nurse Kitty',
-            'platform': u'FirefoxOS',
+            'platform': u'Firefox OS',
             'locale': 'en-US',
         }
 
@@ -184,7 +184,7 @@ class TestFeedbackAPI(TestCase):
             'product': u'Firefox OS',
             'channel': u'stable',
             'version': u'1.1',
-            'platform': u'FirefoxOS',
+            'platform': u'Firefox OS',
             'locale': 'en-US',
         }
 
