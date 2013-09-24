@@ -114,12 +114,13 @@ If there are errors in those files, we need to open up a bug in
 
 Bug description template::
 
-    We found errors in the translated strings for Input. The
-    errors are as follows:
+    We found errors in the translated strings for Input (https://input.mozilla.org/).
+    The errors are as follows:
+
 
     <paste errors here>
 
-    Until these errors are fixed, we can't deploy updates to
-    the strings for this locale.
+
+    Until these errors are fixed, we can't deploy updates to the strings for this locale.
 
     If you have any questions, let me know.
