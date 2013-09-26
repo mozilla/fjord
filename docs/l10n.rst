@@ -9,7 +9,7 @@ Things to know about l10n
 =========================
 
 1. translations are done in `Verbatim
-   <https://localize.mozilla.org/>`_
+   <https://localize.mozilla.org/>`_ 
 
 2. translators are looking at our -dev environment to see the strings
    in use
@@ -18,8 +18,9 @@ Things to know about l10n
    minutes that updates the svn locale repository so that translators
    can see the latest stuff
 
-:svn url:    https://svn.mozilla.org/projects/l10n-misc/trunk/input/locale
-:viewvc svn: http://viewvc.svn.mozilla.org/vc/projects/l10n-misc/trunk/input/locale/
+:svn url:           https://svn.mozilla.org/projects/l10n-misc/trunk/input/locale
+:viewvc svn:        http://viewvc.svn.mozilla.org/vc/projects/l10n-misc/trunk/input/locale/
+:Input in Verbatim: https://localize.mozilla.org/projects/input/
 
 
 Installing localizations from svn
