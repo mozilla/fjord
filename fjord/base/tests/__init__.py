@@ -7,6 +7,7 @@ from django.test.utils import override_settings
 
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
+from selenium.webdriver.firefox import firefox_binary
 from nose import SkipTest
 
 from funfactory.urlresolvers import split_path, reverse
@@ -66,7 +67,14 @@ class SeleniumTestCase(LiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         try:
-            cls.webdriver = webdriver.Firefox()
+            firefox_path = getattr(settings, 'SELENIUM_FIREFOX_PATH', None)
+            if firefox_path:
+                firefox_bin = firefox_binary.FirefoxBinary(
+                    firefox_path=firefox_path)
+                kwargs = {'firefox_binary': firefox_bin}
+            else:
+                kwargs = {}
+            cls.webdriver = webdriver.Firefox(**kwargs)
         except (RuntimeError, WebDriverException):
             cls.skipme = True
 
