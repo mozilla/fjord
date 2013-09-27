@@ -18,11 +18,11 @@ function init() {
     $('x-deck')[0].shuffleNext();
   });
 
-  $('#country input.country-radio').on('change', function() {
+  $('#country input.country-radio').on('click', function() {
     $('x-deck')[0].shuffleNext();
   });
 
-  $('#device input.device-radio').on('change', function() {
+  $('#device input.device-radio').on('click', function() {
     $('x-deck')[0].shuffleNext();
   });
 
