@@ -2,8 +2,6 @@ from django import forms
 
 from tower import ugettext as _
 
-from fjord.feedback import config
-
 
 class URLInput(forms.TextInput):
     """Text field with HTML5 URL Input type."""
