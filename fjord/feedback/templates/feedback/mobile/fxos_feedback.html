@@ -93,16 +93,13 @@
         {{ _('Please describe what you liked.') }}
       </label>
       <label class="sad" for="description">
-        {{ _('Please describe your problem below.') }}
+        {{ _('Please describe your problem below and be as specific as you can.') }}
       </label>
 
       <p>
-        <textarea id="description" name="description" cols="40" rows="10"></textarea>
+        <textarea id="description" name="description" cols="40" rows="4"></textarea>
       </p>
 
-      <div class="feedback-message sad">
-        {{ _('Please be as specific as you can.') }}
-      </div>
       <p>
         {% trans %}
         The content of your feedback will be public, so please be

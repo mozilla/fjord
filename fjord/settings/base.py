@@ -241,7 +241,7 @@ MINIFY_BUNDLES = {
         ),
         'mobile/fxos_feedback': (
             'css/lib/normalize.css',
-            'css/lib/brick-1.0beta7.byob.min.css',
+            'css/lib/brick-1.0beta8.byob.min.css',
             'css/mobile/base.less',
             'css/mobile/fxos_feedback.less',
         ),
@@ -287,7 +287,7 @@ MINIFY_BUNDLES = {
         ),
         'mobile/fxos_feedback': (
             'js/lib/jquery.min.js',
-            'js/lib/brick-1.0beta7.byob.min.js',
+            'js/lib/brick-1.0beta8.byob.min.js',
             'js/mobile/fxos_feedback.js',
             'js/ga.js',
         ),
