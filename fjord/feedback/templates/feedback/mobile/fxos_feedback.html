@@ -149,27 +149,48 @@
     </x-appbar>
 
     <section>
-      <p>{{ _('Submitting!') }}</p>
+      <p>
+        {% trans %}
+        Submitting your feedback now. This may take a moment.
+        {% endtrans %}
+      </p>
     </section>
   </x-card>
 
   <x-card id="thanks">
     <x-appbar>
-      <header>{{ _('Thanks!') }}</header>
+      <header>{{ _('Success!') }}</header>
     </x-appbar>
 
     <section>
-      <p>{{ _('Thanks!') }}</p>
+      <p>
+        {% trans %}
+        Thank you for your feedback! We will use it to help us create a better
+        experience in future versions of Firefox OS.
+        {% endtrans %}
+      </p>
+      <p>
+        {% trans url='http://www.mozilla.org/contribute' %}
+        Learn how you can <a href="{{ url }}">make Firefox OS and Mozilla
+        better</a>.
+        {% endtrans %}
+      </p>
     </section>
   </x-card>
 
   <x-card id="failure">
     <x-appbar>
-      <header>{{ _('Oops!') }}</header>
+      <header>{{ _('We\'re sorry!') }}</header>
     </x-appbar>
 
     <section>
-      <p>{{ _('Oops!') }}</p>
+      <p>
+        {% trans %}
+        Something has happened and we can't submit your feedback. Feedback will
+        be saved on your device so you can try sending it again later.
+        {% endtrans %}
+      </p>
+      <button class="complete btn submit">{{ _('Try again') }}</button>
     </section>
   </x-card>
 </x-deck>

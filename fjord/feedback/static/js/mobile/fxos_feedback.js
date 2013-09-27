@@ -51,21 +51,25 @@ function init() {
       data['email'] = $('#email-input').val()
     }
 
+    console.log('submitting data');
     console.log(data);
+
     var numCards = $('x-deck')[0].numCards;
+    // Here's the order of cards so it's easier to do the math here.
     // email, submitting, thanks, failure
-    // -4     -3          -2      -1
+    // -4     -3          -2      -1       numCards
 
     $('x-deck')[0].shuffleTo(numCards-3);
 
-    var jqxhr = $.post('/api/v1/feedback/', data, function() {
+    var jqxhr = $.post(
+      '/api/v1/feedback/', data,
+      function(data, textStatus, jqXHR) {
         // on success
         $('x-deck')[0].shuffleTo(numCards-2);
-        console.log('success!');
-    })
-      .fail(function() {
-        $('x-deck')[0].shuffleTo(numCards-1);
-        console.log('failure!');
+      })
+        .fail(function(jqXHR, textStatus, errorThrown) {
+          $('x-deck')[0].shuffleTo(numCards-1);
+          console.log('submission failure. ' + textStatus);
       });
   });
 }
