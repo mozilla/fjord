@@ -46,18 +46,27 @@ function init() {
     };
 
     // FIXME - figure out Firefox OS version from Gecko version in UA
+
     if ($('#email-ok').val()) {
       data['email'] = $('#email-input').val()
     }
 
     console.log(data);
-    // var jqxhr = $.post(
-    //     '/api/v1/feedback/',
-    //     data,
-    //     function() {
-    //       // FIXME - redirect to thanks
-    //     },
-    //     'json');
+    var numCards = $('x-deck')[0].numCards;
+    // email, submitting, thanks, failure
+    // -4     -3          -2      -1
+
+    $('x-deck')[0].shuffleTo(numCards-3);
+
+    var jqxhr = $.post('/api/v1/feedback/', data, function() {
+        // on success
+        $('x-deck')[0].shuffleTo(numCards-2);
+        console.log('success!');
+    })
+      .fail(function() {
+        $('x-deck')[0].shuffleTo(numCards-1);
+        console.log('failure!');
+      });
   });
 }
 
