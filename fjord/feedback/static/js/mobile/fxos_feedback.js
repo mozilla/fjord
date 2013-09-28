@@ -1,7 +1,6 @@
 (function() {
 
 function init() {
-
   $('#intro').on('click', 'button', function() {
     var happy = $(this).hasClass('happy');
 
@@ -15,10 +14,6 @@ function init() {
     $('x-deck')[0].shufflePrev();
   });
 
-  $('#moreinfo button.next').on('click', function() {
-    $('x-deck')[0].shuffleNext();
-  });
-
   $('#country input:radio').on('click', function(ev) {
     if (window.localStorage) {
       localStorage['country'] = $('#country input:radio:checked').val();
@@ -30,6 +25,10 @@ function init() {
     if (window.localStorage) {
       localStorage['device'] = $('#device input:radio:checked').val();
     }
+    $('x-deck')[0].shuffleNext();
+  });
+
+  $('#moreinfo button.next').on('click', function() {
     $('x-deck')[0].shuffleNext();
   });
 
@@ -78,12 +77,9 @@ function init() {
       data['email'] = $('#email-input').val()
     }
 
-    console.log('submitting data');
-    console.log(data);
-
     numCards = $('x-deck')[0].numCards;
 
-    // Here's the order of cards so it's easier to do the math here.
+    // here's the order of cards so it's easier to do the math here.
     // email, submitting, thanks, failure
     // -4     -3          -2      -1       numCards
     $('x-deck')[0].shuffleTo(numCards-3);
@@ -94,25 +90,28 @@ function init() {
         // on success
         $('x-deck')[0].shuffleTo(numCards-2);
         if (window.localStorage) {
+          // wipe these two things on success figuring they're likely
+          // to change them next time
           localStorage.removeItem('emailok');
           localStorage.removeItem('description');
         }
       })
         .fail(function(jqXHR, textStatus, errorThrown) {
+          // persist state so they can try again later
           if (window.localStorage) {
             if ($('#email-ok').is(':checked')) {
               localStorage['emailok'] = true;
-              console.log('emailok');
             }
             localStorage['description'] = $('#description').val();
           }
 
           $('x-deck')[0].shuffleTo(numCards-1);
+          // FIXME - get the error message which is in the response body
           console.log('submission failure. ' + textStatus + ' ' + errorThrown);
       });
   });
 
-  // populate and set everything up
+  // populate and initialize values to what was persisted
   if (window.localStorage) {
     if (localStorage['country']) {
       $('#country input:radio').val([localStorage['country']]);
