@@ -49,12 +49,12 @@
       </p>
       {% for value, display in countries %}
         <label class="country">
-          <input class="country-radio" type="radio" name="country" value="{{ value }}"/>
+          <input type="radio" name="country" value="{{ value }}"/>
           {{ display }}
         </label>
       {% endfor %}
       <label class="country">
-        <input class="country-radio" type="radio" name="country" value=""/>
+        <input type="radio" name="country" value=""/>
         {{ _('Other') }}
       </label>
       <input type="hidden" id="locale" name="locale" value="{{ request.locale }}"/>
@@ -73,12 +73,12 @@
       </p>
       {% for value, display in devices %}
         <label class="device">
-          <input class="device-radio" type="radio" name="device" value="{{ value }}"/>
+          <input type="radio" name="device" value="{{ value }}"/>
           {{ display }}
         </label>
       {% endfor %}
       <label class="device">
-        <input class="device-radio" type="radio" name="device" value=""/>
+        <input type="radio" name="device" value=""/>
         {{ _('Other') }}
       </label>
     </section>
@@ -121,7 +121,7 @@
     <section>
       <label class="email-ok">
         <p>
-          <input id="email-ok" type="checkbox" name="email_ok">
+          <input id="email-ok" type="checkbox" name="email_ok"/>
           {{ _('Check here to let us contact you to follow up on your feedback.') }}
         </p>
       </label>
@@ -130,7 +130,10 @@
         <label for="id_email">
           {{ _('Email address (optional):') }}
         </label>
-        <input type="text" id="email-input" name="email">
+        <input type="text" id="email-input" name="email"/>
+        <p id="email-error" class="error">
+          {{ _('Please enter a valid email address.') }}
+        </p>
       </div>
 
       <p>
