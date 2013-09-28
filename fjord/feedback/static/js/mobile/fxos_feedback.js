@@ -2,19 +2,6 @@
 
 function init() {
 
-  // Populate everything
-  if (window.localStorage) {
-    if (localStorage['country']) {
-      $('#country input:radio').val([localStorage['country']]);
-    }
-    if (localStorage['device']) {
-      $('#device input:radio').val([localStorage['device']]);
-    }
-    if (localStorage['email']) {
-      $('#email-input').val(localStorage['email']);
-    }
-  }
-
   $('#intro').on('click', 'button', function() {
     var happy = $(this).hasClass('happy');
 
@@ -51,8 +38,6 @@ function init() {
     $('#email .email').toggle(on);
     $('#privacy-email').toggle(on);
   });
-  $('#email-ok').change();
-  $('#email-error').hide();
 
   $('button.complete').on('click', function() {
     var email, data, numCards, jqxhr;
@@ -108,16 +93,45 @@ function init() {
       function(data, textStatus, jqXHR) {
         // on success
         $('x-deck')[0].shuffleTo(numCards-2);
+        if (window.localStorage) {
+          localStorage.removeItem('emailok');
+          localStorage.removeItem('description');
+        }
       })
         .fail(function(jqXHR, textStatus, errorThrown) {
+          if (window.localStorage) {
+            if ($('#email-ok').is(':checked')) {
+              localStorage['emailok'] = true;
+              console.log('emailok');
+            }
+            localStorage['description'] = $('#description').val();
+          }
+
           $('x-deck')[0].shuffleTo(numCards-1);
-
-          // FIXME - save all fields here and make sure they're
-          // resurrected above
-
           console.log('submission failure. ' + textStatus + ' ' + errorThrown);
       });
   });
+
+  // populate and set everything up
+  if (window.localStorage) {
+    if (localStorage['country']) {
+      $('#country input:radio').val([localStorage['country']]);
+    }
+    if (localStorage['device']) {
+      $('#device input:radio').val([localStorage['device']]);
+    }
+    if (localStorage['email']) {
+      $('#email-input').val(localStorage['email']);
+    }
+    if (localStorage['emailok']) {
+      $('#email-ok').prop('checked', true);
+    }
+    if (localStorage['description']) {
+      $('#description').val(localStorage['description']);
+    }
+  }
+  $('#email-ok').change();
+  $('#email-error').hide();
 }
 
 $(init);
