@@ -16,7 +16,7 @@
 <x-deck>
   <x-card id="intro">
     <x-appbar>
-      <header>{{ _('Submit Your Feedback') }}</header>
+      <header>{{ _('Submit your feedback') }}</header>
     </x-appbar>
 
     <section>
@@ -194,6 +194,24 @@
         {% endtrans %}
       </p>
       <button class="complete btn submit">{{ _('Try again') }}</button>
+      <button class="cancel btn submit">{{ _('Cancel') }}</button>
+    </section>
+  </x-card>
+
+  <x-card id="tryagain">
+    <x-appbar>
+      <header>{{ _('Try again') }}</header>
+    </x-appbar>
+
+    <section>
+      <p>
+        {% trans %}
+        You have unsubmitted feedback data. Would you like to try submitting
+        it again?
+        {% endtrans %}
+      </p>
+      <button class="complete btn submit">{{ _('Try again') }}</button>
+      <button class="cancel btn submit">{{ _('Cancel') }}</button>
     </section>
   </x-card>
 </x-deck>

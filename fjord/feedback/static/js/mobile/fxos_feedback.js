@@ -1,35 +1,47 @@
 (function() {
 
+function formReset() {
+  $('#email-ok').prop('checked', false);
+  $('#description').val('');
+
+  if (window.localStorage) {
+    localStorage.removeItem('emailok');
+    localStorage.removeItem('description');
+  }
+};
+
 function init() {
+  var xdeck = $('x-deck')[0];
+
   $('#intro').on('click', 'button', function() {
     var happy = $(this).hasClass('happy');
 
     $('#moreinfo').removeClass(happy ? 'sad' : 'happy');
     $('#moreinfo').addClass(happy ? 'happy' : 'sad');
     $('#happy').val(happy ? '1' : '0');
-    $('x-deck')[0].shuffleNext();
+    xdeck.shuffleNext();
   });
 
   $('button.back').on('click', function() {
-    $('x-deck')[0].shufflePrev();
+    xdeck.shufflePrev();
   });
 
   $('#country input:radio').on('click', function(ev) {
     if (window.localStorage) {
       localStorage['country'] = $('#country input:radio:checked').val();
     }
-    $('x-deck')[0].shuffleNext();
+    xdeck.shuffleNext();
   });
 
   $('#device input:radio').on('click', function() {
     if (window.localStorage) {
       localStorage['device'] = $('#device input:radio:checked').val();
     }
-    $('x-deck')[0].shuffleNext();
+    xdeck.shuffleNext();
   });
 
   $('#moreinfo button.next').on('click', function() {
-    $('x-deck')[0].shuffleNext();
+    xdeck.shuffleNext();
   });
 
   $('#email .email-ok input').on('change', function() {
@@ -38,8 +50,13 @@ function init() {
     $('#privacy-email').toggle(on);
   });
 
+  $('button.cancel').on('click', function() {
+    formReset();
+    xdeck.shuffleTo(0);
+  });
+
   $('button.complete').on('click', function() {
-    var email, data, numCards, jqxhr;
+    var data, device, email, jqxhr, numCards;
 
     // verify email address
     if ($('#email-ok:checked').val()) {
@@ -60,6 +77,8 @@ function init() {
       }
     }
 
+    device = $('#device input:radio').val().split('::');
+
     data = {
       'happy': $('#happy').val(),
       'description': $('#description').val(),
@@ -67,8 +86,8 @@ function init() {
       'platform': 'Firefox OS',
       'locale': $('#locale').val(),
       'country': $('#country input:radio').val(),
-      'manufacturer': $('#device input:radio').val().split('::')[0],
-      'device': $('#device input:radio').val().split('::')[1]
+      'manufacturer': device[0],
+      'device': device[1]
     };
 
     // FIXME - figure out Firefox OS version from Gecko version in UA
@@ -77,24 +96,19 @@ function init() {
       data['email'] = $('#email-input').val()
     }
 
-    numCards = $('x-deck')[0].numCards;
+    numCards = xdeck.numCards;
 
     // here's the order of cards so it's easier to do the math here.
-    // email, submitting, thanks, failure
-    // -4     -3          -2      -1       numCards
-    $('x-deck')[0].shuffleTo(numCards-3);
+    // email, submitting, thanks, failure, tryagain
+    // -5     -4          -3      -2       -1       numCards
+    xdeck.shuffleTo(numCards-4);
 
     var jqxhr = $.post(
       '/api/v1/feedback/', data,
       function(data, textStatus, jqXHR) {
         // on success
-        $('x-deck')[0].shuffleTo(numCards-2);
-        if (window.localStorage) {
-          // wipe these two things on success figuring they're likely
-          // to change them next time
-          localStorage.removeItem('emailok');
-          localStorage.removeItem('description');
-        }
+        formReset();
+        xdeck.shuffleTo(numCards-3);
       })
         .fail(function(jqXHR, textStatus, errorThrown) {
           // persist state so they can try again later
@@ -105,7 +119,7 @@ function init() {
             localStorage['description'] = $('#description').val();
           }
 
-          $('x-deck')[0].shuffleTo(numCards-1);
+          xdeck.shuffleTo(numCards-2);
           // FIXME - get the error message which is in the response body
           console.log('submission failure. ' + textStatus + ' ' + errorThrown);
       });
@@ -122,11 +136,21 @@ function init() {
     if (localStorage['email']) {
       $('#email-input').val(localStorage['email']);
     }
+
     if (localStorage['emailok']) {
       $('#email-ok').prop('checked', true);
     }
     if (localStorage['description']) {
       $('#description').val(localStorage['description']);
+
+      document.addEventListener('DOMComponentsLoaded', function() {
+        // if there's a description, this indicates that the previous
+        // attempt to submit failed so we go directly to the "try
+        // again" card; have to do it in this listener because
+        // otherwise x-deck isn't ready, yet
+        var numCards = xdeck.numCards;
+        xdeck.shuffleTo(numCards-1);
+      });
     }
   }
   $('#email-ok').change();
