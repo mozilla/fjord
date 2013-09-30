@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block site_js %}
+  <script src="{{ settings.STATIC_URL }}/js/lib/brick-1.0beta8.byob.min.js"></script>
   {{ js('mobile/fxos_feedback') }}
 {% endblock %}
 
@@ -57,6 +58,7 @@
         <input type="radio" name="country" value=""/>
         {{ _('Other') }}
       </label>
+      <button class="next btn submit">{{ _('Next') }}</button>
       <input type="hidden" id="locale" name="locale" value="{{ request.locale }}"/>
     </section>
   </x-card>
@@ -81,6 +83,7 @@
         <input type="radio" name="device" value=""/>
         {{ _('Other') }}
       </label>
+      <button class="next btn submit">{{ _('Next') }}</button>
     </section>
   </x-card>
 

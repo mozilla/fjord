@@ -189,57 +189,7 @@ def mobile_stable_feedback(request):
 
 
 @requires_firefox
-# @csrf_protect
 def firefox_os_stable_feedback(request):
-    happy = None
-
-    # if request.method == 'POST':
-    #     form = FirefoxOSResponseForm(request.POST)
-    #     if form.is_valid():
-    #         data = form.cleaned_data
-
-    #         device = config.FIREFOX_OS_DEVICES.get(
-    #             data.get('fxosdevice'), ('', ''))
-    #         country = config.COUNTRIES.get(data.get('country'), '')
-
-    #         opinion = models.Response(
-    #             # Data coming from the user
-    #             happy=data['happy'],
-    #             url=data['url'],
-    #             description=data['description'],
-
-    #             # Inferred data from user agent
-    #             prodchan=_get_prodchan(request),
-    #             user_agent=request.META.get('HTTP_USER_AGENT', ''),
-    #             browser=request.BROWSER.browser,
-    #             browser_version=request.BROWSER.browser_version,
-    #             platform=request.BROWSER.platform,
-
-    #             # Data that comes form the user or is inferred
-    #             locale=data.get('locale', request.locale),
-
-    #             # Data specific to the Firefox OS feedback form
-    #             manufacturer=device[0],
-    #             device=device[1],
-    #             country=country,
-
-    #             product=u'Firefox OS',
-    #             version=request.BROWSER.browser_version,
-    #             channel=u'stable',
-    #         )
-
-    #         opinion.save()
-
-    #         if data['email_ok'] and data['email']:
-    #             e = models.ResponseEmail(email=data['email'], opinion=opinion)
-    #             e.save()
-
-    #         return HttpResponseRedirect(reverse('thanks'))
-
-    #     happy = smart_bool(request.POST.get('happy', None), None)
-    # # else:
-    # #     form = ResponseForm()
-
     return render(request, 'feedback/mobile/fxos_feedback.html', {
         'countries': config.FIREFOX_OS_COUNTRIES,
         'devices': config.FIREFOX_OS_DEVICES,
