@@ -268,7 +268,9 @@ def feedback_router(request, formname=None, *args, **kwargs):
         view = android_about_feedback
 
     if view is None:
-        if request.BROWSER.mobile:
+        if request.BROWSER.browser == 'Firefox OS':
+            view = firefox_os_stable_feedback
+        elif request.BROWSER.mobile:
             view = mobile_stable_feedback
         else:
             view = desktop_stable_feedback
