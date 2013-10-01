@@ -151,15 +151,11 @@
 
   <x-card id="submitting">
     <x-appbar>
-      <header>{{ _('Submitting!') }}</header>
+      <header>{{ _('Submitting....') }}</header>
     </x-appbar>
 
     <section>
-      <p>
-        {% trans %}
-        Submitting your feedback now. This may take a moment.
-        {% endtrans %}
-      </p>
+      <img class="in-progress" src="{{ settings.STATIC_URL }}img/wait-trans.gif"/>
     </section>
   </x-card>
 
