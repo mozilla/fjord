@@ -17,7 +17,7 @@
 <x-deck>
   <x-card id="intro">
     <x-appbar>
-      <header>{{ _('Submit your feedback') }}</header>
+      <header>{{ _('Submit feedback') }}</header>
     </x-appbar>
 
     <section>
@@ -149,21 +149,17 @@
     </section>
   </x-card>
 
-  <x-card id="submitting">
+  <x-card id="submitting" transition-override="none">
     <x-appbar>
-      <header>{{ _('Submitting!') }}</header>
+      <header>{{ _('Submitting....') }}</header>
     </x-appbar>
 
     <section>
-      <p>
-        {% trans %}
-        Submitting your feedback now. This may take a moment.
-        {% endtrans %}
-      </p>
+      <img class="in-progress" src="{{ settings.STATIC_URL }}img/wait-trans.gif"/>
     </section>
   </x-card>
 
-  <x-card id="thanks">
+  <x-card id="thanks" transition-override="none">
     <x-appbar>
       <header>{{ _('Success!') }}</header>
     </x-appbar>
@@ -184,7 +180,7 @@
     </section>
   </x-card>
 
-  <x-card id="failure">
+  <x-card id="failure" transition-override="none">
     <x-appbar>
       <header>{{ _('We\'re sorry!') }}</header>
     </x-appbar>
@@ -201,7 +197,7 @@
     </section>
   </x-card>
 
-  <x-card id="tryagain">
+  <x-card id="tryagain" transition-override="none">
     <x-appbar>
       <header>{{ _('Try again') }}</header>
     </x-appbar>

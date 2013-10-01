@@ -189,6 +189,7 @@ def mobile_stable_feedback(request):
 
 
 @requires_firefox
+@csrf_exempt
 def firefox_os_stable_feedback(request):
     return render(request, 'feedback/mobile/fxos_feedback.html', {
         'countries': config.FIREFOX_OS_COUNTRIES,
