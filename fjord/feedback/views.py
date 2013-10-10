@@ -194,18 +194,12 @@ def mobile_stable_feedback(request):
 def firefox_os_stable_feedback(request):
     # Localized country names are in region files in product
     # details. We try really hard to use localized country names, so
-    # we try to pull it from product details and if that fails, we use
-    # gettext. This is going to be a little weird since if someone
-    # translates the country name differently than what we have in
-    # product details, they'll be confused. I'm not sure how to
-    # elegantly do this such that if there is a gettext translation,
-    # it overrides the product details.
-    #
-    # Anyhow, so we rework the countries list here and pass that to
-    # the template.
+    # we use gettext and if that's not available, use whatever is in
+    # product details.
     countries = [
-        (code, translate_country_name(translation.get_language(), code, name))
-        for code, name in config.FIREFOX_OS_COUNTRIES
+        (code, translate_country_name(translation.get_language(),
+                                      code, name, name_l10n))
+        for code, name, name_l10n in config.FIREFOX_OS_COUNTRIES
     ]
 
     return render(request, 'feedback/mobile/fxos_feedback.html', {
