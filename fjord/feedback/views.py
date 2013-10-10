@@ -2,6 +2,7 @@ from functools import wraps
 
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
+from django.utils import translation
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.decorators.http import require_POST
@@ -11,7 +12,7 @@ from mobility.decorators import mobile_template
 from rest_framework import generics
 
 from fjord.base.browsers import UNKNOWN
-from fjord.base.util import smart_bool
+from fjord.base.util import smart_bool, translate_country_name
 from fjord.feedback.forms import ResponseForm
 from fjord.feedback import config
 from fjord.feedback import models
@@ -191,8 +192,24 @@ def mobile_stable_feedback(request):
 @requires_firefox
 @csrf_exempt
 def firefox_os_stable_feedback(request):
+    # Localized country names are in region files in product
+    # details. We try really hard to use localized country names, so
+    # we try to pull it from product details and if that fails, we use
+    # gettext. This is going to be a little weird since if someone
+    # translates the country name differently than what we have in
+    # product details, they'll be confused. I'm not sure how to
+    # elegantly do this such that if there is a gettext translation,
+    # it overrides the product details.
+    #
+    # Anyhow, so we rework the countries list here and pass that to
+    # the template.
+    countries = [
+        (code, translate_country_name(translation.get_language(), code, name))
+        for code, name in config.FIREFOX_OS_COUNTRIES
+    ]
+
     return render(request, 'feedback/mobile/fxos_feedback.html', {
-        'countries': config.FIREFOX_OS_COUNTRIES,
+        'countries': countries,
         'devices': config.FIREFOX_OS_DEVICES,
     })
 
