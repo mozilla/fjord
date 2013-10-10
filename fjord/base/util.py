@@ -1,8 +1,54 @@
 from datetime import datetime
 import time
 
+from product_details import product_details
 from rest_framework.throttling import AnonRateThrottle
 from statsd import statsd
+
+
+def translate_country_name(current_language, country_code, country_name,
+                           country_name_l10n):
+    """Translates country name from product details or gettext
+
+    It might seem a bit weird we're not doing the _lazy gettext
+    translation here, but if we did, then we'd be translating a
+    variable value rather than a string and then it wouldn't get
+    picked up by extract script.
+
+    :arg current_language: the language of the user viewing the page
+    :arg country_code: the iso 3166 two-letter country code
+    :arg country_name: the country name
+    :arg country_name_l10n: the country name wrapped in a lazy gettext call
+
+    :returns: translated country name
+
+    """
+    # FIXME: this is a lousy way to alleviate the problem where we
+    # have a "locale" and we really need a "language".
+    language_fix = {
+        'es': 'es-ES',
+    }
+
+    current_language = language_fix.get(current_language, current_language)
+
+    # If the country name has been translated, then use that
+    if unicode(country_name) != unicode(country_name_l10n):
+        return country_name_l10n
+
+    current_language = current_language.split('-')
+    current_language[0] = current_language[0].lower()
+    if len(current_language) > 1:
+        current_language[1] = current_language[1].upper()
+    current_language = '-'.join(current_language)
+
+    country_code = country_code.lower()
+
+    try:
+        countries = product_details.get_regions(current_language)
+    except IOError:
+        return country_name
+
+    return countries.get(country_code, country_name)
 
 
 def smart_truncate(content, length=100, suffix='...'):

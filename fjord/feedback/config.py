@@ -10,15 +10,16 @@ PRODUCTS = [
     (u'Firefox', u'Firefox'),
 ]
 
-# List of (value, display) tuples for countries Firefox OS has
+# List of (value, name, _lazy(name)) tuples for countries Firefox OS has
 # been released in.
 # Values are ISO 3166 country codes.
-# Display names are l10n-ized country names.
+# Names are the country names.
+# _lazy(name) causes extract to pick up the name so it can be localized.
 FIREFOX_OS_COUNTRIES = [
-    (u'CO', _lazy('Colombia')),
-    (u'VE', _lazy('Venezuela')),
-    (u'PL', _lazy('Poland')),
-    (u'ES', _lazy('Spain')),
+    (u'CO', 'Colombia', _lazy('Colombia')),
+    (u'VE', 'Venezuela', _lazy('Venezuela')),
+    (u'PL', 'Poland', _lazy('Poland')),
+    (u'ES', 'Spain', _lazy('Spain')),
 ]
 
 # List of (value, display name) for Firefox OS devices that

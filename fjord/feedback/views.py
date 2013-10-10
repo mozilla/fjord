@@ -2,6 +2,7 @@ from functools import wraps
 
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
+from django.utils import translation
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.decorators.http import require_POST
@@ -11,7 +12,7 @@ from mobility.decorators import mobile_template
 from rest_framework import generics
 
 from fjord.base.browsers import UNKNOWN
-from fjord.base.util import smart_bool
+from fjord.base.util import smart_bool, translate_country_name
 from fjord.feedback.forms import ResponseForm
 from fjord.feedback import config
 from fjord.feedback import models
@@ -191,8 +192,18 @@ def mobile_stable_feedback(request):
 @requires_firefox
 @csrf_exempt
 def firefox_os_stable_feedback(request):
+    # Localized country names are in region files in product
+    # details. We try really hard to use localized country names, so
+    # we use gettext and if that's not available, use whatever is in
+    # product details.
+    countries = [
+        (code, translate_country_name(translation.get_language(),
+                                      code, name, name_l10n))
+        for code, name, name_l10n in config.FIREFOX_OS_COUNTRIES
+    ]
+
     return render(request, 'feedback/mobile/fxos_feedback.html', {
-        'countries': config.FIREFOX_OS_COUNTRIES,
+        'countries': countries,
         'devices': config.FIREFOX_OS_DEVICES,
     })
 
