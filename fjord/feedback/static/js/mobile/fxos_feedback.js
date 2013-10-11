@@ -46,14 +46,12 @@ function init() {
     xdeck.shuffleNext();
   });
 
-  $('#country input:radio').on('click', function(ev) {
-    storageAddItem('country', $('#country input:radio:checked').val());
-    xdeck.shuffleNext();
+  $('#country select').on('change', function(ev) {
+    storageAddItem('country', $('#country select').val());
   });
 
-  $('#device input:radio').on('click', function() {
-    storageAddItem('device', $('#device input:radio:checked').val());
-    xdeck.shuffleNext();
+  $('#device select').on('change', function() {
+    storageAddItem('device', $('#device select').val());
   });
 
   $('#email .email-ok input').on('change', function() {
@@ -87,7 +85,7 @@ function init() {
       storageAddItem('email', $('#email-input').val());
     }
 
-    device = $('#device input:radio').val().split('::');
+    device = $('#device select').val().split('::');
 
     data = {
       'happy': $('#happy').val(),
@@ -95,7 +93,7 @@ function init() {
       'product': 'Firefox OS',
       'platform': 'Firefox OS',
       'locale': $('#locale').val(),
-      'country': $('#country input:radio').val(),
+      'country': $('#country select').val(),
       'manufacturer': device[0],
       'device': device[1]
     };
@@ -135,16 +133,10 @@ function init() {
 
   // populate and initialize values to what was persisted
   if (storageItem('country')) {
-    $('#country input:radio').val([storageItem('country')]);
-    $('#country button.next').show();
-  } else {
-    $('#country button.next').hide();
+    $('#country select').val(storageItem('country'));
   }
   if (storageItem('device')) {
-    $('#device input:radio').val([storageItem('device')]);
-    $('#device button.next').show();
-  } else {
-    $('#device button.next').hide();
+    $('#device select').val(storageItem('device'));
   }
   if (storageItem('email')) {
     $('#email-input').val(storageItem('email'));
