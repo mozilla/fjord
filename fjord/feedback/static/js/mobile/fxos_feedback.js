@@ -23,7 +23,7 @@ function formReset() {
 
   storageRemoveItem('emailok');
   storageRemoveItem('description');
-};
+}
 
 function init() {
   var xdeck = $('x-deck')[0];
@@ -76,7 +76,7 @@ function init() {
 
       // this should be close enough to what django is doing that we
       // can catch issues client-side
-      if (!email.match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/)) {
+      if (!email.match(/^[a-zA-Z0-9._\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,6}$/)) {
         $('#email-error').show();
         return;
       }
@@ -103,7 +103,7 @@ function init() {
     // FIXME - figure out Firefox OS version from Gecko version in UA
 
     if ($('#email-ok:checked').val()) {
-      data['email'] = $('#email-input').val()
+      data.email = $('#email-input').val();
     }
 
     numCards = xdeck.numCards;
@@ -113,7 +113,7 @@ function init() {
     // -5     -4          -3      -2       -1       numCards
     xdeck.shuffleTo(numCards-4);
 
-    var jqxhr = $.post(
+    jqxhr = $.post(
       '/api/v1/feedback/', data,
       function(data, textStatus, jqXHR) {
         // on success
@@ -171,4 +171,4 @@ function init() {
 
 $(init);
 
-})();
+}());
