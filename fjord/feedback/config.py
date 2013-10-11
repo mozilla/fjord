@@ -20,6 +20,12 @@ FIREFOX_OS_COUNTRIES = [
     (u'VE', 'Venezuela', _lazy('Venezuela')),
     (u'PL', 'Poland', _lazy('Poland')),
     (u'ES', 'Spain', _lazy('Spain')),
+    (u'BR', 'Brazil', _lazy('Brazil')),
+    (u'DE', 'Germany', _lazy('Germany')),
+    (u'GR', 'Greece', _lazy('Greece')),
+    (u'HU', 'Hungary', _lazy('Hungary')),
+    (u'CS', 'Serbia', _lazy('Serbia')),
+    (u'CS', 'Montenegro', _lazy('Montenegro')),
 ]
 
 # List of (value, display name) for Firefox OS devices that

@@ -48,16 +48,12 @@
       <p>
         {{ _('In what country did you purchase your Firefox OS device?') }}
       </p>
-      {% for value, display in countries %}
-        <label class="country">
-          <input type="radio" name="country" value="{{ value }}"/>
-          {{ display }}
-        </label>
-      {% endfor %}
-      <label class="country">
-        <input type="radio" name="country" value=""/>
-        {{ _('Other') }}
-      </label>
+      <select name="country">
+        {% for value, display in countries %}
+          <option value="{{ value }}">{{ display }}</option>
+        {% endfor %}
+        <option value="">{{ _('Other') }}</option>
+      </select>
       <button class="next btn submit">{{ _('Next') }}</button>
       <input type="hidden" id="locale" name="locale" value="{{ request.locale }}"/>
     </section>
@@ -73,16 +69,12 @@
       <p>
         {{ _('What Firefox OS device are you using?') }}
       </p>
-      {% for value, display in devices %}
-        <label class="device">
-          <input type="radio" name="device" value="{{ value }}"/>
-          {{ display }}
-        </label>
-      {% endfor %}
-      <label class="device">
-        <input type="radio" name="device" value=""/>
-        {{ _('Other') }}
-      </label>
+      <select name="device">
+        {% for value, display in devices %}
+          <option value="{{ value }}">{{ display }}</option>
+        {% endfor %}
+        <option value="">{{ _('Other') }}</option>
+      </select>
       <button class="next btn submit">{{ _('Next') }}</button>
     </section>
   </x-card>
