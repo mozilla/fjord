@@ -111,24 +111,27 @@ function init() {
     // -5     -4          -3      -2       -1       numCards
     xdeck.shuffleTo(numCards-4);
 
-    jqxhr = $.post(
-      '/api/v1/feedback/', data,
-      function(data, textStatus, jqXHR) {
-        // on success
+    jqxhr = $.ajax({
+      contentType: 'application/json',
+      data: JSON.stringify(data),
+      dataType: 'json',
+      type: 'POST',
+      url: '/api/v1/feedback/',
+      success: function(data, textStatus, jqxhr) {
         formReset();
         xdeck.shuffleTo(numCards-3);
-      })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-          // persist state so they can try again later
-          if ($('#email-ok').is(':checked')) {
-            storageAddItem('emailok', true);
-          }
-          storageAddItem('description', $('#description').val());
+      },
+      error: function(jqxhr, textStatus, errorThrown) {
+        // persist state so they can try again later
+        if ($('#email-ok').is(':checked')) {
+          storageAddItem('emailok', true);
+        }
+        storageAddItem('description', $('#description').val());
 
-          xdeck.shuffleTo(numCards-2);
-          // FIXME - get the error message which is in the response body
-          console.log('submission failure. ' + textStatus + ' ' + errorThrown);
-      });
+        xdeck.shuffleTo(numCards-2);
+        // FIXME - get the error message which is in the response body
+        console.log('submission failure. ' + textStatus + ' ' + errorThrown);
+      }});
   });
 
   // populate and initialize values to what was persisted
