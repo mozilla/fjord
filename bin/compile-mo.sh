@@ -23,6 +23,7 @@ touch $LOCKFILE
 for lang in `find $TARGET -type f -name "*.po"`; do
     dir=`dirname $lang`
     stem=`basename $lang .po`
+    echo $lang
     msgfmt -o ${dir}/${stem}.mo $lang
 done
 rm $LOCKFILE
