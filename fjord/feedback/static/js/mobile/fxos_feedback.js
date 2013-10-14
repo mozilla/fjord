@@ -72,11 +72,13 @@ function init() {
     if ($('#email-ok').is(':checked')) {
       email = $.trim($('#email-input').val());
 
-      // this should be close enough to what django is doing that we
-      // can catch issues client-side
-      if (!email.match(/^[a-zA-Z0-9._\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,6}$/)) {
-        $('#email-error').show();
-        return;
+      if (email !== '') {
+        // this should be close enough to what django is doing that we
+        // can catch issues client-side
+        if (!email.match(/^[a-zA-Z0-9._\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,6}$/)) {
+          $('#email-error').show();
+          return;
+        }
       }
 
       // in case it was showing, we hide it again
@@ -100,7 +102,7 @@ function init() {
 
     // FIXME - figure out Firefox OS version from Gecko version in UA
 
-    if ($('#email-ok:checked').val()) {
+    if ($('#email-ok:checked').val() && email !== '') {
       data.email = $('#email-input').val();
     }
 
