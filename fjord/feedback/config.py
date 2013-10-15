@@ -28,11 +28,9 @@ FIREFOX_OS_COUNTRIES = [
     (u'CS', 'Montenegro', _lazy('Montenegro')),
 ]
 
-# List of (value, display name) for Firefox OS devices that
-# have been released.
-# The value is a :: separated string for (manufacturer, device).
+# List of Firefox OS devices that have been released.
 FIREFOX_OS_DEVICES = [
-    (u'ZTE::Open', u'ZTE Open'),
-    (u'Alcatel::OneTouch Fire', u'Alcatel OneTouch Fire'),
-    (u'Geeksphone::', u'Geeksphone'),
+    u'ZTE Open',
+    u'Alcatel OneTouch Fire',
+    u'Geeksphone',
 ]
