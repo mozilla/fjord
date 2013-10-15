@@ -70,8 +70,8 @@
         {{ _('What Firefox OS device are you using?') }}
       </p>
       <select name="device">
-        {% for value, display in devices %}
-          <option value="{{ value }}">{{ display }}</option>
+        {% for value in devices %}
+          <option value="{{ value }}">{{ value }}</option>
         {% endfor %}
         <option value="">{{ _('Other') }}</option>
       </select>

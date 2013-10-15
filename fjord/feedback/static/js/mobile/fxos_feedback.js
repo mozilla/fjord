@@ -66,7 +66,7 @@ function init() {
   });
 
   $('button.complete').on('click', function() {
-    var data, device, email, jqxhr, numCards;
+    var data, email, jqxhr, numCards;
 
     // verify email address
     if ($('#email-ok').is(':checked')) {
@@ -87,8 +87,6 @@ function init() {
       storageAddItem('email', $('#email-input').val());
     }
 
-    device = $('#device select').val().split('::');
-
     data = {
       'happy': $('#happy').val(),
       'description': $('#description').val(),
@@ -96,8 +94,7 @@ function init() {
       'platform': 'Firefox OS',
       'locale': $('#locale').val(),
       'country': $('#country select').val(),
-      'manufacturer': device[0],
-      'device': device[1]
+      'device': $('#device select').val()
     };
 
     // FIXME - figure out Firefox OS version from Gecko version in UA
