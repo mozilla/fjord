@@ -27,7 +27,7 @@ do
         NO_MO_FILES+=("${pofile}")
 
     else
-        ./manage.py polint --errorsonly "${pofile}"
+        ./manage.py lint --errorsonly "${pofile}"
         if [ $? -ne 0 ]
         then
             BAD_FILES+=("${pofile}")

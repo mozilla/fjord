@@ -170,6 +170,7 @@ INSTALLED_APPS = get_apps(
         'eadred',
         'jingo_minify',
         'test_utils',
+        'dennis.django_dennis',
 
         'fjord.analytics',
         'fjord.base',
