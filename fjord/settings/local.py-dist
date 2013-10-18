@@ -1,6 +1,7 @@
 # 1. Copy this file to local.py.
 # 2. Then edit this file to set the configuration for your specific
-#    instance of fjord. See __init__.py docstring for more details.
+#    instance of fjord. See __init__.py docstring for more details
+#    and base.py for documentation on settings to override.
 
 from fjord.settings.base import *
 
@@ -34,11 +35,6 @@ DEV = True
 
 # Uncomment these to activate and customize Celery:
 # CELERY_ALWAYS_EAGER = False  # required to activate celeryd
-
-# By default, BrowserID expects your app to use http://127.0.0.1:8000
-# Uncomment the following line if you prefer to access your app via
-# localhost
-# SITE_URL = 'http://localhost:8000'
 
 # This should be False if you're running a local development install
 # without HTTPS. It disables HTTPS-only cookies.
