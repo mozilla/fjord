@@ -307,8 +307,6 @@ AUTHENTICATION_BACKENDS = [
 # time.
 BROWSERID_CREATE_USER = False
 
-# DEPRECATED -- remove after django-browserid upgrade
-SITE_URL = 'http://127.0.0.1:8000'
 BROWSERID_AUDIENCES = ['http://127.0.0.1:8000', 'http://localhost:8000']
 LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = '/'
