@@ -33,4 +33,5 @@ FIREFOX_OS_DEVICES = [
     u'ZTE Open',
     u'Alcatel OneTouch Fire',
     u'Geeksphone',
+    u'LG Fireweb',
 ]
