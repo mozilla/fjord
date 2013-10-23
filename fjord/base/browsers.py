@@ -21,7 +21,8 @@ WINDOWS_VERSION = {
 GECKO_TO_FIREFOXOS_VERSION = {
     '18.0': '1.0',
     '18.1': '1.1',
-    '26.0': '1.2'
+    '26.0': '1.2',
+    '28.0': '1.3'
 }
 
 UNKNOWN = ''

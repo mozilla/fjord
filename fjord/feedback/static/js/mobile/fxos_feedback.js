@@ -1,4 +1,13 @@
 (function() {
+// FIXME: Fix this so we don't have to update the JS file every time we
+// update the version map in fjord/base/browsers.py.
+var GECKO_TO_FXOS = {
+  '18.0': '1.0',
+  '18.1': '1.1',
+  '26.0': '1.2',
+  '28.0': '1.3'
+};
+
 function storageAddItem(key, val) {
   if (window.localStorage) {
     localStorage[key] = val;
@@ -23,6 +32,32 @@ function formReset() {
 
   storageRemoveItem('emailok');
   storageRemoveItem('description');
+}
+
+/*
+ * Infers the FxOS version from the Gecko version in the UA.
+ *
+ * If this can't find a gecko version in the ua, then it returns
+ * null. If this can find a gecko version in the ua, then it tries
+ * to map the gecko version to a FxOS version and return that. If it
+ * can't, then it returns the Gecko/version.
+ *
+ * Returns: null, FxOS version or Gecko versoin
+ */
+function inferFxosVersion() {
+  var gecko_re = /Gecko\/([^\s]+)/,
+    possible_version = navigator.userAgent.match(gecko_re);
+
+  if (possible_version != null) {
+    possible_version = possible_version[1];
+    if (typeof(GECKO_TO_FXOS[possible_version]) !== 'undefined') {
+      possible_version = GECKO_TO_FXOS[possible_version];
+    } else {
+      possible_version = 'Gecko/' + possible_version;
+    }
+  }
+
+  return possible_version;
 }
 
 function init() {
@@ -66,7 +101,7 @@ function init() {
   });
 
   $('button.complete').on('click', function() {
-    var data, email, jqxhr, numCards;
+    var data, email, jqxhr, version, numCards;
 
     // verify email address
     if ($('#email-ok').is(':checked')) {
@@ -97,7 +132,10 @@ function init() {
       'device': $('#device select').val()
     };
 
-    // FIXME - figure out Firefox OS version from Gecko version in UA
+    version = inferFxosVersion();
+    if (version != null) {
+      data.version = version;
+    }
 
     if ($('#email-ok:checked').val() && email !== '') {
       data.email = $('#email-input').val();
