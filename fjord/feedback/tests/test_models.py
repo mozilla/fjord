@@ -11,3 +11,10 @@ class TestResponseModel(TestCase):
         resp.save()
 
         eq_(resp.description, 'a' * 10000)
+
+    def test_description_strip_on_save(self):
+        # Nix leading and trailing whitespace.
+        resp = response(description=u'   \n\tou812\t\n   ')
+        resp.save()
+
+        eq_(resp.description, u'ou812')
