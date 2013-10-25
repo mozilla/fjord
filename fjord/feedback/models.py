@@ -84,7 +84,7 @@ class Response(ModelBase):
         return self.__unicode__().encode('ascii', 'ignore')
 
     def save(self, *args, **kwargs):
-        self.description = self.description[:TRUNCATE_LENGTH]
+        self.description = self.description.strip()[:TRUNCATE_LENGTH]
         super(Response, self).save(*args, **kwargs)
 
     @property
