@@ -16,6 +16,12 @@ from fjord.search.index import (
 from fjord.search.tasks import register_live_index
 
 
+# This defines the number of characters the description can have.  We
+# do this in code rather than in the db since it makes it easier to
+# tweak the value.
+TRUNCATE_LENGTH = 10000
+
+
 @register_live_index
 class Response(ModelBase):
     """Basic feedback response
@@ -76,6 +82,10 @@ class Response(ModelBase):
 
     def __repr__(self):
         return self.__unicode__().encode('ascii', 'ignore')
+
+    def save(self, *args, **kwargs):
+        self.description = self.description[:TRUNCATE_LENGTH]
+        super(Response, self).save(*args, **kwargs)
 
     @property
     def sentiment(self):
