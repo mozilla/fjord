@@ -286,6 +286,22 @@ class TestDashboardView(ElasticTestCase):
 
         assert 'http://www.w3.org/2005/Atom' in r.content
 
+    def test_search_format_atom_has_related_links(self):
+        """Atom output works"""
+        response(description='relatedlinks', url='http://example.com', save=True)
+        self.refresh()
+
+        url = reverse('dashboard')
+        # Text search
+        r = self.client.get(url, {'q': 'relatedlinks', 'format': 'atom'})
+        eq_(r.status_code, 200)
+
+        assert 'http://www.w3.org/2005/Atom' in r.content
+        # FIXME: This is a lousy way to test for a single link with
+        # both attributes.
+        assert 'rel="related"' in r.content
+        assert 'href="http://example.com"' in r.content
+
     def test_date_search(self):
         url = reverse('dashboard')
         # These start and end dates will give known slices of the data.

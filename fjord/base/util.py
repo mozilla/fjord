@@ -1,6 +1,8 @@
 from datetime import datetime
 import time
 
+from django.utils.feedgenerator import Atom1Feed
+
 from product_details import product_details
 from rest_framework.throttling import AnonRateThrottle
 from statsd import statsd
@@ -151,6 +153,23 @@ class FakeLogger(object):
 
     def error(self, msg, *args):
         self._out('ERROR', msg, *args)
+
+
+class Atom1FeedWithRelatedLinks(Atom1Feed):
+    """Atom1Feed with related links
+
+    This adds a "link_related" item as::
+
+        <link rel="related">url</link>
+
+    """
+
+    def add_item_elements(self, handler, item):
+        super(Atom1FeedWithRelatedLinks, self).add_item_elements(handler, item)
+        if item['link_related']:
+            handler.addQuickElement(
+                'link',
+                attrs={'href': item['link_related'], 'rel': 'related'})
 
 
 class MeasuredAnonRateThrottle(AnonRateThrottle):
