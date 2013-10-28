@@ -5,7 +5,6 @@ from math import floor
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.template.defaultfilters import slugify
-from django.utils import feedgenerator
 
 from elasticutils.contrib.django import F, es_required_or_50x
 from funfactory.urlresolvers import reverse
@@ -14,7 +13,11 @@ from tower import ugettext as _
 
 from fjord.analytics.tools import JSONDatetimeEncoder, generate_query_parsed
 from fjord.base.helpers import locale_name, to_date_string, to_datetime_string
-from fjord.base.util import smart_int, smart_datetime, epoch_milliseconds
+from fjord.base.util import (
+    smart_int,
+    smart_datetime,
+    epoch_milliseconds,
+    Atom1FeedWithRelatedLinks)
 from fjord.feedback.models import Response, ResponseMappingType
 
 
@@ -181,7 +184,7 @@ def generate_atom_feed(request, search):
     if dashboard_url.endswith(('?', '&')):
         dashboard_url = dashboard_url[:-1]
 
-    feed = feedgenerator.Atom1Feed(
+    feed = Atom1FeedWithRelatedLinks(
         title=title,
         link=dashboard_url,
         description=_('Search Results From Firefox Input'),
@@ -203,7 +206,8 @@ def generate_atom_feed(request, search):
             description=response.description,
             link=link_url,
             pubdate=response.created,
-            categories=categories
+            categories=categories,
+            link_related=response.url
         )
     return HttpResponse(
         feed.writeString('utf-8'), mimetype='application/atom+xml')
