@@ -31,3 +31,6 @@
 [submodule "vendor-local/src/django-rest-framework"]
 	path = vendor-local/src/django-rest-framework
 	url = https://github.com/tomchristie/django-rest-framework.git
+[submodule "vendor-local/src/django-ratelimit"]
+	path = vendor-local/src/django-ratelimit
+	url = https://github.com/jsocol/django-ratelimit.git

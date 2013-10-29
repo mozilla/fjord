@@ -420,6 +420,40 @@ class TestCSRF(TestCase):
         eq_(r.status_code, 302)
 
 
+class TestWebFormThrottling(TestCase):
+    client_class = LocalizingClient
+
+    def test_throttled(self):
+        """Verify that posts are throttled."""
+        # Make sure there are no responses in the db because we're
+        # basing our test on response counts.
+        initial_amount = models.Response.objects.count()
+        eq_(initial_amount, 0)
+
+        url = reverse('feedback', args=('firefox.desktop.stable',))
+
+        # Toss 100 responses in.
+        for i in range(100):
+            r = self.client.post(url, {
+                'happy': 1,
+                'description': u'Firefox rocks!',
+                'url': u'http://mozilla.org/'
+            })
+        eq_(models.Response.objects.count(), 100)
+
+        # The 101st should be throttled, so there should only be 100
+        # responses in the db.
+        r = self.client.post(url, {
+            'happy': 1,
+            'description': u'Firefox rocks!',
+            'url': u'http://mozilla.org/'
+        })
+        eq_(models.Response.objects.count(), 100)
+
+        # Make sure we still went to the Thanks page.
+        self.assertRedirects(r, reverse('thanks'))
+
+
 class TestRouting(TestCase):
 
     uas = {
