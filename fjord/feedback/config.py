@@ -26,6 +26,8 @@ FIREFOX_OS_COUNTRIES = [
     (u'HU', 'Hungary', _lazy('Hungary')),
     (u'CS', 'Serbia', _lazy('Serbia')),
     (u'CS', 'Montenegro', _lazy('Montenegro')),
+    (u'MX', 'Mexico', _lazy('Mexico')),
+    (u'PE', 'Peru', _lazy('Peru')),
 ]
 
 # List of Firefox OS devices that have been released.
