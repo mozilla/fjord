@@ -9,7 +9,9 @@ from django.views.decorators.http import require_POST
 
 from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
+from ratelimit.decorators import ratelimit
 from rest_framework import generics
+from statsd import statsd
 
 from fjord.base.browsers import UNKNOWN
 from fjord.base.util import smart_bool, translate_country_name
@@ -60,7 +62,14 @@ def requires_firefox(func):
     return _requires_firefox
 
 
+@ratelimit(ip=True, block=False, rate='100/h')
 def _handle_feedback_post(request):
+    if getattr(request, 'limited', False):
+        # If we're throttled, then return the thanks page, but don't
+        # add the response to the db.
+        statsd.incr('webform.throttle.failure')
+        return HttpResponseRedirect(reverse('thanks')), None
+
     form = ResponseForm(request.POST)
     if form.is_valid():
         data = form.cleaned_data
