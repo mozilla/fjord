@@ -14,7 +14,7 @@ from rest_framework import generics
 from statsd import statsd
 
 from fjord.base.browsers import UNKNOWN
-from fjord.base.util import smart_bool, translate_country_name
+from fjord.base.util import actual_ip, smart_bool, translate_country_name
 from fjord.feedback.forms import ResponseForm
 from fjord.feedback import config
 from fjord.feedback import models
@@ -62,7 +62,7 @@ def requires_firefox(func):
     return _requires_firefox
 
 
-@ratelimit(ip=True, block=False, rate='100/h')
+@ratelimit(ip=False, keys=actual_ip, block=False, rate='100/h')
 def _handle_feedback_post(request):
     if getattr(request, 'limited', False):
         # If we're throttled, then return the thanks page, but don't
