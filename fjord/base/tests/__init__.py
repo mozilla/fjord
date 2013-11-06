@@ -1,17 +1,21 @@
 from functools import wraps
+from string import letters
+import random
 
+from django.contrib.auth.models import User
 from django.conf import settings
 from django.test.client import Client
 from django.test import LiveServerTestCase
 from django.test.utils import override_settings
 
+from django_browserid.tests import mock_browserid
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.firefox import firefox_binary
 from nose import SkipTest
 
 from funfactory.urlresolvers import split_path, reverse
-from test_utils import TestCase as OriginalTestCase
+from test_utils import TransactionTestCase as OriginalTestCase
 
 
 class LocalizingClient(Client):
@@ -47,8 +51,14 @@ class LocalizingClient(Client):
         return super(LocalizingClient, self).request(**request)
 
 
+class BaseTestCase(OriginalTestCase):
+    def client_login_user(self, user):
+        with mock_browserid(user.email):
+            self.client.login()
+
+
 @override_settings(ES_LIVE_INDEX=False)
-class TestCase(OriginalTestCase):
+class TestCase(BaseTestCase):
     """A modification of ``test_utils.TestCase`` that skips live indexing."""
     pass
 
@@ -109,3 +119,23 @@ def with_save(func):
         return ret
 
     return saving_func
+
+
+@with_save
+def user(**kwargs):
+    """Return a user with all necessary defaults filled in.
+
+    Default password is 'testpass' unless you say otherwise in a kwarg.
+
+    """
+    defaults = {}
+    if 'username' not in kwargs:
+        defaults['username'] = ''.join(random.choice(letters)
+                                       for x in xrange(15))
+    if 'email' not in kwargs:
+        defaults['email'] = ''.join(
+            random.choice(letters) for x in xrange(10)) + '@example.com'
+    defaults.update(kwargs)
+    user = User(**defaults)
+    user.set_password(kwargs.get('password', 'testpass'))
+    return user

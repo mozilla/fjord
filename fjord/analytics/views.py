@@ -230,6 +230,18 @@ def generate_dashboard_atom_url(request):
 
 
 @es_required_or_50x(error_template='analytics/es_down.html')
+@mobile_template('analytics/{mobile/}analytics_dashboard.html')
+def analytics_dashboard(request, template):
+    return render(request, template)
+
+
+@es_required_or_50x(error_template='analytics/es_down.html')
+@mobile_template('analytics/{mobile/}spam_dashboard.html')
+def spam_dashboard(request, template):
+    return render(request, template)
+
+
+@es_required_or_50x(error_template='analytics/es_down.html')
 @mobile_template('analytics/{mobile/}dashboard.html')
 def dashboard(request, template):
     output_format = request.GET.get('format', None)

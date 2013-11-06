@@ -389,3 +389,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     )
 }
+
+# Just run a syncdb when building the test db--don't run all of
+# South's migrations.
+# SOUTH_TESTS_MIGRATE = False
