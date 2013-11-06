@@ -12,18 +12,15 @@ class Migration(DataMigration):
             name='dashboard',
             app_label='analytics',
             model='unused')
-        analytics_content_type.save()
 
         Permission = orm['auth.Permission']
         view_perm = Permission.objects.create(
             name='View analytics dashboard',
             content_type=analytics_content_type,
             codename='can_view_dashboard')
-        view_perm.save()
 
         Group = orm['auth.Group']
         analyzers_group = Group.objects.create(name='analyzers')
-        analyzers_group.save()
         analyzers_group.permissions.add(view_perm)
 
     def backwards(self, orm):
