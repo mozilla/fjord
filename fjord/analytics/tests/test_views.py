@@ -6,11 +6,12 @@ from nose.tools import eq_
 from pyelasticsearch.exceptions import Timeout
 from pyquery import PyQuery
 
+from django.contrib.auth.models import Group
 from django.http import QueryDict
 
 from fjord.analytics import views
 from fjord.analytics.views import counts_to_options, _zero_fill
-from fjord.base.tests import TestCase, LocalizingClient, reverse
+from fjord.base.tests import TestCase, LocalizingClient, reverse, user
 from fjord.base.util import epoch_milliseconds
 from fjord.feedback.tests import response
 from fjord.search.tests import ElasticTestCase
@@ -431,3 +432,46 @@ class TestResponseview(ElasticTestCase):
         eq_(200, r.status_code)
         self.assertTemplateUsed(r, 'analytics/mobile/response.html')
         assert str(resp.description) in r.content
+
+
+class TestAnalyticsDashboardView(ElasticTestCase):
+    client_class = LocalizingClient
+
+    def test_permissions(self):
+        # Verifies that only analyzers can see the analyzer dashboard
+        # link
+        url = reverse('analytics_dashboard')
+        resp = self.client.get(url)
+        eq_(200, resp.status_code)
+        self.assertTemplateUsed(resp, 'analytics/analytics_dashboard.html')
+        assert 'adashboard' not in resp.content
+
+        jane = user(email='jane@example.com', save=True)
+        jane.groups.add(Group.objects.filter(name='analyzers').get())
+
+        self.client_login_user(jane)
+        resp = self.client.get(url)
+        eq_(200, resp.status_code)
+        assert 'adashboard' in resp.content
+
+
+class TestSpamDashboardView(ElasticTestCase):
+    client_class = LocalizingClient
+
+    def test_permissions(self):
+        # Verifies that only analyzers can see the spam dashboard
+        # link 
+        url = reverse('spam_dashboard')
+        resp = self.client.get(url)
+        eq_(200, resp.status_code)
+        self.assertTemplateUsed(resp, 'analytics/spam_dashboard.html')
+        assert 'sdashboard' not in resp.content
+
+        jane = user(email='jane@example.com', save=True)
+        jane.groups.add(Group.objects.filter(name='analyzers').get())
+
+        self.client_login_user(jane)
+        resp = self.client.get(url)
+        eq_(200, resp.status_code)
+        print resp.content
+        assert 'sdashboard' in resp.content
