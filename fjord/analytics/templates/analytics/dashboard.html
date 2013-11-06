@@ -1,13 +1,5 @@
-{% extends "base.html" %}
+{% extends "analytics/dashboard_base.html" %}
 
-{% block site_css %}
-  {{ css('dashboard') }}
-{% endblock %}
-
-{% block site_js %}
-  {{ js('dashboard') }}
-  <script type="text/javascript" src="https://login.persona.org/include.js"></script>
-{% endblock %}
 
 {% block feeds %}
   <link href="{{ atom_url }}"
