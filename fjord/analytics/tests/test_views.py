@@ -440,14 +440,13 @@ class TestAnalyticsDashboardView(ElasticTestCase):
     def test_permissions(self):
         # Verifies that only analyzers can see the analyzer dashboard
         # link
-        url = reverse('analytics_dashboard')
+        url = reverse('dashboard')
         resp = self.client.get(url)
         eq_(200, resp.status_code)
-        self.assertTemplateUsed(resp, 'analytics/analytics_dashboard.html')
         assert 'adashboard' not in resp.content
 
         jane = user(email='jane@example.com', save=True)
-        jane.groups.add(Group.objects.filter(name='analyzers').get())
+        jane.groups.add(Group.objects.get(name='analyzers'))
 
         self.client_login_user(jane)
         resp = self.client.get(url)
@@ -461,17 +460,15 @@ class TestSpamDashboardView(ElasticTestCase):
     def test_permissions(self):
         # Verifies that only analyzers can see the spam dashboard
         # link 
-        url = reverse('spam_dashboard')
+        url = reverse('dashboard')
         resp = self.client.get(url)
         eq_(200, resp.status_code)
-        self.assertTemplateUsed(resp, 'analytics/spam_dashboard.html')
         assert 'sdashboard' not in resp.content
 
         jane = user(email='jane@example.com', save=True)
-        jane.groups.add(Group.objects.filter(name='analyzers').get())
+        jane.groups.add(Group.objects.get(name='analyzers'))
 
         self.client_login_user(jane)
         resp = self.client.get(url)
         eq_(200, resp.status_code)
-        print resp.content
         assert 'sdashboard' in resp.content

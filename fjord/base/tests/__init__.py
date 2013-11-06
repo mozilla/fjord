@@ -15,7 +15,7 @@ from selenium.webdriver.firefox import firefox_binary
 from nose import SkipTest
 
 from funfactory.urlresolvers import split_path, reverse
-from test_utils import TransactionTestCase as OriginalTestCase
+from test_utils import TestCase as OriginalTestCase
 
 
 class LocalizingClient(Client):
@@ -54,7 +54,8 @@ class LocalizingClient(Client):
 class BaseTestCase(OriginalTestCase):
     def client_login_user(self, user):
         with mock_browserid(user.email):
-            self.client.login()
+            ret = self.client.login(audience='faux', assertion='faux')
+            assert ret, "Login failed."
 
 
 @override_settings(ES_LIVE_INDEX=False)

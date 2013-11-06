@@ -300,6 +300,7 @@ LESS_BIN = 'lessc'
 JAVA_BIN = 'java'
 
 AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
     'django_browserid.auth.BrowserIDBackend',
 ]
 
@@ -392,4 +393,4 @@ REST_FRAMEWORK = {
 
 # Just run a syncdb when building the test db--don't run all of
 # South's migrations.
-# SOUTH_TESTS_MIGRATE = False
+SOUTH_TESTS_MIGRATE = False

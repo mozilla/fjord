@@ -7,7 +7,6 @@ from django.db import models
 class Migration(DataMigration):
     def forwards(self, orm):
         ContentType = orm['contenttypes.ContentType']
-
         analytics_content_type = ContentType.objects.create(
             name='dashboard',
             app_label='analytics',
