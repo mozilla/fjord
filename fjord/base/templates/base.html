@@ -33,11 +33,15 @@
 
         <ul>
           <li><a class="dashboard" href="{{ url('dashboard') }}"><span>{{ _('Dashboard') }}</span></a></li>
+          {% if user.is_authenticated() and user.has_perm('analytics.can_view_dashboard') %}
+            <li><a class="adashboard" href="{{ url('analytics_dashboard') }}"><span>{{ _('Analytics') }}</span></a></li>
+            <li><a class="sdashboard" href="{{ url('spam_dashboard') }}"><span>{{ _('Damn Spam') }}</span></a></li>
+          {% endif %}
         </ul>
 
         <ul class="pull-right">
           {% if user.is_authenticated() %}
-            <li><span class="greeting">{{ _('Hello, {username}')|fe(username=user.username) }}</span></li>
+            <li><span class="greeting">{{ _('Hello, {username}')|fe(username=user.first_name) }}</span></li>
             {% if user.is_superuser %}
               <li><span><a href="{{ url('admin:index') }}">Admin</a></span></li>
             {% endif %}

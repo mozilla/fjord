@@ -1,0 +1,28 @@
+{% extends "analytics/dashboard_base.html" %}
+
+{% block body_id %}adashboard{% endblock %}
+
+{% block content %}
+
+<div class="col">
+{% block content_leftside %}
+{% endblock %}
+</div>
+
+<div class="col wide">
+{% block content_middle %}
+  <div class="block feedback">
+    <h2>Welcome Analyzer {{ user.first_name }}!</h2>
+    <p>
+      Coming soon in 2013q4!
+    </p>
+  </div>
+{% endblock %}
+</div>
+
+<div class="col">
+{% block content_rightside %}
+{% endblock %}
+</div>
+
+{% endblock %}

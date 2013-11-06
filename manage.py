@@ -23,5 +23,13 @@ except ImportError:
 
 manage.setup_environ(__file__, more_pythonic=True)
 
+
+if 'test' in sys.argv:
+    # This quells south's crazy debug logging during tests
+    import logging
+    import south.logger
+    logging.getLogger('south').setLevel(logging.INFO)
+
+
 if __name__ == "__main__":
     manage.main()

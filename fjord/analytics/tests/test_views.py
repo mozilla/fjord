@@ -6,11 +6,12 @@ from nose.tools import eq_
 from pyelasticsearch.exceptions import Timeout
 from pyquery import PyQuery
 
+from django.contrib.auth.models import Group
 from django.http import QueryDict
 
 from fjord.analytics import views
 from fjord.analytics.views import counts_to_options, _zero_fill
-from fjord.base.tests import TestCase, LocalizingClient, reverse
+from fjord.base.tests import TestCase, LocalizingClient, reverse, user
 from fjord.base.util import epoch_milliseconds
 from fjord.feedback.tests import response
 from fjord.search.tests import ElasticTestCase
@@ -431,3 +432,58 @@ class TestResponseview(ElasticTestCase):
         eq_(200, r.status_code)
         self.assertTemplateUsed(r, 'analytics/mobile/response.html')
         assert str(resp.description) in r.content
+
+
+class TestAnalyticsDashboardView(ElasticTestCase):
+    client_class = LocalizingClient
+
+    def test_permissions(self):
+        # Verifies that only analyzers can see the analytics dashboard
+        # link
+        resp = self.client.get(reverse('dashboard'))
+        eq_(200, resp.status_code)
+        assert 'adashboard' not in resp.content
+
+        # Verifies that only analyzers can see the analytics dashboard
+        resp = self.client.get(reverse('analytics_dashboard'))
+        eq_(403, resp.status_code)
+
+        # Verify analyzers can see analytics dashboard link
+        jane = user(email='jane@example.com', save=True)
+        jane.groups.add(Group.objects.get(name='analyzers'))
+
+        self.client_login_user(jane)
+        resp = self.client.get(reverse('dashboard'))
+        eq_(200, resp.status_code)
+        assert 'adashboard' in resp.content
+
+        # Verify analyzers can see analytics dashboard
+        resp = self.client.get(reverse('analytics_dashboard'))
+        eq_(200, resp.status_code)
+
+
+class TestSpamDashboardView(ElasticTestCase):
+    client_class = LocalizingClient
+
+    def test_permissions(self):
+        # Verifies that only analyzers can see the spam dashboard link
+        resp = self.client.get(reverse('dashboard'))
+        eq_(200, resp.status_code)
+        assert 'sdashboard' not in resp.content
+
+        # Verifies that only analyzers can see the spam dashboard
+        resp = self.client.get(reverse('spam_dashboard'))
+        eq_(403, resp.status_code)
+
+        # Verify analyzers can see spam dashboard link
+        jane = user(email='jane@example.com', save=True)
+        jane.groups.add(Group.objects.get(name='analyzers'))
+
+        self.client_login_user(jane)
+        resp = self.client.get(reverse('dashboard'))
+        eq_(200, resp.status_code)
+        assert 'sdashboard' in resp.content
+
+        # Verify analyzers can see spam dashboard
+        resp = self.client.get(reverse('spam_dashboard'))
+        eq_(200, resp.status_code)

@@ -300,6 +300,7 @@ LESS_BIN = 'lessc'
 JAVA_BIN = 'java'
 
 AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
     'django_browserid.auth.BrowserIDBackend',
 ]
 
@@ -389,3 +390,7 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     )
 }
+
+# Use the Django nose test runner because the test_utils one is
+# insane.
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

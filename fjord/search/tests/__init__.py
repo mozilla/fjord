@@ -5,14 +5,13 @@ from django.conf import settings
 from nose import SkipTest
 from pyelasticsearch.exceptions import (Timeout, ConnectionError,
                                         ElasticHttpNotFoundError)
-from test_utils import TestCase
 
-from fjord.base.tests import with_save
+from fjord.base.tests import BaseTestCase, with_save
 from fjord.search.index import get_index, get_es
 from fjord.search.models import Record
 
 
-class ElasticTestCase(TestCase):
+class ElasticTestCase(BaseTestCase):
     """Base class for Elastic Search tests, providing some conveniences"""
     skipme = False
 

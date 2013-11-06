@@ -1,0 +1,32 @@
+{% extends "analytics/dashboard_base.html" %}
+
+{% block body_id %}sdashboard{% endblock %}
+
+{% block content %}
+
+<div class="col">
+{% block content_leftside %}
+{% endblock %}
+</div>
+
+<div class="col wide">
+{% block content_middle %}
+  <div class="block feedback">
+    <h2>Greetings!</h2>
+    <p>
+      Greetings, Spamfighter {{ user.username }}. You have been recruited by the Star
+      League to defend the frontier against Xur and the Ko-Dan armada.
+    </p>
+    <p>
+      Coming soon in 2013q4!
+    </p>
+  </div>
+{% endblock %}
+</div>
+
+<div class="col">
+{% block content_rightside %}
+{% endblock %}
+</div>
+
+{% endblock %}
