@@ -31,16 +31,17 @@
             {% endif %}
           </label>
           <p>{{ form.description }}</p>
-          <div id="{{ type }}-description-counter" class="characters-remaining"></div>
           {{ form.description.errors }}
         </div>
 
-        <div>
-          <label for="url">
-            {{ _('If your feedback is related to a website, you can include it here.') }}
-          </label>
-          <p>{{ form.url }}</p>
-          {{ form.url.errors }}
+        <div class="privacy">
+          <span>
+            {% trans %}
+              To protect your privacy, please ensure that no
+              personally identifiable information is included in
+              your feedback.
+            {% endtrans %}
+          </span>
         </div>
 
         {% if type == 'sad' %}
@@ -55,6 +56,14 @@
             {% endtrans %}
           </div>
         {% endif %}
+
+        <div>
+          <label for="url">
+            {{ _('If your feedback is related to a website, you can include it here.') }}
+          </label>
+          <p>{{ form.url }}</p>
+          {{ form.url.errors }}
+        </div>
 
         <label class="email-ok">
           <p>
@@ -84,17 +93,6 @@
           {% endtrans %}
         </p>
 
-        <div class="privacy-wrapper">
-          <p class="privacy">
-            <span>
-              {% trans %}
-              To protect your privacy, please ensure that no
-              personally identifiable information is included in
-              your feedback.
-              {% endtrans %}
-            </span>
-          </p>
-        </div>
       </div>
 
       {{ form.errors['__all__'] }}
