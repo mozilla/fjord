@@ -438,37 +438,52 @@ class TestAnalyticsDashboardView(ElasticTestCase):
     client_class = LocalizingClient
 
     def test_permissions(self):
-        # Verifies that only analyzers can see the analyzer dashboard
+        # Verifies that only analyzers can see the analytics dashboard
         # link
-        url = reverse('dashboard')
-        resp = self.client.get(url)
+        resp = self.client.get(reverse('dashboard'))
         eq_(200, resp.status_code)
         assert 'adashboard' not in resp.content
 
+        # Verifies that only analyzers can see the analytics dashboard
+        resp = self.client.get(reverse('analytics_dashboard'))
+        eq_(403, resp.status_code)
+
+        # Verify analyzers can see analytics dashboard link
         jane = user(email='jane@example.com', save=True)
         jane.groups.add(Group.objects.get(name='analyzers'))
 
         self.client_login_user(jane)
-        resp = self.client.get(url)
+        resp = self.client.get(reverse('dashboard'))
         eq_(200, resp.status_code)
         assert 'adashboard' in resp.content
+
+        # Verify analyzers can see analytics dashboard
+        resp = self.client.get(reverse('analytics_dashboard'))
+        eq_(200, resp.status_code)
 
 
 class TestSpamDashboardView(ElasticTestCase):
     client_class = LocalizingClient
 
     def test_permissions(self):
-        # Verifies that only analyzers can see the spam dashboard
-        # link 
-        url = reverse('dashboard')
-        resp = self.client.get(url)
+        # Verifies that only analyzers can see the spam dashboard link
+        resp = self.client.get(reverse('dashboard'))
         eq_(200, resp.status_code)
         assert 'sdashboard' not in resp.content
 
+        # Verifies that only analyzers can see the spam dashboard
+        resp = self.client.get(reverse('spam_dashboard'))
+        eq_(403, resp.status_code)
+
+        # Verify analyzers can see spam dashboard link
         jane = user(email='jane@example.com', save=True)
         jane.groups.add(Group.objects.get(name='analyzers'))
 
         self.client_login_user(jane)
-        resp = self.client.get(url)
+        resp = self.client.get(reverse('dashboard'))
         eq_(200, resp.status_code)
         assert 'sdashboard' in resp.content
+
+        # Verify analyzers can see spam dashboard
+        resp = self.client.get(reverse('spam_dashboard'))
+        eq_(200, resp.status_code)

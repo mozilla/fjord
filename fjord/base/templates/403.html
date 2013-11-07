@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block page_title %}{{ _('Forbidden') }}{% endblock %}
+
+{% block content %}
+  <div class="col"></div>
+  <div class="col wide">
+    <div class="block">
+      <h1>{{ _('Forbidden') }}</h1>
+      <p>
+        {% if user.is_authenticated() %}
+          {{ _('You do not have access to this page.') }}
+        {% else %}
+          {{ _('You do not have access to this page. If you have an account, try signing in.') }}
+        {% endif %}
+      </p>
+      <p>
+        <a href="/">{{ _('Return to the dashboard.') }}</a>
+      </p>
+    </div>
+  </div>
+{% endblock %}

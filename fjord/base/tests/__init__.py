@@ -1,9 +1,9 @@
+import random
 from functools import wraps
 from string import letters
-import random
 
-from django.contrib.auth.models import User
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.test.client import Client
 from django.test import LiveServerTestCase
 from django.test.utils import override_settings

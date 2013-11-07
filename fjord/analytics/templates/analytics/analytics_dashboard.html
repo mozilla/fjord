@@ -1,6 +1,6 @@
 {% extends "analytics/dashboard_base.html" %}
 
-{% block body_id %}dashboard{% endblock %}
+{% block body_id %}adashboard{% endblock %}
 
 {% block content %}
 
@@ -12,7 +12,7 @@
 <div class="col wide">
 {% block content_middle %}
   <div class="block feedback">
-    <h2>Welcome Analyzer {{ user.username }}!</h2>
+    <h2>Welcome Analyzer {{ user.first_name }}!</h2>
     <p>
       Coming soon in 2013q4!
     </p>
