@@ -59,6 +59,9 @@ INSTALLED_APPS += ('django_nose',)
 CELERY_ALWAYS_EAGER = True
 ES_URLS = ['http://jenkins-es20:9200']
 HMAC_KEYS = {'2012-06-06': 'jenkinsrocks'}
+
+from django_sha2 import get_password_hashers
+PASSWORD_HASHERS = get_password_hashers(BASE_PASSWORD_HASHERS, HMAC_KEYS)
 SETTINGS
 
 echo "Creating database if we need it..."
