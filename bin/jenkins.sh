@@ -35,9 +35,7 @@ pip install -q -r requirements/compiled.txt
 
 cat > fjord/settings/local.py <<SETTINGS
 from fjord.settings.base import *
-from fjord.settings.test import *
 
-DEBUG = True
 SECRET_KEY = 'pining'
 LOG_LEVEL = logging.ERROR
 
