@@ -64,8 +64,8 @@ echo "Creating database if we need it..."
 echo "CREATE DATABASE IF NOT EXISTS ${JOB_NAME}"|mysql -u $DB_USER -h $DB_HOST
 
 echo "Generating all the static assets..."
-manage.py collectstatic --noinput
-manage.py compress_assets
+python manage.py collectstatic --noinput
+python manage.py compress_assets
 
 echo "Starting tests..."
 coverage run manage.py test --noinput --with-xunit
