@@ -169,7 +169,6 @@ INSTALLED_APPS = get_apps(
         'djcelery',
         'eadred',
         'jingo_minify',
-        'test_utils',
         'dennis.django_dennis',
 
         'fjord.analytics',
@@ -390,7 +389,3 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     )
 }
-
-# Use the Django nose test runner because the test_utils one is
-# insane.
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

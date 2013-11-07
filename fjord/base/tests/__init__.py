@@ -4,8 +4,10 @@ from string import letters
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.test.client import Client
+from django.core.cache import cache
 from django.test import LiveServerTestCase
+from django.test import TestCase as OriginalTestCase
+from django.test.client import Client
 from django.test.utils import override_settings
 
 from django_browserid.tests import mock_browserid
@@ -14,8 +16,9 @@ from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.firefox import firefox_binary
 from nose import SkipTest
 
+# reverse is here for convenience so other test modules import it from
+# here rather than importing it from funfactory
 from funfactory.urlresolvers import split_path, reverse
-from test_utils import TestCase as OriginalTestCase
 
 
 class LocalizingClient(Client):
@@ -57,10 +60,15 @@ class BaseTestCase(OriginalTestCase):
             ret = self.client.login(audience='faux', assertion='faux')
             assert ret, "Login failed."
 
+    def setUp(self):
+        super(BaseTestCase, self).setUp()
+        # Clear the cache before running tests
+        cache.clear()
+
 
 @override_settings(ES_LIVE_INDEX=False)
 class TestCase(BaseTestCase):
-    """A modification of ``test_utils.TestCase`` that skips live indexing."""
+    """TestCase that skips live indexing."""
     pass
 
 
