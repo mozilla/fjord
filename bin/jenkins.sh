@@ -58,6 +58,8 @@ DATABASES = {
 INSTALLED_APPS += ('django_nose',)
 CELERY_ALWAYS_EAGER = True
 ES_URLS = ['http://jenkins-es20:9200']
+HMAC_KEYS = {'2012-06-06': 'jenkinsrocks'}
+}
 SETTINGS
 
 echo "Creating database if we need it..."
