@@ -63,8 +63,11 @@ SETTINGS
 echo "Creating database if we need it..."
 echo "CREATE DATABASE IF NOT EXISTS ${JOB_NAME}"|mysql -u $DB_USER -h $DB_HOST
 
+echo "Generating all the static assets..."
+manage.py collectstatic --noinput
+manage.py compress_assets
+
 echo "Starting tests..."
-export FORCE_DB=1
 coverage run manage.py test --noinput --with-xunit
 coverage xml $(find fjord lib -name '*.py')
 
