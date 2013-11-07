@@ -39,7 +39,6 @@ from fjord.settings.test import *
 
 DEBUG = True
 SECRET_KEY = 'pining'
-ROOT_URLCONF = 'fjord.urls'
 LOG_LEVEL = logging.ERROR
 
 DATABASES = {
