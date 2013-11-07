@@ -391,6 +391,6 @@ REST_FRAMEWORK = {
     )
 }
 
-# Just run a syncdb when building the test db--don't run all of
-# South's migrations.
-SOUTH_TESTS_MIGRATE = False
+# Use the Django nose test runner because the test_utils one is
+# insane.
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
