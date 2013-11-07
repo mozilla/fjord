@@ -35,12 +35,13 @@ pip install -q -r requirements/compiled.txt
 
 cat > fjord/settings/local.py <<SETTINGS
 from fjord.settings.base import *
+from fjord.settings.test import *
 
 DEBUG = True
 SECRET_KEY = 'pining'
 ROOT_URLCONF = 'fjord.urls'
 LOG_LEVEL = logging.ERROR
-# Database name has to be set because of sphinx
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -55,8 +56,6 @@ DATABASES = {
     }
 }
 
-INSTALLED_APPS += ('django_nose',)
-CELERY_ALWAYS_EAGER = True
 ES_URLS = ['http://jenkins-es20:9200']
 HMAC_KEYS = {'2012-06-06': 'jenkinsrocks'}
 
