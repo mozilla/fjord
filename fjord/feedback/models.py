@@ -198,6 +198,7 @@ class ResponseSerializer(serializers.Serializer):
     version = serializers.CharField(max_length=30, required=False, default=u'')
     locale = serializers.CharField(max_length=8, required=False, default=u'')
     platform = serializers.CharField(max_length=30, required=False, default=u'')
+    country = serializers.CharField(max_length=4, required=False, default=u'')
 
     # device information
     manufacturer = serializers.CharField(required=False, default=u'')
@@ -229,7 +230,8 @@ class ResponseSerializer(serializers.Serializer):
             platform=attrs['platform'].strip(),
             locale=attrs['locale'].strip(),
             manufacturer=attrs['manufacturer'].strip(),
-            device=attrs['device'].strip()
+            device=attrs['device'].strip(),
+            country=attrs['country'].strip()
         )
 
         # If there is an email address, stash it on this instance so

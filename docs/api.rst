@@ -92,6 +92,15 @@ Posting feedback
 
         Examples: ``"en-US"``, ``"fr"``, ``"de"``
 
+    **country**
+        String. The country of origin for the device.
+
+        Examples: ``"Peru"``, ``"Mexico"``
+
+        .. Note::
+
+           This is probably only relevant to Firefox OS phones.
+
     **manufacturer**
         String. The manufacturer of the device the product is running
         on.

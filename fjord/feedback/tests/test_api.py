@@ -26,6 +26,44 @@ class TestFeedbackAPI(TestCase):
         eq_(feedback.url, u'')
         eq_(feedback.user_agent, u'api')
 
+    def test_maximal(self):
+        """Tests an API call with all possible data"""
+        data = {
+            'happy': True,
+            'description': u'Great!',
+            'product': u'Firefox OS',
+            'channel': u'stable',
+            'version': u'1.1',
+            'platform': u'Firefox OS',
+            'locale': 'en-US',
+            'email': 'foo@example.com',
+            'url': 'http://example.com/',
+            'manufacturer': 'OmniCorp',
+            'device': 'OmniCorp',
+            'country': 'US',
+        }
+
+        # This makes sure the test is up-to-date. If we add fields
+        # to the serializer, then this will error out unless we've
+        # also added them to this test.
+        for field in models.ResponseSerializer.base_fields.keys():
+            assert field in data, '{0} not in data'.format(field)
+
+        # Post the data and then make sure everything is in the
+        # resulting Response. In most cases, the field names line up
+        # between ResponseSerializer and Response with the exception
+        # of 'email' which is stored in a different table.
+        r = self.client.post(reverse('api-post-feedback'), data)
+        eq_(r.status_code, 201)
+
+        feedback = models.Response.objects.latest(field_name='id')
+        for field in models.ResponseSerializer.base_fields.keys():
+            if field == 'email':
+                email = models.ResponseEmail.objects.latest(field_name='id')
+                eq_(email.email, data['email'])
+            else:
+                eq_(getattr(feedback, field), data[field])
+
     def test_with_email(self):
         data = {
             'happy': True,
