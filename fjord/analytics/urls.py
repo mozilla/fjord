@@ -15,5 +15,6 @@ urlpatterns = patterns(
     url(r'^analytics_dashboard/?$', 'analytics_dashboard', name='analytics_dashboard'),
 
     # Spam dashboard
-    url(r'^spam_dashboard/?$', 'spam_dashboard', name='spam_dashboard')
+    url(r'^spam_dashboard/?$', 'spam_dashboard', name='spam_dashboard'),
+    url(r'^spam_dashboard/duplicates/?$', 'spam_duplicates', name='spam_duplicates')
 )

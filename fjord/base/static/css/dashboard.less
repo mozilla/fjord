@@ -87,3 +87,52 @@ ul.bars {
     }
   }
 }
+
+.note {
+  color: red;
+}
+
+.spamtable {
+  display: block;
+  padding: 10px 40px;
+  position: relative;
+
+  p {
+    margin: 0 0 3px 0;
+    font-size: 14px;
+    line-height: 18px;
+    word-wrap: break-word;
+    word-break: break-all;
+    white-space: normal;
+  }
+
+  > tbody {
+    > tr {
+      > td {
+        width: 50%;
+        padding: 20px;
+        vertical-align: top;
+      }
+    }
+
+    > tr:nth-child(even) {
+      background-color: #fff;
+    }
+
+    > tr:nth-child(odd) {
+      background-color: #eef;
+    }
+  }
+
+  table.details {
+    width: 100%;
+    td {
+      padding: 5px 10px;
+      vertical-align: top;
+
+      p {
+        white-space: nowrap;
+      }
+    }
+  }
+}
