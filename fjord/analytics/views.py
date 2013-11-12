@@ -230,20 +230,6 @@ def generate_dashboard_atom_url(request):
     return reverse('dashboard') + '?' + qd.urlencode()
 
 
-@permission_required('analytics.can_view_dashboard', raise_exception=True)
-@es_required_or_50x(error_template='analytics/es_down.html')
-@mobile_template('analytics/{mobile/}analytics_dashboard.html')
-def analytics_dashboard(request, template):
-    return render(request, template)
-
-
-@permission_required('analytics.can_view_dashboard', raise_exception=True)
-@es_required_or_50x(error_template='analytics/es_down.html')
-@mobile_template('analytics/{mobile/}spam_dashboard.html')
-def spam_dashboard(request, template):
-    return render(request, template)
-
-
 @es_required_or_50x(error_template='analytics/es_down.html')
 @mobile_template('analytics/{mobile/}dashboard.html')
 def dashboard(request, template):
@@ -451,3 +437,17 @@ def dashboard(request, template):
         'selected': selected,
         'atom_url': generate_dashboard_atom_url(request)
     })
+
+
+@permission_required('analytics.can_view_dashboard', raise_exception=True)
+@es_required_or_50x(error_template='analytics/es_down.html')
+@mobile_template('analytics/{mobile/}analytics_dashboard.html')
+def analytics_dashboard(request, template):
+    return render(request, template)
+
+
+@permission_required('analytics.can_view_dashboard', raise_exception=True)
+@es_required_or_50x(error_template='analytics/es_down.html')
+@mobile_template('analytics/{mobile/}spam_dashboard.html')
+def spam_dashboard(request, template):
+    return render(request, template)
