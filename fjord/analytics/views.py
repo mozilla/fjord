@@ -1,5 +1,5 @@
 import json
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 from math import floor
 
 from django.contrib.auth.decorators import permission_required
@@ -451,3 +451,34 @@ def analytics_dashboard(request, template):
 @mobile_template('analytics/{mobile/}spam_dashboard.html')
 def spam_dashboard(request, template):
     return render(request, template)
+
+
+@permission_required('analytics.can_view_dashboard', raise_exception=True)
+@es_required_or_50x(error_template='analytics/es_down.html')
+def spam_duplicates(request):
+    """Shows all duplicate descriptions over the last n days"""
+    n = 14
+
+    responses = (ResponseMappingType.search()
+                 .filter(created__gte=datetime.now() - timedelta(days=n))
+                 .values_dict('description', 'happy', 'created', 'locale',
+                              'user_agent', 'id')
+                 .order_by('created').all())
+
+    response_dupes = {}
+    for resp in responses:
+        response_dupes.setdefault(resp['description'], []).append(resp)
+
+    response_dupes = [
+        (key, val) for key, val in response_dupes.items()
+        if len(val) > 1
+    ]
+
+    # convert the dict into a list of tuples sorted by the number of
+    # responses per tuple largest number first
+    response_dupes = sorted(response_dupes, key=lambda item: len(item[1]) * -1)
+
+    return render(request, 'analytics/spam_duplicates.html', {
+        'n': 14,
+        'response_dupes': response_dupes
+    })
