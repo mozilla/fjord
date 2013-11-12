@@ -125,6 +125,7 @@
 
         $('.submit a').click(function(e) {
             if ($(this).hasClass('disabled') === false) {
+                $(this).addClass('disabled');
                 $(this).closest('form').submit();
             }
 
