@@ -465,6 +465,8 @@ def spam_duplicates(request):
                               'user_agent', 'id')
                  .order_by('created').all())
 
+    total_count = len(responses)
+
     response_dupes = {}
     for resp in responses:
         response_dupes.setdefault(resp['description'], []).append(resp)
@@ -490,4 +492,5 @@ def spam_duplicates(request):
         'response_dupes': response_dupes,
         'render_time': datetime.now(),
         'summary_counts': summary_counts,
+        'total_count': total_count,
     })

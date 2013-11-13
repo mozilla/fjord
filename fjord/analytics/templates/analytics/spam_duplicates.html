@@ -8,6 +8,10 @@
       <p>
         Report rendered on {{ render_time|datetime('%a %b %d %Y at %H:%M:%S') }}
       </p>
+      <p>
+        <strong>Total responses in the last {{ n }} days:</strong> {{ total_count }}
+      </p>
+
       <h3>Summary</h3>
       <table class="summarytable">
         <thead>
