@@ -1,0 +1,10 @@
+<h2>{{ _('Welcome!') }}</h2>
+<p>
+  {% trans %}
+    The identity you just logged into Persona with ties you to your
+    account on Input. Please remember which identity you used.
+  {% endtrans %}
+</p>
+<p>
+  <a href="{{ next_url }}">{{ _('Onwards to your destination.') }}</a>
+</p>

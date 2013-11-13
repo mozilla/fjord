@@ -2,7 +2,6 @@ import json
 from datetime import datetime, timedelta
 from math import floor
 
-from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.template.defaultfilters import slugify
@@ -15,6 +14,8 @@ from tower import ugettext as _
 from fjord.analytics.tools import JSONDatetimeEncoder, generate_query_parsed
 from fjord.base.helpers import locale_name, to_datetime_string
 from fjord.base.util import (
+    analyzer_required,
+    check_new_user,
     smart_int,
     smart_datetime,
     epoch_milliseconds,
@@ -143,6 +144,7 @@ def _zero_fill(start, end, data_sets, spacing=DAY_IN_MILLIS):
         timestamp += spacing
 
 
+@check_new_user
 @mobile_template('analytics/{mobile/}response.html')
 def response_view(request, responseid, template):
     response = get_object_or_404(Response, id=responseid)
@@ -230,6 +232,7 @@ def generate_dashboard_atom_url(request):
     return reverse('dashboard') + '?' + qd.urlencode()
 
 
+@check_new_user
 @es_required_or_50x(error_template='analytics/es_down.html')
 @mobile_template('analytics/{mobile/}dashboard.html')
 def dashboard(request, template):
@@ -439,21 +442,24 @@ def dashboard(request, template):
     })
 
 
-@permission_required('analytics.can_view_dashboard', raise_exception=True)
+@check_new_user
+@analyzer_required
 @es_required_or_50x(error_template='analytics/es_down.html')
 @mobile_template('analytics/{mobile/}analytics_dashboard.html')
 def analytics_dashboard(request, template):
     return render(request, template)
 
 
-@permission_required('analytics.can_view_dashboard', raise_exception=True)
+@check_new_user
+@analyzer_required
 @es_required_or_50x(error_template='analytics/es_down.html')
 @mobile_template('analytics/{mobile/}spam_dashboard.html')
 def spam_dashboard(request, template):
     return render(request, template)
 
 
-@permission_required('analytics.can_view_dashboard', raise_exception=True)
+@check_new_user
+@analyzer_required
 @es_required_or_50x(error_template='analytics/es_down.html')
 def spam_duplicates(request):
     """Shows all duplicate descriptions over the last n days"""

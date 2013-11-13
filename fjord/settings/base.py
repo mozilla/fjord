@@ -303,10 +303,7 @@ AUTHENTICATION_BACKENDS = [
     'django_browserid.auth.BrowserIDBackend',
 ]
 
-# We don't want browserid to automatically create users at the present
-# time.
-BROWSERID_CREATE_USER = False
-
+BROWSERID_VERIFY_CLASS = 'fjord.base.browserid.FjordVerify'
 BROWSERID_AUDIENCES = ['http://127.0.0.1:8000', 'http://localhost:8000']
 LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = '/'

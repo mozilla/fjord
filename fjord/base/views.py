@@ -8,14 +8,29 @@ from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 
 from celery.messaging import establish_connection
+from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
 from pyelasticsearch.exceptions import (
     ConnectionError, ElasticHttpNotFoundError, Timeout)
 
+from fjord.base.models import Profile
 from fjord.search.index import get_index, get_index_stats
 
 
 log = logging.getLogger('i.services')
+
+
+@mobile_template('{mobile/}new_user.html')
+def new_user_view(request, template=None):
+    # We could do more with this, but we're not at the moment.
+    up = Profile(user=request.user)
+    up.save()
+
+    next_url = request.GET.get('next', reverse('dashboard'))
+
+    return render(request, template, {
+        'next_url': next_url,
+    })
 
 
 @mobile_template('{mobile/}login_failure.html')

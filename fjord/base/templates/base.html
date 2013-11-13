@@ -41,7 +41,7 @@
 
         <ul class="pull-right">
           {% if user.is_authenticated() %}
-            <li><span class="greeting">{{ _('Hello, {username}')|fe(username=user.first_name) }}</span></li>
+            <li><span class="greeting">{{ _('Hello, {username}')|fe(username=displayname(user)) }}</span></li>
             {% if user.is_superuser %}
               <li><span><a href="{{ url('admin:index') }}">Admin</a></span></li>
             {% endif %}

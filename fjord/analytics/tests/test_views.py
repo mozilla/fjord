@@ -11,7 +11,7 @@ from django.http import QueryDict
 
 from fjord.analytics import views
 from fjord.analytics.views import counts_to_options, _zero_fill
-from fjord.base.tests import TestCase, LocalizingClient, reverse, user
+from fjord.base.tests import TestCase, LocalizingClient, profile, reverse, user
 from fjord.base.util import epoch_milliseconds
 from fjord.feedback.tests import response
 from fjord.search.tests import ElasticTestCase
@@ -450,6 +450,7 @@ class TestAnalyticsDashboardView(ElasticTestCase):
 
         # Verify analyzers can see analytics dashboard link
         jane = user(email='jane@example.com', save=True)
+        profile(user=jane, save=True)
         jane.groups.add(Group.objects.get(name='analyzers'))
 
         self.client_login_user(jane)
@@ -477,6 +478,7 @@ class TestSpamDashboardView(ElasticTestCase):
 
         # Verify analyzers can see spam dashboard link
         jane = user(email='jane@example.com', save=True)
+        profile(user=jane, save=True)
         jane.groups.add(Group.objects.get(name='analyzers'))
 
         self.client_login_user(jane)

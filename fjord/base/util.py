@@ -1,8 +1,12 @@
 from datetime import datetime
+from functools import wraps
 import time
 
+from django.contrib.auth.decorators import permission_required
+from django.http import HttpResponseRedirect
 from django.utils.feedgenerator import Atom1Feed
 
+from funfactory.urlresolvers import reverse
 from product_details import product_details
 from rest_framework.throttling import AnonRateThrottle
 from statsd import statsd
@@ -189,3 +193,27 @@ class MeasuredAnonRateThrottle(AnonRateThrottle):
     """On throttle failure, does a statsd call"""
     def throttle_failure(self):
         statsd.incr('api.throttle.failure')
+
+
+def check_new_user(fun):
+    @wraps(fun)
+    def _wrapped_view(request, *args, **kwargs):
+        # Do this here to avoid circular imports
+        from fjord.base.models import Profile
+
+        try:
+            request.user.profile
+        except AttributeError:
+            pass
+        except Profile.DoesNotExist:
+            url = reverse('new-user-view') + '?next=' + request.path
+            return HttpResponseRedirect(url)
+
+        return fun(request, *args, **kwargs)
+
+    return _wrapped_view
+
+
+analyzer_required = permission_required(
+    'analytics.can_view_dashboard',
+    raise_exception=True)

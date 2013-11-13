@@ -18,11 +18,11 @@
 <div class="col wide">
 {% block content_middle %}
   <div class="block">
-    <h2>Greetings!</h2>
-    <p>
-      Greetings, Spamfighter {{ user.username }}. You have been recruited by the Star
-      League to defend the frontier against Xur and the Ko-Dan armada.
-    </p>
+    <h2>
+      Greetings, Spamfighter {{ displayname(user) }}! You
+      have been recruited by the Star League to defend the frontier against
+      Xur and the Ko-Dan armada.
+    </h2>
   </div>
 {% endblock %}
 </div>

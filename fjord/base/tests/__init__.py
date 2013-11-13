@@ -20,6 +20,8 @@ from nose import SkipTest
 # here rather than importing it from funfactory
 from funfactory.urlresolvers import split_path, reverse
 
+from fjord.base.models import Profile
+
 
 class LocalizingClient(Client):
     """Client which rewrites urls to include locales and adds a user agent.
@@ -148,3 +150,15 @@ def user(**kwargs):
     user = User(**defaults)
     user.set_password(kwargs.get('password', 'testpass'))
     return user
+
+
+@with_save
+def profile(**kwargs):
+    """Returns a Profile"""
+    defaults = {}
+    if 'user' not in kwargs:
+        defaults['user'] = user(save=True)
+
+    defaults.update(kwargs)
+
+    return Profile(**defaults)

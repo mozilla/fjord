@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 import caching.base
@@ -11,3 +12,7 @@ class ModelBase(caching.base.CachingMixin, models.Model):
 
     class Meta:
         abstract = True
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
