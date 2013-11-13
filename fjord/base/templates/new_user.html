@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block page_title %}{{ _('Welcome to Input!') }}{% endblock %}
+
+{% block content %}
+  <div class="col"></div>
+  <div class="col wide">
+    <div class="block">
+      {% include "includes/new_user_text.html" %}
+    </div>
+  </div>
+{% endblock %}
