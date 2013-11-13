@@ -15,7 +15,7 @@
                   <strong>Count:</strong> {{ responses|count }}
                 </p>
                 <p>
-                  <strong>Range:</strong> {{ responses[0][1] }} through {{ responses[-1][1] }}
+                  <strong>Range:</strong> {{ responses[0].created|datetime('%a %b %d %Y at %H:%M:%S') }} - {{ responses[-1].created|datetime('%a %b %d %Y at %H:%M:%S') }}
                 </p>
                 <p>
                   <strong>Description:</strong>
@@ -29,7 +29,7 @@
                       <tr>
                         <td><a href="{{ url('response_view', responseid=resp.id) }}">{{ resp.id }}</a></td>
                         <td>{% if resp.happy %}Happy{% else %}Sad{% endif %}</td>
-                        <td><p>{{ resp.created }}</p></td>
+                        <td><p>{{ resp.created|datetime('%a %b %d %Y at %H:%M:%S') }}</p></td>
                         <td>{{ resp.locale }}</td>
                         <td>{{ resp.ua }}</td>
                       </tr>
