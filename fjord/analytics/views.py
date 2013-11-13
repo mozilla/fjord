@@ -478,7 +478,16 @@ def spam_duplicates(request):
     # responses per tuple largest number first
     response_dupes = sorted(response_dupes, key=lambda item: len(item[1]) * -1)
 
+    # duplicate_count -> count
+    # i.e. "how many responses had 2 duplicates?"
+    summary_counts = {}
+    for desc, responses in response_dupes:
+        summary_counts[len(responses)] = summary_counts.get(len(responses), 0) + 1
+    summary_counts = sorted(summary_counts.items(), key=lambda item: item[0])
+
     return render(request, 'analytics/spam_duplicates.html', {
         'n': 14,
-        'response_dupes': response_dupes
+        'response_dupes': response_dupes,
+        'render_time': datetime.now(),
+        'summary_counts': summary_counts,
     })

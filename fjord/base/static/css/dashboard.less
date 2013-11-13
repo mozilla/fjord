@@ -92,9 +92,29 @@ ul.bars {
   color: red;
 }
 
+.summarytable {
+  display: block;
+  padding: 5px 40px;
+  position: relative;
+
+  th, td {
+    padding: 4px 8px;
+  }
+
+  tbody {
+    tr:nth-child(even) {
+      background-color: #fff;
+    }
+
+    tr:nth-child(odd) {
+      background-color: #eef;
+    }
+  }
+}
+
 .spamtable {
   display: block;
-  padding: 10px 40px;
+  padding: 5px 40px;
   position: relative;
 
   p {

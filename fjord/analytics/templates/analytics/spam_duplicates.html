@@ -5,7 +5,28 @@
   <div class="col full">
     <div class="block feedback">
       <h2>Spam: Duplicates over the last {{ n }} days ordered by most duplicate-y</h2>
+      <p>
+        Report rendered on {{ rendrer_time|datetime('%a %b %d %Y at %H:%M:%S') }}
+      </p>
+      <h3>Summary</h3>
+      <table class="summarytable">
+        <thead>
+          <tr>
+            <th>count</th>
+            <th>responses with n duplicates</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for duplicate_count, count in summary_counts %}
+            <tr>
+              <td>{{ count }}</td>
+              <td>{{ duplicate_count }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
 
+      <h3>Details</h3>
       <table class="spamtable">
         <tbody>
           {% for desc, responses in response_dupes %}
