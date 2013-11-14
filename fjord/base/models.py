@@ -14,8 +14,5 @@ class ModelBase(caching.base.CachingMixin, models.Model):
         abstract = True
 
 
-class UserProfile(models.Model):
+class Profile(models.Model):
     user = models.OneToOneField(User)
-
-    def display_name(self):
-        return self.user.first_name or self.user.email

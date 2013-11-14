@@ -20,7 +20,7 @@ from nose import SkipTest
 # here rather than importing it from funfactory
 from funfactory.urlresolvers import split_path, reverse
 
-from fjord.base.models import UserProfile
+from fjord.base.models import Profile
 
 
 class LocalizingClient(Client):
@@ -154,11 +154,11 @@ def user(**kwargs):
 
 @with_save
 def profile(**kwargs):
-    """Returns a UserProfile"""
+    """Returns a Profile"""
     defaults = {}
     if 'user' not in kwargs:
         defaults['user'] = user(save=True)
 
     defaults.update(kwargs)
 
-    return UserProfile(**defaults)
+    return Profile(**defaults)

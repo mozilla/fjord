@@ -59,3 +59,9 @@ def to_datetime_string(dt):
 def to_date_string(dt):
     """Converts date/datetime to '%Y-%m-%d'"""
     return dt.strftime('%Y-%m-%d')
+
+
+@register.function
+def displayname(user):
+    """Returns the best display name for the user"""
+    return user.first_name or user.email

@@ -8,17 +8,17 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'UserProfile'
-        db.create_table('base_userprofile', (
+        # Adding model 'Profile'
+        db.create_table('base_profile', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
         ))
-        db.send_create_signal('base', ['UserProfile'])
+        db.send_create_signal('base', ['Profile'])
 
 
     def backwards(self, orm):
-        # Deleting model 'UserProfile'
-        db.delete_table('base_userprofile')
+        # Deleting model 'Profile'
+        db.delete_table('base_profile')
 
 
     models = {
@@ -51,8 +51,8 @@ class Migration(SchemaMigration):
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
-        'base.userprofile': {
-            'Meta': {'object_name': 'UserProfile'},
+        'base.profile': {
+            'Meta': {'object_name': 'Profile'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
         },

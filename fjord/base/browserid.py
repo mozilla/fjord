@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django_browserid.views import Verify
 from funfactory.urlresolvers import reverse
 
-from fjord.base.models import UserProfile
+from fjord.base.models import Profile
 
 
 class FjordVerify(Verify):
@@ -15,10 +15,10 @@ class FjordVerify(Verify):
         # If this user has never logged in before, send them to our
         # super secret "Welcome!" page.
         try:
-            self.user.get_profile()
+            self.user.profile
             return response
 
-        except UserProfile.DoesNotExist:
+        except Profile.DoesNotExist:
             url = reverse('new-user-view')
 
             redirect_to = self.request.REQUEST.get('next')
