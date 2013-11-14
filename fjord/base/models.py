@@ -15,4 +15,4 @@ class ModelBase(caching.base.CachingMixin, models.Model):
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
