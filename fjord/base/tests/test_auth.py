@@ -24,12 +24,12 @@ class TestAuth(BaseTestCase):
         get_request.user = new_user
         get_request.session = self.client.session
 
-        fv = FjordVerify()        
+        fv = FjordVerify()
         fv.user = new_user
         fv.request = get_request
 
         resp = fv.login_success()
-        eq_(302, resp.status_code)        
+        eq_(302, resp.status_code)
         eq_(resp.get('location'), reverse('new-user-view'))
 
     def test_existing_user(self):
@@ -51,12 +51,12 @@ class TestAuth(BaseTestCase):
         get_request.user = new_user
         get_request.session = self.client.session
 
-        fv = FjordVerify()        
+        fv = FjordVerify()
         fv.user = new_user
         fv.request = get_request
 
         resp = fv.login_success()
-        eq_(302, resp.status_code)        
+        eq_(302, resp.status_code)
         eq_(resp.get('location'), '/')
 
         # Now do it with next!
@@ -64,10 +64,10 @@ class TestAuth(BaseTestCase):
         get_request.user = new_user
         get_request.session = self.client.session
 
-        fv = FjordVerify()        
+        fv = FjordVerify()
         fv.user = new_user
         fv.request = get_request
 
         resp = fv.login_success()
-        eq_(302, resp.status_code)        
+        eq_(302, resp.status_code)
         eq_(resp.get('location'), '/foo')
