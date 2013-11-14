@@ -17,18 +17,22 @@
     <ul>
       <li class="opinion">
         {% if response.happy %}
-        <span class="sprite happy">{{ _('Happy') }}</span>
+          <span class="sprite happy">{{ _('Happy') }}</span>
         {% else %}
-        <span class="sprite sad">{{ _('Sad') }}</span>
+          <span class="sprite sad">{{ _('Sad') }}</span>
         {% endif %}
-        <p>
-          {{ response.description }}
-        </p>
-        <ul class="meta">
-{# Note: This next line says it's -0800/PST, but the server time is
-   Pacific and "celebrates" daylight savings so it's a villainous lie
-   for all datetimes in PDT. #}
-          <li>
+        <dl class="inline">
+          <dt>{{ _('Description') }}</dt>
+          <dd>
+            {{ response.description|nl2br }}
+          </dd>
+          <dt>{{ _('Created') }}</dt>
+          <dd>
+            {#
+               Note: This next line says it's -0800/PST, but the server time is
+               Pacific and "celebrates" daylight savings so it's a villainous lie
+               for all datetimes in PDT.
+            #}
             {% set created_date = to_date_string(response.created) %}
             {% set created_dt = to_datetime_string(response.created) %}
             <a href="{{ url('dashboard')|urlparams(date_start=created_dt) }}">
@@ -36,11 +40,61 @@
                 {{ response.created|naturaltime }}
               </time>
             </a>
-          </li>
-          <li><a href="{{ url('dashboard')|urlparams(platform=response.platform) }}">{{ response.platform|unknown }}</a></li>
-          <li><a href="{{ url('dashboard')|urlparams(locale=response.locale) }}">{{ response.locale|locale_name }}</a></li>
-          <li><a href="{{ url('response_view', responseid=response.id) }}">{{ _('Permalink') }}</a></li>
-        </ul>
+          </dd>
+          <dt>{{ _('Platform') }}</dt>
+          <dd>
+            <a href="{{ url('dashboard')|urlparams(platform=response.platform) }}">
+              {{ response.platform|unknown }}
+            </a>
+          </dd>
+          <dt>{{ _('Locale') }}</dt>
+          <dd>
+            <a href="{{ url('dashboard')|urlparams(locale=response.locale) }}">
+              {{ response.locale|locale_name }}
+            </a>
+          </dd>
+        </dl>
+
+        {% if user.is_authenticated() and user.has_perm('analytics.can_view_dashboard') %}
+          <dl class="inline secret">
+            <dt>{{ _('URL') }}</dt>
+            <dd>
+              {{ response.url or 'None' }}
+            </dd>
+            <dt>{{ _('Product') }}</dt>
+            <dd>
+              {{ response.product|unknown }}
+            </dd>
+            <dt>{{ _('Channel') }}</dt>
+            <dd>
+              {{ response.product|unknown }}
+            </dd>
+            <dt>{{ _('Version') }}</dt>
+            <dd>
+              {{ response.version|unknown }}
+            </dd>
+            <dt>{{ _('Country') }}</dt>
+            <dd>
+              {{ response.country|unknown }}
+            </dd>
+            <dt>{{ _('Manufacturer') }}</dt>
+            <dd>
+              {{ response.manufacturer|unknown }}
+            </dd>
+            <dt>{{ _('Device') }}</dt>
+            <dd>
+              {{ response.device|unknown }}
+            </dd>
+            <dt>{{ _('User agent') }}</dt>
+            <dd>
+              {{ response.user_agent|unknown }}
+            </dd>
+            <dt>{{ _('Has email?') }}</dt>
+            <dd>
+              {% if response.responseemail_set.count() > 0 %}{{ _('Yes') }}{% else %}{{ _('No') }}{% endif %}
+            </dd>
+          </dl>
+        {% endif %}
       </li>
     </ul>
   </div>
