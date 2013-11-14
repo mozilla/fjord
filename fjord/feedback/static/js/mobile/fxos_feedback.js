@@ -89,6 +89,14 @@ function init() {
     storageAddItem('device', $('#device select').val());
   });
 
+  $('#description').on('keyup', function() {
+    if ($('#description').val() === '') {
+      $('#description-next-btn').prop('disabled', true);
+    } else {
+      $('#description-next-btn').prop('disabled', false);
+    }
+  });
+
   $('#email .email-ok input').on('change', function() {
     var on = $(this).is(':checked');
     $('#email .email').toggle(on);
@@ -197,6 +205,7 @@ function init() {
       xdeck.shuffleTo(numCards-1);
     });
   }
+  $('#description-next-btn').prop('disabled', true);
   $('#email-ok').change();
   $('#email-error').hide();
 }
