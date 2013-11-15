@@ -96,3 +96,13 @@ class TestRobots(TestCase):
         resp = self.client.get('/robots.txt')
         eq_(resp.status_code, 200)
         self.assertTemplateUsed(resp, 'robots.txt')
+
+
+class TestNewUserView(TestCase):
+    def test_redirect_to_dashboard_if_anonymous(self):
+        # AnonymousUser shouldn't get to the new-user-view, so make
+        # sure they get redirected to the dashboard.
+        resp = self.client.get(reverse('new-user-view'), follow=True)
+        eq_(resp.status_code, 200)
+        self.assertTemplateNotUsed('new_user.html')
+        self.assertTemplateUsed('analytics/dashboard.html')

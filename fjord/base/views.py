@@ -3,7 +3,7 @@ import socket
 from functools import wraps
 
 from django.conf import settings
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 
@@ -22,6 +22,11 @@ log = logging.getLogger('i.services')
 
 @mobile_template('{mobile/}new_user.html')
 def new_user_view(request, template=None):
+    if request.user.is_anonymous():
+        # This is the AnonymousUser and they shouldn't be here
+        # so push them to the dashboard.
+        return HttpResponseRedirect(reverse('dashboard'))
+
     # We could do more with this, but we're not at the moment.
     up = Profile(user=request.user)
     up.save()
