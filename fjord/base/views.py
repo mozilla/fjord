@@ -27,9 +27,17 @@ def new_user_view(request, template=None):
         # so push them to the dashboard.
         return HttpResponseRedirect(reverse('dashboard'))
 
-    # We could do more with this, but we're not at the moment.
-    up = Profile(user=request.user)
-    up.save()
+    try:
+        # If they have a profile, then this doesn't throw an error
+        # and we can let them see the new user view again, but it's
+        # not particularly interesting.
+        request.user.profile
+    except Profile.DoesNotExist:
+        # They aren't anonymous and don't have a profile, so create
+        # a profile for them.
+        #
+        # We could do more with this, but we're not at the moment.
+        Profile.objects.create(user=request.user)
 
     next_url = request.GET.get('next', reverse('dashboard'))
 
