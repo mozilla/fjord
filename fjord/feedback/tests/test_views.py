@@ -90,7 +90,7 @@ class TestFeedback(TestCase):
         self.assertTemplateUsed(r, 'feedback/mobile/fxos_feedback.html')
 
     def test_invalid_form(self):
-        """Submitting a bad form should return an error and not change pages."""
+        """Submitting a really bad form should return an error."""
         url = reverse('feedback', args=('firefox.desktop.stable',))
         r = self.client.post(url, {
             'url': 'http://mozilla.org/'
@@ -101,7 +101,8 @@ class TestFeedback(TestCase):
         self.assertContains(r, 'This field is required')
         self.assertTemplateUsed(r, 'feedback/feedback.html')
 
-        # Test happy sans description
+    def test_invalid_form_happy(self):
+        """Submitting a bad happy form should return an error."""
         url = reverse('feedback', args=('firefox.desktop.stable',))
         r = self.client.post(url, {
             'url': 'http://mozilla.org/',
@@ -110,8 +111,10 @@ class TestFeedback(TestCase):
         })
 
         self.assertContains(r, 'This field is required')
+        self.assertTemplateUsed(r, 'feedback/feedback.html')
 
-        # Test sad sans description
+    def test_invalid_form_sad(self):
+        """Submitting a bad sad form should return an error."""
         url = reverse('feedback', args=('firefox.desktop.stable',))
         r = self.client.post(url, {
             'url': 'http://mozilla.org/',
@@ -120,6 +123,7 @@ class TestFeedback(TestCase):
         })
 
         self.assertContains(r, 'This field is required')
+        self.assertTemplateUsed(r, 'feedback/feedback.html')
 
     def test_whitespace_description(self):
         """Descriptions should have more than just whitespace"""
@@ -436,7 +440,7 @@ class TestWebFormThrottling(TestCase):
         for i in range(100):
             r = self.client.post(url, {
                 'happy': 1,
-                'description': u'Firefox rocks!',
+                'description': u'{0} Firefox rocks! {0}'.format(i),
                 'url': u'http://mozilla.org/'
             })
         eq_(models.Response.objects.count(), 100)
@@ -452,6 +456,37 @@ class TestWebFormThrottling(TestCase):
 
         # Make sure we still went to the Thanks page.
         self.assertRedirects(r, reverse('thanks'))
+
+    def test_double_submit_throttling(self):
+        """Verify double-submit throttling."""
+        # Make sure there are no responses in the db because we're
+        # basing our test on response counts.
+        initial_amount = models.Response.objects.count()
+        eq_(initial_amount, 0)
+
+        url = reverse('feedback', args=('firefox.desktop.stable',))
+
+        data = {
+            'happy': 1,
+            'description': u'Double-submit is the best!',
+            'url': u'http://mozilla.org/'
+        }
+
+        # Post it!
+        r = self.client.post(url, data)
+        self.assertRedirects(r, reverse('thanks'))
+        eq_(models.Response.objects.count(), 1)
+
+        # Post it again! This time it doesn't get to the db.
+        r = self.client.post(url, data)
+        self.assertRedirects(r, reverse('thanks'))
+        eq_(models.Response.objects.count(), 1)
+
+        # Post something different from the same ip address.
+        data['description'] = u'Not a double-submit!'
+        r = self.client.post(url, data)
+        self.assertRedirects(r, reverse('thanks'))
+        eq_(models.Response.objects.count(), 2)
 
 
 class TestRouting(TestCase):
