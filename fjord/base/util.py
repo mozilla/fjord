@@ -176,19 +176,6 @@ class Atom1FeedWithRelatedLinks(Atom1Feed):
                 attrs={'href': item['link_related'], 'rel': 'related'})
 
 
-def actual_ip(req):
-    """Returns the actual ip address
-
-    Our dev, stage and prod servers are behind a reverse proxy, so the ip
-    address in REMOTE_ADDR is the reverse proxy server and not the client
-    ip address. The actual client ip address is in HTTP_X_CLUSTER_CLIENT_IP.
-
-    In our local development and test environments, the client ip address
-    is in REMOTE_ADDR.
-    """
-    return req.META.get('HTTP_X_CLUSTER_CLIENT_IP', req.META['REMOTE_ADDR'])
-
-
 class MeasuredAnonRateThrottle(AnonRateThrottle):
     """On throttle failure, does a statsd call"""
     def throttle_failure(self):

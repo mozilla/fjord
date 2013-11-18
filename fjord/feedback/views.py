@@ -9,15 +9,14 @@ from django.views.decorators.http import require_POST
 
 from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
-from ratelimit.decorators import ratelimit
 from rest_framework import generics
-from statsd import statsd
 
 from fjord.base.browsers import UNKNOWN
-from fjord.base.util import actual_ip, smart_bool, translate_country_name
-from fjord.feedback.forms import ResponseForm
+from fjord.base.util import smart_bool, translate_country_name
 from fjord.feedback import config
 from fjord.feedback import models
+from fjord.feedback.forms import ResponseForm
+from fjord.feedback.utils import actual_ip_plus_desc, ratelimit
 
 
 def happy_redirect(request):
@@ -62,12 +61,12 @@ def requires_firefox(func):
     return _requires_firefox
 
 
-@ratelimit(ip=False, keys=actual_ip, block=False, rate='100/h')
+@ratelimit(rulename='doublesubmit_1pm', key=actual_ip_plus_desc, rate='1/m')
+@ratelimit(rulename='100ph', rate='100/h')
 def _handle_feedback_post(request):
     if getattr(request, 'limited', False):
         # If we're throttled, then return the thanks page, but don't
         # add the response to the db.
-        statsd.incr('webform.throttle.failure')
         return HttpResponseRedirect(reverse('thanks')), None
 
     form = ResponseForm(request.POST)
