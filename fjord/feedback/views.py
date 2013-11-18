@@ -1,3 +1,4 @@
+from base64 import b64encode
 from functools import wraps
 
 from django.http import HttpResponseRedirect, HttpResponse
@@ -14,7 +15,7 @@ from rest_framework import generics
 from statsd import statsd
 
 from fjord.base.browsers import UNKNOWN
-from fjord.base.util import actual_ip, smart_bool, translate_country_name
+from fjord.base.util import smart_bool, translate_country_name
 from fjord.feedback.forms import ResponseForm
 from fjord.feedback import config
 from fjord.feedback import models
@@ -62,6 +63,40 @@ def requires_firefox(func):
     return _requires_firefox
 
 
+def actual_ip(req):
+    """Returns the actual ip address
+
+    Our dev, stage and prod servers are behind a reverse proxy, so the ip
+    address in REMOTE_ADDR is the reverse proxy server and not the client
+    ip address. The actual client ip address is in HTTP_X_CLUSTER_CLIENT_IP.
+
+    In our local development and test environments, the client ip address
+    is in REMOTE_ADDR.
+
+    """
+    return req.META.get('HTTP_X_CLUSTER_CLIENT_IP', req.META['REMOTE_ADDR'])
+
+
+def actual_ip_plus_desc(req):
+    """Returns actual ip address plus first 30 characters of desc
+
+    This key is formulated to reduce double-submits.
+
+    """
+    # This pulls out the description, makes sure it's a unicode and
+    # takes the first 50 characters.
+    desc = unicode(req.POST.get('description', u'no description'))[:50]
+
+    # Converts that to a utf-8 string because b64encode only works on
+    # bytes--not unicode characters.
+    desc = desc.encode('utf-8')
+
+    # b64encodes that.
+    desc = b64encode(desc)
+    return actual_ip(req) + ':' + desc
+
+
+@ratelimit(ip=False, keys=actual_ip_plus_desc, block=False, rate='1/m')
 @ratelimit(ip=False, keys=actual_ip, block=False, rate='100/h')
 def _handle_feedback_post(request):
     if getattr(request, 'limited', False):
