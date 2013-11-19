@@ -38,7 +38,7 @@ def actual_ip_plus_desc(req):
     return actual_ip(req) + ':' + desc
 
 
-def ratelimit(rulename, key=None, rate='5/m'):
+def ratelimit(rulename, keyfun=None, rate='5/m'):
     """Rate-limiting decorator that keeps metrics via statsd
 
     This is just like the django-ratelimit ratelimit decorator, but is
@@ -48,13 +48,13 @@ def ratelimit(rulename, key=None, rate='5/m'):
     :arg rulename: rulename for statsd logging---must be a string
         with letters only! look for this in statsd under
         "throttled." + rulename.
-    :arg keys: (optional) function to generate a key for this
+    :arg keyfun: (optional) function to generate a key for this
         throttling. defaults to actual_ip.
     :arg rate: (optional) rate to throttle at. defaults to 5/m.
 
     """
-    if key is None:
-        key = actual_ip
+    if keyfun is None:
+        keyfun = actual_ip
 
     def decorator(fn):
         @wraps(fn)
@@ -62,7 +62,7 @@ def ratelimit(rulename, key=None, rate='5/m'):
             already_limited = getattr(request, 'limited', False)
             ratelimited = is_ratelimited(
                 request=request, increment=True, ip=False, method=['POST'],
-                field=None, rate=rate, keys=key)
+                field=None, rate=rate, keys=keyfun)
 
             if not already_limited and ratelimited:
                 statsd.incr('throttled.' + rulename)

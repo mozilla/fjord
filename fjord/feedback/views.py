@@ -61,7 +61,7 @@ def requires_firefox(func):
     return _requires_firefox
 
 
-@ratelimit(rulename='doublesubmit_1pm', key=actual_ip_plus_desc, rate='1/m')
+@ratelimit(rulename='doublesubmit_1pm', keyfun=actual_ip_plus_desc, rate='1/m')
 @ratelimit(rulename='100ph', rate='100/h')
 def _handle_feedback_post(request):
     if getattr(request, 'limited', False):
