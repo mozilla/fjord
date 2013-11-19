@@ -98,7 +98,7 @@ class TestRobots(TestCase):
         self.assertTemplateUsed(resp, 'robots.txt')
 
 
-class TestNewUserView(TestCase):
+class TestNewUserView(ElasticTestCase):
     def test_redirect_to_dashboard_if_anonymous(self):
         # AnonymousUser shouldn't get to the new-user-view, so make
         # sure they get redirected to the dashboard.
