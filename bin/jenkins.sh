@@ -68,7 +68,7 @@ python manage.py collectstatic --noinput
 python manage.py compress_assets
 
 echo "Starting tests..."
-coverage run manage.py test --noinput --with-xunit
+coverage run manage.py test -v 2 --noinput --with-xunit
 coverage xml $(find fjord lib -name '*.py')
 
 echo "FIN"
