@@ -103,8 +103,6 @@ class TestNewUserView(ElasticTestCase):
         # AnonymousUser shouldn't get to the new-user-view, so make
         # sure they get redirected to the dashboard.
         resp = self.client.get(reverse('new-user-view'), follow=True)
-        print resp.content
-        print resp.status_code
         eq_(resp.status_code, 200)
         self.assertTemplateNotUsed('new_user.html')
         self.assertTemplateUsed('analytics/dashboard.html')
