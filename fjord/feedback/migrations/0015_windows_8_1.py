@@ -1,21 +1,24 @@
 # -*- coding: utf-8 -*-
-import datetime
-from south.db import db
+import os
 from south.v2 import DataMigration
-from django.db import models
+from django.conf import settings
+
 
 class Migration(DataMigration):
     def forwards(self, orm):
         # Convert "Windows NT 6.3" to "Windows 8.1"
-        print 'updated', (orm.Response.objects
-                          .filter(platform=u'Windows NT 6.3')
-                          .update(platform=u'Windows 8.1'))
+
+        ret = orm.Response.objects.filter(platform=u'Windows NT 6.3').update(platform=u'Windows 8.1')
+
+        if not getattr(settings, 'TEST'):
+            print os.path.basename(__file__), ret
 
     def backwards(self, orm):
         # Convert it back!
-        print 'updated', (orm.Response.objects
-                          .filter(platform=u'Windows 8.1')
-                          .update(platform=u'Windows NT 6.3'))
+        ret = orm.Response.objects.filter(platform=u'Windows 8.1').update(platform=u'Windows NT 6.3')
+
+        if not getattr(settings, 'TEST'):
+            print os.path.basename(__file__), ret
 
     models = {
         'feedback.response': {

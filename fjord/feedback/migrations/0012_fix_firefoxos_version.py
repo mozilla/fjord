@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
+import os
 import re
-
-from south.db import db
 from south.v2 import DataMigration
-from django.db import models
-
+from django.conf import settings
 
 # copied and slimmed down from fjord/base/browsers.py
 GECKO_TO_FIREFOXOS_VERSION = {
@@ -43,7 +41,8 @@ class Migration(DataMigration):
                         resp.browser_version = fxos_version
                         resp.save()
 
-        print '0012: {0} fixed'.format(working_set.count())
+        if not getattr(settings, 'TEST'):
+            print os.path.basename(__file__), '{0} fixed'.format(working_set.count())
 
     def backwards(self, orm):
         working_set = orm.Response.objects.filter(product=u'Firefox OS')
@@ -60,7 +59,8 @@ class Migration(DataMigration):
                         resp.browser_version = fx_version
                         resp.save()
 
-        print '0012: {0} unfixed'.format(working_set.count())
+        if not getattr(settings, 'TEST'):
+            print os.path.basename(__file__), '{0} unfixed'.format(working_set.count())
 
     models = {
         'feedback.response': {

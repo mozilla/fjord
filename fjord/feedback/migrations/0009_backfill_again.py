@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+import os
 from south.v2 import DataMigration
+from django.conf import settings
 
 # Does a second pass on the data migration to catch the responses that
 # were being created when the migration was happening and thus didn't
@@ -10,7 +12,8 @@ class Migration(DataMigration):
     def forwards(self, orm):
         working_set = orm.Response.objects.filter(product='')
 
-        print '0009: {0} responses to update.'.format(len(working_set))
+        if not getattr(settings, 'TEST'):
+            print os.path.basename(__file__), '{0} responses to update'.format(len(working_set))
 
         for resp in working_set:
             # This replicates the logic in Response.infer_product.

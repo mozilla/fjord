@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-import datetime
-from south.db import db
+import os
 from south.v2 import DataMigration
-from django.db import models
+from django.conf import settings
 
 class Migration(DataMigration):
     def forwards(self, orm):
@@ -11,7 +10,10 @@ class Migration(DataMigration):
 
         for col in ('platform', 'product', 'channel', 'browser',
                     'browser_version'):
-            print '0010:', col, orm.Response.objects.filter(**{col: u'Unknown'}).update(**{col: u''})
+
+            ret = orm.Response.objects.filter(**{col: u'Unknown'}).update(**{col: u''})
+            if not getattr(settings, 'TEST'):
+                print os.path.basename(__file__), col, ret
 
     def backwards(self, orm):
         # NB: This is technically not a perfect backwards migration since
@@ -19,7 +21,9 @@ class Migration(DataMigration):
 
         for col in ('platform', 'product', 'channel', 'browser',
                     'browser_version'):
-            print '0010:', col, orm.Response.objects.filter(**{col: u''}).update(**{col: u'Unknown'})
+            ret = orm.Response.objects.filter(**{col: u''}).update(**{col: u'Unknown'})
+            if not getattr(settings, 'TEST'):
+                print os.path.basename(__file__), col, ret
 
     models = {
         'feedback.response': {
