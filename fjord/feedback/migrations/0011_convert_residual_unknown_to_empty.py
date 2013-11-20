@@ -1,20 +1,23 @@
 # -*- coding: utf-8 -*-
-import datetime
-from south.db import db
+import os
 from south.v2 import DataMigration
-from django.db import models
+from django.conf import settings
 
 class Migration(DataMigration):
     def forwards(self, orm):
         # Change "Unknown" to "" in version column
 
-        print '0011: version updated', orm.Response.objects.filter(version=u'Unknown').update(version=u'')
+        ret = orm.Response.objects.filter(version=u'Unknown').update(version=u'')
+        if not getattr(settings, 'TEST'):
+            print os.path.basename(__file__), ret
 
     def backwards(self, orm):
         # NB: This is technically not a perfect backwards migration since
         # we don't have the original values for those columns.
 
-        print '0011: version updated', orm.Response.objects.filter(version=u'').update(version=u'Unknown')
+        ret = orm.Response.objects.filter(version=u'').update(version=u'Unknown')
+        if not getattr(settings, 'TEST'):
+            print os.path.basename(__file__), ret
 
     models = {
         'feedback.response': {

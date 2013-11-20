@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-import datetime
-from south.db import db
+import os
 from south.v2 import DataMigration
-from django.db import models
+from django.conf import settings
+
 
 class Migration(DataMigration):
     def forwards(self, orm):
@@ -17,7 +17,8 @@ class Migration(DataMigration):
                 resp.save()
                 affected_count += 1
 
-        print 'Stripped {0} descriptions'.format(affected_count)
+        if not getattr(settings, 'TEST'):
+            print os.path.basename(__file__), 'Stripped {0} descriptions'.format(affected_count)
 
     def backwards(self, orm):
         raise RuntimeError("Cannot reverse this migration.")

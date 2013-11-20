@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
+import os
 import re
-
-from south.db import db
 from south.v2 import DataMigration
-from django.db import models
+from django.conf import settings
 
 
 GECKO_TO_FIREFOXOS_VERSION = {
@@ -55,7 +54,8 @@ class Migration(DataMigration):
 
             resp.save()
 
-        print '0014: {0} fixed'.format(working_set.count())
+        if not getattr(settings, 'TEST'):
+            print os.path.basename(__file__), '{0} fixed'.format(working_set.count())
 
     def backwards(self, orm):
         raise RuntimeError("Cannot reverse this migration.")
