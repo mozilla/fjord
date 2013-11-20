@@ -1,4 +1,5 @@
 {% extends "analytics/dashboard_base.html" %}
+{# Note: This is not l10n-ized since it's only available to analyzers for now. #}
 
 {% block body_id %}adashboard{% endblock %}
 
@@ -6,10 +7,16 @@
 
 <div class="col">
 {% block content_leftside %}
+  <div class="block">
+    <h2>Reports</h2>
+    <p>
+      <a href="{{ url('analytics_occurrences_comparison') }}">Occurrences Comparsion Report</a>
+    </p>
+  </div>
 {% endblock %}
 </div>
 
-<div class="col wide">
+<div class="col doublewide">
 {% block content_middle %}
   <div class="block feedback">
     <h2>Welcome Analyzer {{ displayname(user) }}!</h2>
@@ -17,11 +24,6 @@
       Coming soon in 2013q4!
     </p>
   </div>
-{% endblock %}
-</div>
-
-<div class="col">
-{% block content_rightside %}
 {% endblock %}
 </div>
 

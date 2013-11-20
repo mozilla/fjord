@@ -2,6 +2,8 @@ from nose.tools import eq_
 
 from fjord.base.tests import TestCase
 from fjord.feedback.tests import response
+from fjord.feedback.utils import compute_grams
+from fjord.search.tests import ElasticTestCase
 
 
 class TestResponseModel(TestCase):
@@ -18,3 +20,38 @@ class TestResponseModel(TestCase):
         resp.save()
 
         eq_(resp.description, u'ou812')
+
+
+class TestComputeGrams(ElasticTestCase):
+    def test_empty(self):
+        eq_(compute_grams(u''), [])
+
+    def test_parsing(self):
+        # stop words are removed
+        eq_(compute_grams(u'i me him her'), [])
+
+        # capital letters don't matter
+        eq_(compute_grams(u'I ME HIM HER'), [])
+
+        # punctuation nixed
+        eq_(compute_grams(u'i, me, him, her'), [])
+
+    def test_bigrams(self):
+        # One word a bigram does not make
+        eq_(compute_grams(u'youtube'), [])
+
+        # Two words is the minimum number to create a bigram
+        eq_(sorted(compute_grams(u'youtube crash')),
+            ['crash youtube'])
+
+        # Three words creates two bigrams
+        eq_(sorted(compute_grams(u'youtube crash flash')),
+            ['crash flash', 'crash youtube'])
+
+        # Four words creates three bigrams
+        eq_(sorted(compute_grams(u'youtube crash flash bridge')),
+            ['bridge flash', 'crash flash', 'crash youtube'])
+
+        # Nix duplicate bigrams
+        eq_(sorted(compute_grams(u'youtube crash youtube flash')),
+            ['crash youtube', 'flash youtube'])

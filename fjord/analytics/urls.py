@@ -12,7 +12,11 @@ urlpatterns = patterns(
         'response_view', name='response_view'),
 
     # Analytics dashboard
-    url(r'^analytics_dashboard/?$', 'analytics_dashboard', name='analytics_dashboard'),
+    url(r'^analytics_dashboard/?$', 'analytics_dashboard',
+        name='analytics_dashboard'),
+    url(r'^analytics_dashboard/occurrences_comparison/?$',
+        'analytics_occurrences_comparison',
+        name='analytics_occurrences_comparison'),
 
     # Spam dashboard
     url(r'^spam_dashboard/?$', 'spam_dashboard', name='spam_dashboard'),

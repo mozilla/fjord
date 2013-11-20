@@ -1,4 +1,5 @@
 import json
+from collections import defaultdict
 from datetime import datetime, timedelta
 from math import floor
 
@@ -11,8 +12,9 @@ from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
 from tower import ugettext as _
 
+from fjord.analytics.forms import OccurrencesComparisonForm
 from fjord.analytics.tools import JSONDatetimeEncoder, generate_query_parsed
-from fjord.base.helpers import locale_name, to_datetime_string
+from fjord.base.helpers import locale_name
 from fjord.base.util import (
     analyzer_required,
     check_new_user,
@@ -452,6 +454,113 @@ def analytics_dashboard(request, template):
 
 @check_new_user
 @analyzer_required
+def analytics_occurrences_comparison(request):
+    template = 'analytics/analytics_occurrences_comparison.html'
+
+    first_facet_bi = None
+    second_facet_bi = None
+
+    # FIXME - dropdown for products?
+
+    if 'product' in request.GET:
+        form = OccurrencesComparisonForm(request.GET)
+        if form.is_valid():
+            cleaned = form.cleaned_data
+
+            # First item
+            first_resp_s = (ResponseMappingType.search()
+                            .filter(product=cleaned['product'])
+                            .filter(locale__startswith='en'))
+
+            if cleaned['first_version']:
+                first_resp_s = first_resp_s.filter(
+                    version=cleaned['first_version'])
+
+            if cleaned['first_start_date']:
+                first_resp_s = first_resp_s.filter(
+                    created__gte=cleaned['first_start_date'])
+
+            if cleaned['first_end_date']:
+                first_resp_s = first_resp_s.filter(
+                    created__lte=cleaned['first_end_date'])
+
+            if cleaned['first_search_term']:
+                first_resp_s = first_resp_s.query(
+                    description__text=cleaned['first_search_term'])
+
+            # Have to do raw because we want a size > 10.
+            first_resp_s = first_resp_s.facet_raw(
+                description_bigrams={
+                    'terms': {
+                        'field': 'description_bigrams',
+                        'size': '20',
+                    },
+                    'facet_filter': first_resp_s._build_query()['filter']
+                }
+            )
+            first_resp_s = first_resp_s[0:0]
+
+            first_facet = first_resp_s.facet_counts()
+
+            first_facet_bi = first_facet['description_bigrams']
+            first_facet_bi = sorted(
+                first_facet_bi, key=lambda item: -item['count'])
+
+            if (cleaned['second_version']
+                or cleaned['second_search_term']
+                or cleaned['second_start_date']):
+
+                second_resp_s = (ResponseMappingType.search()
+                                .filter(product=cleaned['product'])
+                                .filter(locale__startswith='en'))
+
+                if cleaned['second_version']:
+                    second_resp_s = second_resp_s.filter(
+                        version=cleaned['second_version'])
+
+                if cleaned['second_start_date']:
+                    second_resp_s = second_resp_s.filter(
+                        created__gte=cleaned['second_start_date'])
+
+                if cleaned['second_end_date']:
+                    second_resp_s = second_resp_s.filter(
+                        created__lte=cleaned['second_end_date'])
+
+                if form.cleaned_data['second_search_term']:
+                    second_resp_s = second_resp_s.query(
+                        description__text=cleaned['second_search_term'])
+
+                # Have to do raw because we want a size > 10.
+                second_resp_s = second_resp_s.facet_raw(
+                    description_bigrams={
+                        'terms': {
+                            'field': 'description_bigrams',
+                            'size': '20',
+                        },
+                        'facet_filter': second_resp_s._build_query()['filter']
+                    }
+                )
+                second_resp_s = second_resp_s[0:0]
+
+                second_facet = second_resp_s.facet_counts()
+
+                second_facet_bi = second_facet['description_bigrams']
+                second_facet_bi = sorted(
+                    second_facet_bi, key=lambda item: -item['count'])
+
+    else:
+        form = OccurrencesComparisonForm()
+
+    return render(request, template, {
+        'form': form,
+        'first_facet_bi': first_facet_bi,
+        'second_facet_bi': second_facet_bi,
+        'render_time': datetime.now(),
+    })
+
+
+@check_new_user
+@analyzer_required
 @es_required_or_50x(error_template='analytics/es_down.html')
 @mobile_template('analytics/{mobile/}spam_dashboard.html')
 def spam_dashboard(request, template):
@@ -463,6 +572,8 @@ def spam_dashboard(request, template):
 @es_required_or_50x(error_template='analytics/es_down.html')
 def spam_duplicates(request):
     """Shows all duplicate descriptions over the last n days"""
+    template = 'analytics/spam_duplicates.html'
+
     n = 14
 
     responses = (ResponseMappingType.search()
@@ -488,12 +599,12 @@ def spam_duplicates(request):
 
     # duplicate_count -> count
     # i.e. "how many responses had 2 duplicates?"
-    summary_counts = {}
+    summary_counts = defaultdict(int)
     for desc, responses in response_dupes:
-        summary_counts[len(responses)] = summary_counts.get(len(responses), 0) + 1
+        summary_counts[len(responses)] = summary_counts[len(responses)] + 1
     summary_counts = sorted(summary_counts.items(), key=lambda item: item[0])
 
-    return render(request, 'analytics/spam_duplicates.html', {
+    return render(request, template, {
         'n': 14,
         'response_dupes': response_dupes,
         'render_time': datetime.now(),

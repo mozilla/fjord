@@ -1,0 +1,128 @@
+{% extends "analytics/analytics_dashboard.html" %}
+{# Note: This is not l10n-ized since it's only available to analyzers for now. #}
+
+{% block content_middle %}
+  <div class="col full">
+    <div class="block feedback">
+      <h2>Analytics: Occurrence Comparison Report</h2>
+      <p>
+        Report rendered on {{ render_time|datetime('%a %b %d %Y at %H:%M:%S') }}
+      </p>
+
+      <form id="occurrence-form" method="GET" action="{{ url('analytics_occurrences_comparison') }}">
+        {{ form.non_field_errors() }}
+
+        <ul class="container-group">
+          <li>
+            <div class="container">
+              <h3>Product</h3>
+            </div>
+
+            <div class="container">
+              <label for="id_product">Product</label>
+              <input id="id_product" type="text" name="product" value="{{ form.product.value() }}" />
+              {{ form.product.errors }}
+            </div>
+          </li>
+        </ul>
+
+        <ul class="container-group">
+          <li>
+            <div class="container">
+              <h3>First</h3>
+            </div>
+
+            <div class="container">
+              <label for="id_first_version">Version</label>
+              <input id="id_first_version" type="text" name="first_version" value="{{ form.first_version.value() }}" />
+              {{ form.first_version.errors }}
+            </div>
+            
+            <div class="container">
+              <label for="id_first_search_term">Search term</label>
+              <input id="id_first_search_term" type="text" name="first_search_term" value="{{ form.first_search_term.value() }}" />
+              {{ form.first_search_term.errors }}
+            </div>
+
+            <div class="container">
+              <label for="first_start_date">Start date</label>
+              <input id="id_first_start_date" type="text" name="first_start_date" value="{{ form.first_start_date.value() }}" />
+              {{ form.first_start_date.errors }}
+            </div>
+          
+            <div class="container">
+              <label for="first_end_date">End date</label>
+              <input id="id_first_end_date" type="text" name="first_end_date" value="{{ form.first_end_date.value() }}" />
+              {{ form.first_end_date.errors }}
+            </div>
+          </li>
+
+          <li>
+            <div class="container">
+              <h3>Second</h3>
+            </div>
+
+            <div class="container">
+              <label for="id_second_version">Version</label>
+              <input id="id_second_version" type="text" name="second_version" value="{{ form.second_version.value() }}" />
+              {{ form.second_version.errors }}
+            </div>
+
+            <div class="container">
+              <label for="id_second_search_term">Search term</label>
+              <input id="id_second_search_term" type="text" name="second_search_term" value="{{ form.second_search_term.value() }}" />
+              {{ form.second_search_term.errors }}
+            </div>
+
+            <div class="container">
+              <label for="second_start_date">Start date</label>
+              <input id="id_second_start_date" type="text" name="second_start_date" value="{{ form.second_start_date.value() }}" />
+              {{ form.second_start_date.errors }}
+            </div>
+          
+            <div class="container">
+              <label for="second_end_date">End date</label>
+              <input id="id_second_end_date" type="text" name="second_end_date" value="{{ form.second_end_date.value() }}" />
+              {{ form.second_end_date.errors }}
+            </div>
+          </li>
+        </ul>
+
+        <div class="container">
+          <button type="submit">Submit</button>
+        </div>
+      </form>
+
+      <div class="clearfix"></div>
+
+      <div class="container">
+        <h3>Bigrams</h3>
+      </div>
+
+      <div id="results">
+        <ul class="outer">
+          <li>
+            <ol>
+              {% if first_facet_bi is not none %}
+                {% for item in first_facet_bi %}
+                  <li>{{ item.count }} - {{ item.term }}</li>
+                {% endfor%}
+              {% endif %}
+            </ol>
+          </li>
+          <li>
+            <ol>
+              {% if second_facet_bi is not none %}
+                {% for item in second_facet_bi %}
+                  <li>{{ item.count }} - {{ item.term }}</li>
+                {% endfor%}
+              {% endif %}
+            </ol>
+          </li>
+        </ul>
+      </div>
+
+      <div class="clearfix"></div>
+    </div>
+  </div>
+{% endblock %}

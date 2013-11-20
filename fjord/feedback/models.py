@@ -1,6 +1,5 @@
 from datetime import datetime
 
-from django.conf import settings
 from django.db import models
 
 from elasticutils.contrib.django import Indexable
@@ -10,6 +9,7 @@ from tower import ugettext_lazy as _
 from fjord.base.models import ModelBase
 from fjord.base.util import smart_truncate
 from fjord.feedback import config
+from fjord.feedback.utils import compute_grams
 from fjord.search.index import (
     register_mapping_type, FjordMappingType,
     boolean_type, date_type, integer_type, keyword_type, text_type)
@@ -130,6 +130,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'happy': boolean_type(),
             'url': keyword_type(),
             'description': text_type(),
+            'description_bigrams': keyword_type(),
             'user_agent': keyword_type(),
             'product': keyword_type(),
             'channel': keyword_type(),
@@ -151,7 +152,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
         def empty_to_unknown(text):
             return u'Unknown' if text == u'' else text
 
-        return {
+        doc = {
             'id': obj.id,
             'prodchan': obj.prodchan,
             'happy': obj.happy,
@@ -169,6 +170,14 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'manufacturer': obj.manufacturer,
             'created': obj.created,
         }
+
+        # We only compute bigrams for english because the analysis
+        # uses English stopwords, stemmers, ...
+        if obj.locale.startswith(u'en') and obj.description:
+            bigrams = compute_grams(obj.description)
+            doc['description_bigrams'] = bigrams
+
+        return doc
 
 
 class ResponseEmail(ModelBase):
