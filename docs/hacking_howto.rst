@@ -148,7 +148,7 @@ instructions assume you use:
 In a terminal, do::
 
     $ mysql -u root -p
-    mysql> CREATE DATABASE fjord;
+    mysql> CREATE DATABASE fjord CHARACTER SET utf8 COLLATE utf8_unicode_ci;
     mysql> create user 'fjord'@'localhost' IDENTIFIED BY 'password';
     mysql> GRANT ALL ON fjord.* TO 'fjord'@'localhost';
 
