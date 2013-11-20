@@ -1,8 +1,13 @@
 from base64 import b64encode
 from functools import wraps
+import re
 
+from pyelasticsearch.exceptions import ElasticHttpError
 from ratelimit.helpers import is_ratelimited
 from statsd import statsd
+
+from fjord.feedback import config
+from fjord.search.index import es_analyze
 
 
 def actual_ip(req):
@@ -70,3 +75,43 @@ def ratelimit(rulename, keyfun=None, rate='5/m'):
             return fn(request, *args, **kwargs)
         return _wrapped
     return decorator
+
+
+def compute_grams(text):
+    """Computes bigrams from analyzed text
+
+    :arg text: text to analyze and generate bigrams from
+
+    :returns: list of bigrams
+
+    >>> compute_grams(u'The quick brown fox jumped')
+    [u'quick brown', u'brown fox', u'fox jumped']
+
+    """
+    if not text:
+        return []
+
+    try:
+        tokens = [item['token'] for item in es_analyze(text)]
+    except ElasticHttpError:
+        return []
+
+    # Remove configured stopwords.
+    tokens = [token for token in tokens
+              if token not in config.ANALYSIS_STOPWORDS]
+
+    # ES analyzes the text and returns tokens that look like u'u4231'
+    # for unicode characters. This nixes all of those.
+    unicode_re = re.compile(r'u\d')
+    tokens = [token for token in tokens if not unicode_re.match(token)]
+
+    # Generate set of bigrams. A bigram is a set of two consecutive
+    # tokens. We put them in a set because we don't want duplicates.
+    # We sort them so that "youtube crash" will match "crash youtube".
+    bigrams = set()
+    if len(tokens) >= 2:
+        for i in range(len(tokens) - 1):
+            bigrams.add(u' '.join(
+                sorted([tokens[i], tokens[i+1]])))
+
+    return list(bigrams)

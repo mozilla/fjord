@@ -21,6 +21,26 @@ log = logging.getLogger('i.search')
 _mapping_types = {}
 
 
+def es_analyze(text, analyzer=None):
+    """Returns analysis of text.
+
+    :arg text: the text to analyze
+
+    :arg analyzer: (optional) the analyzer to use. Defaults to the
+        default analyzer for the index.
+
+    :returns: list of dicts each describing a token
+
+    """
+    es = get_es()
+    index = get_index()
+
+    # pyelasticsearch doesn't support analyze, so we do it "manually"
+    # using pyelasticsearch's innards. When we update to
+    # elasticsearch-py we should rewrite this.
+    return es.send_request('GET', [index, '_analyze'], body=text)['tokens']
+
+
 def register_mapping_type(mapping_type):
     """Registers a mapping type.
 
@@ -76,7 +96,7 @@ def integer_type():
 
 
 def keyword_type():
-    return {'type': 'string', 'index': 'not_analyzed'}
+    return {'type': 'string', 'analyzer': 'keyword'}
 
 
 def text_type():
