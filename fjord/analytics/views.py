@@ -1,4 +1,5 @@
 import json
+from collections import defaultdict
 from datetime import datetime, timedelta
 from math import floor
 
@@ -13,7 +14,7 @@ from tower import ugettext as _
 
 from fjord.analytics.forms import OccurrencesComparisonForm
 from fjord.analytics.tools import JSONDatetimeEncoder, generate_query_parsed
-from fjord.base.helpers import locale_name, to_datetime_string
+from fjord.base.helpers import locale_name
 from fjord.base.util import (
     analyzer_required,
     check_new_user,
@@ -472,16 +473,20 @@ def analytics_occurrences_comparison(request):
                             .filter(locale__startswith='en'))
 
             if cleaned['first_version']:
-                first_resp_s = first_resp_s.filter(version=cleaned['first_version'])
+                first_resp_s = first_resp_s.filter(
+                    version=cleaned['first_version'])
 
             if cleaned['first_start_date']:
-                first_resp_s = first_resp_s.filter(created__gte=cleaned['first_start_date'])
+                first_resp_s = first_resp_s.filter(
+                    created__gte=cleaned['first_start_date'])
 
             if cleaned['first_end_date']:
-                first_resp_s = first_resp_s.filter(created__lte=cleaned['first_end_date'])
+                first_resp_s = first_resp_s.filter(
+                    created__lte=cleaned['first_end_date'])
 
             if cleaned['first_search_term']:
-                first_resp_s = first_resp_s.query(description__text=cleaned['first_search_term'])
+                first_resp_s = first_resp_s.query(
+                    description__text=cleaned['first_search_term'])
 
             # Have to do raw because we want a size > 10.
             first_resp_s = first_resp_s.facet_raw(
@@ -498,7 +503,8 @@ def analytics_occurrences_comparison(request):
             first_facet = first_resp_s.facet_counts()
 
             first_facet_bi = first_facet['description_bigrams']
-            first_facet_bi = sorted(first_facet_bi, key=lambda item: -item['count'])
+            first_facet_bi = sorted(
+                first_facet_bi, key=lambda item: -item['count'])
 
             if (cleaned['second_version']
                 or cleaned['second_search_term']
@@ -539,7 +545,8 @@ def analytics_occurrences_comparison(request):
                 second_facet = second_resp_s.facet_counts()
 
                 second_facet_bi = second_facet['description_bigrams']
-                second_facet_bi = sorted(second_facet_bi, key=lambda item: -item['count'])
+                second_facet_bi = sorted(
+                    second_facet_bi, key=lambda item: -item['count'])
 
     else:
         form = OccurrencesComparisonForm()
@@ -592,9 +599,9 @@ def spam_duplicates(request):
 
     # duplicate_count -> count
     # i.e. "how many responses had 2 duplicates?"
-    summary_counts = {}
+    summary_counts = defaultdict(int)
     for desc, responses in response_dupes:
-        summary_counts[len(responses)] = summary_counts.get(len(responses), 0) + 1
+        summary_counts[len(responses)] = summary_counts[len(responses)] + 1
     summary_counts = sorted(summary_counts.items(), key=lambda item: item[0])
 
     return render(request, template, {
