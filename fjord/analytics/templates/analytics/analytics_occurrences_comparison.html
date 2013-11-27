@@ -12,15 +12,19 @@
       <form id="occurrence-form" method="GET" action="{{ url('analytics_occurrences_comparison') }}">
         {{ form.non_field_errors() }}
 
-        <div class="container">
-          <h3>Product</h3>
-        </div>
+        <ul class="container-group">
+          <li>
+            <div class="container">
+              <h3>Product</h3>
+            </div>
 
-        <div class="container">
-          <label for="id_product">Product</label>
-          <input id="id_product" type="text" name="product" value="{{ form.product.value() }}" />
-          {{ form.product.errors }}
-        </div>
+            <div class="container">
+              <label for="id_product">Product</label>
+              <input id="id_product" type="text" name="product" value="{{ form.product.value() }}" />
+              {{ form.product.errors }}
+            </div>
+          </li>
+        </ul>
 
         <ul class="container-group">
           <li>
@@ -98,22 +102,22 @@
       <div id="results">
         <ul class="outer">
           <li>
-            {% if first_facet_bi is not none %}
-              <ol>
+            <ol>
+              {% if first_facet_bi is not none %}
                 {% for item in first_facet_bi %}
                   <li>{{ item.count }} - {{ item.term }}</li>
                 {% endfor%}
-              </ol>
-            {% endif %}
+              {% endif %}
+            </ol>
           </li>
           <li>
-            {% if second_facet_bi is not none %}
-              <ol>
+            <ol>
+              {% if second_facet_bi is not none %}
                 {% for item in second_facet_bi %}
                   <li>{{ item.count }} - {{ item.term }}</li>
                 {% endfor%}
-              </ol>
-            {% endif %}
+              {% endif %}
+            </ol>
           </li>
         </ul>
       </div>
