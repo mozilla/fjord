@@ -99,20 +99,20 @@
         <ul class="outer">
           <li>
             {% if first_facet_bi is not none %}
-              <ul>
+              <ol>
                 {% for item in first_facet_bi %}
                   <li>{{ item.count }} - {{ item.term }}</li>
                 {% endfor%}
-              </ul>
+              </ol>
             {% endif %}
           </li>
           <li>
             {% if second_facet_bi is not none %}
-              <ul>
+              <ol>
                 {% for item in second_facet_bi %}
                   <li>{{ item.count }} - {{ item.term }}</li>
                 {% endfor%}
-              </ul>
+              </ol>
             {% endif %}
           </li>
         </ul>
