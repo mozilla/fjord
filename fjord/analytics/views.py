@@ -548,10 +548,14 @@ def analytics_occurrences_comparison(request):
                 second_facet_bi = sorted(
                     second_facet_bi, key=lambda item: -item['count'])
 
+        permalink = request.build_absolute_uri()
+
     else:
+        permalink = ''
         form = OccurrencesComparisonForm()
 
     return render(request, template, {
+        'permalink': permalink,
         'form': form,
         'first_facet_bi': first_facet_bi,
         'second_facet_bi': second_facet_bi,
