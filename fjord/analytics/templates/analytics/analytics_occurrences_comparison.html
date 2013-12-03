@@ -95,7 +95,7 @@
 
       <div class="clearfix"></div>
 
-      {% if first_facet_bi or second_facet_bi %}
+      {% if first_facet_bi is not none or second_facet_bi is not none %}
         <div id="permalink">
           <h3>Permalink for this report</h3>
           <input type="text" value="{{ permalink }}" />
@@ -113,6 +113,8 @@
                   {% for item in first_facet_bi %}
                     <li>{{ item.count }} - {{ item.term }}</li>
                   {% endfor%}
+                {% else %}
+                  <li>None
                 {% endif %}
               </ol>
             </li>
@@ -122,6 +124,8 @@
                   {% for item in second_facet_bi %}
                     <li>{{ item.count }} - {{ item.term }}</li>
                   {% endfor%}
+                {% else %}
+                  <li>None
                 {% endif %}
               </ol>
             </li>
