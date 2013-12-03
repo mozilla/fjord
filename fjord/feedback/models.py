@@ -48,7 +48,7 @@ class Response(ModelBase):
 
     # Data coming from the user
     happy = models.BooleanField(default=True)
-    url = models.URLField(verify_exists=False, blank=True)
+    url = models.URLField(blank=True)
     description = models.TextField(blank=True)
 
     # Translation into English of the description
