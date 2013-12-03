@@ -463,6 +463,72 @@ class TestAnalyticsDashboardView(ElasticTestCase):
         eq_(200, resp.status_code)
 
 
+class TestOccurrencesReportView(ElasticTestCase):
+    client_class = LocalizingClient
+
+    def setUp(self):
+        super(TestOccurrencesReportView, self).setUp()
+        # Set up some sample data
+        items = [
+            # happy, locale, description
+            (True, 'en-US', 'apple banana orange pear'),
+            (True, 'en-US', 'orange pear kiwi'),
+            (True, 'en-US', 'chocolate chocolate yum'),
+            (False, 'en-US', 'apple banana grapefruit'),
+
+            # This one doesn't create bigrams because there isn't enough words
+            (False, 'en-US', 'orange'),
+
+            # This one shouldn't show up
+            (False, 'es', 'apple banana'),
+        ]
+        for happy, locale, description in items:
+            response(
+                happy=happy, locale=locale, description=description, save=True)
+
+        self.refresh()
+
+        # Create analyzer and log analyzer in
+        jane = user(email='jane@example.com', save=True)
+        profile(user=jane, save=True)
+        jane.groups.add(Group.objects.get(name='analyzers'))
+
+        self.client_login_user(jane)
+
+    def test_occurrence_report(self):
+        url = reverse('analytics_occurrences_comparison')
+
+        # No results when you initially look at the page
+        resp = self.client.get(url)
+        eq_(200, resp.status_code)
+        assert 'id="results"' not in resp.content
+
+        # 'product' is a required field
+        resp = self.client.get(url, {'product': ''})
+        eq_(200, resp.status_code)
+        # FIXME - this test is too loose
+        assert 'This field is required' in resp.content
+
+        # At least a version, search term or start date is required
+        resp = self.client.get(url, {'product': 'Firefox'})
+        eq_(200, resp.status_code)
+        assert 'This field is required' not in resp.content
+        assert 'Must specify at least one' in resp.content
+
+        # Minimal required for results
+        resp = self.client.get(url, {
+            'product': 'Firefox',
+            'first_version': '17.0.0'}
+        )
+        eq_(200, resp.status_code)
+        assert 'This field is required' not in resp.content
+        assert 'Must speicfy at least one' not in resp.content
+        assert 'id="results"' in resp.content
+
+        # FIXME - when things are less prototypy, add tests for
+        # specific results
+
+
 class TestSpamDashboardView(ElasticTestCase):
     client_class = LocalizingClient
 
