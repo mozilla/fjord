@@ -46,13 +46,13 @@
 
             <div class="container">
               <label for="first_start_date">Start date</label>
-              <input id="id_first_start_date" type="text" name="first_start_date" value="{{ form.first_start_date.value() }}" />
+              <input id="id_first_start_date" type="text" name="first_start_date" value="{{ form.first_start_date.value() }}" placeholder="{{ form.first_start_date.help_text }}" />
               {{ form.first_start_date.errors }}
             </div>
           
             <div class="container">
               <label for="first_end_date">End date</label>
-              <input id="id_first_end_date" type="text" name="first_end_date" value="{{ form.first_end_date.value() }}" />
+              <input id="id_first_end_date" type="text" name="first_end_date" value="{{ form.first_end_date.value() }}" placeholder="{{ form.first_start_date.help_text }}" />
               {{ form.first_end_date.errors }}
             </div>
           </li>
@@ -76,13 +76,13 @@
 
             <div class="container">
               <label for="second_start_date">Start date</label>
-              <input id="id_second_start_date" type="text" name="second_start_date" value="{{ form.second_start_date.value() }}" />
+              <input id="id_second_start_date" type="text" name="second_start_date" value="{{ form.second_start_date.value() }}" placeholder="{{ form.first_start_date.help_text }}" />
               {{ form.second_start_date.errors }}
             </div>
           
             <div class="container">
               <label for="second_end_date">End date</label>
-              <input id="id_second_end_date" type="text" name="second_end_date" value="{{ form.second_end_date.value() }}" />
+              <input id="id_second_end_date" type="text" name="second_end_date" value="{{ form.second_end_date.value() }}" placeholder="{{ form.first_start_date.help_text }}" />
               {{ form.second_end_date.errors }}
             </div>
           </li>
@@ -95,34 +95,44 @@
 
       <div class="clearfix"></div>
 
-      <div class="container">
-        <h3>Bigrams</h3>
-      </div>
+      {% if first_facet_bi is not none or second_facet_bi is not none %}
+        <div id="permalink">
+          <h3>Permalink for this report</h3>
+          <input type="text" value="{{ permalink }}" readonly />
+        </div>
 
-      <div id="results">
-        <ul class="outer">
-          <li>
-            <ol>
-              {% if first_facet_bi is not none %}
-                {% for item in first_facet_bi %}
-                  <li>{{ item.count }} - {{ item.term }}</li>
-                {% endfor%}
-              {% endif %}
-            </ol>
-          </li>
-          <li>
-            <ol>
-              {% if second_facet_bi is not none %}
-                {% for item in second_facet_bi %}
-                  <li>{{ item.count }} - {{ item.term }}</li>
-                {% endfor%}
-              {% endif %}
-            </ol>
-          </li>
-        </ul>
-      </div>
+        <div class="container">
+          <h3>Bigrams</h3>
+        </div>
 
-      <div class="clearfix"></div>
+        <div id="results">
+          <ul class="outer">
+            <li>
+              <ol>
+                {% if first_facet_bi is not none %}
+                  {% for item in first_facet_bi %}
+                    <li>{{ item.count }} - {{ item.term }}</li>
+                  {% endfor%}
+                {% else %}
+                  <li>None
+                {% endif %}
+              </ol>
+            </li>
+            <li>
+              <ol>
+                {% if second_facet_bi is not none %}
+                  {% for item in second_facet_bi %}
+                    <li>{{ item.count }} - {{ item.term }}</li>
+                  {% endfor%}
+                {% else %}
+                  <li>None
+                {% endif %}
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <div class="clearfix"></div>
+      {% endif %}
     </div>
   </div>
 {% endblock %}
