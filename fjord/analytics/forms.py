@@ -21,7 +21,7 @@ class OccurrencesComparisonForm(forms.Form):
         # User must specify at least one of version, search term or
         # start date for the first set otherwise the form is invalid.
         required_values = [
-            cleaned_data[key] for key in
+            cleaned_data.get(key, '') for key in
             ('first_version', 'first_search_term', 'first_start_date')]
 
         if not any(required_values):
