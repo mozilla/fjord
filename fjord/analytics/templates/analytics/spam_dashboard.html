@@ -9,9 +9,9 @@
 {% block content_leftside %}
   <div class="block">
     <h2>Reports</h2>
-    <ul>
-      <li><a href="{{ url('spam_duplicates') }}">Spam: Duplicates</a></li>
-    </ul>
+    <p>
+      <a href="{{ url('spam_duplicates') }}">Spam: Duplicates</a>
+    </p>
   </div>
 {% endblock %}
 </div>
@@ -20,10 +20,11 @@
 {% block content_middle %}
   <div class="block">
     <h2>
-      Greetings, Spamfighter {{ displayname(user) }}! You
-      have been recruited by the Star League to defend the frontier against
-      Xur and the Ko-Dan armada.
+      Welcome Spamfighter {{ displayname(user) }}!
     </h2>
+    <p>
+      This dashboard holds spam-related reports for Analyzers.
+    </p>
   </div>
 {% endblock %}
 </div>
