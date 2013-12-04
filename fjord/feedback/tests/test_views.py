@@ -202,22 +202,24 @@ class TestFeedback(TestCase):
             'happy': 0,
             'description': u"I like the colors.",
             'email': 'bob@example.com',
-            'email_ok': 1,
+            'email_ok': 'on',
         })
         eq_(models.ResponseEmail.objects.count(), 1)
         eq_(r.status_code, 302)
 
     def test_email_privacy(self):
         """If an email is entered, but the box is not checked, don't collect."""
+        email_count = models.ResponseEmail.objects.count()
+
         url = reverse('feedback', args=('firefox.desktop.stable',))
 
         r = self.client.post(url, {
             'happy': 0,
             'description': u"I like the colors.",
             'email': 'bob@example.com',
-            'email_ok': 0,
+            'email_ok': '',
         })
-        assert not models.ResponseEmail.objects.exists()
+        eq_(email_count, models.ResponseEmail.objects.count())
         eq_(r.status_code, 302)
 
     def test_email_missing(self):
@@ -227,7 +229,7 @@ class TestFeedback(TestCase):
         r = self.client.post(url, {
             'happy': 0,
             'description': u'Can you fix it?',
-            'email_ok': 1,
+            'email_ok': 'on',
         })
         assert not models.ResponseEmail.objects.exists()
         # No redirect to thank you page, since there is a form error.
@@ -241,7 +243,7 @@ class TestFeedback(TestCase):
         r = self.client.post(url, {
             'happy': 0,
             'description': u'There is something wrong here.\0',
-            'email_ok': 1,
+            'email_ok': 'on',
             'email': '/dev/sda1\0',
         })
         assert not models.ResponseEmail.objects.exists()
@@ -252,7 +254,7 @@ class TestFeedback(TestCase):
         r = self.client.post(url, {
             'happy': 0,
             'description': u'There is something wrong here.\0',
-            'email_ok': 0,
+            'email_ok': '',
             'email': "huh what's this for?",
         })
         assert not models.ResponseEmail.objects.exists()
