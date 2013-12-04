@@ -106,30 +106,49 @@
         </div>
 
         <div id="results">
-          <ul class="outer">
-            <li>
-              <ol>
-                {% if first_facet_bi is not none %}
-                  {% for item in first_facet_bi %}
-                    <li>{{ item.count }} - {{ item.term }}</li>
-                  {% endfor%}
-                {% else %}
-                  <li>None
-                {% endif %}
-              </ol>
-            </li>
-            <li>
-              <ol>
-                {% if second_facet_bi is not none %}
-                  {% for item in second_facet_bi %}
-                    <li>{{ item.count }} - {{ item.term }}</li>
-                  {% endfor%}
-                {% else %}
-                  <li>None
-                {% endif %}
-              </ol>
-            </li>
-          </ul>
+          <div class="column">
+            <p>Total responses: {{ first_facet_total }}</p>
+            {% if first_facet_bi is not none %}
+              <table>
+                <tr>
+                  <th>Count</th>
+                  <th>Count / {{ first_normalization }}</th>
+                  <th>Bigram</th>
+                </tr>
+                {% for item in first_facet_bi %}
+                  <tr>
+                    <td>{{ item.count }}</td>
+                    <td>{{ (item.count / first_normalization)|round(3, 'floor') }}</td>
+                    <td>
+                      <a href="{{ url('dashboard')|urlparams(bigram=item.term, **first_params) }}">{{ item.term }}</a>
+                    </td>
+                  </tr>
+                {% endfor%}
+              </table>
+            {% endif %}
+          </div>
+
+          <div class="column">
+            <p>Total responses: {{ second_facet_total }}</p>
+            {% if second_facet_bi is not none %}
+              <table>
+                <tr>
+                  <th>Count</th>
+                  <th>Count / {{ second_normalization }}</th>
+                  <th>Bigram</th>
+                </tr>
+                {% for item in second_facet_bi %}
+                  <tr>
+                    <td>{{ item.count }}</td>
+                    <td>{{ (item.count / second_normalization)|round(3, 'floor') }}</td>
+                    <td>
+                      <a href="{{ url('dashboard')|urlparams(bigram=item.term, **second_params) }}">{{ item.term }}</a>
+                    </td>
+                  </tr>
+                {% endfor%}
+              </table>
+            {% endif %}
+          </div>
         </div>
         <div class="clearfix"></div>
       {% endif %}
