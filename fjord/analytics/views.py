@@ -253,8 +253,10 @@ def dashboard(request, template):
                                        fallback=None)
     search_date_end = smart_datetime(request.GET.get('date_end', None),
                                      fallback=None)
+    search_bigram = request.GET.get('bigram', None)
     selected = request.GET.get('selected', None)
 
+    filter_data = []
     current_search = {'page': page}
 
     search = ResponseMappingType.search()
@@ -308,6 +310,20 @@ def dashboard(request, template):
         es_query = generate_query_parsed('description', search_query)
         search = search.query_raw(es_query)
 
+    if search_bigram is not None:
+        f &= F(description_bigrams=search_bigram)
+        filter_data.append({
+            'display': _('Bigram'),
+            'name': 'bigram',
+            'options': [{
+                'count': 'all',
+                'name': search_bigram,
+                'display': search_bigram,
+                'value': search_bigram,
+                'checked': True
+            }]
+        })
+
     search = search.filter(f).order_by('-created')
 
     # If the user asked for a feed, give him/her a feed!
@@ -356,7 +372,7 @@ def dashboard(request, template):
     def empty_to_unknown(text):
         return _('Unknown') if text == u'' else text
 
-    filter_data = [
+    filter_data.extend([
         counts_to_options(
             counts['happy'].items(),
             name='happy',
@@ -370,7 +386,7 @@ def dashboard(request, template):
             display=_('Product'),
             display_map=empty_to_unknown,
             checked=search_product)
-    ]
+    ])
     # Only show the version if we're showing a specific
     # product.
     if search_product:
@@ -440,7 +456,7 @@ def dashboard(request, template):
         'next_page': page + 1 if end < search_count else None,
         'current_search': current_search,
         'selected': selected,
-        'atom_url': generate_dashboard_atom_url(request)
+        'atom_url': generate_dashboard_atom_url(request),
     })
 
 
@@ -458,9 +474,12 @@ def analytics_occurrences_comparison(request):
     template = 'analytics/analytics_occurrences_comparison.html'
 
     first_facet_bi = None
-    second_facet_bi = None
+    first_params = {}
+    first_facet_total = 0
 
-    # FIXME - dropdown for products?
+    second_facet_bi = None
+    second_params = {}
+    second_facet_total = 0
 
     if 'product' in request.GET:
         form = OccurrencesComparisonForm(request.GET)
@@ -472,34 +491,38 @@ def analytics_occurrences_comparison(request):
                             .filter(product=cleaned['product'])
                             .filter(locale__startswith='en'))
 
+            first_params['product'] = cleaned['product']
+
             if cleaned['first_version']:
                 first_resp_s = first_resp_s.filter(
                     version=cleaned['first_version'])
-
+                first_params['version'] = cleaned['first_version']
             if cleaned['first_start_date']:
                 first_resp_s = first_resp_s.filter(
                     created__gte=cleaned['first_start_date'])
-
+                first_params['date_start'] = cleaned['first_start_date']
             if cleaned['first_end_date']:
                 first_resp_s = first_resp_s.filter(
                     created__lte=cleaned['first_end_date'])
-
+                first_params['date_end'] = cleaned['first_end_date']
             if cleaned['first_search_term']:
                 first_resp_s = first_resp_s.query(
                     description__text=cleaned['first_search_term'])
+                first_params['q'] = cleaned['first_search_term']
 
             # Have to do raw because we want a size > 10.
             first_resp_s = first_resp_s.facet_raw(
                 description_bigrams={
                     'terms': {
                         'field': 'description_bigrams',
-                        'size': '20',
+                        'size': '30',
                     },
                     'facet_filter': first_resp_s._build_query()['filter']
                 }
             )
             first_resp_s = first_resp_s[0:0]
 
+            first_facet_total = first_resp_s.count()
             first_facet = first_resp_s.facet_counts()
 
             first_facet_bi = first_facet['description_bigrams']
@@ -514,34 +537,38 @@ def analytics_occurrences_comparison(request):
                                 .filter(product=cleaned['product'])
                                 .filter(locale__startswith='en'))
 
+                second_params['product'] = cleaned['product']
+
                 if cleaned['second_version']:
                     second_resp_s = second_resp_s.filter(
                         version=cleaned['second_version'])
-
+                    second_params['version'] = cleaned['second_version']
                 if cleaned['second_start_date']:
                     second_resp_s = second_resp_s.filter(
                         created__gte=cleaned['second_start_date'])
-
+                    second_params['date_start'] = cleaned['second_start_date']
                 if cleaned['second_end_date']:
                     second_resp_s = second_resp_s.filter(
                         created__lte=cleaned['second_end_date'])
-
+                    second_params['date_end'] = cleaned['second_end_date']
                 if form.cleaned_data['second_search_term']:
                     second_resp_s = second_resp_s.query(
                         description__text=cleaned['second_search_term'])
+                    second_params['q'] = cleaned['second_search_term']
 
                 # Have to do raw because we want a size > 10.
                 second_resp_s = second_resp_s.facet_raw(
                     description_bigrams={
                         'terms': {
                             'field': 'description_bigrams',
-                            'size': '20',
+                            'size': '30',
                         },
                         'facet_filter': second_resp_s._build_query()['filter']
                     }
                 )
                 second_resp_s = second_resp_s[0:0]
 
+                second_facet_total = second_resp_s.count()
                 second_facet = second_resp_s.facet_counts()
 
                 second_facet_bi = second_facet['description_bigrams']
@@ -558,7 +585,13 @@ def analytics_occurrences_comparison(request):
         'permalink': permalink,
         'form': form,
         'first_facet_bi': first_facet_bi,
+        'first_params': first_params,
+        'first_facet_total': first_facet_total,
+        'first_normalization': round(first_facet_total * 1.0 / 1000, 3),
         'second_facet_bi': second_facet_bi,
+        'second_params': second_params,
+        'second_facet_total': second_facet_total,
+        'second_normalization': round(second_facet_total * 1.0 / 1000, 3),
         'render_time': datetime.now(),
     })
 
