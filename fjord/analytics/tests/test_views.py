@@ -332,6 +332,14 @@ class TestDashboardView(ElasticTestCase):
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 4)
 
+    def test_date_start_valueerror(self):
+        # https://bugzilla.mozilla.org/show_bug.cgi?id=898584
+        url = reverse('dashboard')
+        r = self.client.get(url, {
+                'date_start': '0001-01-01',
+            })
+        eq_(r.status_code, 200)
+
     def test_invalid_search(self):
         url = reverse('dashboard')
         # Invalid values for happy shouldn't filter
