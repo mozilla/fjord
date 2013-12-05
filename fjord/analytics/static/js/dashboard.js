@@ -83,7 +83,6 @@ $(function() {
         });
     });
 
-
     // Draw histogram in the middle column.
     var data = $histogram.data('histogram');
     colors = {

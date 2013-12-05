@@ -16,15 +16,17 @@
       <table class="summarytable">
         <thead>
           <tr>
-            <th>count</th>
             <th>responses with n duplicates</th>
+            <th>count</th>
+            <th>elite ascii graphing technology</th>
           </tr>
         </thead>
         <tbody>
           {% for duplicate_count, count in summary_counts %}
             <tr>
-              <td>{{ count }}</td>
               <td>{{ duplicate_count }}</td>
+              <td>{{ count }}</td>
+              <td><span class="spamasciibar">{{ 'l' * count }}</span></td>
             </tr>
           {% endfor %}
         </tbody>
