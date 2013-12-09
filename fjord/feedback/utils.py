@@ -30,17 +30,19 @@ def actual_ip_plus_desc(req):
     This key is formulated to reduce double-submits.
 
     """
-    # This pulls out the description, makes sure it's a unicode and
-    # takes the first 50 characters.
-    desc = unicode(req.POST.get('description', u'no description'))[:50]
+    # This pulls out the description and make sure it's unicode.
+    desc = unicode(req.POST.get('description', u'no description'))
 
     # Converts that to a utf-8 string because b64encode only works on
     # bytes--not unicode characters.
     desc = desc.encode('utf-8')
 
-    # b64encodes that.
+    # b64encode that.
     desc = b64encode(desc)
-    return actual_ip(req) + ':' + desc
+
+    # Then return the ip address plus a : plus the first 200
+    # characters of the description blob.
+    return actual_ip(req) + ':' + desc[:200]
 
 
 def ratelimit(rulename, keyfun=None, rate='5/m'):
