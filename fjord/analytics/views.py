@@ -199,7 +199,8 @@ def generate_atom_feed(request, search):
         categories = {
             'sentiment': _('Happy') if response.happy else _('Sad'),
             'platform': response.platform,
-            'locale': response.locale
+            'locale': response.locale,
+            'url': response.url
         }
         categories = (':'.join(item) for item in categories.items())
 
