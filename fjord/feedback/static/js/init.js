@@ -1,5 +1,5 @@
 /* general initialization */
-$(document).ready(function(){
+$(document).ready(function() {
     // Set up input placeholders.
     $('input[placeholder]').placeholder();
 
