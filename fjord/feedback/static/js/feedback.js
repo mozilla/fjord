@@ -1,4 +1,3 @@
-
 (function($) {
     $.extend($.fn, {
         nodeIndex: function() {
