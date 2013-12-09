@@ -168,6 +168,18 @@ class TestDashboardView(ElasticTestCase):
         eq_(qs['product'], u'Firefox')
         eq_(qs['version'], u'20.0.0')
 
+    def test_truncated_description_on_dashboard(self):
+        # Create a description that's 500 characters long (which is
+        # the truncation length) plus a string that's easy to assert
+        # non-existence of.
+        desc = ('0' * 500) + 'OMGou812'
+        response(description=desc, save=True)
+        self.refresh()
+
+        url = reverse('dashboard')
+        r = self.client.get(url)
+        assert 'OMGou812' not in r.content
+
     def test_search(self):
         url = reverse('dashboard')
         # Happy

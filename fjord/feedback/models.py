@@ -179,6 +179,11 @@ class ResponseMappingType(FjordMappingType, Indexable):
 
         return doc
 
+    @property
+    def truncated_description(self):
+        """Shorten feedback for dashboard view."""
+        return smart_truncate(self.description, length=500)
+
 
 class ResponseEmail(ModelBase):
     """Holds email addresses related to Responses."""
