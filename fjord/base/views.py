@@ -5,6 +5,7 @@ from functools import wraps
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django.utils.http import is_safe_url
 from django.views.decorators.cache import never_cache
 
 from celery.messaging import establish_connection
@@ -40,6 +41,8 @@ def new_user_view(request, template=None):
         Profile.objects.create(user=request.user)
 
     next_url = request.GET.get('next', reverse('dashboard'))
+    if not is_safe_url(next_url):
+        next_url = reverse('dashboard')
 
     return render(request, template, {
         'next_url': next_url,
