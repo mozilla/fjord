@@ -1,9 +1,11 @@
+from django.contrib.auth.models import Group
 from django.test.utils import override_settings
 
 from nose.tools import eq_
+from pyquery import PyQuery
 
 from fjord.base import views
-from fjord.base.tests import LocalizingClient, reverse, TestCase
+from fjord.base.tests import LocalizingClient, TestCase, profile, reverse, user
 from fjord.base.views import IntentionalException
 from fjord.search.tests import ElasticTestCase
 
@@ -99,6 +101,13 @@ class TestRobots(TestCase):
 
 
 class TestNewUserView(ElasticTestCase):
+    def setUp(self):
+        super(TestNewUserView, self).setUp()
+        jane = user(email='jane@example.com', save=True)
+        profile(user=jane, save=True)
+        jane.groups.add(Group.objects.get(name='analyzers'))
+        self.jane = jane
+
     def test_redirect_to_dashboard_if_anonymous(self):
         # AnonymousUser shouldn't get to the new-user-view, so make
         # sure they get redirected to the dashboard.
@@ -106,3 +115,44 @@ class TestNewUserView(ElasticTestCase):
         eq_(resp.status_code, 200)
         self.assertTemplateNotUsed('new_user.html')
         self.assertTemplateUsed('analytics/dashboard.html')
+
+    def test_default_next_url(self):
+        self.client_login_user(self.jane)
+        resp = self.client.get(reverse('new-user-view'))
+        eq_(resp.status_code, 200)
+        self.assertTemplateUsed('new_user.html')
+
+        # Pull out next link
+        pq = PyQuery(resp.content)
+        next_url = pq('#next-url-link')
+        eq_(next_url.attr['href'], '/en-US/')  # this is the dashboard
+
+    def test_valid_next_url(self):
+        self.client_login_user(self.jane)
+        url = reverse('new-user-view')
+        resp = self.client.get(url, {
+            'next': '/ou812'  # stretches the meaning of 'valid'
+        })
+        eq_(resp.status_code, 200)
+        self.assertTemplateUsed('new_user.html')
+
+        # Pull out next link which is naughty, so it should have been
+        # replaced with a dashboard link.
+        pq = PyQuery(resp.content)
+        next_url = pq('#next-url-link')
+        eq_(next_url.attr['href'], '/ou812')
+
+    def test_sanitized_next_url(self):
+        self.client_login_user(self.jane)
+        url = reverse('new-user-view')
+        resp = self.client.get(url, {
+            'next': 'javascript:prompt%28document.cookie%29'
+        })
+        eq_(resp.status_code, 200)
+        self.assertTemplateUsed('new_user.html')
+
+        # Pull out next link which is naughty, so it should have been
+        # replaced with a dashboard link.
+        pq = PyQuery(resp.content)
+        next_url = pq('#next-url-link')
+        eq_(next_url.attr['href'], '/en-US/')  # this is the dashboard
