@@ -116,8 +116,7 @@ class TestNewUserView(ElasticTestCase):
         self.assertTemplateNotUsed('new_user.html')
         self.assertTemplateUsed('analytics/dashboard.html')
 
-    def test_new_user(self):
-        # New user should get redirected to New User view.
+    def test_default_next_url(self):
         self.client_login_user(self.jane)
         resp = self.client.get(reverse('new-user-view'))
         eq_(resp.status_code, 200)
@@ -128,7 +127,22 @@ class TestNewUserView(ElasticTestCase):
         next_url = pq('#next-url-link')
         eq_(next_url.attr['href'], '/en-US/')  # this is the dashboard
 
-    def test_sanitized_next(self):
+    def test_valid_next_url(self):
+        self.client_login_user(self.jane)
+        url = reverse('new-user-view')
+        resp = self.client.get(url, {
+            'next': '/ou812'  # stretches the meaning of 'valid'
+        })
+        eq_(resp.status_code, 200)
+        self.assertTemplateUsed('new_user.html')
+
+        # Pull out next link which is naughty, so it should have been
+        # replaced with a dashboard link.
+        pq = PyQuery(resp.content)
+        next_url = pq('#next-url-link')
+        eq_(next_url.attr['href'], '/ou812')
+
+    def test_sanitized_next_url(self):
         self.client_login_user(self.jane)
         url = reverse('new-user-view')
         resp = self.client.get(url, {
