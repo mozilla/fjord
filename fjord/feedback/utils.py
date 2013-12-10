@@ -1,10 +1,13 @@
 from base64 import b64encode
 from functools import wraps
+from hashlib import md5
 import re
 
 from pyelasticsearch.exceptions import ElasticHttpError
 from ratelimit.helpers import is_ratelimited
 from statsd import statsd
+
+from django.utils.encoding import force_str
 
 from fjord.feedback import config
 from fjord.search.index import es_analyze
@@ -30,19 +33,16 @@ def actual_ip_plus_desc(req):
     This key is formulated to reduce double-submits.
 
     """
-    # This pulls out the description and make sure it's unicode.
-    desc = unicode(req.POST.get('description', u'no description'))
+    # This pulls out the description and make sure it's bytes.
+    desc = force_str(req.POST.get('description', u'no description'))
 
-    # Converts that to a utf-8 string because b64encode only works on
-    # bytes--not unicode characters.
-    desc = desc.encode('utf-8')
+    # md5 hash that.
+    hasher = md5()
+    hasher.update(desc)
+    desc = hasher.hexdigest()
 
-    # b64encode that.
-    desc = b64encode(desc)
-
-    # Then return the ip address plus a : plus the first 200
-    # characters of the description blob.
-    return actual_ip(req) + ':' + desc[:200]
+    # Then return the ip address plus a : plus the desc md5 hash.
+    return actual_ip(req) + ':' + desc
 
 
 def ratelimit(rulename, keyfun=None, rate='5/m'):
