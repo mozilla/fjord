@@ -89,9 +89,13 @@
             <dd>
               {{ response.user_agent|unknown }}
             </dd>
-            <dt>{{ _('Has email?') }}</dt>
+            <dt>{{ _('Email address') }}</dt>
             <dd>
-              {% if response.responseemail_set.count() > 0 %}{{ _('Yes') }}{% else %}{{ _('No') }}{% endif %}
+              {% if response.responseemail_set.count() > 0 %}
+                {{ response.responseemail_set.all()[0].email }}
+              {% else %}
+                &mdash;
+              {% endif %}
             </dd>
           </dl>
         {% endif %}
