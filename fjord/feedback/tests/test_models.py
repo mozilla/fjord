@@ -37,21 +37,26 @@ class TestComputeGrams(ElasticTestCase):
         eq_(compute_grams(u'i, me, him, her'), [])
 
     def test_bigrams(self):
+        # Note: Tokens look weird after being analyzed probably due to
+        # the stemmer. We could write a bunch of code to "undo" some
+        # of the excessive stemming, but it's probably an exercise in
+        # futility. Ergo the tests look a little odd. e.g. "youtub"
+
         # One word a bigram does not make
         eq_(compute_grams(u'youtube'), [])
 
         # Two words is the minimum number to create a bigram
         eq_(sorted(compute_grams(u'youtube crash')),
-            ['crash youtube'])
+            ['crash youtub'])
 
         # Three words creates two bigrams
         eq_(sorted(compute_grams(u'youtube crash flash')),
-            ['crash flash', 'crash youtube'])
+            ['crash flash', 'crash youtub'])
 
         # Four words creates three bigrams
         eq_(sorted(compute_grams(u'youtube crash flash bridge')),
-            ['bridge flash', 'crash flash', 'crash youtube'])
+            ['bridg flash', 'crash flash', 'crash youtub'])
 
         # Nix duplicate bigrams
         eq_(sorted(compute_grams(u'youtube crash youtube flash')),
-            ['crash youtube', 'flash youtube'])
+            ['crash youtub', 'flash youtub'])

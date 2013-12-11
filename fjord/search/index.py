@@ -26,8 +26,8 @@ def es_analyze(text, analyzer=None):
 
     :arg text: the text to analyze
 
-    :arg analyzer: (optional) the analyzer to use. Defaults to the
-        default analyzer for the index.
+    :arg analyzer: (optional) the analyzer to use. Defaults to snowball
+        which is an English-settings analyzer.
 
     :returns: list of dicts each describing a token
 
@@ -35,10 +35,18 @@ def es_analyze(text, analyzer=None):
     es = get_es()
     index = get_index()
 
+    analyzer = analyzer or 'snowball'
+
     # pyelasticsearch doesn't support analyze, so we do it "manually"
     # using pyelasticsearch's innards. When we update to
     # elasticsearch-py we should rewrite this.
-    return es.send_request('GET', [index, '_analyze'], body=text)['tokens']
+    ret = es.send_request(
+        'GET',
+        [index, '_analyze'],
+        query_params={'analyzer': analyzer},
+        body=text)
+
+    return ret['tokens']
 
 
 def register_mapping_type(mapping_type):
