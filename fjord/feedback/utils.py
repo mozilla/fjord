@@ -1,4 +1,3 @@
-from base64 import b64encode
 from functools import wraps
 from hashlib import md5
 import re
@@ -94,7 +93,8 @@ def compute_grams(text):
         return []
 
     try:
-        tokens = [item['token'] for item in es_analyze(text)]
+        tokens = [item['token'] for item in es_analyze(
+            text, analyzer='snowball')]
     except ElasticHttpError:
         return []
 
