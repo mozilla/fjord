@@ -470,6 +470,7 @@ def analytics_dashboard(request, template):
 
 @check_new_user
 @analyzer_required
+@es_required_or_50x(error_template='analytics/es_down.html')
 def analytics_occurrences_comparison(request):
     template = 'analytics/analytics_occurrences_comparison.html'
 
@@ -607,9 +608,15 @@ def analytics_occurrences_comparison(request):
         permalink = ''
         form = OccurrencesComparisonForm()
 
+    # FIXME - We have responses that have no product set. This ignores
+    # those. That's probably the right thing to do for the Occurrences Report
+    # but maybe not.
+    products = [prod for prod in ResponseMappingType.get_products() if prod]
+
     return render(request, template, {
         'permalink': permalink,
         'form': form,
+        'products': products,
         'first_facet_bi': first_facet_bi,
         'first_params': first_params,
         'first_facet_total': first_facet_total,
