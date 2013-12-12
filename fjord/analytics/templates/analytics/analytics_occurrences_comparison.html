@@ -20,7 +20,11 @@
 
             <div class="container">
               <label for="id_product">Product</label>
-              <input id="id_product" type="text" name="product" value="{{ form.product.value() }}" />
+              <select id="id_product" name="product">
+                {% for prod in products %}
+                  <option value="{{ prod }}"{% if form.product.value() == prod %} selected{% endif %}>{{ prod }}</option>
+                {% endfor %}
+              </select>
               {{ form.product.errors }}
             </div>
           </li>

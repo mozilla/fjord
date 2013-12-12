@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.core.cache import cache
 from django.db import models
 
 from elasticutils.contrib.django import Indexable
@@ -183,6 +184,24 @@ class ResponseMappingType(FjordMappingType, Indexable):
     def truncated_description(self):
         """Shorten feedback for dashboard view."""
         return smart_truncate(self.description, length=500)
+
+    @classmethod
+    def get_products(cls):
+        """Returns a list of all products
+
+        This is cached.
+
+        """
+        key = 'feedback:response_products1'
+        products = cache.get(key)
+        if products is not None:
+            return products
+
+        facet = cls.search().facet('product').facet_counts()
+        products = [prod['term'] for prod in facet['product']]
+
+        cache.add(key, products)
+        return products
 
 
 class ResponseEmail(ModelBase):
