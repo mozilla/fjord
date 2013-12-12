@@ -23,8 +23,7 @@
    for all datetimes in PDT. #}
       <li>
        {% set created_date = to_date_string(feedback.created) %}
-       {% set created_dt = to_datetime_string(feedback.created) %}
-       <a href="{{ request.get_full_path()|urlparams(date_start=created_dt) }}">
+       <a href="{{ request.get_full_path()|urlparams(date_start=created_date, date_end=created_date) }}">
           <time datetime="{{ created_date }}-08:00" title="{{ created_date }} PST">
             {{ feedback.created|naturaltime }}
           </time>
