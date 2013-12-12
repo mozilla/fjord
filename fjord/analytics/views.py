@@ -510,6 +510,19 @@ def analytics_occurrences_comparison(request):
                     description__text=cleaned['first_search_term'])
                 first_params['q'] = cleaned['first_search_term']
 
+            if ('date_start' not in first_params
+                and 'date_end' not in first_params):
+
+                # FIXME - If there's no start date, then we want
+                # "everything" so we use a hard-coded 2013-01-01 date
+                # here to hack that.
+                #
+                # Better way might be to change the dashboard to allow
+                # for an "infinite" range, but there's no other use
+                # case for that and the ranges are done in the ui--not
+                # in the backend.
+                first_params['date_start'] = '2013-01-01'
+
             # Have to do raw because we want a size > 10.
             first_resp_s = first_resp_s.facet_raw(
                 description_bigrams={
@@ -555,6 +568,19 @@ def analytics_occurrences_comparison(request):
                     second_resp_s = second_resp_s.query(
                         description__text=cleaned['second_search_term'])
                     second_params['q'] = cleaned['second_search_term']
+
+                if ('date_start' not in second_params
+                    and 'date_end' not in second_params):
+
+                    # FIXME - If there's no start date, then we want
+                    # "everything" so we use a hard-coded 2013-01-01 date
+                    # here to hack that.
+                    #
+                    # Better way might be to change the dashboard to allow
+                    # for an "infinite" range, but there's no other use
+                    # case for that and the ranges are done in the ui--not
+                    # in the backend.
+                    second_params['date_start'] = '2013-01-01'
 
                 # Have to do raw because we want a size > 10.
                 second_resp_s = second_resp_s.facet_raw(
