@@ -86,6 +86,7 @@
     </x-appbar>
 
     <section>
+      <div id="description-counter" class="characters-remaining"></div>
       <label class="happy" for="description">
         {{ _('Please describe what you liked.') }}
       </label>
@@ -94,7 +95,7 @@
       </label>
 
       <p>
-        <textarea id="description" name="description" cols="40" rows="4"></textarea>
+        <textarea data-max-length="10000" id="description" name="description" cols="40" rows="4"></textarea>
       </p>
 
       <p>

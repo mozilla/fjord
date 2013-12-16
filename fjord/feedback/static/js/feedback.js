@@ -69,14 +69,18 @@
     var currentArticle;
 
     function countRemaining(inputElement) {
-        var counter = $('#' + $(inputElement).attr('id') + '-counter'),
-        max = $(inputElement).attr('data-max-length'),
-        remaining = max - $(inputElement).val().length;
+        // Updates the counter and inputElement based on the number of
+        // characters in the specified inputElement.
+        var $desc = $(inputElement);
+        var $counter = $('#' + $desc.attr('id') + '-counter');
+        var max = $desc.attr('data-max-length');
+        var remaining = max - $desc.val().length;
 
-        $(counter).text(remaining);
-        $(counter).toggleClass('no-characters-remaining', remaining < 0);
-        $(counter).toggleClass('limited-characters-remaining', remaining <= Math.round(max * 0.2));
-        $('#' + $(inputElement).attr('id').replace(/-description/, '') + '-submit a').toggleClass('disabled', (max == remaining || remaining < 0));
+        $desc.toggleClass('error', remaining < 0);
+
+        $counter.text(remaining);
+        $counter.toggleClass('error', remaining < 0);
+        $counter.toggleClass('warning', (remaining >= 0 && remaining <= Math.round(max * 0.2)));
     }
 
     function getArticle(href) {
@@ -105,15 +109,14 @@
         oldArticle.switchTo(newArticle, callback);
     }
 
-    $(function() {
+    function init() {
         // Look for errors and show that initially
         var errorlst = $('article .errorlist');
         if(errorlst.length) {
             currentArticle = errorlst.closest('article');
             currentArticle.css({ display: 'block' });
             window.location.hash = currentArticle.attr('id');
-        }
-        else {
+        } else {
             currentArticle = getArticle(document.location.hash);
             currentArticle.css({ display: 'block' });
         }
@@ -139,7 +142,7 @@
         $('article textarea').each(function(i, element) {
             countRemaining(element);
         });
-        $('article textarea').live('keyup', function(e) {
+        $('article textarea').keyup(function() {
             countRemaining(this);
         });
 
@@ -163,8 +166,9 @@
             email_expansion(this, 0);
         });
 
-    });
+        $('html').addClass('js');
+    };
 
-    $('html').addClass('js');
+    $(init);
 
-})(jQuery);
+}(jQuery));

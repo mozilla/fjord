@@ -221,25 +221,33 @@ input[type=text], input[type=url], textarea {
   box-shadow: 0 0 2px rgba(0,0,0, .4) inset;
 }
 
+textarea.error {
+  outline: solid 1px red;
+}
+
 .characters-remaining {
   color: green;
   float: right;
-  font-size: 1.1em;
-  margin: 5px 5px 0 0;
+  font-size: 0.9em;
+  margin: 0px;
+  padding: 0px;
+  text-align: right;
+  width: 3em;
 
-  .warning {
-    color: inherit;
+  &.error {
+    color: red;
     font-weight: bold;
   }
 
-  .error {
-    color: red;
-    font-weight: bold;
+  &.warning {
+    color: orange;
   }
 }
 
 .privacy {
   font-size: 14px;
+  margin: 0px;
+  padding: 0px;
   color: #5c4b00;
 
   span {

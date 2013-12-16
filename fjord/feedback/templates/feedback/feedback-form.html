@@ -23,6 +23,7 @@
     <form action="" method="post" autocomplete="off">
       <div class="fields">
         <div>
+          <div id="{{ type }}-id_description-counter" class="characters-remaining"></div>
           <label for="description">
             {% if type == 'happy' %}
               {{ _('Please describe what you liked.') }}
@@ -30,11 +31,13 @@
               {{ _('Please describe your problem below.') }}
             {% endif %}
           </label>
-          <p>{{ form.description }}</p>
+          <p>
+            <textarea data-max-length="10000" id="{{ type }}-id_description" class="description-field" rows="10" name="description" cols="40"></textarea>
+          </p>
           {{ form.description.errors }}
         </div>
 
-        <div class="privacy">
+        <p class="privacy">
           <span>
             {% trans %}
               To protect your privacy, please ensure that no
@@ -42,7 +45,7 @@
               your feedback.
             {% endtrans %}
           </span>
-        </div>
+        </p>
 
         {% if type == 'sad' %}
           <div class="feedback-message">
