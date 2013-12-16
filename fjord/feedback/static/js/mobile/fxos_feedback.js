@@ -1,4 +1,4 @@
-(function() {
+(function($) {
     // FIXME: Fix this so we don't have to update the JS file every
     // time we update the version map in fjord/base/browsers.py.
     var GECKO_TO_FXOS = {
@@ -212,4 +212,4 @@
 
     $(init);
 
-}());
+}(jQuery));
