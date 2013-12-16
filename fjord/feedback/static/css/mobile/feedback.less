@@ -57,3 +57,24 @@ article {
   }
 }
 
+textarea.error {
+  outline: solid 1px red;
+}
+
+.characters-remaining {
+  color: green;
+  float: right;
+  font-size: 0.9em;
+  padding: 0px 10px 10px 10px;
+  text-align: right;
+  width: 3em;
+
+  &.error {
+    color: red;
+    font-weight: bold;
+  }
+
+  &.warning {
+    color: orange;
+  }
+}

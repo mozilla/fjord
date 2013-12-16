@@ -46,6 +46,7 @@
     <section>
       <form action="" method="post">
         <div>
+          <div id="id_description-counter" class="characters-remaining"></div>
           <label class="happy" for="description">
             {{ _('Please describe what you liked.') }}
           </label>
@@ -53,14 +54,22 @@
             {{ _('Please describe your problem below.') }}
           </label>
 
-          <p>{{ form.description }}</p>
-          <div id="{{ type }}-description-counter" class="characters-remaining"></div>
+          <p>
+            <textarea data-max-length="10000" id="id_description" class="description-field" rows="10" name="description" cols="40"></textarea>
+          </p>
           {{ form.description.errors }}
         </div>
 
         <div class="feedback-message sad">
           {{ _('Please be as specific as you can.') }}
         </div>
+
+        <p>
+          {% trans %}
+            The content of your feedback will be public, so please be
+            sure not to include any personal information.
+          {% endtrans %}
+        </p>
 
         <label class="email-ok">
           <p>
@@ -78,10 +87,6 @@
         </div>
 
         <p>
-          {% trans %}
-            The content of your feedback will be public, so please be
-            sure not to include any personal information.
-          {% endtrans %}
           <span id="privacy-email">
             {{ _("Don't worry, your email will always be kept private.") }}
           </span>
