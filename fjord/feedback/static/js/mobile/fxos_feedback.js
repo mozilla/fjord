@@ -26,9 +26,25 @@
         }
     }
 
+    function countRemaining(inputElement) {
+        // Updates the counter and inputElement based on the number of
+        // characters in the specified inputElement.
+        var $desc = $(inputElement);
+        var $counter = $('#' + $desc.attr('id') + '-counter');
+        var max = $desc.attr('data-max-length');
+        var remaining = max - $desc.val().length;
+
+        $desc.toggleClass('error', remaining < 0);
+
+        $counter.text(remaining);
+        $counter.toggleClass('error', remaining < 0);
+        $counter.toggleClass('warning', (remaining >= 0 && remaining <= Math.round(max * 0.2)));
+    }
+
     function formReset() {
         $('#email-ok').prop('checked', false);
         $('#description').val('');
+        countRemaining($('#description'));
 
         storageRemoveItem('emailok');
         storageRemoveItem('description');
@@ -89,7 +105,10 @@
             storageAddItem('device', $('#device select').val());
         });
 
+        countRemaining($('#description'));
+
         $('#description').on('keyup', function() {
+            countRemaining(this);
             if ($('#description').val() === '') {
                 $('#description-next-btn').prop('disabled', true);
             } else {
