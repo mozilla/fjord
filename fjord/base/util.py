@@ -176,7 +176,7 @@ class Atom1FeedWithRelatedLinks(Atom1Feed):
 
     def add_item_elements(self, handler, item):
         super(Atom1FeedWithRelatedLinks, self).add_item_elements(handler, item)
-        if item['link_related']:
+        if item.get('link_related'):
             handler.addQuickElement(
                 'link',
                 attrs={'href': item['link_related'], 'rel': 'related'})
