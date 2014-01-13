@@ -1,9 +1,10 @@
-from datetime import datetime
 from functools import wraps
+import datetime
 import time
 
 from django.contrib.auth.decorators import permission_required
 from django.http import HttpResponseRedirect
+from django.utils.dateparse import parse_date
 from django.utils.feedgenerator import Atom1Feed
 
 from funfactory.urlresolvers import reverse
@@ -96,23 +97,23 @@ def smart_int(s, fallback=0):
         return fallback
 
 
-def smart_datetime(s, fmt='%Y-%m-%d', fallback=None):
-    """Convert a string to a datetime, with a fallback for invalid input.
-
-    Note that this won't take ``datetime``s as input, only strings. It is
-    different than ``smart_int`` in this way.
+def smart_date(s, fallback=None):
+    """Convert a string to a datetime.date with a fallback for invalid input.
 
     :arg s: The string to convert to a date.
-    :arg fmt: Format to use to parse the string into a date.
-        Default: ``'%Y-%m-%d'``.
     :arg fallback: Value to use in case of an error. Default: ``None``.
 
     """
+    if isinstance(s, datetime.date):
+        return s
+
     try:
-        dt = datetime.strptime(s, fmt)
+        dt = parse_date(s)
+
         # The strftime functions require a year >= 1900, so if this
-        # has a year before that, then it's not a valid date.
-        if dt.year >= 1900:
+        # has a year before that, then we treat it as an invalid date so
+        # later processing doesn't get hosed.
+        if dt and dt.year >= 1900:
             return dt
     except (ValueError, TypeError):
         pass

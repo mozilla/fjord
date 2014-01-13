@@ -19,7 +19,7 @@ from fjord.base.util import (
     analyzer_required,
     check_new_user,
     smart_int,
-    smart_datetime,
+    smart_date,
     epoch_milliseconds,
     Atom1FeedWithRelatedLinks)
 from fjord.feedback.models import Response, ResponseMappingType
@@ -250,10 +250,10 @@ def dashboard(request):
     search_product = request.GET.get('product', None)
     search_version = request.GET.get('version', None)
     search_query = request.GET.get('q', None)
-    search_date_start = smart_datetime(request.GET.get('date_start', None),
-                                       fallback=None)
-    search_date_end = smart_datetime(request.GET.get('date_end', None),
-                                     fallback=None)
+    search_date_start = smart_date(
+        request.GET.get('date_start', None), fallback=None)
+    search_date_end = smart_date(
+        request.GET.get('date_end', None), fallback=None)
     search_bigram = request.GET.get('bigram', None)
     selected = request.GET.get('selected', None)
 

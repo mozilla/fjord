@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
+import datetime
 
 from nose.tools import eq_
 
 from fjord.base.tests import TestCase
 from fjord.base.util import (
-    smart_truncate, smart_str, smart_int, smart_datetime, smart_bool)
+    smart_truncate, smart_str, smart_int, smart_date, smart_bool)
 
 
 def test_smart_truncate():
@@ -54,23 +54,23 @@ class SmartIntTestCase(TestCase):
 
 class SmartDateTest(TestCase):
     def test_sanity(self):
-        eq_(datetime(2012, 1, 1), smart_datetime('2012-01-01'))
-        eq_(None, smart_datetime('1742-11-05'))
-        eq_(None, smart_datetime('0001-01-01'))
+        eq_(datetime.date(2012, 1, 1), smart_date('2012-01-01'))
+        eq_(None, smart_date('1742-11-05'))
+        eq_(None, smart_date('0001-01-01'))
 
     def test_empty_string(self):
-        eq_(None, smart_datetime(''))
+        eq_(None, smart_date(''))
+
+    def test_date(self):
+        eq_(datetime.date(2012, 1, 1), smart_date('2012-01-01'))
+        eq_(datetime.date(2012, 1, 1), smart_date('2012-1-1'))
 
     def test_fallback(self):
-        eq_('Hullaballo', smart_datetime('', fallback='Hullaballo'))
-
-    def test_format(self):
-        eq_(datetime(2012, 9, 28),
-            smart_datetime('9/28/2012', fmt='%m/%d/%Y'))
+        eq_('Hullaballo', smart_date('', fallback='Hullaballo'))
 
     def test_null_bytes(self):
         # strptime likes to barf on null bytes in strings, so test it.
-        eq_(None, smart_datetime('/etc/passwd\x00'))
+        eq_(None, smart_date('/etc/passwd\x00'))
 
 
 class SmartBoolTest(TestCase):
