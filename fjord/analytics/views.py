@@ -236,8 +236,9 @@ def generate_dashboard_atom_url(request):
 
 @check_new_user
 @es_required_or_50x(error_template='analytics/es_down.html')
-@mobile_template('analytics/{mobile/}dashboard.html')
-def dashboard(request, template):
+def dashboard(request):
+    template = 'analytics/dashboard.html'
+
     output_format = request.GET.get('format', None)
     page = smart_int(request.GET.get('page', 1), 1)
 
