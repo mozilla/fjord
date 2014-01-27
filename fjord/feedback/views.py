@@ -12,11 +12,26 @@ from mobility.decorators import mobile_template
 from rest_framework import generics
 
 from fjord.base.browsers import UNKNOWN
-from fjord.base.util import smart_bool, translate_country_name
+from fjord.base.util import smart_bool, smart_str, translate_country_name
 from fjord.feedback import config
 from fjord.feedback import models
 from fjord.feedback.forms import ResponseForm
 from fjord.feedback.utils import actual_ip_plus_desc, ratelimit
+
+
+# Map url bits to their Product names
+# FIXME - This should be pulled from the db: list of products, url
+# aliases, etc
+PRODUCT_MAP = {
+    'firefox': u'Firefox',
+    'metrofirefox': u'Firefox Metro',
+    'android': u'Firefox for Android',
+    'fxos': u'Firefox OS',
+
+    # FIXME - nix these when we ditch the formname router stuff
+    'firefox.desktop.stable': u'Firefox',
+    'firefox.android.stable': u'Firefox for Android',
+}
 
 
 def happy_redirect(request):
@@ -63,7 +78,8 @@ def requires_firefox(func):
 
 @ratelimit(rulename='doublesubmit_1pm', keyfun=actual_ip_plus_desc, rate='1/m')
 @ratelimit(rulename='100ph', rate='100/h')
-def _handle_feedback_post(request):
+def _handle_feedback_post(request, locale=None, product=None,
+                          version=None, channel=None):
     if getattr(request, 'limited', False):
         # If we're throttled, then return the thanks page, but don't
         # add the response to the db.
@@ -71,6 +87,13 @@ def _handle_feedback_post(request):
 
     form = ResponseForm(request.POST)
     if form.is_valid():
+        # Do some data validation of product, channel and version
+        # coming from the url.
+        product = PRODUCT_MAP.get(smart_str(product), u'')
+        # FIXME - validate these better
+        channel = smart_str(channel).lower()
+        version = smart_str(version)
+
         data = form.cleaned_data
 
         # Most platforms aren't different enough between versions to care.
@@ -86,41 +109,42 @@ def _handle_feedback_post(request):
             description=data['description'],
 
             # Inferred data from user agent
-            prodchan=_get_prodchan(request),
+            prodchan=_get_prodchan(request, product, channel),
             user_agent=request.META.get('HTTP_USER_AGENT', ''),
             browser=request.BROWSER.browser,
             browser_version=request.BROWSER.browser_version,
             platform=platform,
 
-            # Data that comes form the user or is inferred
-            locale=data.get('locale', request.locale),
+            # Pulled from the form data or the url
+            locale=data.get('locale', locale),
 
-            # Data from mobile devices
+            # Data from mobile devices which is probably only
+            # applicable to mobile devices
             manufacturer=data.get('manufacturer', ''),
             device=data.get('device', ''),
         )
 
-        # This data is coming from the web form where we infer many
-        # things from the user agent. If the user agent is bogus, then
-        # the browser is UNKNOWN. If that's the case, then we can't
-        # infer anything useful for product, channel or version so we
-        # set them to empty strings.
-        if opinion.browser == UNKNOWN:
-            opinion.product = u''
-            opinion.channel = u''
-            opinion.version = u''
-
-        else:
-            opinion.product = data.get(
+        # We prefer the data from the url over what we're inferring from
+        # the user agent.
+        if opinion.browser != UNKNOWN:
+            product = product or data.get(
                 'product', models.Response.infer_product(platform))
             # For now, we assume everything is stable because we don't
             # know otherwise.
-            opinion.channel = u'stable'
-            opinion.version = data.get(
+            channel = channel or u'stable'
+            version = version or data.get(
                 'version', request.BROWSER.browser_version)
+
+        # Either a truthy string value or the empty string. This makes
+        # sure we're not putting Nones in the db because we'd prefer
+        # an empty string in that case.
+        opinion.product = product or u''
+        opinion.channel = channel or u''
+        opinion.version = version or u''
 
         opinion.save()
 
+        # If there was an email address, save that separately.
         if data['email_ok'] and data['email']:
             e = models.ResponseEmail(email=data['email'], opinion=opinion)
             e.save()
@@ -131,7 +155,8 @@ def _handle_feedback_post(request):
     return None, form
 
 
-def _get_prodchan(request):
+def _get_prodchan(request, product=None, channel=None):
+    # FIXME - redo this to handle product/channel
     meta = request.BROWSER
 
     product = ''
@@ -157,16 +182,18 @@ def _get_prodchan(request):
 
 @requires_firefox
 @csrf_protect
-def desktop_stable_feedback(request):
-    # Use two instances of the same form because the template changes the text
-    # based on the value of ``happy``.
+def desktop_stable_feedback(request, locale=None, product=None,
+                            version=None, channel=None):
+    # Use two instances of the same form because the template changes
+    # the text based on the value of ``happy``.
     forms = {
         'happy': ResponseForm(initial={'happy': 1}),
         'sad': ResponseForm(initial={'happy': 0}),
     }
 
     if request.method == 'POST':
-        response, form = _handle_feedback_post(request)
+        response, form = _handle_feedback_post(
+            request, locale, product, version, channel)
         if response:
             return response
 
@@ -181,12 +208,14 @@ def desktop_stable_feedback(request):
 
 @requires_firefox
 @csrf_protect
-def mobile_stable_feedback(request):
+def mobile_stable_feedback(request, locale=None, product=None,
+                           version=None, channel=None):
     form = ResponseForm()
     happy = None
 
     if request.method == 'POST':
-        response, form = _handle_feedback_post(request)
+        response, form = _handle_feedback_post(
+            request, locale, product, version, channel)
         if response:
             return response
         happy = smart_bool(request.POST.get('happy', None), None)
@@ -199,7 +228,8 @@ def mobile_stable_feedback(request):
 
 @requires_firefox
 @csrf_exempt
-def firefox_os_stable_feedback(request):
+def firefox_os_stable_feedback(request, locale=None, product=None,
+                               version=None, channel=None):
     # Localized country names are in region files in product
     # details. We try really hard to use localized country names, so
     # we use gettext and if that's not available, use whatever is in
@@ -218,14 +248,18 @@ def firefox_os_stable_feedback(request):
 
 @csrf_exempt
 @require_POST
-def android_about_feedback(request):
+def android_about_feedback(request, locale=None, product=None,
+                           version=None, channel=None):
     """A view specifically for Firefox for Android.
 
     Firefox for Android has a feedback form built in that generates
     POSTS directly to Input, and is always sad or ideas. Since Input no
     longer supports idea feedbacks, everything is Sad.
-    """
 
+    FIXME - measure usage of this and nix it when we can. See bug
+    #964292.
+
+    """
     # Firefox for Android only sends up sad and idea responses, but it
     # uses the old `_type` variable from old Input. Tweak the data to do
     # what FfA means, not what it says.
@@ -241,7 +275,10 @@ def android_about_feedback(request):
         happy = 0
     request.POST['happy'] = happy
 
-    response, form = _handle_feedback_post(request)
+    # Note: product, version and channel are always None in this view
+    # since this is to handle backwards-compatibility. So we don't
+    # bother passing them along.
+    response, form = _handle_feedback_post(request, locale)
 
     if response:
         return response
@@ -251,9 +288,9 @@ def android_about_feedback(request):
     return HttpResponse('', status=400)
 
 
-# Mapping of prodchan values to views. If the parameter `formname` is passed to
-# `feedback_router`, it will key into this dict.
-feedback_routes = {
+# FIXME - This should go away once we unify the feedback forms.
+# Mapping of product names to views.
+product_routes = {
     'firefox.desktop.stable': desktop_stable_feedback,
     'firefox.android.stable': mobile_stable_feedback,
     'firefox.fxos.stable': firefox_os_stable_feedback,
@@ -262,18 +299,34 @@ feedback_routes = {
 
 @csrf_exempt
 @never_cache
-def feedback_router(request, formname=None, *args, **kwargs):
+def feedback_router(request, product=None, version=None, channel=None,
+                    *args, **kwargs):
     """Determine a view to use, and call it.
 
-    If formname is given, reference `feedback_routes` to look up a view.
-    If `formname` is not passed, or isn't found in `feedback_routes`,
+    If product is given, reference `product_routes` to look up a view.
+    If `product` is not passed, or isn't found in `product_routes`,
     asssume the user is either a stable desktop Firefox or a stable
-    mobile Firefox based on the parsed UA, and serve them the appropriate
-    page.
+    mobile Firefox based on the parsed UA, and serve them the
+    appropriate page. This is to handle the old formname way of doing
+    things. At some point P, we should measure usage of the old
+    formnames and deprecate them.
+
+    This also handles backwards-compatability with the old Firefox for
+    Android form which can't have a CSRF token.
 
     Note: We never want to cache this view.
+
     """
-    view = feedback_routes.get(formname)
+    if product:
+        # If they passed in a product and we don't know about it, stop
+        # here.
+        if product not in PRODUCT_MAP:
+            return render(request, 'feedback/unknownproduct.html', {
+                'product': product
+            })
+
+    # FIXME - Remove this when we nix the form routing.
+    view = product_routes.get(product)
 
     # Checks to see if `_type` is in the POST data and if so this is
     # coming from Firefox for Android which doesn't know anything
@@ -288,14 +341,17 @@ def feedback_router(request, formname=None, *args, **kwargs):
         view = android_about_feedback
 
     if view is None:
-        if request.BROWSER.browser == 'Firefox OS':
+        # FIXME - Remove product hard-coding from here
+        if product == 'firefoxos' or request.BROWSER.browser == 'Firefox OS':
             view = firefox_os_stable_feedback
-        elif request.BROWSER.mobile:
+
+        elif product == 'android' or request.BROWSER.mobile:
             view = mobile_stable_feedback
+
         else:
             view = desktop_stable_feedback
 
-    return view(request, *args, **kwargs)
+    return view(request, request.locale, product, version, channel, *args, **kwargs)
 
 
 class PostFeedbackAPI(generics.CreateAPIView):

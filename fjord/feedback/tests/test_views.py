@@ -89,6 +89,138 @@ class TestFeedback(TestCase):
 
         self.assertTemplateUsed(r, 'feedback/mobile/fxos_feedback.html')
 
+    def test_urls_locale(self):
+        """Test setting locale from the locale part of the url"""
+        try:
+            url = reverse('feedback')
+            # N.B. Cheating here to get the right localized url.
+            url = url.replace('/en-US/', '/es/')
+            resp = self.client.post(url, {
+                'happy': 1,
+                'description': u'Firefox rocks for es!',
+                'url': u'http://mozilla.org/'
+            })
+
+            self.assertRedirects(resp, reverse('thanks'))
+            feedback = models.Response.objects.latest(field_name='id')
+            eq_(u'es', feedback.locale)
+            eq_(u'Firefox', feedback.product)
+            eq_(u'14.0.1', feedback.version)
+            eq_(u'stable', feedback.channel)
+
+        finally:
+            # FIXME - We have to do another request to set the
+            # LocalizingClient back to en-US otherwise it breaks all
+            # tests ever. This is goofy-pants since it should get
+            # reset in test teardown.
+            resp = self.client.get('/en-US/')
+
+    def test_urls_product(self):
+        """Test setting product from the url"""
+        amount = models.Response.objects.count()
+
+        url = reverse('feedback', args=(u'android',))
+        resp = self.client.post(url, {
+            'happy': 1,
+            'description': u'Firefox rocks FFA!',
+            'url': u'http://mozilla.org/'
+        })
+
+        self.assertRedirects(resp, reverse('thanks'))
+        eq_(amount + 1, models.Response.objects.count())
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(u'en-US', feedback.locale)
+        eq_(u'Firefox for Android', feedback.product)
+        eq_(u'14.0.1', feedback.version)
+        eq_(u'stable', feedback.channel)
+
+    def test_urls_unknown_product(self):
+        """Test unknown product shows unknown product page"""
+        url = reverse('feedback', args=(u'fakeproduct',))
+        resp = self.client.get(url)
+
+        self.assertContains(resp, 'Unknown product')
+
+    def test_urls_product_version(self):
+        """Test setting version from the url"""
+        amount = models.Response.objects.count()
+
+        url = reverse('feedback', args=(u'android', u'29'))
+        resp = self.client.post(url, {
+            'happy': 1,
+            'description': u'Firefox rocks FFA 29!',
+            'url': u'http://mozilla.org/'
+        })
+
+        self.assertRedirects(resp, reverse('thanks'))
+        eq_(amount + 1, models.Response.objects.count())
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(u'en-US', feedback.locale)
+        eq_(u'Firefox for Android', feedback.product)
+        eq_(u'29', feedback.version)
+        eq_(u'stable', feedback.channel)
+
+    def test_urls_product_version_channel(self):
+        """Test setting channel from url"""
+        amount = models.Response.objects.count()
+
+        url = reverse('feedback', args=(u'android', u'29', u'nightly'))
+        resp = self.client.post(url, {
+            'happy': 1,
+            'description': u'Firefox rocks FFA 29 nightly!',
+            'url': u'http://mozilla.org/'
+        })
+
+        self.assertRedirects(resp, reverse('thanks'))
+        eq_(amount + 1, models.Response.objects.count())
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(u'en-US', feedback.locale)
+        eq_(u'Firefox for Android', feedback.product)
+        eq_(u'29', feedback.version)
+        eq_(u'nightly', feedback.channel)
+
+    def test_urls_product_version_uppercased_channel(self):
+        """Test setting uppercase channel from the url gets lowercased"""
+        amount = models.Response.objects.count()
+
+        url = reverse('feedback', args=(u'android', u'29', u'NIGHTLY'))
+        resp = self.client.post(url, {
+            'happy': 1,
+            'description': u'Firefox rocks FFA 29 NIGHTLY!',
+            'url': u'http://mozilla.org/'
+        })
+
+        self.assertRedirects(resp, reverse('thanks'))
+        eq_(amount + 1, models.Response.objects.count())
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(u'en-US', feedback.locale)
+        eq_(u'Firefox for Android', feedback.product)
+        eq_(u'29', feedback.version)
+        eq_(u'nightly', feedback.channel)
+
+    def test_urls_product_version_channel_android_ua(self):
+        """Test setting everything with a Fennec user agent"""
+        amount = models.Response.objects.count()
+
+        ua = 'Mozilla/5.0 (Android; Tablet; rv:24.0) Gecko/24.0 Firefox/24.0'
+        url = reverse('feedback', args=(u'android', u'29', u'nightly'))
+        resp = self.client.post(
+            url,
+            {
+                'happy': 1,
+                'description': u'Firefox rocks FFA 29 nightly android ua!',
+                'url': u'http://mozilla.org/'
+            },
+            HTTP_USER_AGENT=ua)
+
+        self.assertRedirects(resp, reverse('thanks'))
+        eq_(amount + 1, models.Response.objects.count())
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(u'en-US', feedback.locale)
+        eq_(u'Firefox for Android', feedback.product)
+        eq_(u'29', feedback.version)
+        eq_(u'nightly', feedback.channel)
+
     def test_invalid_form(self):
         """Submitting a really bad form should return an error."""
         url = reverse('feedback', args=('firefox.desktop.stable',))
