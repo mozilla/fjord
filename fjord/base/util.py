@@ -80,6 +80,14 @@ def smart_truncate(content, length=100, suffix='...'):
         return content[:length].rsplit(' ', 1)[0] + suffix
 
 
+def smart_str(s, fallback=u''):
+    """Returns the string or the fallback if it's not a string"""
+    if isinstance(s, basestring):
+        return s
+
+    return fallback
+
+
 def smart_int(s, fallback=0):
     """Convert a string to int, with fallback for invalid strings or types."""
     try:

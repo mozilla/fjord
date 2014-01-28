@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block site_css %}
+  {{ css('feedback') }}
+{% endblock %}
+
+{% block site_js %}
+  {{ js('feedback') }}
+{% endblock %}
+
+{# Remove site header. #}
+{% block site_header %}{% endblock %}
+
+{% block page_title %}{{ _('Unknown product') }}{% endblock %}
+
+{% block content %}
+
+<article class="visible">
+  <header>
+    <h1>{{ _('Unknown product') }}</h1>
+  </header>
+
+  <div class="content">
+    <div>
+      <p>
+        {% trans product=product, url='https://bugzilla.mozilla.org/enter_bug.cgi?product=Input&rep_platform=all&op_sys=all' %}
+          Input doesn't know about "<em>{{ product }}</em>". If you think
+          this is an error, please let us know by <a href="{{  bugurl }}">writing 
+          up a bug</a>.
+        {% endtrans %}
+      </p>
+      <p>
+        {% trans url='https://input.mozilla.org/feedback/' %}
+          If you are here by mistake and want to leave feedback, you can
+          do so <a href="{{ url }}">on our feedback form</a>.
+        {% endtrans %}
+      </p>
+    </div>
+  </div>
+
+  <span class="fade"></span>
+</article>
+
+{% endblock %}

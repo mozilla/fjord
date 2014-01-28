@@ -4,7 +4,8 @@ from datetime import datetime
 from nose.tools import eq_
 
 from fjord.base.tests import TestCase
-from fjord.base.util import smart_truncate, smart_int, smart_datetime, smart_bool
+from fjord.base.util import (
+    smart_truncate, smart_str, smart_int, smart_datetime, smart_bool)
 
 
 def test_smart_truncate():
@@ -13,6 +14,20 @@ def test_smart_truncate():
     eq_(smart_truncate(u'abc def', length=4), u'abc...')
     eq_(smart_truncate(u'abcdef', length=4), u'abcd...')
     eq_(smart_truncate(u'ééé ééé', length=4), u'ééé...')
+
+
+class SmartStrTestCase(TestCase):
+    def test_str(self):
+        eq_('a', smart_str('a'))
+        eq_(u'a', smart_str(u'a'))
+
+    def test_not_str(self):
+        eq_(u'', smart_str(1))
+        eq_(u'', smart_str(1.1))
+        eq_(u'', smart_str(True))
+        eq_(u'', smart_str(['a']))
+
+        eq_(u'', smart_str(None))
 
 
 class SmartIntTestCase(TestCase):
