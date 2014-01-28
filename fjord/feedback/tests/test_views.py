@@ -131,8 +131,8 @@ class TestFeedback(TestCase):
         feedback = models.Response.objects.latest(field_name='id')
         eq_(u'en-US', feedback.locale)
         eq_(u'Firefox for Android', feedback.product)
-        eq_(u'14.0.1', feedback.version)
-        eq_(u'stable', feedback.channel)
+        eq_(u'', feedback.version)
+        eq_(u'', feedback.channel)
 
     def test_urls_unknown_product(self):
         """Test unknown product shows unknown product page"""
@@ -158,7 +158,7 @@ class TestFeedback(TestCase):
         eq_(u'en-US', feedback.locale)
         eq_(u'Firefox for Android', feedback.product)
         eq_(u'29', feedback.version)
-        eq_(u'stable', feedback.channel)
+        eq_(u'', feedback.channel)
 
     def test_urls_product_version_channel(self):
         """Test setting channel from url"""

@@ -27,10 +27,6 @@ PRODUCT_MAP = {
     'metrofirefox': u'Firefox Metro',
     'android': u'Firefox for Android',
     'fxos': u'Firefox OS',
-
-    # FIXME - nix these when we ditch the formname router stuff
-    'firefox.desktop.stable': u'Firefox',
-    'firefox.android.stable': u'Firefox for Android',
 }
 
 
@@ -124,23 +120,29 @@ def _handle_feedback_post(request, locale=None, product=None,
             device=data.get('device', ''),
         )
 
-        # We prefer the data from the url over what we're inferring from
-        # the user agent.
-        if opinion.browser != UNKNOWN:
-            product = product or data.get(
-                'product', models.Response.infer_product(platform))
-            # For now, we assume everything is stable because we don't
-            # know otherwise.
-            channel = channel or u'stable'
-            version = version or data.get(
-                'version', request.BROWSER.browser_version)
+        if product:
+            # If we picked up the product from the url, we use url
+            # bits for everything.
+            product = product or u''
+            version = version or u''
+            channel = channel or u''
 
-        # Either a truthy string value or the empty string. This makes
-        # sure we're not putting Nones in the db because we'd prefer
-        # an empty string in that case.
+        elif opinion.browser != UNKNOWN:
+            # If we didn't pick up a product from the url, then we
+            # infer as much as we can from the user agent.
+            product = data.get(
+                'product', models.Response.infer_product(platform))
+            version = data.get(
+                'version', request.BROWSER.browser_version)
+            # Assume everything we don't know about is stable channel.
+            channel = u'stable'
+
+        else:
+            product = channel = version = u''
+
         opinion.product = product or u''
-        opinion.channel = channel or u''
         opinion.version = version or u''
+        opinion.channel = channel or u''
 
         opinion.save()
 
@@ -317,15 +319,8 @@ def feedback_router(request, product=None, version=None, channel=None,
     Note: We never want to cache this view.
 
     """
-    if product:
-        # If they passed in a product and we don't know about it, stop
-        # here.
-        if product not in PRODUCT_MAP:
-            return render(request, 'feedback/unknownproduct.html', {
-                'product': product
-            })
-
-    # FIXME - Remove this when we nix the form routing.
+    # FIXME - Remove this when we nix the form routing. It converts
+    # the product to a formname.
     view = product_routes.get(product)
 
     # Checks to see if `_type` is in the POST data and if so this is
@@ -340,7 +335,22 @@ def feedback_router(request, product=None, version=None, channel=None,
     if '_type' in request.POST:
         view = android_about_feedback
 
-    if view is None:
+    if view:
+        # If we have a view, then the "product" was really a formname
+        # or we're handling the old way Firefox for Android posted
+        # feedback. So we clear out the product so it doesn't cause
+        # issues later.
+        product = None
+
+    else:
+        if product:
+            # If they passed in a product and we don't know about it, stop
+            # here.
+            if product not in PRODUCT_MAP:
+                return render(request, 'feedback/unknownproduct.html', {
+                    'product': product
+                })
+
         # FIXME - Remove product hard-coding from here
         if product == 'firefoxos' or request.BROWSER.browser == 'Firefox OS':
             view = firefox_os_stable_feedback
