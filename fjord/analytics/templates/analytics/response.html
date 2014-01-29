@@ -52,6 +52,18 @@
               {{ response.locale|locale_name }}
             </a>
           </dd>
+          <dt>{{ _('Product') }}</dt>
+          <dd>
+            {{ response.product|unknown }}
+          </dd>
+          <dt>{{ _('Version') }}</dt>
+          <dd>
+            {{ response.version|unknown }}
+          </dd>
+          <dt>{{ _('Channel') }}</dt>
+          <dd>
+            {{ response.channel|unknown }}
+          </dd>
         </dl>
 
         {% if user.is_authenticated() and user.has_perm('analytics.can_view_dashboard') %}
@@ -59,18 +71,6 @@
             <dt>{{ _('URL') }}</dt>
             <dd>
               {{ response.url or 'None' }}
-            </dd>
-            <dt>{{ _('Product') }}</dt>
-            <dd>
-              {{ response.product|unknown }}
-            </dd>
-            <dt>{{ _('Channel') }}</dt>
-            <dd>
-              {{ response.channel|unknown }}
-            </dd>
-            <dt>{{ _('Version') }}</dt>
-            <dd>
-              {{ response.version|unknown }}
             </dd>
             <dt>{{ _('Country') }}</dt>
             <dd>
