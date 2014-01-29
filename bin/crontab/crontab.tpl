@@ -2,19 +2,11 @@
 # {{ header }}
 #
 
-# MAILTO=some-email-list
+MAILTO=input-tracebacks@mozilla.com
 
 HOME=/tmp
 
-# Every minute!
-* * * * * {{ cron }}
-
-# Every hour.
-42 * * * * {{ django }} cleanup
-
-# Every 2 hours.
-1 */2 * * * {{ cron }} something
-
-# Etc...
-
-MAILTO=root
+# Once a day at 2:00am run the l10n completion script.
+# Note: This runs as root so it has access to the locale/ directory
+# to do an svn up.
+0 2 * * * * root cd {{ source }} && ./bin/run_l10n_completion.sh {{ source }} {{ python }}

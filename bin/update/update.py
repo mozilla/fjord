@@ -71,6 +71,14 @@ def update_db(ctx):
 
 
 @task
+def update_cron(ctx):
+    with ctx.lcd(settings.SRC_DIR):
+        ctx.local("python2.6 ./bin/crontab/gen-crons.py -w %s -s %s -u apache > /etc/cron.d/.%s" %
+                  (settings.WWW_DIR, settings.SRC_DIR, settings.CRON_NAME))
+        ctx.local("mv /etc/cron.d/.%s /etc/cron.d/%s" % (settings.CRON_NAME, settings.CRON_NAME))
+
+
+@task
 def checkin_changes(ctx):
     """Use the local, IT-written deploy script to check in changes."""
     ctx.local(settings.DEPLOY_SCRIPT)
@@ -122,6 +130,7 @@ def update(ctx):
 
 @task
 def deploy(ctx):
+    update_cron()
     checkin_changes()
     deploy_app()
     update_celery()

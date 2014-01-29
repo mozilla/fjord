@@ -19,14 +19,12 @@ from optparse import OptionParser
 import json
 import os
 import site
+import sys
+import time
 
 # Add site path to pick up libs
 SCRIPTS_DIR = os.path.dirname(__file__)
-site.addsitedir(os.path.join(SCRIPTS_DIR, '..', 'vendor'))
-
-
-import sys
-import time
+site.addsitedir(os.path.join(SCRIPTS_DIR, '..', 'vendor-local'))
 
 import polib
 
