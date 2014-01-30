@@ -13,6 +13,8 @@ def main():
     parser = OptionParser()
     parser.add_option('-w', '--webapp',
                       help='Location of web app (required)')
+    parser.add_option('-s', '--source',
+                      help='Location of source for the web app (required)')
     parser.add_option('-u', '--user',
                       help=('Prefix cron with this user. '
                             'Only define for cron.d style crontabs.'))
@@ -32,6 +34,10 @@ def main():
             ctx[k] = '%s %s' % (opts.user, v)
 
     # Needs to stay below the opts.user injection.
+    if opts.user:
+        ctx['user'] = opts.user
+    ctx['webapp'] = opts.webapp
+    ctx['source'] = opts.source
     ctx['python'] = opts.python
     ctx['header'] = HEADER
 
