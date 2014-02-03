@@ -52,15 +52,8 @@ def format_short_date(t):
     return time.strftime('%m/%d', time.gmtime(t))
 
 
-def display_percent(p):
+def format_bar(p):
     return '=' * (p / 2) + ' ' + str(p)
-
-
-def value_or_default(argv, index, default=None):
-    try:
-        return argv[index]
-    except IndexError:
-        return default
 
 
 def display_summary(last_item, app):
@@ -68,13 +61,14 @@ def display_summary(last_item, app):
     if app:
         print 'Showing app: {0}'.format(app)
 
-    for loc, loc_data in sorted(last_item['locales'].items(), key=lambda x: -x[1]['percent']):
+    data = last_item['locales']
+    for loc, loc_data in sorted(data, key=lambda x: -x[1]['percent']):
         if app:
             perc = loc_data['apps'][app]['percent']
         else:
             perc = loc_data['percent']
 
-        print '{0:>8}: {1}'.format(loc, display_percent(perc))
+        print '{0:>8}: {1}'.format(loc, format_bar(perc))
 
 
 def display_history(data, app, highlight):
@@ -126,9 +120,13 @@ def display_history(data, app, highlight):
 
 def main(argv):
     parser = argparse.ArgumentParser(description=DESC, usage=USAGE)
-    parser.add_argument('--app', help='Specify the app to show data for')
-    parser.add_argument('--highlight', default=[], help='Comma separated list of important locales')
-    parser.add_argument('--type', default='summary', choices=['summary', 'history'])
+    parser.add_argument('--app',
+                        help='Specify the app to show data for')
+    parser.add_argument('--highlight', default=[],
+                        help='Comma separated list of important locales')
+    parser.add_argument('--type', default='summary',
+                        choices=['summary', 'history'],
+                        help='Report to view')
     parser.add_argument('url', help='URL for your data')
 
     args = parser.parse_args()
