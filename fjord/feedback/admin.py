@@ -1,7 +1,19 @@
 from django.contrib import admin
 from django.core.exceptions import PermissionDenied
 
-from fjord.feedback.models import Response
+from fjord.feedback.models import Product, Response
+
+
+class ProductAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'enabled',
+        'on_dashboard',
+        'display_name',
+        'db_name',
+        'notes',
+        'slug')
+    list_filter = ('enabled', 'on_dashboard')
 
 
 class EmptyFriendlyAVFLF(admin.AllValuesFieldListFilter):
@@ -52,4 +64,5 @@ class ResponseFeedbackAdmin(admin.ModelAdmin):
             request, *args, **kwargs)
 
 
+admin.site.register(Product, ProductAdmin)
 admin.site.register(Response, ResponseFeedbackAdmin)
