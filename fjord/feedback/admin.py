@@ -6,6 +6,7 @@ from fjord.feedback.models import Product, Response
 
 class ProductAdmin(admin.ModelAdmin):
     list_display = (
+        'id',
         'enabled',
         'on_dashboard',
         'display_name',
