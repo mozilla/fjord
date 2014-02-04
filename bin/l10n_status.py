@@ -149,7 +149,8 @@ def display_history(data, app, highlight):
 
 
 def main(argv):
-    parser = argparse.ArgumentParser(description=DESC, usage=USAGE)
+    parser = argparse.ArgumentParser(description=DESC, usage=USAGE,
+                                     epilog='Note: Install blessings for color.')
     parser.add_argument('--app',
                         help='Specify the app to show data for')
     parser.add_argument('--highlight', default=[],
