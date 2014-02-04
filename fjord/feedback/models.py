@@ -23,6 +23,29 @@ from fjord.search.tasks import register_live_index
 TRUNCATE_LENGTH = 10000
 
 
+class Product(ModelBase):
+    """Represents a product we capture feedback for"""
+    # Whether or not this product is enabled
+    enabled = models.BooleanField(default=True)
+
+    # Used internally for notes to make it easier to manage products
+    notes = models.CharField(max_length=255)
+
+    # This is the name we display everywhere
+    display_name = models.CharField(max_length=20)
+
+    # We're not using foreign keys, so when we save something to the
+    # database, we use this name
+    db_name = models.CharField(max_length=20)
+
+    # This is the slug used in the feedback product urls; we don't use
+    # the SlugField because we don't require slugs be unique
+    slug = models.CharField(max_length=20)
+
+    # Whether or not this product shows up on the dashboard
+    on_dashboard = models.BooleanField(default=True)
+
+
 @register_live_index
 class Response(ModelBase):
     """Basic feedback response
