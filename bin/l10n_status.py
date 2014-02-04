@@ -56,18 +56,32 @@ def format_bar(p):
     return '=' * (p / 2) + ' ' + str(p)
 
 
-def display_summary(last_item, app):
+def display_summary(last_item, app, highlight):
     # Show summary
     if app:
         print 'Showing app: {0}'.format(app)
 
     data = last_item['locales']
-    for loc, loc_data in sorted(data, key=lambda x: -x[1]['percent']):
-        if app:
-            perc = loc_data['apps'][app]['percent']
-        else:
-            perc = loc_data['percent']
 
+    if app:
+        get_data = lambda x: x['apps'][app]['percent']
+    else:
+        get_data = lambda x: x['percent']
+
+    items = [item for item in data.items() if item[0] not in highlight]
+    hitems = [item for item in data.items() if item[0] in highlight]
+
+    if hitems:
+        print 'Highlighted locales:'
+
+        for loc, loc_data in sorted(hitems, key=lambda x: -x[1]['percent']):
+            perc = get_data(loc_data)
+            print '{0:>8}: {1}'.format(loc, format_bar(perc))
+        print ''
+
+    print 'Locales:'
+    for loc, loc_data in sorted(items, key=lambda x: -x[1]['percent']):
+        perc = get_data(loc_data)
         print '{0:>8}: {1}'.format(loc, format_bar(perc))
 
 
@@ -81,15 +95,14 @@ def display_history(data, app, highlight):
     # FIXME - adjust this to show more depending on console width
     data = data[-num_days:]
 
-    # Build the template
-    tmpl = '{:4} {:>6} ' + ('{:>6}' * len(data))
-    tmpl += '  {:10}'  # tags
+    # Build the template: locale, completed per day, tags
+    tmpl = '{:>6} ' + ('{:>6}' * len(data)) + '  {:10}'
 
     # Get a list of dates -- show last 2 weeks
     dates = [item['created'] for item in data]
 
     # Print the header
-    values = ['', ''] + [format_short_date(day) for day in dates] + ['']
+    values = [''] + [format_short_date(day) for day in dates] + ['']
     print tmpl.format(*values)
 
     if app:
@@ -97,13 +110,30 @@ def display_history(data, app, highlight):
     else:
         get_data = lambda x: x['percent']
 
+    hlocales = [loc for loc in locales if loc in highlight]
+    locales = [loc for loc in locales if loc not in highlight]
+
+    if hlocales:
+        print 'Highlighted locales:'
+        for loc in hlocales:
+            values = []
+            values.append(loc)
+            values.extend([get_data(day['locales'][loc]) for day in data])
+
+            if values[-1] < 90:
+                values.append('Ugh.')
+            else:
+                values.append('')
+
+            if loc in highlight:
+                print TERM.bold_green(tmpl.format(*values))
+            else:
+                print tmpl.format(*values)
+        print ''
+
+    print 'Locales:'
     for loc in locales:
         values = []
-        if loc in highlight:
-            values.append('***')
-        else:
-            values.append('')
-
         values.append(loc)
         values.extend([get_data(day['locales'][loc]) for day in data])
 
@@ -138,10 +168,12 @@ def main(argv):
         return 0
 
     last_item = data[-1]
+    print 'URL:     {0}'.format(args.url)
     print 'Created: {0}'.format(format_time(last_item['created']))
+    print ''
 
     if args.type == 'summary':
-        display_summary(data[-1], args.app)
+        display_summary(data[-1], args.app, args.highlight)
     elif args.type == 'history':
         display_history(data, args.app, args.highlight)
     else:
