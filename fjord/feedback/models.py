@@ -9,7 +9,6 @@ from tower import ugettext_lazy as _
 
 from fjord.base.models import ModelBase
 from fjord.base.util import smart_truncate
-from fjord.feedback import config
 from fjord.feedback.utils import compute_grams
 from fjord.search.index import (
     register_mapping_type, FjordMappingType,
@@ -249,7 +248,7 @@ class ResponseSerializer(serializers.Serializer):
     # browser since those don't make sense.
 
     # product, channel, version, locale, platform
-    product = serializers.ChoiceField(choices=config.PRODUCTS, required=True)
+    product = serializers.CharField(max_length=20, required=True)
     channel = serializers.CharField(max_length=30, required=False, default=u'')
     version = serializers.CharField(max_length=30, required=False, default=u'')
     locale = serializers.CharField(max_length=8, required=False, default=u'')
@@ -262,6 +261,18 @@ class ResponseSerializer(serializers.Serializer):
 
     # user's email address
     email = serializers.EmailField(required=False)
+
+    def validate_product(self, attrs, source):
+        """Validates the product against Product model"""
+        value = attrs[source]
+
+        # This looks goofy, but it makes it more likely we have a
+        # cache hit.
+        products = Product.objects.values_list('display_name', flat=True)
+        if value not in products:
+            raise serializers.ValidationError(
+                '{0} is not a valid product'.format(value))
+        return attrs
 
     def restore_object(self, attrs, instance=None):
         # Note: instance should never be anything except None here

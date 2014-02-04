@@ -1,16 +1,6 @@
 from tower import ugettext_lazy as _lazy
 
 
-# List of valid products accepted by the Input API
-# Note: When you change this, please change the API docs, too!
-PRODUCTS = [
-    # (Value to store, Human readable)
-    (u'Firefox OS', u'Firefox OS'),
-    (u'Firefox for Android', u'Firefox for Android'),
-    (u'Firefox', u'Firefox'),
-]
-
-
 # Map url bits to their Product names
 # FIXME - This should be pulled from the db: list of products, url
 # aliases, etc
