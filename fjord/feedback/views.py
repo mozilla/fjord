@@ -74,7 +74,7 @@ def _handle_feedback_post(request, locale=None, product=None,
     if form.is_valid():
         # Do some data validation of product, channel and version
         # coming from the url.
-        product = config.PRODUCT_MAP.get(smart_str(product), u'')
+        product = models.Product.get_product_map().get(smart_str(product), u'')
         # FIXME - validate these better
         channel = smart_str(channel).lower()
         version = smart_str(version)
@@ -335,7 +335,7 @@ def feedback_router(request, product=None, version=None, channel=None,
         if product:
             # If they passed in a product and we don't know about it, stop
             # here.
-            if product not in config.PRODUCT_MAP:
+            if product not in models.Product.get_product_map():
                 return render(request, 'feedback/unknownproduct.html', {
                     'product': product
                 })

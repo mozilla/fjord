@@ -5,6 +5,7 @@ from mock import NonCallableMock
 from fjord.base.browsers import parse_ua
 from fjord.base.tests import TestCase, LocalizingClient, reverse
 from fjord.feedback import models
+from fjord.feedback.tests import product
 from fjord.feedback.views import _get_prodchan
 
 
@@ -22,6 +23,13 @@ class TestRedirectFeedback(TestCase):
 
 class TestFeedback(TestCase):
     client_class = LocalizingClient
+
+    def setUp(self):
+        super(TestFeedback, self).setUp()
+        product(display_name=u'Firefox', slug=u'firefox', save=True)
+        product(display_name=u'Firefox OS', slug=u'fxos', save=True)
+        product(display_name=u'Firefox for Android', slug=u'android', save=True)
+        product(display_name=u'Firefox Metro', slug=u'metrofirefox', save=True)
 
     def test_valid_happy(self):
         """Submitting a valid happy form creates an item in the DB.

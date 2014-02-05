@@ -38,13 +38,11 @@ Onboarding a new developer
 10. Bask in the tranquil rhythmic sounds of the Fjord
 
 
-Adding a new product choice to the API
-======================================
+Adding support for a new product
+================================
 
-To add a new product choice to the API, do this:
-
-1. Add the new value to ``PRODUCTS`` in ``fjord/feedback/config.py``
-2. Add the value to the docs at ``docs/api.rst``
+To add support for a new product via product urls for the feedback form or the
+Input API, add a new entry to the Products table.
 
 
 Adding a new locale
