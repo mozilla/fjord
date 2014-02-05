@@ -17,8 +17,11 @@ urlpatterns = patterns(
     url(r'^analytics_dashboard/occurrences_comparison/?$',
         'analytics_occurrences_comparison',
         name='analytics_occurrences_comparison'),
+    url(r'^analytics_dashboard/products/?$',
+        'analytics_products',
+        name='analytics_products'),
 
     # Spam dashboard
     url(r'^spam_dashboard/?$', 'spam_dashboard', name='spam_dashboard'),
-    url(r'^spam_dashboard/duplicates/?$', 'spam_duplicates', name='spam_duplicates')
+    url(r'^spam_dashboard/duplicates/?$', 'spam_duplicates', name='spam_duplicates'),
 )

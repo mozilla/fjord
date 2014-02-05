@@ -22,7 +22,7 @@ from fjord.base.util import (
     smart_date,
     epoch_milliseconds,
     Atom1FeedWithRelatedLinks)
-from fjord.feedback.models import Response, ResponseMappingType
+from fjord.feedback.models import Product, Response, ResponseMappingType
 
 
 def counts_to_options(counts, name, display=None, display_map=None,
@@ -467,6 +467,16 @@ def dashboard(request):
 @mobile_template('analytics/{mobile/}analytics_dashboard.html')
 def analytics_dashboard(request, template):
     return render(request, template)
+
+
+@check_new_user
+@analyzer_required
+@mobile_template('analytics/{mobile/}analytics_products.html')
+def analytics_products(request, template):
+    products = Product.objects.all()
+    return render(request, template, {
+        'products': products
+    })
 
 
 @check_new_user
