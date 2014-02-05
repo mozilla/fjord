@@ -1,17 +1,6 @@
 from tower import ugettext_lazy as _lazy
 
 
-# Map url bits to their Product names
-# FIXME - This should be pulled from the db: list of products, url
-# aliases, etc
-PRODUCT_MAP = {
-    'firefox': u'Firefox',
-    'metrofirefox': u'Firefox Metro',
-    'android': u'Firefox for Android',
-    'fxos': u'Firefox OS',
-}
-
-
 # List of (value, name, _lazy(name)) tuples for countries Firefox OS has
 # been released in.
 # Values are ISO 3166 country codes.

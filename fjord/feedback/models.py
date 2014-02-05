@@ -44,6 +44,12 @@ class Product(ModelBase):
     # Whether or not this product shows up on the dashboard
     on_dashboard = models.BooleanField(default=True)
 
+    @classmethod
+    def get_product_map(cls):
+        """Returns map of product slug -> db_name"""
+        products = cls.objects.values_list('slug', 'db_name')
+        return dict(prod for prod in products)
+
 
 @register_live_index
 class Response(ModelBase):
