@@ -62,10 +62,14 @@ Posting feedback
         * `'Firefox OS'`
         * `'Firefox for Android'`
         * `'Firefox'`
+        * `'Firefox Metro'`
 
         Those changes are case-sensitive and must appear exactly like
         that.
 
+        Note: This list may be old. If you think it's old, please ask
+        someone from the User Advocacy group or an Input developer to
+        verify.
 
 **Optional fields**
 
