@@ -1,4 +1,4 @@
-{% extends "analytics/analytics_dashboard.html" %}
+{% extends "analytics/analyzer/dashboard.html" %}
 {# Note: This is not l10n-ized since it's only available to analyzers for now. #}
 
 {% block content_middle %}
@@ -9,7 +9,7 @@
         Report rendered on {{ render_time|datetime('%a %b %d %Y at %H:%M:%S') }}
       </p>
 
-      <form id="occurrence-form" method="GET" action="{{ url('analytics_occurrences_comparison') }}">
+      <form id="occurrence-form" method="GET" action="{{ url('analytics_occurrences') }}">
         {{ form.non_field_errors() }}
 
         <ul class="container-group">

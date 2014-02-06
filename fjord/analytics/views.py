@@ -1,149 +1,29 @@
+# Note: These views are public with the exception of the response_view
+# which has "secure" parts to it in the template.
+
 import json
-from collections import defaultdict
 from datetime import datetime, timedelta
-from math import floor
 
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
-from django.template.defaultfilters import slugify
 
 from elasticutils.contrib.django import F, es_required_or_50x
 from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
 from tower import ugettext as _
 
-from fjord.analytics.forms import OccurrencesComparisonForm
-from fjord.analytics.tools import JSONDatetimeEncoder, generate_query_parsed
+from fjord.analytics.tools import (
+    JSONDatetimeEncoder,
+    generate_query_parsed,
+    counts_to_options,
+    zero_fill)
 from fjord.base.helpers import locale_name
 from fjord.base.util import (
-    analyzer_required,
     check_new_user,
     smart_int,
     smart_date,
-    epoch_milliseconds,
     Atom1FeedWithRelatedLinks)
-from fjord.feedback.models import Product, Response, ResponseMappingType
-
-
-def counts_to_options(counts, name, display=None, display_map=None,
-                      value_map=None, checked=None):
-    """Generates a set of option blocks from a set of facet counts.
-
-    One options block represents a set of options to search for, as
-    well as the query parameter that can be used to search for that
-    opinion, and the friendly name to show the opinion block as.
-
-    For each option the keys mean:
-    - `name`: Used to name in the DOM.
-    - `display`: Shown to the user.
-    - `value`: The value to set the query parameter to in order to
-      search for this option.
-    - `count`: The facet count of this option.
-    - `checked`: Whether the checkbox should start checked.
-
-    :arg counts: A list of tuples of the form (count, item), like from
-        ES.
-    :arg name: The name of the search string that corresponds to this
-        block.  Like "locale" or "platform".
-    :arg display: The human friendly title to represent this set of
-        options.
-    :arg display_map: Either a dictionary or a function to map items
-        to their display names. For a dictionary, the form is {item:
-        display}. For a function, the form is lambda item:
-        display_name.
-    :arg value_map: Like `display_map`, but for mapping the values
-        that get put into the query string for searching.
-    :arg checked: Which item should be marked as checked.
-    """
-    if display is None:
-        display = name
-
-    options = {
-        'name': name,
-        'display': display,
-        'options': [],
-    }
-
-    # This is used in the loop below, to be a bit neater and so we can
-    # do it for both value and display generically.
-    def from_map(source, item):
-        """Look up an item from a source.
-
-        The source may be a dictionary, a function, or None, in which
-        case the item is returned unmodified.
-
-        """
-        if source is None:
-            return item
-        elif callable(source):
-            return source(item)
-        else:
-            return source[item]
-
-    # Built an option dict for every item.
-    for item, count in counts:
-        options['options'].append({
-            'name': slugify(item),
-            'display': from_map(display_map, item),
-            'value': from_map(value_map, item),
-            'count': count,
-            'checked': checked == item,
-        })
-    options['options'].sort(key=lambda item: item['count'], reverse=True)
-    return options
-
-
-DAY_IN_MILLIS = 24 * 60 * 60 * 1000.0
-
-
-def _zero_fill(start, end, data_sets, spacing=DAY_IN_MILLIS):
-    """Given one or more histogram dicts, zero fill them in a range.
-
-    The format of the dictionaries should be {milliseconds: numeric
-    value}. It is important that the time points in the dictionary are
-    equally spaced. If they are not, extra points will be added.
-
-    This method works with milliseconds because that is the format
-    elasticsearch and Javascript use.
-
-    :arg start: Datetime to start zero filling.
-    :arg end: Datetime to stop zero filling at.
-    :arg data_sets: A list of dictionaries to zero fill.
-    :arg spacing: Number of milliseconds between data points.
-    """
-    start_millis = epoch_milliseconds(start)
-    # Date ranges are inclusive on both ends.
-    end_millis = epoch_milliseconds(end) + spacing
-
-    # `timestamp` is a loop counter that iterates over the timestamps
-    # from start to end. It can't just be `timestamp = start`, because
-    # then the zeros being adding to the data might not be aligned
-    # with the data already in the graph, since we aren't counting by
-    # 24 hours, and the data could have a timezone offset.
-    #
-    # This block picks a time up to `spacing` time after `start` so
-    # that it lines up with the data. If there is no data, then we use
-    # `stamp = start`, because there is nothing to align with.
-
-    # start <= timestamp < start + spacing
-    days = [d for d in data_sets if d.keys()]
-    if days:
-        source = days[0]
-        timestamp = source.keys()[0]
-        d = floor((timestamp - start_millis) / spacing)
-        timestamp -= d * spacing
-    else:
-        # If there no data, it doesn't matter how it aligns.
-        timestamp = start_millis
-
-    # Iterate in the range `start` to `end`, starting from
-    # `timestamp`, increasing by `spacing` each time. This ensures
-    # there is a data point for each day.
-    while timestamp < end_millis:
-        for d in data_sets:
-            if timestamp not in d:
-                d[timestamp] = 0
-        timestamp += spacing
+from fjord.feedback.models import Response, ResponseMappingType
 
 
 @check_new_user
@@ -218,8 +98,9 @@ def generate_atom_feed(request, search):
         feed.writeString('utf-8'), mimetype='application/atom+xml')
 
 
-def generate_dashboard_atom_url(request):
-    """For a given request, generates the dashboard atom url"""
+def generate_dashboard_url(request, output_format='atom',
+                                viewname='dashboard'):
+    """For a given request, generates the dashboard url for the given format"""
     qd = request.GET.copy()
 
     # Remove anything from the querystring that isn't good for a feed:
@@ -229,9 +110,9 @@ def generate_dashboard_atom_url(request):
                        'version', 'q'):
             del qd[mem]
 
-    qd['format'] = 'atom'
+    qd['format'] = output_format
 
-    return reverse('dashboard') + '?' + qd.urlencode()
+    return reverse(viewname) + '?' + qd.urlencode()
 
 
 @check_new_user
@@ -439,7 +320,7 @@ def dashboard(request):
     happy_data = dict((p['time'], p['count']) for p in histograms['happy'])
     sad_data = dict((p['time'], p['count']) for p in histograms['sad'])
 
-    _zero_fill(search_date_start, search_date_end, [happy_data, sad_data])
+    zero_fill(search_date_start, search_date_end, [happy_data, sad_data])
     histogram = [
         {'label': _('Happy'), 'name': 'happy',
          'data': sorted(happy_data.items())},
@@ -457,238 +338,5 @@ def dashboard(request):
         'next_page': page + 1 if end < search_count else None,
         'current_search': current_search,
         'selected': selected,
-        'atom_url': generate_dashboard_atom_url(request),
-    })
-
-
-@check_new_user
-@analyzer_required
-@es_required_or_50x(error_template='analytics/es_down.html')
-@mobile_template('analytics/{mobile/}analytics_dashboard.html')
-def analytics_dashboard(request, template):
-    return render(request, template)
-
-
-@check_new_user
-@analyzer_required
-@mobile_template('analytics/{mobile/}analytics_products.html')
-def analytics_products(request, template):
-    products = Product.objects.all()
-    return render(request, template, {
-        'products': products
-    })
-
-
-@check_new_user
-@analyzer_required
-@es_required_or_50x(error_template='analytics/es_down.html')
-def analytics_occurrences_comparison(request):
-    template = 'analytics/analytics_occurrences_comparison.html'
-
-    first_facet_bi = None
-    first_params = {}
-    first_facet_total = 0
-
-    second_facet_bi = None
-    second_params = {}
-    second_facet_total = 0
-
-    if 'product' in request.GET:
-        form = OccurrencesComparisonForm(request.GET)
-        if form.is_valid():
-            cleaned = form.cleaned_data
-
-            # First item
-            first_resp_s = (ResponseMappingType.search()
-                            .filter(product=cleaned['product'])
-                            .filter(locale__startswith='en'))
-
-            first_params['product'] = cleaned['product']
-
-            if cleaned['first_version']:
-                first_resp_s = first_resp_s.filter(
-                    version=cleaned['first_version'])
-                first_params['version'] = cleaned['first_version']
-            if cleaned['first_start_date']:
-                first_resp_s = first_resp_s.filter(
-                    created__gte=cleaned['first_start_date'])
-                first_params['date_start'] = cleaned['first_start_date']
-            if cleaned['first_end_date']:
-                first_resp_s = first_resp_s.filter(
-                    created__lte=cleaned['first_end_date'])
-                first_params['date_end'] = cleaned['first_end_date']
-            if cleaned['first_search_term']:
-                first_resp_s = first_resp_s.query(
-                    description__text=cleaned['first_search_term'])
-                first_params['q'] = cleaned['first_search_term']
-
-            if ('date_start' not in first_params
-                and 'date_end' not in first_params):
-
-                # FIXME - If there's no start date, then we want
-                # "everything" so we use a hard-coded 2013-01-01 date
-                # here to hack that.
-                #
-                # Better way might be to change the dashboard to allow
-                # for an "infinite" range, but there's no other use
-                # case for that and the ranges are done in the ui--not
-                # in the backend.
-                first_params['date_start'] = '2013-01-01'
-
-            # Have to do raw because we want a size > 10.
-            first_resp_s = first_resp_s.facet_raw(
-                description_bigrams={
-                    'terms': {
-                        'field': 'description_bigrams',
-                        'size': '30',
-                    },
-                    'facet_filter': first_resp_s._build_query()['filter']
-                }
-            )
-            first_resp_s = first_resp_s[0:0]
-
-            first_facet_total = first_resp_s.count()
-            first_facet = first_resp_s.facet_counts()
-
-            first_facet_bi = first_facet['description_bigrams']
-            first_facet_bi = sorted(
-                first_facet_bi, key=lambda item: -item['count'])
-
-            if (cleaned['second_version']
-                or cleaned['second_search_term']
-                or cleaned['second_start_date']):
-
-                second_resp_s = (ResponseMappingType.search()
-                                .filter(product=cleaned['product'])
-                                .filter(locale__startswith='en'))
-
-                second_params['product'] = cleaned['product']
-
-                if cleaned['second_version']:
-                    second_resp_s = second_resp_s.filter(
-                        version=cleaned['second_version'])
-                    second_params['version'] = cleaned['second_version']
-                if cleaned['second_start_date']:
-                    second_resp_s = second_resp_s.filter(
-                        created__gte=cleaned['second_start_date'])
-                    second_params['date_start'] = cleaned['second_start_date']
-                if cleaned['second_end_date']:
-                    second_resp_s = second_resp_s.filter(
-                        created__lte=cleaned['second_end_date'])
-                    second_params['date_end'] = cleaned['second_end_date']
-                if form.cleaned_data['second_search_term']:
-                    second_resp_s = second_resp_s.query(
-                        description__text=cleaned['second_search_term'])
-                    second_params['q'] = cleaned['second_search_term']
-
-                if ('date_start' not in second_params
-                    and 'date_end' not in second_params):
-
-                    # FIXME - If there's no start date, then we want
-                    # "everything" so we use a hard-coded 2013-01-01 date
-                    # here to hack that.
-                    #
-                    # Better way might be to change the dashboard to allow
-                    # for an "infinite" range, but there's no other use
-                    # case for that and the ranges are done in the ui--not
-                    # in the backend.
-                    second_params['date_start'] = '2013-01-01'
-
-                # Have to do raw because we want a size > 10.
-                second_resp_s = second_resp_s.facet_raw(
-                    description_bigrams={
-                        'terms': {
-                            'field': 'description_bigrams',
-                            'size': '30',
-                        },
-                        'facet_filter': second_resp_s._build_query()['filter']
-                    }
-                )
-                second_resp_s = second_resp_s[0:0]
-
-                second_facet_total = second_resp_s.count()
-                second_facet = second_resp_s.facet_counts()
-
-                second_facet_bi = second_facet['description_bigrams']
-                second_facet_bi = sorted(
-                    second_facet_bi, key=lambda item: -item['count'])
-
-        permalink = request.build_absolute_uri()
-
-    else:
-        permalink = ''
-        form = OccurrencesComparisonForm()
-
-    # FIXME - We have responses that have no product set. This ignores
-    # those. That's probably the right thing to do for the Occurrences Report
-    # but maybe not.
-    products = [prod for prod in ResponseMappingType.get_products() if prod]
-
-    return render(request, template, {
-        'permalink': permalink,
-        'form': form,
-        'products': products,
-        'first_facet_bi': first_facet_bi,
-        'first_params': first_params,
-        'first_facet_total': first_facet_total,
-        'first_normalization': round(first_facet_total * 1.0 / 1000, 3),
-        'second_facet_bi': second_facet_bi,
-        'second_params': second_params,
-        'second_facet_total': second_facet_total,
-        'second_normalization': round(second_facet_total * 1.0 / 1000, 3),
-        'render_time': datetime.now(),
-    })
-
-
-@check_new_user
-@analyzer_required
-@es_required_or_50x(error_template='analytics/es_down.html')
-@mobile_template('analytics/{mobile/}spam_dashboard.html')
-def spam_dashboard(request, template):
-    return render(request, template)
-
-
-@check_new_user
-@analyzer_required
-@es_required_or_50x(error_template='analytics/es_down.html')
-def spam_duplicates(request):
-    """Shows all duplicate descriptions over the last n days"""
-    template = 'analytics/spam_duplicates.html'
-
-    n = 14
-
-    responses = (ResponseMappingType.search()
-                 .filter(created__gte=datetime.now() - timedelta(days=n))
-                 .values_dict('description', 'happy', 'created', 'locale',
-                              'user_agent', 'id')
-                 .order_by('created').all())
-
-    total_count = len(responses)
-
-    response_dupes = {}
-    for resp in responses:
-        response_dupes.setdefault(resp['description'], []).append(resp)
-
-    response_dupes = [
-        (key, val) for key, val in response_dupes.items()
-        if len(val) > 1
-    ]
-
-    # convert the dict into a list of tuples sorted by the number of
-    # responses per tuple largest number first
-    response_dupes = sorted(response_dupes, key=lambda item: len(item[1]) * -1)
-
-    # duplicate_count -> count
-    # i.e. "how many responses had 2 duplicates?"
-    summary_counts = defaultdict(int)
-    for desc, responses in response_dupes:
-        summary_counts[len(responses)] = summary_counts[len(responses)] + 1
-    summary_counts = sorted(summary_counts.items(), key=lambda item: item[0])
-
-    return render(request, template, {
-        'n': 14,
-        'response_dupes': response_dupes,
-        'render_time': datetime.now(),
-        'summary_counts': summary_counts,
-        'total_count': total_count,
+        'atom_url': generate_dashboard_url(request),
     })

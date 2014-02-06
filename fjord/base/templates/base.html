@@ -35,7 +35,6 @@
           <li><a class="dashboard" href="{{ url('dashboard') }}"><span>{{ _('Dashboard') }}</span></a></li>
           {% if user.is_authenticated() and user.has_perm('analytics.can_view_dashboard') %}
             <li><a class="adashboard" href="{{ url('analytics_dashboard') }}"><span>{{ _('Analytics') }}</span></a></li>
-            <li><a class="sdashboard" href="{{ url('spam_dashboard') }}"><span>{{ _('Damn Spam') }}</span></a></li>
           {% endif %}
         </ul>
 
