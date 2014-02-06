@@ -36,8 +36,8 @@ To get the localizations, do::
 Updating strings in svn
 =======================
 
-First, ping Milos and tell him we're merging strings (i.e. extracting
-them from our codebase and committing the changes to svn).
+First, ping Kadir (or whoever else) and tell him/her we're merging strings
+(i.e. extracting them from our codebase and committing the changes to svn).
 
 Then, update the svn repository::
 
@@ -59,13 +59,34 @@ Then, commit the new strings to svn::
     $ cd locale
     $ svn commit -m 'String update YYYY/MM/DD'
 
-Then, tell Milos that the strings have been extracted. He will update
-Verbatim for all locales and post a message to dev.l10n.web about the
-new strings.
+Then, tell him/her that the strings have been extracted. He/she will
+update Verbatim for all locales.
 
 .. Note::
 
    There are also instructions in ``./locale/README.txt``.
+
+After that, send an email to the `dev-l10n-web mailing list
+<https://lists.mozilla.org/listinfo/dev-l10n-web>`_ using this template::
+
+    Hi!
+
+    I've just pushed new strings to Verbatim for Input.
+
+    https://lists.mozilla.org/listinfo/dev-l10n-web
+
+    < explanation of strings changes here >
+
+    To give you an idea of how many untranslated strings there are, I
+    have computed this list:
+
+    < copy and paste output of "./bin/stats-po.sh locale/" >
+
+    If you have any questions, please reply to the list.
+
+    Thank you so much for your help!
+
+    Input development team
 
 
 Creating new localization locales
