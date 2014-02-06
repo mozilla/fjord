@@ -11,17 +11,19 @@ urlpatterns = patterns(
     url(r'^dashboard/response/(?P<responseid>\d+)/?$',
         'response_view', name='response_view'),
 
+)
+
+# These are analyzer-group only views.
+urlpatterns += patterns(
+    'fjord.analytics.analyzer_views',
+
     # Analytics dashboard
-    url(r'^analytics_dashboard/?$', 'analytics_dashboard',
+    url(r'^analytics/?$', 'analytics_dashboard',
         name='analytics_dashboard'),
-    url(r'^analytics_dashboard/occurrences_comparison/?$',
-        'analytics_occurrences_comparison',
-        name='analytics_occurrences_comparison'),
-    url(r'^analytics_dashboard/products/?$',
-        'analytics_products',
+    url(r'^analytics/occurrences/?$', 'analytics_occurrences',
+        name='analytics_occurrences'),
+    url(r'^analytics/products/?$', 'analytics_products',
         name='analytics_products'),
 
-    # Spam dashboard
-    url(r'^spam_dashboard/?$', 'spam_dashboard', name='spam_dashboard'),
-    url(r'^spam_dashboard/duplicates/?$', 'spam_duplicates', name='spam_duplicates'),
+    url(r'^analytics/duplicates/?$', 'analytics_duplicates', name='analytics_duplicates'),
 )
