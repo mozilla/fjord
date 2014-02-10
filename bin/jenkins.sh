@@ -53,7 +53,7 @@ DATABASES = {
     }
 }
 
-ES_URLS = ['http://jenkins-es20:9200']
+ES_URLS = ['http://jenkins-es:9200']
 HMAC_KEYS = {'2012-06-06': 'jenkinsrocks'}
 
 from django_sha2 import get_password_hashers
