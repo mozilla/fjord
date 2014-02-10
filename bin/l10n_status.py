@@ -121,7 +121,7 @@ def display_history(data, app, highlight):
             values.extend([get_data(day['locales'][loc]) for day in data])
 
             if values[-1] < 90:
-                values.append('Ugh.')
+                values.append('**')
             else:
                 values.append('')
 
@@ -138,7 +138,7 @@ def display_history(data, app, highlight):
         values.extend([get_data(day['locales'][loc]) for day in data])
 
         if values[-1] < 90:
-            values.append('Ugh.')
+            values.append('**')
         else:
             values.append('')
 
