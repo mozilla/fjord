@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from elasticutils.contrib.django import Indexable
@@ -239,6 +240,19 @@ class ResponseEmail(ModelBase):
     email = models.EmailField()
 
 
+class NoNullsCharField(serializers.CharField):
+    """Further restricts CharField so it doesn't accept nulls
+
+    DRF lets CharFields take nulls which is not what I want. This
+    raises a ValidationError if the value is a null.
+
+    """
+    def from_native(self, value):
+        if value is None:
+            raise ValidationError('Value cannot be null')
+        return super(NoNullsCharField, self).from_native(value)
+
+
 class ResponseSerializer(serializers.Serializer):
     """This handles incoming feedback
 
@@ -254,16 +268,16 @@ class ResponseSerializer(serializers.Serializer):
     # browser since those don't make sense.
 
     # product, channel, version, locale, platform
-    product = serializers.CharField(max_length=20, required=True)
-    channel = serializers.CharField(max_length=30, required=False, default=u'')
-    version = serializers.CharField(max_length=30, required=False, default=u'')
-    locale = serializers.CharField(max_length=8, required=False, default=u'')
-    platform = serializers.CharField(max_length=30, required=False, default=u'')
-    country = serializers.CharField(max_length=4, required=False, default=u'')
+    product = NoNullsCharField(max_length=20, required=True)
+    channel = NoNullsCharField(max_length=30, required=False, default=u'')
+    version = NoNullsCharField(max_length=30, required=False, default=u'')
+    locale = NoNullsCharField(max_length=8, required=False, default=u'')
+    platform = NoNullsCharField(max_length=30, required=False, default=u'')
+    country = NoNullsCharField(max_length=4, required=False, default=u'')
 
     # device information
-    manufacturer = serializers.CharField(required=False, default=u'')
-    device = serializers.CharField(required=False, default=u'')
+    manufacturer = NoNullsCharField(required=False, default=u'')
+    device = NoNullsCharField(required=False, default=u'')
 
     # user's email address
     email = serializers.EmailField(required=False)
