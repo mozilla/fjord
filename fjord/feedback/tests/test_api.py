@@ -1,3 +1,5 @@
+import json
+
 from django.conf import settings
 
 from nose.tools import eq_
@@ -110,17 +112,11 @@ class TestFeedbackAPI(TestCase):
             'device': None
         }
 
-        r = self.client.post(reverse('api-post-feedback'), data)
-        eq_(r.status_code, 201)
-
-        feedback = models.Response.objects.latest(field_name='id')
-        eq_(feedback.happy, True)
-        eq_(feedback.description, data['description'])
-        eq_(feedback.product, data['product'])
-
-        # Fills in defaults
-        eq_(feedback.url, u'')
-        eq_(feedback.user_agent, u'api')
+        r = self.client.post(reverse('api-post-feedback'),
+                             json.dumps(data),
+                             content_type='application/json')
+        eq_(r.status_code, 400)
+        assert 'device' in r.content
 
     def test_invalid_email_address_returns_400(self):
         data = {
