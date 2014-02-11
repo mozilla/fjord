@@ -102,6 +102,26 @@ class TestFeedbackAPI(TestCase):
         email = models.ResponseEmail.objects.latest(field_name='id')
         eq_(email.email, data['email'])
 
+    def test_null_device_returns_400(self):
+        data = {
+            'happy': True,
+            'description': u'Great!',
+            'product': u'Firefox OS',
+            'device': None
+        }
+
+        r = self.client.post(reverse('api-post-feedback'), data)
+        eq_(r.status_code, 201)
+
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(feedback.happy, True)
+        eq_(feedback.description, data['description'])
+        eq_(feedback.product, data['product'])
+
+        # Fills in defaults
+        eq_(feedback.url, u'')
+        eq_(feedback.user_agent, u'api')
+
     def test_invalid_email_address_returns_400(self):
         data = {
             'happy': True,
