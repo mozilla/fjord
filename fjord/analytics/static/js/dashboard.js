@@ -1,12 +1,6 @@
 $(function() {
     var $histogram = $('.graph .histogram');
 
-    // If the histogram isn't on the page, then we're probably looking
-    // at the es_down template and none of this will work.
-    if ($histogram.length === 0) {
-        return;
-    }
-
     // General widgets.
     // Expandos
     $('.expando').hide();
@@ -83,37 +77,40 @@ $(function() {
         });
     });
 
-    // Draw histogram in the middle column.
-    var data = $histogram.data('histogram');
-    colors = {
-        'happy': '#72BF3E',
-        'sad': '#AA4643'
-    };
-    for (var i = 0; i < data.length; i++) {
-        var name = data[i]['name'];
-        var color = colors[name];
-        if (color === undefined) {
-            color = '#000000';
+    if ($histogram.length !== 0) {
+
+        // Draw histogram in the middle column.
+        var data = $histogram.data('histogram');
+        colors = {
+            'happy': '#72BF3E',
+            'sad': '#AA4643'
+        };
+        for (var i = 0; i < data.length; i++) {
+            var name = data[i]['name'];
+            var color = colors[name];
+            if (color === undefined) {
+                color = '#000000';
+            }
+            data[i]['color'] = color;
         }
-        data[i]['color'] = color;
+        var options = {
+            series: {
+                hover: true,
+                lines: { show: true, fill: false },
+                points: { show: true }
+            },
+            xaxis: {
+                mode: 'time',
+                timeformat: ('%b %d')
+            },
+            yaxis: {
+                min: 0
+            },
+            legend: {
+                container: $('.graph .legend'),
+                noColumns: 2 // number of columns
+            }
+        };
+        var plot = $.plot($histogram, data, options);
     }
-    var options = {
-        series: {
-            hover: true,
-            lines: { show: true, fill: false },
-            points: { show: true }
-        },
-        xaxis: {
-            mode: 'time',
-            timeformat: ('%b %d')
-        },
-        yaxis: {
-            min: 0
-        },
-        legend: {
-            container: $('.graph .legend'),
-            noColumns: 2 // number of columns
-        }
-    };
-    var plot = $.plot($histogram, data, options);
 });
