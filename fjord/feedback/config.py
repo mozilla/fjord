@@ -22,6 +22,10 @@ FIREFOX_OS_COUNTRIES = [
     (u'UY', 'Uruguay', _lazy('Uruguay')),
 ]
 
+CODE_TO_COUNTRY = dict([(mem[0], {'English': mem[1], 'native': mem[2]})
+                        for mem in FIREFOX_OS_COUNTRIES])
+
+
 # List of Firefox OS devices that have been released.
 FIREFOX_OS_DEVICES = [
     u'ZTE Open',

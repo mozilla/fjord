@@ -1,0 +1,185 @@
+{% extends "analytics/analyzer/dashboard.html" %}
+
+{% macro feedback_block(feedback) -%}
+  <li class="opinion">
+    {% if feedback.happy %}
+      <span class="sprite happy">{{ _('Happy') }}</span>
+    {% else %}
+      <span class="sprite sad">{{ _('Sad') }}</span>
+    {% endif %}
+    <div>
+      <dl>
+        <dt>Email:</dt>
+        <dd>
+          {% if feedback.responseemail_set.count() > 0 %}
+            {{ feedback.responseemail_set.all()[0].email }}
+          {% else %}
+            &mdash;
+          {% endif %}
+        </dd>
+        <dt>URL:</dt>
+        <dd>
+          {% if feedback.url %}
+            <a href="{{ feedback.url }}">{{ feedback.url }}</a>
+          {% else %}
+            &mdash;
+          {% endif %}
+        </dd>
+        <dt>User agent:</dt>
+        <dd>{{ feedback.user_agent|unknown }}</dd>
+      </dl>
+      <p>
+        <strong>Description:</strong>
+      </p>
+      <p>
+        {{ feedback.description|nl2br }}
+      </p>
+    </div>
+
+    <ul class="meta">
+      <li>
+        {% set created_date = to_date_string(feedback.created) %}
+        <a href="{{ request.get_full_path()|urlparams(date_start=created_date, date_end=created_date) }}">
+          <time datetime="{{ created_date }}-08:00" title="{{ created_date }} PST">
+            {{ feedback.created }}
+          </time>
+        </a>
+      </li>
+      <li>
+        {% if feedback.product %}
+          <a href="{{ request.get_full_path()|urlparams(product=feedback.product) }}">{{ feedback.product|unknown }}</a>
+          {% if feedback.version %}
+            <a href="{{ request.get_full_path()|urlparams(product=feedback.product, version=feedback.version) }}">{{ feedback.version|unknown }}</a>
+          {% endif %}
+
+          {% if feedback.channel %}
+            {{ feedback.channel|unknown }}
+          {% endif %}
+        {% else  %}
+          Unknown
+        {% endif %}
+      </li>
+      <li>
+        <a href="{{ request.get_full_path()|urlparams(platform=feedback.platform) }}">{{ feedback.platform|unknown }}</a>
+      </li>
+      <li>
+        <a href="{{ request.get_full_path()|urlparams(locale=feedback.locale) }}">{{ feedback.locale|locale_name }}</a>
+      </li>
+      <li>
+        {{ feedback.country|country_name }}
+      </li>
+      <li>
+        {{ feedback.manufacturer|unknown }}
+        &mdash;
+        {{ feedback.device|unknown }}
+      </li>
+      <li>
+        <a href="{{ url('response_view', responseid=feedback.id) }}">{{ _('Permalink') }}</a></li>
+    </ul>
+  </li>
+{% endmacro -%}
+
+{% macro filter_block(filter_set) %}
+  <div class="filter">
+    <h3>{{ filter_set.display }}</h3>
+    <ul class="bars" data-total="{{ opinion_count }}" name="{{ filter_set.name }}">
+      {% for item in filter_set.options %}
+        {% set count = item.count if item.count != 'all' else opinion_count %}
+        <li data-value="{{ count }}">
+          <input name="{{ item.name }}" type="checkbox" value="{{ item.value }}"{% if item.checked %}checked{% endif %} />
+          <label class="bar" for="{{ item.name }}">
+            <span>{{ item.display }}</span>
+          </label>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endmacro %}
+
+{% macro date_range_button(days, text) %}
+  {% set days_text = '%sd' % days %}
+  {% if selected == days_text %}
+    {% set sel = 'selected' %}
+  {% endif %}
+
+  {% if days is none %}
+    {% set ago = None %}
+  {% else %}
+    {% set ago = date_ago(days=days) %}
+  {% endif %}
+
+  {# date_end=None here is to remove the date_end parameter from the query string. #}
+  {% set href = request.get_full_path()|urlparams(date_start=ago, date_end=None, selected=days_text) %}
+
+  <a class="button when {{ sel }}" href="{{ href }}">{{ text }}</a>
+{% endmacro %}
+
+{% block content_leftside %}
+  <div class="block search">
+
+    <div class="filter">
+      <h3>{{ _('When') }}</h3>
+      {# L10n: Short for 1 day. #}
+      {{ date_range_button(1, _('1d')) }}
+      {# L10n: Short for 7 days. #}
+      {{ date_range_button(7, _('7d')) }}
+      {# L10n: Short for 30 days. #}
+      {{ date_range_button(30, _('30d')) }}
+      {# L10n: Short for 90 days. #}
+      {{ date_range_button(90, _('90d')) }}
+
+      <a href="#" class="expander button" for="whentext">{{ _('&raquo;') }}</a>
+
+      <div class="expando" id="whentext">
+        <input type="date" name="date_start" value="{{ current_search.date_start }}"
+          placeholder="{{ _('Start') }}"> -
+        <input type="date" name="date_end" value="{{ current_search.date_end }}"
+          placeholder="{{ _('End') }}">
+        <a href="#" class="button" id="whensubmit">{{ _('Set') }}</a>
+      </div>
+    </div>
+
+    {% for filter_set in filter_data %}
+      {{ filter_block(filter_set) }}
+    {% endfor %}
+
+  </div>
+{% endblock %}
+
+{% block content_middle %}
+  <div class="col full">
+
+  <div class="block feedback">
+    <h2>Feedback search</h2>
+
+    <form id="analyzer_search" action="{{ request.get_full_path() }}" method="get">
+      <input class="search_box" type="text" name="q"
+        placeholder="Search by text query" value="{{ current_search.q }}" />
+
+      {% for key, value in current_search.items() %}
+        {% if key not in ('q', 'page') %}
+          <input type="hidden" name="{{ key }}" value="{{ value }}" />
+        {% endif %}
+      {% endfor %}
+    </form>
+
+    <ul class="search_results">
+      {% for opinion in opinions %}
+        {{ feedback_block(opinion) }}
+      {% endfor %}
+    </ul>
+
+    <div class="pager">
+      {% if next_page %}
+        <a class="older" href="{{ request.get_full_path()|urlparams(page=next_page) }}">
+          Older Messages
+        </a>
+      {% endif %}
+      {% if prev_page %}
+        <a class="newer" href="{{ request.get_full_path()|urlparams(page=prev_page) }}">
+          Newer Messages
+        </a>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
