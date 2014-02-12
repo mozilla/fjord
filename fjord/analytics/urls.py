@@ -24,6 +24,8 @@ urlpatterns += patterns(
         name='analytics_occurrences'),
     url(r'^analytics/products/?$', 'analytics_products',
         name='analytics_products'),
+    url(r'^analytics/search/?$', 'analytics_search',
+        name='analytics_search'),
 
     url(r'^analytics/duplicates/?$', 'analytics_duplicates', name='analytics_duplicates'),
 )

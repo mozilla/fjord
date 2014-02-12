@@ -1,24 +1,19 @@
+from datetime import datetime, timedelta
 import json
 import logging
 
 from nose.tools import eq_
-from pyelasticsearch.exceptions import Timeout
 from pyquery import PyQuery
 
 from django.contrib.auth.models import Group
 from django.http import QueryDict
 
-from fjord.analytics import views
-from fjord.analytics.tools import counts_to_options, zero_fill
-from fjord.base.tests import TestCase, LocalizingClient, profile, reverse, user
-from fjord.base.util import epoch_milliseconds
+from fjord.base.tests import LocalizingClient, profile, reverse, user
 from fjord.feedback.tests import response
 from fjord.search.tests import ElasticTestCase
 
 
 logger = logging.getLogger(__name__)
-
-
 
 
 class TestAnalyticsDashboardView(ElasticTestCase):
@@ -114,3 +109,206 @@ class TestOccurrencesView(ElasticTestCase):
 
         # FIXME - when things are less prototypy, add tests for
         # specific results
+
+
+class TestSearchView(ElasticTestCase):
+    client_class = LocalizingClient
+    url = reverse('analytics_search')
+
+    # Note: We count the number of td.sentiment things since there's
+    # one sentiment-classed td element for every feedback response
+    # that shows up in the search results.
+
+    def setUp(self):
+        super(TestSearchView, self).setUp()
+        # Set up some sample data
+        # 4 happy, 3 sad.
+        # 2 Windows XP, 2 Linux, 1 OS X, 2 Windows 7
+        now = datetime.now()
+        # The dashboard by default shows the last week of data, so
+        # these need to be relative to today. The alternative is that
+        # every test gives an explicit date range, and that is
+        # annoying and verbose.
+        items = [
+            # happy, platform, locale, description, created
+            (True, '', 'en-US', 'apple', now - timedelta(days=6)),
+            (True, 'Windows 7', 'es', 'banana', now - timedelta(days=5)),
+            (True, 'Linux', 'en-US', 'orange', now - timedelta(days=4)),
+            (True, 'Linux', 'en-US', 'apple', now - timedelta(days=3)),
+            (False, 'Windows XP', 'en-US', 'banana', now - timedelta(days=2)),
+            (False, 'Windows 7', 'en-US', 'orange', now - timedelta(days=1)),
+            (False, 'Linux', 'es', u'\u2713 apple', now - timedelta(days=0)),
+        ]
+        for happy, platform, locale, description, created in items:
+            # We don't need to keep this around, just need to create it.
+            response(happy=happy, platform=platform, locale=locale,
+                     description=description, created=created, save=True)
+
+        self.refresh()
+
+        # Create analyzer and log analyzer in
+        jane = user(email='jane@example.com', save=True)
+        profile(user=jane, save=True)
+        jane.groups.add(Group.objects.get(name='analyzers'))
+
+        self.client_login_user(jane)
+
+    def test_front_page(self):
+        r = self.client.get(self.url)
+        eq_(200, r.status_code)
+        self.assertTemplateUsed(r, 'analytics/analyzer/search.html')
+
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 7)
+
+    def test_search(self):
+        # Happy
+        r = self.client.get(self.url, {'happy': 1})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 4)
+
+        # Sad
+        r = self.client.get(self.url, {'happy': 0})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 3)
+
+        # Locale
+        r = self.client.get(self.url, {'locale': 'es'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 2)
+
+        # Platform and happy
+        r = self.client.get(self.url, {'happy': 1, 'platform': 'Linux'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 2)
+
+        # Product
+        r = self.client.get(self.url, {'product': 'Firefox'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 7)
+
+        # Product
+        r = self.client.get(self.url, {'product': 'Firefox for Android'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 0)
+
+        # Product version
+        r = self.client.get(
+            self.url, {'product': 'Firefox', 'version': '17.0.0'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 7)
+
+        # Product version
+        r = self.client.get(
+            self.url, {'product': 'Firefox', 'version': '18.0.0'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 0)
+
+        # Empty search
+        r = self.client.get(self.url, {'platform': 'Atari'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 0)
+
+    def test_empty_and_unknown(self):
+        # Empty value should work
+        r = self.client.get(self.url, {'platform': ''})
+        eq_(r.status_code, 200)
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 1)
+
+        # "Unknown" value should also work
+        r = self.client.get(self.url, {'platform': 'Unknown'})
+        eq_(r.status_code, 200)
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 1)
+
+    def test_version_noop(self):
+        """version has no effect if product isn't set"""
+        # Filter on product and version--both filters affect the
+        # results
+        r = self.client.get(
+            self.url, {'product': 'Firefox', 'version': '18.0.0'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 0)
+
+        # Filter on version--filter has no effect on results
+        r = self.client.get(
+            self.url, {'version': '18.0.0'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 7)
+
+    def test_text_search(self):
+        # Text search
+        r = self.client.get(self.url, {'q': 'apple'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 3)
+
+        # Text and filter
+        r = self.client.get(
+            self.url, {'q': 'apple', 'happy': 1, 'locale': 'en-US'})
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 2)
+
+    def test_text_search_unicode(self):
+        """Unicode in the search field shouldn't kick up errors"""
+        # Text search
+        r = self.client.get(self.url, {'q': u'\u2713'})
+        eq_(r.status_code, 200)
+
+    def test_date_search(self):
+        # These start and end dates will give known slices of the data.
+        # Silly relative dates.
+        start = (datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d'),
+        end = (datetime.now() - timedelta(days=2)).strftime('%Y-%m-%d'),
+
+        # Unspecified start => (-infin, end]
+        r = self.client.get(self.url, {
+                'date_end': end,
+            })
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 5)
+
+        # Unspecified end => [start, +infin)
+        r = self.client.get(self.url, {
+                'date_start': start
+            })
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 6)
+
+        # Both start and end => [start, end]
+        r = self.client.get(self.url, {
+                'date_start': start,
+                'date_end': end,
+            })
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 4)
+
+    def test_date_start_valueerror(self):
+        # https://bugzilla.mozilla.org/show_bug.cgi?id=898584
+        r = self.client.get(self.url, {
+                'date_start': '0001-01-01',
+            })
+        eq_(r.status_code, 200)
+
+    def test_invalid_search(self):
+        # Invalid values for happy shouldn't filter
+        r = self.client.get(self.url, {'happy': 'fish'})
+        eq_(r.status_code, 200)
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 7)
+
+        # Unknown parameters should be ignored.
+        r = self.client.get(self.url, {'apples': 'oranges'})
+        eq_(r.status_code, 200)
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 7)
+
+        # A broken date range search shouldn't affect anything
+        # Why this? Because this is the thing the fuzzer found.
+        r = self.client.get(self.url, {
+                'date_end': '/etc/shadow\x00',
+                'date_start': '/etc/passwd\x00'
+                })
+        eq_(r.status_code, 200)
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 7)

@@ -10,17 +10,28 @@
 #    @analyzer_required
 #    def my_view(request):
 #        ...
+#
+# Also, since it's just analyzers, everyone is expected to speak
+# English. Ergo, there's no localization here.
 
 from collections import defaultdict
 from datetime import datetime, timedelta
 
-from elasticutils.contrib.django import es_required_or_50x
+from elasticutils.contrib.django import F, es_required_or_50x
 
 from django.shortcuts import render
 
 from fjord.analytics.forms import OccurrencesComparisonForm
-from fjord.base.util import analyzer_required, check_new_user
-from fjord.feedback.models import Product, ResponseMappingType
+from fjord.analytics.tools import (
+    generate_query_parsed,
+    counts_to_options)
+from fjord.base.helpers import locale_name
+from fjord.base.util import (
+    analyzer_required,
+    check_new_user,
+    smart_int,
+    smart_date)
+from fjord.feedback.models import Product, Response, ResponseMappingType
 
 
 @check_new_user
@@ -246,4 +257,198 @@ def analytics_duplicates(request):
         'render_time': datetime.now(),
         'summary_counts': summary_counts,
         'total_count': total_count,
+    })
+
+
+@check_new_user
+@analyzer_required
+@es_required_or_50x(error_template='analytics/es_down.html')
+def analytics_search(request):
+    template = 'analytics/analyzer/search.html'
+
+    page = smart_int(request.GET.get('page', 1), 1)
+
+    # Note: If we add additional querystring fields, we need to add
+    # them to generate_dashboard_url.
+    search_happy = request.GET.get('happy', None)
+    search_platform = request.GET.get('platform', None)
+    search_locale = request.GET.get('locale', None)
+    search_product = request.GET.get('product', None)
+    search_version = request.GET.get('version', None)
+    search_query = request.GET.get('q', None)
+    search_date_start = smart_date(
+        request.GET.get('date_start', None), fallback=None)
+    search_date_end = smart_date(
+        request.GET.get('date_end', None), fallback=None)
+    search_bigram = request.GET.get('bigram', None)
+    selected = request.GET.get('selected', None)
+
+    filter_data = []
+    current_search = {'page': page}
+
+    search = ResponseMappingType.search()
+    f = F()
+    # If search happy is '0' or '1', set it to False or True, respectively.
+    search_happy = {'0': False, '1': True}.get(search_happy, None)
+    if search_happy in [False, True]:
+        f &= F(happy=search_happy)
+        current_search['happy'] = int(search_happy)
+
+    def unknown_to_empty(text):
+        """Convert "Unknown" to "" to support old links"""
+        return u'' if text.lower() == u'unknown' else text
+
+    if search_platform is not None:
+        f &= F(platform=unknown_to_empty(search_platform))
+        current_search['platform'] = search_platform
+    if search_locale is not None:
+        f &= F(locale=unknown_to_empty(search_locale))
+        current_search['locale'] = search_locale
+    if search_product is not None:
+        f &= F(product=unknown_to_empty(search_product))
+        current_search['product'] = search_product
+
+        if search_version is not None:
+            # Note: We only filter on version if we're filtering on
+            # product.
+            f &= F(version=unknown_to_empty(search_version))
+            current_search['version'] = search_version
+
+    if search_date_start is None and search_date_end is None:
+        selected = '7d'
+
+    if search_date_end is None:
+        search_date_end = datetime.now()
+    if search_date_start is None:
+        search_date_start = search_date_end - timedelta(days=7)
+
+    current_search['date_end'] = search_date_end.strftime('%Y-%m-%d')
+    # Add one day, so that the search range includes the entire day.
+    end = search_date_end + timedelta(days=1)
+    # Note 'less than', not 'less than or equal', because of the added
+    # day above.
+    f &= F(created__lt=end)
+
+    current_search['date_start'] = search_date_start.strftime('%Y-%m-%d')
+    f &= F(created__gte=search_date_start)
+
+    if search_query:
+        current_search['q'] = search_query
+        es_query = generate_query_parsed('description', search_query)
+        search = search.query_raw(es_query)
+
+    if search_bigram is not None:
+        f &= F(description_bigrams=search_bigram)
+        filter_data.append({
+            'display': 'Bigram',
+            'name': 'bigram',
+            'options': [{
+                'count': 'all',
+                'name': search_bigram,
+                'display': search_bigram,
+                'value': search_bigram,
+                'checked': True
+            }]
+        })
+
+    search = search.filter(f).order_by('-created')
+
+    # FIXME - Links to output formats here
+
+    # Search results and pagination
+    if page < 1:
+        page = 1
+    page_count = 50
+    start = page_count * (page - 1)
+    end = start + page_count
+
+    search_count = search.count()
+    opinion_page_ids = [mem[0] for mem in search.values_list('id')[start:end]]
+
+    # We convert what we get back from ES to what's in the db so we
+    # can get all the information.
+    opinion_page = Response.objects.filter(id__in=opinion_page_ids)
+
+    # Navigation facet data
+    facets = search.facet(
+        'happy', 'platform', 'locale', 'product', 'version',
+        filtered=bool(search._process_filters(f.filters)))
+
+    # This loop does two things. First it maps 'T' -> True and 'F' ->
+    # False.  This is probably something EU should be doing for
+    # us. Second, it restructures the data into a more convenient
+    # form.
+    counts = {
+        'happy': {},
+        'platform': {},
+        'locale': {},
+        'product': {},
+        'version': {}
+    }
+    for param, terms in facets.facet_counts().items():
+        for term in terms:
+            name = term['term']
+            if name == 'T':
+                name = True
+            elif name == 'F':
+                name = False
+
+            counts[param][name] = term['count']
+
+    def empty_to_unknown(text):
+        return 'Unknown' if text == u'' else text
+
+    filter_data.extend([
+        counts_to_options(
+            counts['happy'].items(),
+            name='happy',
+            display='Sentiment',
+            display_map={True: 'Happy', False: 'Sad'},
+            value_map={True: 1, False: 0},
+            checked=search_happy),
+        counts_to_options(
+            counts['product'].items(),
+            name='product',
+            display='Product',
+            display_map=empty_to_unknown,
+            checked=search_product)
+    ])
+    # Only show the version if we're showing a specific
+    # product.
+    if search_product:
+        filter_data.append(
+            counts_to_options(
+                counts['version'].items(),
+                name='version',
+                display='Version',
+                display_map=empty_to_unknown,
+                checked=search_version)
+        )
+
+    filter_data.extend(
+        [
+            counts_to_options(
+                counts['platform'].items(),
+                name='platform',
+                display='Platform',
+                display_map=empty_to_unknown,
+                checked=search_platform),
+            counts_to_options(
+                counts['locale'].items(),
+                name='locale',
+                display='Locale',
+                checked=search_locale,
+                display_map=locale_name),
+        ]
+    )
+
+    return render(request, template, {
+        'opinions': opinion_page,
+        'opinion_count': search_count,
+        'filter_data': filter_data,
+        'page': page,
+        'prev_page': page - 1 if start > 0 else None,
+        'next_page': page + 1 if end < search_count else None,
+        'current_search': current_search,
+        'selected': selected,
     })
