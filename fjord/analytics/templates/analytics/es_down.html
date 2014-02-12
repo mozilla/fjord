@@ -1,5 +1,10 @@
 {% extends "analytics/dashboard.html" %}
 
+{# We don't need the dashboard js files for this. #}
+{% block site_js %}
+  <script type="text/javascript" src="https://login.persona.org/include.js"></script>
+{% endblock %}
+
 {% block content_leftside %}{% endblock %}
 
 {% block content_middle %}
