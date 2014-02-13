@@ -136,6 +136,39 @@ ul.bars {
   }
 }
 
+.search_results {
+  dt {
+    clear: left;
+    float: left;
+    font-weight: bold;
+    padding: 0.2em 0.2em 0.2em 0;
+    width: 100px;
+  }
+  dd {
+    margin-left: 110px;
+    padding: 0.2em;
+  }
+
+  > li:nth-child(even) {
+    background-color: #f6f6ff;
+  }
+  > li:nth-child(odd) {
+    background-color: #fff;
+  }
+}
+
+#analyzer_search {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+
+  .search_box {
+    background: url('../img/search.png') no-repeat scroll 4px center transparent;
+    padding-left: 16px;
+    width: 350px;
+  }
+}
+
 .spamasciibar {
   word-wrap: break-word;
   word-break: break-all;
