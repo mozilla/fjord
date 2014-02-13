@@ -146,6 +146,13 @@ class TestSearchView(ElasticTestCase):
 
         self.refresh()
 
+        # Create analyzer and log analyzer in
+        jane = user(email='jane@example.com', save=True)
+        profile(user=jane, save=True)
+        jane.groups.add(Group.objects.get(name='analyzers'))
+
+        self.client_login_user(jane)
+
     def test_front_page(self):
         r = self.client.get(self.url)
         eq_(200, r.status_code)

@@ -261,6 +261,7 @@ def analytics_duplicates(request):
 
 
 @check_new_user
+@analyzer_required
 @es_required_or_50x(error_template='analytics/es_down.html')
 def analytics_search(request):
     template = 'analytics/analyzer/search.html'
