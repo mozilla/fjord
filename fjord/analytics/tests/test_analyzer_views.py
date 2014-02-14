@@ -242,6 +242,23 @@ class TestSearchView(ElasticTestCase):
         ok_('ou812' in r.content)
         eq_(len(pq('li.opinion')), 1)
 
+    def test_country(self):
+        resp = response(
+            happy=True, product=u'Firefox OS', description=u'ou812',
+            country=u'ES', created=datetime.now(), save=True)
+        responseemail(opinion=resp, save=True)
+        # Have to reindex everything because unlike in a request
+        # context, what happens here is we index the Response, but
+        # without the ResponseEmail.
+        self.setup_indexes()
+
+        r = self.client.get(self.url, {
+            'product': 'Firefox OS', 'country': 'ES'})
+        eq_(r.status_code, 200)
+        pq = PyQuery(r.content)
+        ok_('ou812' in r.content)
+        eq_(len(pq('li.opinion')), 1)
+
     def test_empty_and_unknown(self):
         # Empty value should work
         r = self.client.get(self.url, {'platform': ''})

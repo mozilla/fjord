@@ -170,6 +170,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'browser_version': keyword_type(),
             'platform': keyword_type(),
             'locale': keyword_type(),
+            'country': keyword_type(),
             'device': keyword_type(),
             'manufacturer': keyword_type(),
             'created': date_type()
@@ -198,6 +199,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'browser_version': obj.browser_version,
             'platform': obj.platform,
             'locale': obj.locale,
+            'country': obj.country,
             'device': obj.device,
             'manufacturer': obj.manufacturer,
             'created': obj.created,

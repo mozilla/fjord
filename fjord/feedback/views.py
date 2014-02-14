@@ -341,7 +341,7 @@ def feedback_router(request, product=None, version=None, channel=None,
                 })
 
         # FIXME - Remove product hard-coding from here
-        if product == 'firefoxos' or request.BROWSER.browser == 'Firefox OS':
+        if product == 'fxos' or request.BROWSER.browser == 'Firefox OS':
             view = firefox_os_stable_feedback
 
         elif product == 'android' or request.BROWSER.mobile:
