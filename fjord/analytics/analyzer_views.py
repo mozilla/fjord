@@ -31,6 +31,7 @@ from fjord.base.util import (
     check_new_user,
     smart_int,
     smart_date)
+from fjord.feedback.helpers import country_name
 from fjord.feedback.models import Product, Response, ResponseMappingType
 
 
@@ -274,6 +275,7 @@ def analytics_search(request):
     search_has_email = request.GET.get('has_email', None)
     search_platform = request.GET.get('platform', None)
     search_locale = request.GET.get('locale', None)
+    search_country = request.GET.get('country', None)
     search_product = request.GET.get('product', None)
     search_version = request.GET.get('version', None)
     search_query = request.GET.get('q', None)
@@ -316,11 +318,17 @@ def analytics_search(request):
         f &= F(product=unknown_to_empty(search_product))
         current_search['product'] = search_product
 
+        # Only show the version if there's a product.
         if search_version is not None:
             # Note: We only filter on version if we're filtering on
             # product.
             f &= F(version=unknown_to_empty(search_version))
             current_search['version'] = search_version
+
+        # Only show the country if the product is Firefox OS.
+        if search_country is not None and search_product == 'Firefox OS':
+            f &= F(country=unknown_to_empty(search_country))
+            current_search['country'] = search_country
 
     if search_date_start is None and search_date_end is None:
         selected = '7d'
@@ -379,7 +387,8 @@ def analytics_search(request):
 
     # Navigation facet data
     facets = search.facet(
-        'happy', 'platform', 'locale', 'product', 'version', 'has_email',
+        'happy', 'platform', 'locale', 'country', 'product', 'version',
+        'has_email',
         filtered=bool(search._process_filters(f.filters)))
 
     # This loop does two things. First it maps 'T' -> True and 'F' ->
@@ -391,6 +400,7 @@ def analytics_search(request):
         'has_email': {},
         'platform': {},
         'locale': {},
+        'country': {},
         'product': {},
         'version': {},
     }
@@ -440,6 +450,16 @@ def analytics_search(request):
                 display_map=empty_to_unknown,
                 checked=search_version)
         )
+        # Only show the country if the product is Firefox OS.
+        if search_product == 'Firefox OS':
+            filter_data.append(
+                counts_to_options(
+                    counts['country'].items(),
+                    name='country',
+                    display='Country',
+                    checked=search_country,
+                    display_map=country_name),
+            )
 
     filter_data.extend(
         [
