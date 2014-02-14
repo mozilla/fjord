@@ -2,14 +2,14 @@ from datetime import datetime, timedelta
 import json
 import logging
 
-from nose.tools import eq_
+from nose.tools import eq_, ok_
 from pyquery import PyQuery
 
 from django.contrib.auth.models import Group
 from django.http import QueryDict
 
 from fjord.base.tests import LocalizingClient, profile, reverse, user
-from fjord.feedback.tests import response
+from fjord.feedback.tests import response, responseemail
 from fjord.search.tests import ElasticTestCase
 
 
@@ -208,6 +208,39 @@ class TestSearchView(ElasticTestCase):
         r = self.client.get(self.url, {'platform': 'Atari'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 0)
+
+    def test_has_email(self):
+        # Test before we create a responsemail
+        r = self.client.get(self.url, {'has_email': '0'})
+        eq_(r.status_code, 200)
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 7)
+
+        r = self.client.get(self.url, {'has_email': '1'})
+        eq_(r.status_code, 200)
+        pq = PyQuery(r.content)
+        eq_(len(pq('li.opinion')), 0)
+
+        resp = response(
+            happy=True, product=u'Firefox', description=u'ou812',
+            created=datetime.now(), save=True)
+        responseemail(opinion=resp, save=True)
+        # Have to reindex everything because unlike in a request
+        # context, what happens here is we index the Response, but
+        # without the ResponseEmail.
+        self.setup_indexes()
+
+        r = self.client.get(self.url, {'has_email': '0'})
+        eq_(r.status_code, 200)
+        pq = PyQuery(r.content)
+        ok_('ou812' not in r.content)
+        eq_(len(pq('li.opinion')), 7)
+
+        r = self.client.get(self.url, {'has_email': '1'})
+        eq_(r.status_code, 200)
+        pq = PyQuery(r.content)
+        ok_('ou812' in r.content)
+        eq_(len(pq('li.opinion')), 1)
 
     def test_empty_and_unknown(self):
         # Empty value should work
