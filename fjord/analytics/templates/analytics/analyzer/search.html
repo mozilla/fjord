@@ -12,8 +12,8 @@
       <dl>
         <dt>Email:</dt>
         <dd>
-          {% if feedback.responseemail_set.count() > 0 %}
-            {{ feedback.responseemail_set.all()[0].email }}
+          {% if feedback.user_email %}
+            {{ feedback.user_email }}
           {% else %}
             &mdash;
           {% endif %}
@@ -64,10 +64,10 @@
         <a href="{{ request.get_full_path()|urlparams(platform=feedback.platform) }}">{{ feedback.platform|unknown }}</a>
       </li>
       <li>
-        <a href="{{ request.get_full_path()|urlparams(locale=feedback.locale) }}">{{ feedback.locale|locale_name }}</a>
+        <a href="{{ request.get_full_path()|urlparams(locale=feedback.locale) }}">{{ feedback.locale_name }}</a>
       </li>
       <li>
-        {{ feedback.country|country_name }}
+        {{ feedback.country_name }}
       </li>
       <li>
         {{ feedback.manufacturer|unknown }}
@@ -167,6 +167,10 @@
     <p class="note">
       Note: This contains confidential personally identifiable
       information. Please act responsibly with it.
+    </p>
+
+    <p>
+      <a href="{{ request.get_full_path()|urlparams(format='csv') }}">CSV export</a>
     </p>
 
     <ul class="search_results">

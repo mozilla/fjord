@@ -7,9 +7,11 @@ from django.db import models
 from elasticutils.contrib.django import Indexable
 from rest_framework import serializers
 from tower import ugettext_lazy as _
+from product_details import product_details
 
 from fjord.base.models import ModelBase
 from fjord.base.util import smart_truncate
+from fjord.feedback.config import CODE_TO_COUNTRY
 from fjord.feedback.utils import compute_grams
 from fjord.search.index import (
     register_mapping_type, FjordMappingType,
@@ -113,9 +115,52 @@ class Response(ModelBase):
     def __repr__(self):
         return self.__unicode__().encode('ascii', 'ignore')
 
+    @classmethod
+    def get_export_keys(cls, confidential=False):
+        """Returns set of keys that are interesting for export
+
+        Some parts of the Response aren't very interesting. This lets
+        us explicitly state what is available for export.
+
+        Note: This returns the name of *properties* of Response which
+        aren't all database fields. Some of them are finessed.
+
+        :arg confidential: Whether or not to include confidential data
+
+        """
+        keys = [
+            'id',
+            'created',
+            'sentiment',
+            'description',
+            'translated_description',
+            'product',
+            'channel',
+            'version',
+            'locale_name',
+            'manufacturer',
+            'device',
+            'platform',
+        ]
+
+        if confidential:
+            keys.extend([
+                'url',
+                'country_name',
+                'user_email',
+            ])
+        return keys
+
     def save(self, *args, **kwargs):
         self.description = self.description.strip()[:TRUNCATE_LENGTH]
         super(Response, self).save(*args, **kwargs)
+
+    @property
+    def user_email(self):
+        """Associated email address or u''"""
+        if self.responseemail_set.count() > 0:
+            return self.responseemail_set.all()[0].email
+        return u''
 
     @property
     def sentiment(self):
@@ -127,6 +172,26 @@ class Response(ModelBase):
     def truncated_description(self):
         """Shorten feedback for list display etc."""
         return smart_truncate(self.description, length=70)
+
+    @property
+    def locale_name(self, native=False):
+        """Convert a locale code into a human readable locale name"""
+        locale = self.locale
+        if locale in product_details.languages:
+            display_locale = 'native' if native else 'English'
+            return product_details.languages[locale][display_locale]
+
+        return locale
+
+    @property
+    def country_name(self, native=False):
+        """Convert a country code into a human readable country name"""
+        country = self.country
+        if country in CODE_TO_COUNTRY:
+            display_locale = 'native' if native else 'English'
+            return CODE_TO_COUNTRY[country][display_locale]
+
+        return country
 
     @classmethod
     def get_mapping_type(self):
@@ -189,7 +254,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'prodchan': obj.prodchan,
             'happy': obj.happy,
             'url': obj.url,
-            'has_email': obj.responseemail_set.count() > 0,
+            'has_email': bool(obj.user_email),
             'description': obj.description,
             'user_agent': obj.user_agent,
             'product': obj.product,
