@@ -1,6 +1,6 @@
 from fjord.base import browsers
 from fjord.base.tests import with_save
-from fjord.feedback.models import Product, Response
+from fjord.feedback.models import Product, Response, ResponseEmail
 
 
 USER_AGENT = 'Mozilla/5.0 (X11; Linux i686; rv:17.0) Gecko/17.0 Firefox/17.0'
@@ -46,3 +46,17 @@ def response(**kwargs):
 
     defaults.update(kwargs)
     return Response(**defaults)
+
+
+@with_save
+def responseemail(**kwargs):
+    defaults = {
+        'email': 'joe@example.com'
+    }
+
+    defaults.update(kwargs)
+    if 'opinion' not in kwargs:
+        resp = response(save=True)
+        defaults['opinion'] = resp
+
+    return ResponseEmail(**defaults)

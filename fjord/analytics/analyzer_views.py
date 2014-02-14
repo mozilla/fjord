@@ -271,6 +271,7 @@ def analytics_search(request):
     # Note: If we add additional querystring fields, we need to add
     # them to generate_dashboard_url.
     search_happy = request.GET.get('happy', None)
+    search_has_email = request.GET.get('has_email', None)
     search_platform = request.GET.get('platform', None)
     search_locale = request.GET.get('locale', None)
     search_product = request.GET.get('product', None)
@@ -293,6 +294,13 @@ def analytics_search(request):
     if search_happy in [False, True]:
         f &= F(happy=search_happy)
         current_search['happy'] = int(search_happy)
+
+    # If search has_email is '0' or '1', set it to False or True,
+    # respectively.
+    search_has_email = {'0': False, '1': True}.get(search_has_email, None)
+    if search_has_email in [False, True]:
+        f &= F(has_email=search_has_email)
+        current_search['has_email'] = int(search_has_email)
 
     def unknown_to_empty(text):
         """Convert "Unknown" to "" to support old links"""
@@ -371,7 +379,7 @@ def analytics_search(request):
 
     # Navigation facet data
     facets = search.facet(
-        'happy', 'platform', 'locale', 'product', 'version',
+        'happy', 'platform', 'locale', 'product', 'version', 'has_email',
         filtered=bool(search._process_filters(f.filters)))
 
     # This loop does two things. First it maps 'T' -> True and 'F' ->
@@ -380,10 +388,11 @@ def analytics_search(request):
     # form.
     counts = {
         'happy': {},
+        'has_email': {},
         'platform': {},
         'locale': {},
         'product': {},
-        'version': {}
+        'version': {},
     }
     for param, terms in facets.facet_counts().items():
         for term in terms:
@@ -406,6 +415,13 @@ def analytics_search(request):
             display_map={True: 'Happy', False: 'Sad'},
             value_map={True: 1, False: 0},
             checked=search_happy),
+        counts_to_options(
+            counts['has_email'].items(),
+            name='has_email',
+            display='Has email',
+            display_map={True: 'Yes', False: 'No'},
+            value_map={True: 1, False: 0},
+            checked=search_has_email),
         counts_to_options(
             counts['product'].items(),
             name='product',

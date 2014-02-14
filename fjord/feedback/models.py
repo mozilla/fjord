@@ -159,6 +159,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'prodchan': keyword_type(),
             'happy': boolean_type(),
             'url': keyword_type(),
+            'has_email': boolean_type(),
             'description': text_type(),
             'description_bigrams': keyword_type(),
             'user_agent': keyword_type(),
@@ -187,6 +188,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'prodchan': obj.prodchan,
             'happy': obj.happy,
             'url': obj.url,
+            'has_email': obj.responseemail_set.count() > 0,
             'description': obj.description,
             'user_agent': obj.user_agent,
             'product': obj.product,
@@ -231,6 +233,10 @@ class ResponseMappingType(FjordMappingType, Indexable):
 
         cache.add(key, products)
         return products
+
+    @classmethod
+    def get_indexable(cls):
+        return super(ResponseMappingType, cls).get_indexable().reverse()
 
 
 class ResponseEmail(ModelBase):
