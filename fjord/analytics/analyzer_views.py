@@ -16,10 +16,13 @@
 
 from collections import defaultdict
 from datetime import datetime, timedelta
+import csv
 
 from elasticutils.contrib.django import F, es_required_or_50x
 
+from django.http import HttpResponse
 from django.shortcuts import render
+from django.utils.encoding import force_bytes
 
 from fjord.analytics.forms import OccurrencesComparisonForm
 from fjord.analytics.tools import (
@@ -261,12 +264,59 @@ def analytics_duplicates(request):
     })
 
 
+def _analytics_search_export(request, opinions_s):
+    """Handles CSV export for analytics search
+
+    This only exports MAX_OPINIONS amount. It adds a note to the top
+    about that if the results are truncated.
+
+    """
+    MAX_OPINIONS = 1000
+
+    # Create the HttpResponse object with the appropriate CSV header.
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="{0}"'.format(
+        datetime.now().strftime('%Y%m%d_%H%M_search_export.csv'))
+
+    keys = Response.get_export_keys(confidential=True)
+    total_opinions = opinions_s.count()
+
+    opinions_s = opinions_s.values_list('id')[:MAX_OPINIONS]
+
+    # We convert what we get back from ES to what's in the db so we
+    # can get all the information.
+    opinions = Response.objects.filter(id__in=[mem[0] for mem in opinions_s])
+
+    writer = csv.writer(response)
+
+    # Specify what this search is
+    writer.writerow(['URL: {0}'.format(request.get_full_path())])
+    writer.writerow(['Params: ' +
+                     ' '.join(['{0}: {1}'.format(key, val)
+                               for key, val in request.GET.items()])])
+
+    # Add note if we truncated.
+    if total_opinions > MAX_OPINIONS:
+        writer.writerow(['Truncated {0} rows.'.format(
+            total_opinions - MAX_OPINIONS)])
+
+    # Write headers row.
+    writer.writerow(keys)
+
+    # Write opinion rows.
+    for op in opinions:
+        writer.writerow([force_bytes(getattr(op, key)) for key in keys])
+
+    return response
+
+
 @check_new_user
 @analyzer_required
 @es_required_or_50x(error_template='analytics/es_down.html')
 def analytics_search(request):
     template = 'analytics/analyzer/search.html'
 
+    output_format = request.GET.get('format', None)
     page = smart_int(request.GET.get('page', 1), 1)
 
     # Note: If we add additional querystring fields, we need to add
@@ -369,7 +419,10 @@ def analytics_search(request):
 
     search = search.filter(f).order_by('-created')
 
-    # FIXME - Links to output formats here
+    # If they're asking for a CSV export, then send them to the export
+    # screen.
+    if output_format == 'csv':
+        return _analytics_search_export(request, search)
 
     # Search results and pagination
     if page < 1:

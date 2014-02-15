@@ -362,3 +362,13 @@ class TestSearchView(ElasticTestCase):
         eq_(r.status_code, 200)
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 7)
+
+    def test_search_export_csv(self):
+        r = self.client.get(self.url, {'format': 'csv'})
+        eq_(r.status_code, 200)
+
+        # Check that it parses in csv with n rows.
+        lines = r.content.splitlines()
+
+        # URL row, params row, header row and one row for every opinion
+        eq_(len(lines), 10)
