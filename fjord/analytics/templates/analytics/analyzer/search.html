@@ -150,46 +150,47 @@
 {% block content_middle %}
   <div class="col full">
 
-  <div class="block feedback">
-    <h2>Feedback search: {{ opinion_count }} responses</h2>
+    <div class="block feedback">
+      <h2>Feedback search: {{ opinion_count }} responses</h2>
 
-    <form id="analyzer_search" action="{{ request.get_full_path() }}" method="get">
-      <input class="search_box" type="text" name="q"
-        placeholder="Search by text query" value="{{ current_search.q }}" />
+      <form id="analyzer_search" action="{{ request.get_full_path() }}" method="get">
+        <input class="search_box" type="text" name="q"
+               placeholder="Search by text query" value="{{ current_search.q }}" />
 
-      {% for key, value in current_search.items() %}
-        {% if key not in ('q', 'page') %}
-          <input type="hidden" name="{{ key }}" value="{{ value }}" />
+        {% for key, value in current_search.items() %}
+          {% if key not in ('q', 'page') %}
+            <input type="hidden" name="{{ key }}" value="{{ value }}" />
+          {% endif %}
+        {% endfor %}
+      </form>
+
+      <p class="note">
+        Note: This contains confidential personally identifiable
+        information. Please act responsibly with it.
+      </p>
+
+      <p>
+        <a href="{{ request.get_full_path()|urlparams(format='csv') }}">CSV export</a>
+      </p>
+
+      <ul class="search_results">
+        {% for opinion in opinions %}
+          {{ feedback_block(opinion) }}
+        {% endfor %}
+      </ul>
+
+      <div class="pager">
+        {% if next_page %}
+          <a class="older" href="{{ request.get_full_path()|urlparams(page=next_page) }}">
+            Older Messages
+          </a>
         {% endif %}
-      {% endfor %}
-    </form>
-
-    <p class="note">
-      Note: This contains confidential personally identifiable
-      information. Please act responsibly with it.
-    </p>
-
-    <p>
-      <a href="{{ request.get_full_path()|urlparams(format='csv') }}">CSV export</a>
-    </p>
-
-    <ul class="search_results">
-      {% for opinion in opinions %}
-        {{ feedback_block(opinion) }}
-      {% endfor %}
-    </ul>
-
-    <div class="pager">
-      {% if next_page %}
-        <a class="older" href="{{ request.get_full_path()|urlparams(page=next_page) }}">
-          Older Messages
-        </a>
-      {% endif %}
-      {% if prev_page %}
-        <a class="newer" href="{{ request.get_full_path()|urlparams(page=prev_page) }}">
-          Newer Messages
-        </a>
-      {% endif %}
+        {% if prev_page %}
+          <a class="newer" href="{{ request.get_full_path()|urlparams(page=prev_page) }}">
+            Newer Messages
+          </a>
+        {% endif %}
+      </div>
     </div>
   </div>
 {% endblock %}
