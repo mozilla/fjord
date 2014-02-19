@@ -220,6 +220,14 @@ MINIFY_BUNDLES = {
             'css/lib/normalize.css',
             'css/feedback.less',
         ),
+        'generic_feedback': (
+            'css/lib/normalize.css',
+            'css/lib/brick-1.0beta8.byob.min.css',
+            # FIXME - This should become feedback.less and move out of
+            # mobile/.
+            'css/mobile/base.less',
+            'css/generic_feedback.less',
+        ),
         'dashboard': (
             'css/ui-lightness/jquery-ui.css',
             'css/lib/normalize.css',
@@ -262,6 +270,11 @@ MINIFY_BUNDLES = {
             'js/lib/jquery.min.js',
             'js/init.js',
             'js/feedback.js',
+            'js/ga.js',
+        ),
+        'generic_feedback': (
+            'js/lib/jquery.min.js',
+            'js/generic_feedback.js',
             'js/ga.js',
         ),
         'dashboard': (

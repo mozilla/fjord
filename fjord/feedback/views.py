@@ -230,6 +230,26 @@ def mobile_stable_feedback(request, locale=None, product=None,
     })
 
 
+@csrf_protect
+def generic_feedback(request, locale=None, product=None, version=None,
+                     channel=None):
+    """Generic feedback form for desktop and mobile"""
+    form = ResponseForm()
+    happy = None
+
+    if request.method == 'POST':
+        response, form = _handle_feedback_post(
+            request, locale, product, version, channel)
+        if response:
+            return response
+        happy = smart_bool(request.POST.get('happy', None), None)
+
+    return render(request, 'feedback/generic_feedback.html', {
+        'form': form,
+        'happy': happy,
+    })
+
+
 @requires_firefox
 @csrf_exempt
 def firefox_os_stable_feedback(request, locale=None, product=None,
@@ -298,6 +318,7 @@ product_routes = {
     'firefox.desktop.stable': desktop_stable_feedback,
     'firefox.android.stable': mobile_stable_feedback,
     'firefox.fxos.stable': firefox_os_stable_feedback,
+    'generic': generic_feedback,
 }
 
 

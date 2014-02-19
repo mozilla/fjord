@@ -1,0 +1,152 @@
+/* Box Sizing -- from vendor-prefix.less */
+.box-sizing(@args){
+  -webkit-box-sizing: @args;
+  -moz-box-sizing: @args;
+  box-sizing: @args;
+}
+.border-box(){
+  .box-sizing(border-box);
+}
+.content-box(){
+  .box-sizing(content-box);
+}
+
+.error {
+  color: red;
+  font-size: 0.8em;
+}
+
+textarea.error {
+  font-size: 1.0em;
+  outline: solid 1px red;
+}
+
+#responseform {
+  height: 100%;
+}
+
+#description {
+  height: 17vh;
+  margin-bottom: 1em;
+  width: 100%;
+}
+
+#description-counter {
+  color: green;
+  font-size: 0.9em;
+  margin: 0;
+  padding: 0;
+  text-align: right;
+  width: 100%;
+
+  &.error {
+    color: red;
+    font-size: 0.9em;
+    font-weight: bold;
+  }
+
+  &.warning {
+    color: orange;
+  }
+}
+
+aside {
+  background-color: #D8E9F5;
+  border: 1px solid #A4C5DB;
+  font-size: 0.9em;
+  margin: 3vh auto;
+
+  width: 100%;
+
+  div {
+    padding: 5px;
+  }
+}
+
+x-card {
+  display: none;
+
+  section {
+    display: block;
+    margin: 0 auto;
+    max-width: 320px;
+    overflow: visible;
+    padding: 5px;
+
+    textarea {
+      .box-sizing(border-box);
+      height: 4em;
+      width: 100%;
+    }
+  }
+
+  x-appbar {
+    height: 28px;
+  }
+
+  &.happy {
+    .sad {
+      display: none;
+    }
+  }
+  &.sad {
+    .happy {
+      display: none;
+    }
+  }
+}
+
+x-appbar {
+  button.back {
+    background: transparent no-repeat -17px -19px url("../img/icons.png");
+    border: none;
+    display: inline-block;
+    float: none;
+    font-size: 0;
+    height: 26px;
+    overflow: hidden;
+    position: relative;
+    vertical-align: top;
+    width: 30px;
+  }
+}
+
+#intro {
+  section {
+    #sentiment {
+      width: 100%;
+
+      #buttons {
+        margin: 8vh 0;
+      }
+    }
+
+    button.happy, button.sad {
+      background: 0;
+      border: 0;
+      display: inline-block;
+      margin: 10px;
+      padding-top: 100px;
+      position: relative;
+      vertical-align: top;
+      width: 130px;
+
+      &:before {
+        background: no-repeat url("../img/type.png");
+        content: "";
+        display: block;
+        height: 100px;
+        left: 15px;
+        position: absolute;
+        top: 0px;
+        width: 100px;
+      }
+    }
+
+    button.sad {
+      &:before {
+        background-position: -100px 0;
+      }
+    }
+  }
+}
