@@ -79,6 +79,13 @@ def _handle_feedback_post(request, locale=None, product=None,
         channel = smart_str(channel).lower()
         version = smart_str(version)
 
+        # src, then source, then utm_source
+        source = request.GET.get('src', u'')
+        if not source:
+            source = request.GET.get('utm_source', u'')
+
+        campaign = request.GET.get('utm_campaign', u'')
+
         data = form.cleaned_data
 
         # Most platforms aren't different enough between versions to care.
@@ -108,6 +115,12 @@ def _handle_feedback_post(request, locale=None, product=None,
             manufacturer=data.get('manufacturer', ''),
             device=data.get('device', ''),
         )
+
+        if source:
+            opinion.source = source[:100]
+
+        if campaign:
+            opinion.campaign = campaign[:100]
 
         if product:
             # If we picked up the product from the url, we use url

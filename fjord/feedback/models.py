@@ -104,6 +104,11 @@ class Response(ModelBase):
     browser_version = models.CharField(max_length=30, blank=True)
     platform = models.CharField(max_length=30, blank=True)
 
+    source = models.CharField(max_length=100, blank=True, null=True,
+                              default=u'')
+    campaign = models.CharField(max_length=100, blank=True, null=True,
+                                default=u'')
+
     created = models.DateTimeField(default=datetime.now)
 
     class Meta:
