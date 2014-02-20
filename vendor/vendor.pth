@@ -1,9 +1,20 @@
+packages/Babel
 packages/South
+packages/amqplib
+packages/anyjson
+packages/carrot
+packages/cef
+packages/celery
 packages/cssselect
+packages/django-celery
+packages/django-picklefield/src
+packages/kombu
 packages/mock
 packages/polib
 packages/pyquery
+packages/python-dateutil
 packages/python-memcached
+packages/pytz
 packages/requests
 packages/selenium/py
 packages/simplejson
@@ -17,7 +28,6 @@ src/django-appconf
 src/django-arecibo
 src/django-browserid
 src/django-cache-machine
-src/django-compressor
 src/django-cronjobs
 src/django-eadred
 src/django-mobility
@@ -35,7 +45,5 @@ src/jingo
 src/jingo-minify
 src/nuggets
 src/pyelasticsearch
-src/schematic
-src/statsd
-src/test-utils
+src/pystatsd
 src/tower
