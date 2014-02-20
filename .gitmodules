@@ -31,3 +31,36 @@
 [submodule "vendor-local/src/django-ratelimit"]
 	path = vendor-local/src/django-ratelimit
 	url = https://github.com/jsocol/django-ratelimit.git
+[submodule "vendor/src/dennis"]
+	path = vendor/src/dennis
+	url = https://github.com/willkg/dennis.git
+[submodule "vendor/src/django-adminplus"]
+	path = vendor/src/django-adminplus
+	url = https://github.com/jsocol/django-adminplus.git
+[submodule "vendor/src/django-browserid"]
+	path = vendor/src/django-browserid
+	url = https://github.com/mozilla/django-browserid.git
+[submodule "vendor/src/django-cache-machine"]
+	path = vendor/src/django-cache-machine
+	url = https://github.com/jbalogh/django-cache-machine.git
+[submodule "vendor/src/django-eadred"]
+	path = vendor/src/django-eadred
+	url = https://github.com/willkg/django-eadred.git
+[submodule "vendor/src/django-ratelimit"]
+	path = vendor/src/django-ratelimit
+	url = https://github.com/jsocol/django-ratelimit
+[submodule "vendor/src/django-rest-framework"]
+	path = vendor/src/django-rest-framework
+	url = https://github.com/tomchristie/django-rest-framework.git
+[submodule "vendor/src/django-statsd"]
+	path = vendor/src/django-statsd
+	url = https://github.com/andymckay/django-statsd.git
+[submodule "vendor/src/elasticutils"]
+	path = vendor/src/elasticutils
+	url = https://github.com/mozilla/elasticutils.git
+[submodule "vendor/src/pyelasticsearch"]
+	path = vendor/src/pyelasticsearch
+	url = https://github.com/rhec/pyelasticsearch.git
+[submodule "vendor/src/pystatsd"]
+	path = vendor/src/pystatsd
+	url = https://github.com/jsocol/pystatsd.git
