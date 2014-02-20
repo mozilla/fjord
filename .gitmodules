@@ -70,3 +70,48 @@
 [submodule "vendor/src/funfactory"]
 	path = vendor/src/funfactory
 	url = https://github.com/mozilla/funfactory.git
+[submodule "vendor/src/bleach"]
+	path = vendor/src/bleach
+	url = git://github.com/jsocol/bleach.git
+[submodule "vendor/src/commonware"]
+	path = vendor/src/commonware
+	url = git://github.com/jsocol/commonware.git
+[submodule "vendor/src/django-appconf"]
+	path = vendor/src/django-appconf
+	url = git://github.com/jezdez/django-appconf.git
+[submodule "vendor/src/django-compressor"]
+	path = vendor/src/django-compressor
+	url = git://github.com/jezdez/django_compressor.git
+[submodule "vendor/src/django-cronjobs"]
+	path = vendor/src/django-cronjobs
+	url = git://github.com/jsocol/django-cronjobs.git
+[submodule "vendor/src/django-mobility"]
+	path = vendor/src/django-mobility
+	url = git://github.com/jbalogh/django-mobility.git
+[submodule "vendor/src/django-mozilla-product-details"]
+	path = vendor/src/django-mozilla-product-details
+	url = git://github.com/fwenzel/django-mozilla-product-details
+[submodule "vendor/src/django-multidb-router"]
+	path = vendor/src/django-multidb-router
+	url = git://github.com/jbalogh/django-multidb-router.git
+[submodule "vendor/src/django-nose"]
+	path = vendor/src/django-nose
+	url = git://github.com/jbalogh/django-nose.git
+[submodule "vendor/src/django-session-csrf"]
+	path = vendor/src/django-session-csrf
+	url = git://github.com/mozilla/django-session-csrf.git
+[submodule "vendor/src/django-sha2"]
+	path = vendor/src/django-sha2
+	url = git://github.com/fwenzel/django-sha2.git
+[submodule "vendor/src/jingo"]
+	path = vendor/src/jingo
+	url = git://github.com/jbalogh/jingo.git
+[submodule "vendor/src/jingo-minify"]
+	path = vendor/src/jingo-minify
+	url = git://github.com/jsocol/jingo-minify.git
+[submodule "vendor/src/nuggets"]
+	path = vendor/src/nuggets
+	url = git://github.com/mozilla/nuggets.git
+[submodule "vendor/src/tower"]
+	path = vendor/src/tower
+	url = git://github.com/clouserw/tower.git
