@@ -79,9 +79,6 @@
 [submodule "vendor/src/django-appconf"]
 	path = vendor/src/django-appconf
 	url = git://github.com/jezdez/django-appconf.git
-[submodule "vendor/src/django-compressor"]
-	path = vendor/src/django-compressor
-	url = git://github.com/jezdez/django_compressor.git
 [submodule "vendor/src/django-cronjobs"]
 	path = vendor/src/django-cronjobs
 	url = git://github.com/jsocol/django-cronjobs.git
