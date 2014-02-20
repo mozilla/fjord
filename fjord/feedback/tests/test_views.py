@@ -401,6 +401,48 @@ class TestFeedback(TestCase):
         # Bad email if the box is not checked is not an error.
         eq_(r.status_code, 302)
 
+    def test_src_to_source(self):
+        """We capture the src querystring arg in the source column"""
+        url = reverse('feedback', args=('firefox.desktop.stable',))
+
+        r = self.client.post(url + '?src=newsletter', {
+            'happy': 0,
+            'description': u"I like the colors.",
+        })
+
+        self.assertRedirects(r, reverse('thanks'))
+
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(feedback.source, u'newsletter')
+
+    def test_utm_source_to_source(self):
+        """We capture the utm_source querystring arg in the source column"""
+        url = reverse('feedback', args=('firefox.desktop.stable',))
+
+        r = self.client.post(url + '?utm_source=newsletter', {
+            'happy': 0,
+            'description': u"I like the colors.",
+        })
+
+        self.assertRedirects(r, reverse('thanks'))
+
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(feedback.source, u'newsletter')
+
+    def test_utm_campaign_to_source(self):
+        """We capture the utm_campaign querystring arg in the source column"""
+        url = reverse('feedback', args=('firefox.desktop.stable',))
+
+        r = self.client.post(url + '?utm_campaign=20140220_email', {
+            'happy': 0,
+            'description': u"I like the colors.",
+        })
+
+        self.assertRedirects(r, reverse('thanks'))
+
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(feedback.campaign, u'20140220_email')
+
     def test_deprecated_firefox_for_android_feedback_works(self):
         """Verify firefox for android can post feedback"""
         data = {
