@@ -64,3 +64,9 @@
 [submodule "vendor/src/pystatsd"]
 	path = vendor/src/pystatsd
 	url = https://github.com/jsocol/pystatsd.git
+[submodule "vendor/src/django"]
+	path = vendor/src/django
+	url = https://github.com/django/django
+[submodule "vendor/src/funfactory"]
+	path = vendor/src/funfactory
+	url = https://github.com/mozilla/funfactory.git
