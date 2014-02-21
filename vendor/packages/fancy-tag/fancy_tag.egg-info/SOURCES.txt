@@ -1,0 +1,14 @@
+AUTHORS
+LICENSE
+MANIFEST.in
+README.rst
+RELEASES
+setup.cfg
+setup.py
+fancy_tag/__init__.py
+fancy_tag.egg-info/PKG-INFO
+fancy_tag.egg-info/SOURCES.txt
+fancy_tag.egg-info/dependency_links.txt
+fancy_tag.egg-info/not-zip-safe
+fancy_tag.egg-info/requires.txt
+fancy_tag.egg-info/top_level.txt
