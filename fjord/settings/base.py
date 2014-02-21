@@ -356,6 +356,13 @@ DOMAIN_METHODS['messages'] = [
 # pages that this is not production.
 SHOW_STAGE_NOTICE = False
 
+# Explicitly set this because the one from funfactory includes
+# django-compressor which we don't use.
+# STATICFILES_FINDERS = (
+#     'django.contrib.staticfiles.finders.FileSystemFinder',
+#     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+# )
+
 # ElasticSearch settings.
 
 # List of host urls for the ES hosts we should connect to.

@@ -112,3 +112,6 @@
 [submodule "vendor/src/tower"]
 	path = vendor/src/tower
 	url = git://github.com/clouserw/tower.git
+[submodule "vendor/src/django_compressor"]
+	path = vendor/src/django_compressor
+	url = https://github.com/jezdez/django_compressor.git
