@@ -68,95 +68,102 @@ def _handle_feedback_post(request, locale=None, product=None,
     if getattr(request, 'limited', False):
         # If we're throttled, then return the thanks page, but don't
         # add the response to the db.
-        return HttpResponseRedirect(reverse('thanks')), None
+        return HttpResponseRedirect(reverse('thanks'))
 
+    # Get the form and run is_valid() so it goes through the
+    # validation and cleaning machinery. We don't really care if it's
+    # valid, though, since we will take what we got and do the best we
+    # can with it. Error validation is now in JS.
     form = ResponseForm(request.POST)
-    if form.is_valid():
-        # Do some data validation of product, channel and version
-        # coming from the url.
-        product = models.Product.get_product_map().get(smart_str(product), u'')
-        # FIXME - validate these better
-        channel = smart_str(channel).lower()
-        version = smart_str(version)
+    form.is_valid()
 
-        # src, then source, then utm_source
-        source = request.GET.get('src', u'')
-        if not source:
-            source = request.GET.get('utm_source', u'')
+    data = form.cleaned_data
+    description = data.get('description', u'').strip()
+    if not description:
+        # If there's no description, then there's nothing to do here,
+        # so thank the user and move on.
+        return HttpResponseRedirect(reverse('thanks'))
 
-        campaign = request.GET.get('utm_campaign', u'')
+    # Do some data validation of product, channel and version
+    # coming from the url.
+    product = models.Product.get_product_map().get(smart_str(product), u'')
+    # FIXME - validate these better
+    channel = smart_str(channel).lower()
+    version = smart_str(version)
 
-        data = form.cleaned_data
+    # src, then source, then utm_source
+    source = request.GET.get('src', u'')
+    if not source:
+        source = request.GET.get('utm_source', u'')
 
-        # Most platforms aren't different enough between versions to care.
-        # Windows is.
-        platform = request.BROWSER.platform
-        if platform == 'Windows':
-            platform += ' ' + request.BROWSER.platform_version
+    campaign = request.GET.get('utm_campaign', u'')
 
-        opinion = models.Response(
-            # Data coming from the user
-            happy=data['happy'],
-            url=data['url'],
-            description=data['description'],
+    # Most platforms aren't different enough between versions to care.
+    # Windows is.
+    platform = request.BROWSER.platform
+    if platform == 'Windows':
+        platform += ' ' + request.BROWSER.platform_version
 
-            # Inferred data from user agent
-            prodchan=_get_prodchan(request, product, channel),
-            user_agent=request.META.get('HTTP_USER_AGENT', ''),
-            browser=request.BROWSER.browser,
-            browser_version=request.BROWSER.browser_version,
-            platform=platform,
+    opinion = models.Response(
+        # Data coming from the user
+        happy=data['happy'],
+        url=data['url'],
+        description=data['description'].strip(),
 
-            # Pulled from the form data or the url
-            locale=data.get('locale', locale),
+        # Inferred data from user agent
+        prodchan=_get_prodchan(request, product, channel),
+        user_agent=request.META.get('HTTP_USER_AGENT', ''),
+        browser=request.BROWSER.browser,
+        browser_version=request.BROWSER.browser_version,
+        platform=platform,
 
-            # Data from mobile devices which is probably only
-            # applicable to mobile devices
-            manufacturer=data.get('manufacturer', ''),
-            device=data.get('device', ''),
-        )
+        # Pulled from the form data or the url
+        locale=data.get('locale', locale),
 
-        if source:
-            opinion.source = source[:100]
+        # Data from mobile devices which is probably only
+        # applicable to mobile devices
+        manufacturer=data.get('manufacturer', ''),
+        device=data.get('device', ''),
+    )
 
-        if campaign:
-            opinion.campaign = campaign[:100]
+    if source:
+        opinion.source = source[:100]
 
-        if product:
-            # If we picked up the product from the url, we use url
-            # bits for everything.
-            product = product or u''
-            version = version or u''
-            channel = channel or u''
+    if campaign:
+        opinion.campaign = campaign[:100]
 
-        elif opinion.browser != UNKNOWN:
-            # If we didn't pick up a product from the url, then we
-            # infer as much as we can from the user agent.
-            product = data.get(
-                'product', models.Response.infer_product(platform))
-            version = data.get(
-                'version', request.BROWSER.browser_version)
-            # Assume everything we don't know about is stable channel.
-            channel = u'stable'
+    if product:
+        # If we picked up the product from the url, we use url
+        # bits for everything.
+        product = product or u''
+        version = version or u''
+        channel = channel or u''
 
-        else:
-            product = channel = version = u''
+    elif opinion.browser != UNKNOWN:
+        # If we didn't pick up a product from the url, then we
+        # infer as much as we can from the user agent.
+        product = data.get(
+            'product', models.Response.infer_product(platform))
+        version = data.get(
+            'version', request.BROWSER.browser_version)
+        # Assume everything we don't know about is stable channel.
+        channel = u'stable'
 
-        opinion.product = product or u''
-        opinion.version = version or u''
-        opinion.channel = channel or u''
+    else:
+        product = channel = version = u''
 
-        opinion.save()
+    opinion.product = product or u''
+    opinion.version = version or u''
+    opinion.channel = channel or u''
 
-        # If there was an email address, save that separately.
-        if data['email_ok'] and data['email']:
-            e = models.ResponseEmail(email=data['email'], opinion=opinion)
-            e.save()
+    opinion.save()
 
-        return HttpResponseRedirect(reverse('thanks')), form
+    # If there was an email address, save that separately.
+    if data.get('email_ok') and data.get('email'):
+        e = models.ResponseEmail(email=data['email'], opinion=opinion)
+        e.save()
 
-    # The user did something wrong.
-    return None, form
+    return HttpResponseRedirect(reverse('thanks'))
 
 
 def _get_prodchan(request, product=None, channel=None):
@@ -184,69 +191,18 @@ def _get_prodchan(request, product=None, channel=None):
     return '{0}.{1}.{2}'.format(product, platform, channel)
 
 
-@requires_firefox
-@csrf_protect
-def desktop_stable_feedback(request, locale=None, product=None,
-                            version=None, channel=None):
-    # Use two instances of the same form because the template changes
-    # the text based on the value of ``happy``.
-    forms = {
-        'happy': ResponseForm(initial={'happy': 1}),
-        'sad': ResponseForm(initial={'happy': 0}),
-    }
-
-    if request.method == 'POST':
-        response, form = _handle_feedback_post(
-            request, locale, product, version, channel)
-        if response:
-            return response
-
-        happy = smart_bool(request.POST.get('happy', None))
-        if happy:
-            forms['happy'] = form
-        else:
-            forms['sad'] = form
-
-    return render(request, 'feedback/feedback.html', {'forms': forms})
-
-
-@requires_firefox
-@csrf_protect
-def mobile_stable_feedback(request, locale=None, product=None,
-                           version=None, channel=None):
-    form = ResponseForm()
-    happy = None
-
-    if request.method == 'POST':
-        response, form = _handle_feedback_post(
-            request, locale, product, version, channel)
-        if response:
-            return response
-        happy = smart_bool(request.POST.get('happy', None), None)
-
-    return render(request, 'feedback/mobile/feedback.html', {
-        'form': form,
-        'happy': happy,
-    })
-
-
 @csrf_protect
 def generic_feedback(request, locale=None, product=None, version=None,
                      channel=None):
     """Generic feedback form for desktop and mobile"""
     form = ResponseForm()
-    happy = None
 
     if request.method == 'POST':
-        response, form = _handle_feedback_post(
-            request, locale, product, version, channel)
-        if response:
-            return response
-        happy = smart_bool(request.POST.get('happy', None), None)
+        return _handle_feedback_post(request, locale, product,
+                                     version, channel)
 
     return render(request, 'feedback/generic_feedback.html', {
         'form': form,
-        'happy': happy,
     })
 
 
@@ -302,24 +258,9 @@ def android_about_feedback(request, locale=None, product=None,
     # Note: product, version and channel are always None in this view
     # since this is to handle backwards-compatibility. So we don't
     # bother passing them along.
-    response, form = _handle_feedback_post(request, locale)
 
-    if response:
-        return response
-
-    # This means there was an error. Since FfA doesn't care about the
-    # contents anyways, return an error code.
-    return HttpResponse('', status=400)
-
-
-# FIXME - This should go away once we unify the feedback forms.
-# Mapping of product names to views.
-product_routes = {
-    'firefox.desktop.stable': desktop_stable_feedback,
-    'firefox.android.stable': mobile_stable_feedback,
-    'firefox.fxos.stable': firefox_os_stable_feedback,
-    'generic': generic_feedback,
-}
+    # We always return Thanks! now and ignore errors.
+    return _handle_feedback_post(request, locale)
 
 
 @csrf_exempt
@@ -342,27 +283,20 @@ def feedback_router(request, product=None, version=None, channel=None,
     Note: We never want to cache this view.
 
     """
-    # FIXME - Remove this when we nix the form routing. It converts
-    # the product to a formname.
-    view = product_routes.get(product)
-
-    # Checks to see if `_type` is in the POST data and if so this is
-    # coming from Firefox for Android which doesn't know anything
-    # about csrf tokens. If that's the case, we send it to a view
-    # specifically for FfA Otherwise we pass it to one of the normal
-    # views, which enforces CSRF.
-    #
-    # FIXME: Remove this hairbrained monstrosity when we don't need to
-    # support the method that Firefox for Android currently uses to
-    # post feedback which worked with the old input.mozilla.org.
     if '_type' in request.POST:
+        # Checks to see if `_type` is in the POST data and if so this
+        # is coming from Firefox for Android which doesn't know
+        # anything about csrf tokens. If that's the case, we send it
+        # to a view specifically for FfA Otherwise we pass it to one
+        # of the normal views, which enforces CSRF. Also, nix the
+        # product just in case we're crossing the streams and
+        # confusing new-style product urls with old-style backwards
+        # compatability for the Android form.
+        #
+        # FIXME: Remove this hairbrained monstrosity when we don't need to
+        # support the method that Firefox for Android currently uses to
+        # post feedback which worked with the old input.mozilla.org.
         view = android_about_feedback
-
-    if view:
-        # If we have a view, then the "product" was really a formname
-        # or we're handling the old way Firefox for Android posted
-        # feedback. So we clear out the product so it doesn't cause
-        # issues later.
         product = None
 
     else:
@@ -374,17 +308,16 @@ def feedback_router(request, product=None, version=None, channel=None,
                     'product': product
                 })
 
-        # FIXME - Remove product hard-coding from here
         if product == 'fxos' or request.BROWSER.browser == 'Firefox OS':
+            # Firefox OS gets shunted to a different form which has
+            # different Firefox OS specific questions.
             view = firefox_os_stable_feedback
 
-        elif product == 'android' or request.BROWSER.mobile:
-            view = mobile_stable_feedback
-
         else:
-            view = desktop_stable_feedback
+            view = generic_feedback
 
-    return view(request, request.locale, product, version, channel, *args, **kwargs)
+    return view(request, request.locale, product, version, channel,
+                *args, **kwargs)
 
 
 class PostFeedbackAPI(generics.CreateAPIView):
