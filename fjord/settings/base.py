@@ -325,6 +325,9 @@ ENGAGE_ROBOTS = False
 # Always generate a CSRF token for anonymous users.
 ANON_ALWAYS = True
 
+# CSRF error page
+CSRF_FAILURE_VIEW = 'fjord.base.views.csrf_failure'
+
 # Tells the extract script what files to look for L10n in and what
 # function handles the extraction. The Tower library expects this.
 DOMAIN_METHODS['messages'] = [
