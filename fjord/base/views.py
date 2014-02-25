@@ -3,7 +3,7 @@ import socket
 from functools import wraps
 
 from django.conf import settings
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.http import is_safe_url
 from django.views.decorators.cache import never_cache
@@ -52,6 +52,11 @@ def new_user_view(request, template=None):
 @mobile_template('{mobile/}login_failure.html')
 def login_failure(request, template=None):
     return render(request, template)
+
+
+@mobile_template('{mobile/}csrf_failure.html')
+def csrf_failure(request, reason='', template=None):
+    return HttpResponseForbidden(render(request, template), content_type='text/html')
 
 
 @mobile_template('{mobile/}about.html')
