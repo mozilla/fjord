@@ -38,7 +38,7 @@ class TestFeedback(TestCase):
         """
         amount = models.Response.objects.count()
 
-        url = reverse('feedback', args=('firefox.desktop.stable',))
+        url = reverse('feedback')
         r = self.client.post(url, {
             'happy': 1,
             'description': u'Firefox rocks!',
@@ -67,7 +67,7 @@ class TestFeedback(TestCase):
         """
         amount = models.Response.objects.count()
 
-        url = reverse('feedback', args=('firefox.desktop.stable',))
+        url = reverse('feedback')
         r = self.client.post(url, {
             'happy': 0,
             'description': u"Firefox doesn't make me sandwiches. :("
@@ -230,56 +230,56 @@ class TestFeedback(TestCase):
         eq_(u'nightly', feedback.channel)
 
     def test_invalid_form(self):
-        """Submitting a really bad form should return an error."""
-        url = reverse('feedback', args=('firefox.desktop.stable',))
+        """Bad data gets ignored. Thanks!"""
+        url = reverse('feedback')
         r = self.client.post(url, {
             'url': 'http://mozilla.org/'
             # No happy/sad
             # No description
         })
 
-        self.assertContains(r, 'This field is required')
-        self.assertTemplateUsed(r, 'feedback/feedback.html')
+        self.assertRedirects(r, reverse('thanks'))
+        eq_(models.Response.objects.count(), 0)
 
     def test_invalid_form_happy(self):
-        """Submitting a bad happy form should return an error."""
-        url = reverse('feedback', args=('firefox.desktop.stable',))
+        """Bad data gets ignored. Thanks!"""
+        url = reverse('feedback')
         r = self.client.post(url, {
             'url': 'http://mozilla.org/',
             'happy': 0
             # No description
         })
 
-        self.assertContains(r, 'This field is required')
-        self.assertTemplateUsed(r, 'feedback/feedback.html')
+        self.assertRedirects(r, reverse('thanks'))
+        eq_(models.Response.objects.count(), 0)
 
     def test_invalid_form_sad(self):
-        """Submitting a bad sad form should return an error."""
-        url = reverse('feedback', args=('firefox.desktop.stable',))
+        """Bad data gets ignored. Thanks!"""
+        url = reverse('feedback')
         r = self.client.post(url, {
             'url': 'http://mozilla.org/',
             'happy': 1
             # No description
         })
 
-        self.assertContains(r, 'This field is required')
-        self.assertTemplateUsed(r, 'feedback/feedback.html')
+        self.assertRedirects(r, reverse('thanks'))
+        eq_(models.Response.objects.count(), 0)
 
     def test_whitespace_description(self):
-        """Descriptions should have more than just whitespace"""
-        url = reverse('feedback', args=('firefox.desktop.stable',))
+        """Descriptions with just whitespace get thrown out"""
+        url = reverse('feedback')
         r = self.client.post(url, {
             'url': 'http://mozilla.org/',
             'happy': 0,
             'description': u'      '
         })
 
-        self.assertContains(r, 'This field is required')
-        self.assertTemplateUsed(r, 'feedback/feedback.html')
+        self.assertRedirects(r, reverse('thanks'))
+        eq_(models.Response.objects.count(), 0)
 
     def test_unicode_in_description(self):
         """Description should accept unicode data"""
-        url = reverse('feedback', args=('firefox.desktop.stable',))
+        url = reverse('feedback')
         r = self.client.post(url, {
             'url': 'http://mozilla.org/',
             'happy': 0,
@@ -291,7 +291,7 @@ class TestFeedback(TestCase):
 
     def test_unicode_in_url(self):
         """URL should accept unicode data"""
-        url = reverse('feedback', args=('firefox.desktop.stable',))
+        url = reverse('feedback')
         r = self.client.post(url, {
             'url': u'http://mozilla.org/\u2713',
             'happy': 0,
@@ -310,33 +310,11 @@ class TestFeedback(TestCase):
 
         r = self.client.get(url, HTTP_USER_AGENT=ua)
         eq_(200, r.status_code)
-        self.assertTemplateUsed(r, 'feedback/feedback.html')
-
-    def test_reject_non_firefox(self):
-        """Using non-Firefox browser lands you on download-firefox page."""
-        # TODO: This test might need to change when the router starts routing.
-        url = reverse('feedback')
-
-        for ua in (
-            ('Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; '
-             'Trident/5.0)'),
-            ('Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 '
-             '(KHTML, like Gecko) Chrome/24.0.1312.68 Safari/537.17'),
-            ('Mozilla/5.0 (Linux; U; Android 4.0.2; en-us; Galaxy Nexus '
-             'Build/ICL53F) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 '
-             'Mobile Safari/534.30'),
-            ('Mozilla/5.0 (Linux; U; Android 4.0.4; en-us; Xoom Build/IMM76) '
-             'AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 '
-             'Safari/534.30'),
-            ('Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.22 (KHTML, like '
-             'Gecko) Chrome/25.0.1364.97 Safari/537.22')):
-
-            r = self.client.get(url, HTTP_USER_AGENT=ua)
-            self.assertRedirects(r, reverse('download-firefox'))
+        self.assertTemplateUsed(r, 'feedback/generic_feedback.html')
 
     def test_email_collection(self):
         """If the user enters an email and checks the box, collect the email."""
-        url = reverse('feedback', args=('firefox.desktop.stable',))
+        url = reverse('feedback')
 
         r = self.client.post(url, {
             'happy': 0,
@@ -351,7 +329,7 @@ class TestFeedback(TestCase):
         """If an email is entered, but the box is not checked, don't collect."""
         email_count = models.ResponseEmail.objects.count()
 
-        url = reverse('feedback', args=('firefox.desktop.stable',))
+        url = reverse('feedback')
 
         r = self.client.post(url, {
             'happy': 0,
@@ -363,23 +341,25 @@ class TestFeedback(TestCase):
         eq_(r.status_code, 302)
 
     def test_email_missing(self):
-        """If an email is not entered and the box is checked, don't error out."""
-        url = reverse('feedback', args=('firefox.desktop.stable',))
+        """If no email, ignore it."""
+        url = reverse('feedback')
 
         r = self.client.post(url, {
             'happy': 0,
             'description': u'Can you fix it?',
             'email_ok': 'on',
         })
+        eq_(models.Response.objects.count(), 1)
+        eq_(models.ResponseEmail.objects.count(), 0)
         assert not models.ResponseEmail.objects.exists()
-        # No redirect to thank you page, since there is a form error.
-        eq_(r.status_code, 200)
-        self.assertContains(r, 'Please enter a valid email')
+        eq_(r.status_code, 302)
 
     def test_email_invalid(self):
-        """If an email is not entered and the box is checked, don't error out."""
-        url = reverse('feedback', args=('firefox.desktop.stable',))
+        """If email_ok box is checked, but bad email or no email, ignore it."""
+        url = reverse('feedback')
 
+        # Invalid email address gets ignored, but response is
+        # otherwise saved.
         r = self.client.post(url, {
             'happy': 0,
             'description': u'There is something wrong here.\0',
@@ -387,10 +367,10 @@ class TestFeedback(TestCase):
             'email': '/dev/sda1\0',
         })
         assert not models.ResponseEmail.objects.exists()
-        # No redirect to thank you page, since there is a form error.
-        eq_(r.status_code, 200)
-        self.assertContains(r, 'Please enter a valid email')
+        eq_(r.status_code, 302)
 
+        # Invalid email address is ignored if email_ok box is not
+        # checked.
         r = self.client.post(url, {
             'happy': 0,
             'description': u'There is something wrong here.\0',
@@ -403,7 +383,7 @@ class TestFeedback(TestCase):
 
     def test_src_to_source(self):
         """We capture the src querystring arg in the source column"""
-        url = reverse('feedback', args=('firefox.desktop.stable',))
+        url = reverse('feedback')
 
         r = self.client.post(url + '?src=newsletter', {
             'happy': 0,
@@ -417,7 +397,7 @@ class TestFeedback(TestCase):
 
     def test_utm_source_to_source(self):
         """We capture the utm_source querystring arg in the source column"""
-        url = reverse('feedback', args=('firefox.desktop.stable',))
+        url = reverse('feedback')
 
         r = self.client.post(url + '?utm_source=newsletter', {
             'happy': 0,
@@ -431,7 +411,7 @@ class TestFeedback(TestCase):
 
     def test_utm_campaign_to_source(self):
         """We capture the utm_campaign querystring arg in the source column"""
-        url = reverse('feedback', args=('firefox.desktop.stable',))
+        url = reverse('feedback')
 
         r = self.client.post(url + '?utm_campaign=20140220_email', {
             'happy': 0,
@@ -587,7 +567,7 @@ class TestCSRF(TestCase):
 
     def test_no_csrf_regular_form_fails(self):
         """No csrf token in post data from anonymous user yields 403."""
-        url = reverse('feedback', args=('firefox.desktop.stable',))
+        url = reverse('feedback')
         r = self.client.post(url, {
             'happy': 1,
             'description': u'Firefox rocks!',
@@ -618,7 +598,7 @@ class TestWebFormThrottling(TestCase):
         initial_amount = models.Response.objects.count()
         eq_(initial_amount, 0)
 
-        url = reverse('feedback', args=('firefox.desktop.stable',))
+        url = reverse('feedback')
 
         # Toss 100 responses in.
         for i in range(100):
@@ -648,7 +628,7 @@ class TestWebFormThrottling(TestCase):
         initial_amount = models.Response.objects.count()
         eq_(initial_amount, 0)
 
-        url = reverse('feedback', args=('firefox.desktop.stable',))
+        url = reverse('feedback')
 
         data = {
             'happy': 1,
@@ -674,7 +654,6 @@ class TestWebFormThrottling(TestCase):
 
 
 class TestRouting(TestCase):
-
     uas = {
         'android': 'Mozilla/5.0 (Android; Mobile; rv:18.0) Gecko/18.0 '
                    'Firefox/18.0',
@@ -687,22 +666,6 @@ class TestRouting(TestCase):
     def setUp(self):
         super(TestRouting, self).setUp()
         self.factory = RequestFactory()
-
-    def sub_routing(self, ua, mobile):
-        url = reverse('feedback')
-        extra = {
-            'HTTP_USER_AGENT': ua,
-        }
-        r = self.client.get(url, **extra)
-        if mobile:
-            self.assertTemplateUsed(r, 'feedback/mobile/feedback.html')
-        else:
-            self.assertTemplateUsed(r, 'feedback/feedback.html')
-
-    def test_routing(self):
-        self.sub_routing(self.uas['android'], True)
-        self.sub_routing(self.uas['osx'], False)
-        self.sub_routing(self.uas['linux'], False)
 
     def sub_prodchan(self, ua, prodchan):
         # _get_prodchan checks request.BROWSER to decide what to do, so

@@ -15,60 +15,65 @@
     {% block extra_headers %}{% endblock %}
   </head>
   <body id="{% block body_id %}{% endblock %}" class="html-{{ DIR }}">
-    <nav id="nav-access">
-      <ul>
-        <li><a href="#main-content">{{ _('Proceed to main content') }}</a></li>
-        <li><a href="#footer">{{ _('Proceed to footer') }}</a></li>
-      </ul>
-    </nav>
-    {{ browserid_info() }}
-
-    {% block site_header %}
-      <header>
-        <h1 class="title"><a href="/">
-          {% trans %}
-            <strong>Firefox</strong> Input
-          {% endtrans %}
-        </a></h1>
-
+    {% block body %}
+      <nav id="nav-access">
         <ul>
-          <li><a class="dashboard" href="{{ url('dashboard') }}"><span>{{ _('Dashboard') }}</span></a></li>
-          <li><a class="feedback" href="{{ url('feedback') }}"><span>{{ _('Give Feedback') }}</span></a></li>
-          {% if user.is_authenticated() and user.has_perm('analytics.can_view_dashboard') %}
-            <li><a class="adashboard" href="{{ url('analytics_dashboard') }}"><span>{{ _('Analytics') }}</span></a></li>
-          {% endif %}
+          <li><a href="#main-content">{{ _('Proceed to main content') }}</a></li>
+          <li><a href="#footer">{{ _('Proceed to footer') }}</a></li>
         </ul>
+      </nav>
 
-        <ul class="pull-right">
-          {% if user.is_authenticated() %}
-            <li><span class="greeting">{{ _('Hello, {username}')|fe(username=displayname(user)) }}</span></li>
-            {% if user.is_superuser %}
-              <li><span><a href="{{ url('admin:index') }}">Admin</a></span></li>
+      {% block browserid %}
+        {{ browserid_info() }}
+      {% endblock %}
+
+      {% block site_header %}
+        <header>
+          <h1 class="title"><a href="/">
+            {% trans %}
+              <strong>Firefox</strong> Input
+            {% endtrans %}
+          </a></h1>
+
+          <ul>
+            <li><a class="dashboard" href="{{ url('dashboard') }}"><span>{{ _('Dashboard') }}</span></a></li>
+            <li><a class="feedback" href="{{ url('feedback') }}"><span>{{ _('Give Feedback') }}</span></a></li>
+            {% if user.is_authenticated() and user.has_perm('analytics.can_view_dashboard') %}
+              <li><a class="adashboard" href="{{ url('analytics_dashboard') }}"><span>{{ _('Analytics') }}</span></a></li>
             {% endif %}
-            <li>{{ browserid_logout(text=_('Sign out')) }}</li>
-          {% else %}
-            <li>{{ browserid_login(text=_('Sign in')) }}</li>
-          {% endif %}
-        </ul>
-      </header>
-    {% endblock site_header %}
+          </ul>
 
-    {% if settings.SHOW_STAGE_NOTICE %}
-      {{ css('stage') }}
-      <div class="stage-banner">
-        <div class="close-button">X</div>
-        This is a dev/staging site. The production site is
-        <a href="http://input.mozilla.org">here</a>.
+          <ul class="pull-right">
+            {% if user.is_authenticated() %}
+              <li><span class="greeting">{{ _('Hello, {username}')|fe(username=displayname(user)) }}</span></li>
+              {% if user.is_superuser %}
+                <li><span><a href="{{ url('admin:index') }}">Admin</a></span></li>
+              {% endif %}
+              <li>{{ browserid_logout(text=_('Sign out')) }}</li>
+            {% else %}
+              <li>{{ browserid_login(text=_('Sign in')) }}</li>
+            {% endif %}
+          </ul>
+        </header>
+      {% endblock site_header %}
+
+      {% if settings.SHOW_STAGE_NOTICE %}
+        {{ css('stage') }}
+        <div class="stage-banner">
+          <div class="close-button">X</div>
+          This is a dev/staging site. The production site is
+          <a href="http://input.mozilla.org">here</a>.
+        </div>
+      {% endif %}
+
+      <div id="content">
+        {% block content %}{% endblock %}
       </div>
-    {% endif %}
 
+      {% block site_footer %}
+        {% include "includes/footer.html" %}
+      {% endblock %}
 
-    <div id="content">
-      {% block content %}{% endblock %}
-    </div>
-
-    {% block site_footer %}
-      {% include "includes/footer.html" %}
     {% endblock %}
 
     {% block site_js %}
