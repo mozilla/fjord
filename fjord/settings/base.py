@@ -216,10 +216,6 @@ MINIFY_BUNDLES = {
             'css/lib/normalize.css',
             'css/fjord.less',
         ),
-        'feedback': (
-            'css/lib/normalize.css',
-            'css/feedback.less',
-        ),
         'generic_feedback': (
             'css/lib/normalize.css',
             'css/lib/brick-1.0beta8.byob.min.css',
@@ -237,15 +233,13 @@ MINIFY_BUNDLES = {
         'stage': (
             'css/stage.less',
         ),
-
+        'thanks': (
+            'css/lib/normalize.css',
+            'css/thanks.less',
+        ),
         'mobile/base': (
             'css/lib/normalize.css',
             'css/mobile/base.less',
-        ),
-        'mobile/feedback': (
-            'css/lib/normalize.css',
-            'css/mobile/base.less',
-            'css/mobile/feedback.less',
         ),
         'mobile/fxos_feedback': (
             'css/lib/normalize.css',
@@ -266,12 +260,6 @@ MINIFY_BUNDLES = {
             'js/init.js',
             'js/ga.js',
         ),
-        'feedback': (
-            'js/lib/jquery.min.js',
-            'js/init.js',
-            'js/feedback.js',
-            'js/ga.js',
-        ),
         'generic_feedback': (
             'js/lib/jquery.min.js',
             'js/generic_feedback.js',
@@ -289,13 +277,13 @@ MINIFY_BUNDLES = {
             'browserid/browserid.js',
             'js/ga.js',
         ),
-        'mobile/base': (
+        'thanks': (
             'js/lib/jquery.min.js',
+            'js/init.js',
             'js/ga.js',
         ),
-        'mobile/feedback': (
+        'mobile/base': (
             'js/lib/jquery.min.js',
-            'js/mobile/feedback.js',
             'js/ga.js',
         ),
         'mobile/fxos_feedback': (

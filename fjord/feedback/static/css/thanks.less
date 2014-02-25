@@ -1,4 +1,75 @@
-@import 'lib/vendor-prefix.less';
+/* Box shadow, Transition, Linear gradient -- from vendor-prefix.less */
+.box-shadow(@args) {
+  -webkit-box-shadow: @args;
+  -moz-box-shadow: @args;
+  box-shadow: @args;
+}
+.transition(@args:200ms) {
+  -webkit-transition: @args;
+  -moz-transition: @args;
+  -o-transition: @args;
+  transition: @args;
+}
+.gradient(@default,@start,@stop) {
+  .linear-gradient-top(@default,@start,0%,@stop,100%);
+}
+.gradient(@default,@start,@stop,@extra) {
+  .linear-gradient-top(@default,@start,0%,@stop,100%,@extra);
+}
+.linear-gradient-top(@default,@color1,@stop1,@color2,@stop2) {
+  background-color: @default;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(@stop1, @color1), color-stop(@stop2 @color2));
+  background-image: -webkit-linear-gradient(top, @color1 @stop1, @color2 @stop2);
+  background-image: -moz-linear-gradient(top, @color1 @stop1, @color2 @stop2);
+  background-image: -ms-linear-gradient(top, @color1 @stop1, @color2 @stop2);
+  background-image: -o-linear-gradient(top, @color1 @stop1, @color2 @stop2);
+  background-image: linear-gradient(top, @color1 @stop1, @color2 @stop2);
+}
+.linear-gradient-top(@default,@color1,@stop1,@color2,@stop2,@extra) {
+  background-color: @default;
+  background-image: @extra, -webkit-gradient(linear, left top, left bottom, color-stop(@stop1, @color1), color-stop(@stop2 @color2));
+  background-image: @extra, -webkit-linear-gradient(top, @color1 @stop1, @color2 @stop2);
+  background-image: @extra, -moz-linear-gradient(top, @color1 @stop1, @color2 @stop2);
+  background-image: @extra, -ms-linear-gradient(top, @color1 @stop1, @color2 @stop2);
+  background-image: @extra, -o-linear-gradient(top, @color1 @stop1, @color2 @stop2);
+  background-image: @extra, linear-gradient(top, @color1 @stop1, @color2 @stop2);
+}
+.linear-gradient-top(@default,@color1,@stop1,@color2,@stop2,@color3,@stop3) {
+  background-color: @default;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(@stop1, @color1), color-stop(@stop2 @color2), color-stop(@stop3 @color3));
+  background-image: -webkit-linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3);
+  background-image: -moz-linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3);
+  background-image: -ms-linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3);
+  background-image: -o-linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3);
+  background-image: linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3);
+}
+.linear-gradient-top(@default,@color1,@stop1,@color2,@stop2,@color3,@stop3,@extra) {
+  background-color: @default;
+  background-image: @extra, -webkit-gradient(linear, left top, left bottom, color-stop(@stop1, @color1), color-stop(@stop2 @color2), color-stop(@stop3 @color3));
+  background-image: @extra, -webkit-linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3);
+  background-image: @extra, -moz-linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3);
+  background-image: @extra, -ms-linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3);
+  background-image: @extra, -o-linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3);
+  background-image: @extra, linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3);
+}
+.linear-gradient-top(@default,@color1,@stop1,@color2,@stop2,@color3,@stop3,@color4,@stop4) {
+  background-color: @default;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(@stop1, @color1), color-stop(@stop2 @color2), color-stop(@stop3 @color3), color-stop(@stop4 @color4));
+  background-image: -webkit-linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3, @color4 @stop4);
+  background-image: -moz-linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3, @color4 @stop4);
+  background-image: -ms-linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3, @color4 @stop4);
+  background-image: -o-linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3, @color4 @stop4);
+  background-image: linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3, @color4 @stop4);
+}
+.linear-gradient-top(@default,@color1,@stop1,@color2,@stop2,@color3,@stop3,@color4,@stop4,@extra) {
+  background-color: @default;
+  background-image: @extra, -webkit-gradient(linear, left top, left bottom, color-stop(@stop1, @color1), color-stop(@stop2 @color2), color-stop(@stop3 @color3), color-stop(@stop4 @color4));
+  background-image: @extra, -webkit-linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3, @color4 @stop4);
+  background-image: @extra, -moz-linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3, @color4 @stop4);
+  background-image: @extra, -ms-linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3, @color4 @stop4);
+  background-image: @extra, -o-linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3, @color4 @stop4);
+  background-image: @extra, linear-gradient(top, @color1 @stop1, @color2 @stop2, @color3 @stop3, @color4 @stop4);
+}
 
 html {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -40,20 +111,6 @@ a {
 
 html.js article { display: none; }
 html.js article.visible { display: block; }
-
-html.transitioning {
-  overflow: hidden;
-}
-
-html.transitioning article {
-  position: absolute;
-  .transition(~"left .6s ease-in, right .6s ease-in-out");
-}
-
-html.transitioning article.entering {
-  .transition-delay(.3s);
-  .transition-timing-function(ease-in-out);
-}
 
 article {
   header {
@@ -185,163 +242,6 @@ div.feedback-message {
   line-height: 1.5;
 }
 
-input[type=text], input[type=url], textarea {
-  border: 1px solid #BFD0D8;
-  color: #606060;
-  color: #5e5f60;
-  font-family: inherit;
-  font-weight: normal;
-  font-size: 21px;
-  padding: .25em .25em;
-  border-radius: .25em;
-}
-
-input[type=text]:disabled,
-input[type=url]:disabled,
-textarea:disabled {
-  color: #aeafaf;
-  opacity: .5;
-}
-
-input[type=text], input[type=url] {
-  width: 100%;
-}
-
-textarea {
-  line-height: 1.2;
-  width: 100%;
-  height: 5em;
-}
-
-input[type=text], input[type=url], textarea {
-  background: #FCFDFF;
-  background: #fff;
-  border: 1px solid rgba(0,0,0,.3);
-  border: 0;
-  box-shadow: 0 0 2px rgba(0,0,0, .4) inset;
-}
-
-textarea.error {
-  outline: solid 1px red;
-}
-
-.characters-remaining {
-  color: green;
-  float: right;
-  font-size: 0.9em;
-  margin: 0px;
-  padding: 0px;
-  text-align: right;
-  width: 3em;
-
-  &.error {
-    color: red;
-    font-weight: bold;
-  }
-
-  &.warning {
-    color: orange;
-  }
-}
-
-.privacy {
-  font-size: 14px;
-  margin: 0px;
-  padding: 0px;
-  color: #5c4b00;
-
-  span {
-    background: #ffffdd;
-  }
-}
-
-#intro {
-  header {
-    text-align: center;
-  }
-  .content {
-    position: relative;
-    font-weight: normal;
-    text-align: center;
-
-    li {
-      display: inline;
-      vertical-align: top;
-
-      a {
-        position: relative;
-        display: inline-block;
-        width: 42%;
-        text-decoration: none;
-        .transition(color .25s);
-
-        &:hover {
-          color: #5084C8;
-          text-decoration: underline;
-        }
-
-        span {
-          position: relative;
-          display: block;
-          width: 96px;
-          height: 96px;
-          margin: 0 auto;
-          margin-bottom: 1em;
-          background: url(type.png) no-repeat 0 0;
-        }
-      }
-    }
-  }
-  #feedback-types #intro-happy { color: #568E62; }
-  #feedback-types #intro-sad { color: #977367; }
-
-  #feedback-types span {
-    background-image: url(../img/type.png);
-  }
-  #intro-happy span { background-position: 0 0; }
-  #intro-sad span { background-position: -100px 0; }
-
-  .content li a strong {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    background: url(type.png) no-repeat 0 -100px;
-    opacity: 0;
-    .transition(opacity .25s);
-  }
-  .content li a:hover strong {
-    opacity: 1;
-  }
-
-  #feedback-types strong {
-    background-image: url(../img/type.png);
-  }
-  #intro-rate strong { background-position: 0 -100px; }
-  #intro-happy strong { background-position: 0 -100px; }
-  #intro-sad strong { background-position: -100px -100px; }
-
-  aside {
-    position: relative;
-    padding: 20px 35px 35px;
-    font-size: 14px;
-    line-height: 24px;
-    text-align: center;
-    z-index: 1;
-
-    span {
-      padding: 4px;
-      color: #5C4B00;
-      background: #FFFFDD;
-    }
-
-    a {
-      font-weight: normal;
-    }
-  }
-}
-
 #thanks {
   h3 {
     margin-bottom: .25em;
@@ -415,33 +315,6 @@ textarea.error {
       }
     }
   }
-}
-
-#happy {
-
-  header {
-    .gradient(#e9f1eb, #fff, #e9f1eb);
-    color: #728676;
-
-    h1 {
-      color: #35563c;
-    }
-  }
-}
-
-#sad {
-  header {
-    .gradient(#f1ecea, #fff, #f1ecea);
-    color: #80716c;
-
-    h1 {
-      color: #533f38;
-    }
-  }
-}
-
-.errorlist {
-  color: red;
 }
 
 /* Bookmarklet button */
