@@ -56,10 +56,13 @@ For the minimum installation, you'll need the following:
 
 * git
 * Python 2.6 or 2.7
-* `pip <http://www.pip-installer.org/en/latest/>`_
-* MySQL server and client headers
-* Memcached Server
-* lessc
+* Python development headers for the version of Python you're using
+* `pip <http://pip.readthedocs.org/en/latest/>`_
+* `virtualenv <http://www.virtualenv.org/en/latest/>`_
+* MySQL server
+* MySQL client development headers
+* Memcached server
+* `lessc <http://lesscss.org/>`_
 
 Installation for these is very system dependent. Using a package
 manager, like yum, aptitude, or brew, is encouraged.
