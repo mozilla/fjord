@@ -107,7 +107,7 @@ def _handle_feedback_post(request, locale=None, product=None,
     opinion = models.Response(
         # Data coming from the user
         happy=data['happy'],
-        url=data['url'],
+        url=data.get('url', u''),
         description=data['description'].strip(),
 
         # Inferred data from user agent
