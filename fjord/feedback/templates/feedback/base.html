@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block extra_headers %}
+  <meta name="viewport" content="height=480, width=320, initial-scale=1, maximum-scale=1, minimum-scale=1">
+{% endblock %}
+
+{% block site_css %}
+  {{ css('generic_feedback') }}
+{% endblock %}
+
+{% block site_js %}
+  <script src="{{ settings.STATIC_URL }}js/lib/brick-1.0beta8.byob.min.js"></script>
+  {{ js('generic_feedback') }}
+{% endblock %}
