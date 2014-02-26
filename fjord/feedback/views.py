@@ -320,5 +320,14 @@ def feedback_router(request, product=None, version=None, channel=None,
                 *args, **kwargs)
 
 
+def cyoa(request):
+    template = 'feedback/cyoa.html'
+
+    products = models.Product.objects.all()
+    return render(request, template, {
+        'products': products
+    })
+
+
 class PostFeedbackAPI(generics.CreateAPIView):
     serializer_class = models.ResponseSerializer

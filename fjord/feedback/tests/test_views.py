@@ -21,6 +21,29 @@ class TestRedirectFeedback(TestCase):
         self.assertRedirects(r, reverse('feedback') + '#sad')
 
 
+class TestCYOA(TestCase):
+    client_class = LocalizingClient
+
+    def test_cyoa(self):
+        # Test with no products
+        resp = self.client.get(reverse('cyoa'))
+
+        eq_(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'feedback/cyoa.html')
+
+        # Test with products
+        product(display_name=u'ProductFoo', slug=u'productfoo', save=True)
+        product(display_name=u'ProductBar', slug=u'productbar', save=True)
+
+        resp = self.client.get(reverse('cyoa'))
+
+        eq_(resp.status_code, 200)
+        self.assertContains(resp, 'ProductFoo')
+        self.assertContains(resp, 'productfoo')
+        self.assertContains(resp, 'ProductBar')
+        self.assertContains(resp, 'productbar')
+
+
 class TestFeedback(TestCase):
     client_class = LocalizingClient
 

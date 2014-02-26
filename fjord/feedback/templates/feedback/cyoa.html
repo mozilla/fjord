@@ -1,0 +1,35 @@
+{% extends "feedback/base.html" %}
+{# Note: This is not l10n-ized since it's a prototype. #}
+
+{% block page_title %}Which product?{% endblock %}
+
+{% block body %}
+  <x-deck>
+    <x-card id="picker">
+      <x-appbar>
+        <header>Which product?</header>
+      </x-appbar>
+
+      <section>
+        <p>
+          Here's a list of products you can leave feedback for:
+        </p>
+
+        <div class="content">
+          {% for prod in products %}
+            <p>
+              <a href="{{ url('feedback', product=prod.slug) }}">{{ prod.display_name }}</a>
+            </p>
+          {% endfor %}
+        </div>
+
+        <aside>
+          <div>
+            Note: This is a prototype page and thus is not localized so as
+            to reduce l10n work.
+          </div>
+        </aside>
+      </section>
+    </x-card>
+  </x-deck>
+{% endblock %}
