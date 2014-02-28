@@ -80,10 +80,6 @@ x-card {
     }
   }
 
-  x-appbar {
-    height: 28px;
-  }
-
   &.happy {
     .sad {
       display: none;
@@ -97,15 +93,31 @@ x-card {
 }
 
 x-appbar {
+  padding: 0px;
+  width: 100%;
+  display: block;
+  background-color: #A0A0A0;
+  background-repeat: no-repeat;
+  background-position: 0px 0px;
+  background-image: linear-gradient(-180deg, #A0A0A0 14%, #858585 100%);
+  font-family: _OpenSansBrick,"Segoe UI",Frutiger,"Frutiger Linotype","Dejavu Sans","Helvetica Neue",Arial,sans-serif;
+  font-size: 20px;
+
+  header {
+    color: #fff;
+    display: block;
+    text-align: center;
+  }
+
   button.back {
-    background: transparent no-repeat -17px -19px url("../img/icons.png");
+    background: transparent no-repeat -17px -11px url("../img/icons.png");
     border: none;
-    display: inline-block;
-    float: none;
     font-size: 0;
-    height: 26px;
+    height: 45px;
+    left: 0;
     overflow: hidden;
-    position: relative;
+    position: absolute;
+    top: 0;
     vertical-align: top;
     width: 30px;
   }
