@@ -4,15 +4,15 @@
     function goNext() {
         // Moves to the next card and updates history.
         var oldIndex = xdeck.selectedIndex;
-        xdeck.shuffleNext();
+        xdeck.nextCard();
         window.history.pushState({page: xdeck.selectedIndex}, '', '#' + xdeck.selectedIndex);
     }
 
     window.onpopstate = function(ev) {
         // Switches the the appropriate card
         var pageId = ev.state ? ev.state.page : 0;
-        if (pageId >= 0 && pageId < xdeck.numCards) {
-            xdeck.shuffleTo(pageId);
+        if (pageId >= 0 && pageId < xdeck.cards.length) {
+            xdeck.showCard(pageId);
         }
     };
 
@@ -38,7 +38,7 @@
             // form.
             if (event.which == 13) {
                 if (xdeck.selectedIndex < (xdeck.numCards - 1)) {
-                    // If it's not on the last card, shuffleNext().
+                    // If it's not on the last card, nextCard().
                     goNext();
                 } else {
                     // It's on the last card, so we submit the form.
@@ -124,5 +124,13 @@
     }
 
     $(init);
+
+    document.addEventListener('DOMComponentsLoaded', function setupAnalytics() {
+        // UNSUBSCRIBE!
+        document.removeEventListener('DOMComponentsLoaded', setupAnalytics);
+
+        // Go to the first card.
+        xdeck.nextCard();
+    });
 
 }(jQuery));

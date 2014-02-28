@@ -1,4 +1,6 @@
 (function($) {
+    var xdeck = $('x-deck')[0];
+
     // FIXME: Fix this so we don't have to update the JS file every
     // time we update the version map in fjord/base/browsers.py.
     var GECKO_TO_FXOS = {
@@ -77,8 +79,6 @@
     }
 
     function init() {
-        var xdeck = $('x-deck')[0];
-
         $('#intro').on('click', 'button', function() {
             var happy = $(this).hasClass('happy');
 
@@ -86,15 +86,15 @@
                 .removeClass(happy ? 'sad' : 'happy')
                 .addClass(happy ? 'happy' : 'sad');
             $('#happy').val(happy ? '1' : '0');
-            xdeck.shuffleNext();
+            xdeck.nextCard();
         });
 
         $('button.back').on('click', function() {
-            xdeck.shufflePrev();
+            xdeck.previousCard();
         });
 
         $('button.next').on('click', function() {
-            xdeck.shuffleNext();
+            xdeck.nextCard();
         });
 
         $('#country select').on('change', function(ev) {
@@ -124,7 +124,7 @@
 
         $('button.cancel').on('click', function() {
             formReset();
-            xdeck.shuffleTo(0);
+            xdeck.showCard(0);
         });
 
         $('button.complete').on('click', function() {
@@ -168,12 +168,12 @@
                 data.email = $('#email-input').val();
             }
 
-            numCards = xdeck.numCards;
+            numCards = xdeck.cards.length;
 
             // here's the order of cards so it's easier to do the math here.
             // email, submitting, thanks, failure, tryagain
             // -5     -4          -3      -2       -1       numCards
-            xdeck.shuffleTo(numCards-4);
+            xdeck.showCard(numCards-4);
 
             jqxhr = $.ajax({
                 contentType: 'application/json',
@@ -183,7 +183,7 @@
                 url: '/api/v1/feedback/',
                 success: function(data, textStatus, jqxhr) {
                     formReset();
-                    xdeck.shuffleTo(numCards-3);
+                    xdeck.showCard(numCards-3);
                 },
                 error: function(jqxhr, textStatus, errorThrown) {
                     // persist state so they can try again later
@@ -192,7 +192,7 @@
                     }
                     storageAddItem('description', $('#description').val());
 
-                    xdeck.shuffleTo(numCards-2);
+                    xdeck.showCard(numCards-2);
                     // FIXME - get the error message which is in the response body
                     console.log('submission failure. ' + textStatus + ' ' + errorThrown);
                 }});
@@ -215,13 +215,16 @@
         if (storageItem('description')) {
             $('#description').val(storageItem('description'));
 
-            document.addEventListener('DOMComponentsLoaded', function() {
+            document.addEventListener('DOMComponentsLoaded', function goToLastCard() {
+                // UNSUBSCRIBE!
+                document.removeEventListener('DOMComponentsLoaded', setupAnalytics);
+
                 // if there's a description, this indicates that the previous
                 // attempt to submit failed so we go directly to the "try
                 // again" card; have to do it in this listener because
                 // otherwise x-deck isn't ready, yet
                 var numCards = xdeck.numCards;
-                xdeck.shuffleTo(numCards-1);
+                xdeck.showCard(numCards-1);
             });
         }
         $('#description-next-btn').prop('disabled', true);
@@ -230,5 +233,13 @@
     }
 
     $(init);
+
+    document.addEventListener('DOMComponentsLoaded', function setupAnalytics() {
+        // UNSUBSCRIBE!
+        document.removeEventListener('DOMComponentsLoaded', setupAnalytics);
+
+        // Go to the first card.
+        xdeck.nextCard();
+    });
 
 }(jQuery));

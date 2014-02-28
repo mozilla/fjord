@@ -89,10 +89,6 @@ x-card {
     }
   }
 
-  x-appbar {
-    height: 28px;
-  }
-
   &.happy {
     .sad {
       display: none;
@@ -106,15 +102,17 @@ x-card {
 }
 
 x-appbar {
+  display: block;
+
   button.back {
-    background: transparent no-repeat -17px -19px url("../../img/mobile/icons.png");
+    background: transparent no-repeat -17px -11px url("../../img/icons.png");
     border: none;
-    display: inline-block;
-    float: none;
     font-size: 0;
-    height: 26px;
+    height: 45px;
+    left: 0;
     overflow: hidden;
-    position: relative;
+    position: absolute;
+    top: 0;
     vertical-align: top;
     width: 30px;
   }
