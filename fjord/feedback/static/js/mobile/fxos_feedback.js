@@ -168,7 +168,7 @@
                 data.email = $('#email-input').val();
             }
 
-            numCards = xdeck.numCards;
+            numCards = xdeck.cards.length;
 
             // here's the order of cards so it's easier to do the math here.
             // email, submitting, thanks, failure, tryagain
