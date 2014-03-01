@@ -20,6 +20,10 @@ def update_code(ctx, tag):
     """Update the code to a specific git reference (tag/sha/etc)."""
     with ctx.lcd(settings.SRC_DIR):
         ctx.local('git fetch')
+
+        # FIXME - remove this after we're past vendor/ fixing
+        ctx.local('rm -rf vendor vendor-local')
+
         ctx.local('git checkout -f %s' % tag)
         ctx.local('git submodule sync')
         ctx.local('git submodule update --init --recursive')
