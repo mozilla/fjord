@@ -1,6 +1,13 @@
 (function($) {
     var formName = $('body').data('form-name');
 
+    if (!formName) {
+        if (console) {
+            console.log('Missing data-form-name on <body/>.');
+        }
+        return;
+    }
+
     document.addEventListener('DOMComponentsLoaded', function setupAnalyticsAndStuff() {
         // UNSUBSCRIBE!
         document.removeEventListener('DOMComponentsLoaded', setupAnalyticsAndStuff);
