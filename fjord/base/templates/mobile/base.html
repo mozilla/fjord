@@ -11,7 +11,11 @@
     <link rel="shortcut icon" type="image/png" href="{{ settings.STATIC_URL }}img/favicon.png"/>
     {% block extra_headers %}{% endblock %}
   </head>
-  <body id="{% block body_id %}{% endblock %}" class="html-{{ DIR }}">
+  <body id="{% block body_id %}{% endblock %}" class="html-{{ DIR }}"
+    {% if extra_body_attrs -%}
+      {% for attr, val in extra_body_attrs.items() %}{{ attr }}="{{ val }}" {% endfor %}
+    {%- endif %}>
+
     <nav id="nav-access">
       <ul>
         <li><a href="#main-content">{{ _('Proceed to main content') }}</a></li>

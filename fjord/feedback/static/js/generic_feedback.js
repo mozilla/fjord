@@ -125,12 +125,4 @@
 
     $(init);
 
-    document.addEventListener('DOMComponentsLoaded', function setupAnalytics() {
-        // UNSUBSCRIBE!
-        document.removeEventListener('DOMComponentsLoaded', setupAnalytics);
-
-        // Go to the first card.
-        xdeck.nextCard();
-    });
-
 }(jQuery));
