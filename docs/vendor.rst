@@ -5,30 +5,24 @@ Maintaining Vendor Library
 ==========================
 
 To help make setup faster and deployment easier, we pull all of our
-pure-Python dependencies into the "vendor library". This chapter talks about that.
+pure-Python dependencies into the "vendor library". This chapter talks
+about that.
 
 
 .. contents::
    :local:
 
 
-vendor vs. vendor-local
-=======================
+vendor
+======
 
-The "vendor library" is composed of the ``vendor`` and
-``vendor-local`` directories in the fjord repository.
-
-The ``vendor`` directory is `playdoh-lib
-<https://github.com/mozilla/playdoh-lib>`_.
-
-The ``vendor-local`` directory is specific to Fjord and is where we
-have all the vendory things that aren't in playdoh-lib. We make
-changes to this directly.
+The ``vendor/`` directory contains git submodules and unpacked source
+for dependencies.
 
 If you cloned Fjord with ``--recursive``, you already have the the
 vendor library.
 
-If you didnt' clone with ``--recursive``, or you need to update the
+If you didn't clone with ``--recursive``, or you need to update the
 submodules, run::
 
     $ git submodule update --init --recursive
@@ -42,16 +36,9 @@ submodules, run::
 Updating vendor
 ===============
 
-We don't make changes to this in Fjord. Instead, we'd make changes to
-this upstream and then pull them into Fjord when they land.
-
-
-Updating vendor-local
-=====================
-
 From time to time we need to update libraries, either for new versions
 of libraries or to add a new library. There are two ways to do
-that. The easiest and prefered way is pure git.
+that, but the easiest and prefered way is pure git.
 
 
 Updating an existing library with git submodules
@@ -61,18 +48,18 @@ Using git submodules is prefered because it is much easier to
 maintain, and it keeps the repository size small. Upgrading is as
 simple as updating a submodule.
 
-If the library is in ``vendor-local/src``, it was pulled directly from
+If the library is in ``vendor/src``, it was pulled directly from
 version control, and if that version control was git, updating the
 submodule is as easy as::
 
-    $ cd vendor-local/src/<LIBRARY-DIR>
+    $ cd vendor/src/<LIBRARY-DIR>
     $ git fetch origin
     $ git checkout <REFSPEC>
     $ cd ../..
-    $ git add vendor-local/src/<LIBRARY-DIR>
+    $ git add vendor/src/<LIBRARY-DIR>
     $ git ci -m "[bug xyz] Update <LIBRARY>"
 
-Easy! Just like updating any other git submodule.
+Easy peasy!
 
 
 Adding a new library with git submodules
@@ -80,24 +67,18 @@ Adding a new library with git submodules
 
 Run::
 
-    $ cd vendor-local/src
+    $ cd vendor/src
     $ git clone <LIBRARY-REPO>
     $ cd <LIBRARY-DIR>
     $ git checkout <LIBRARY-REPO-REV>
     $ cd ../../..                      # back to fjord project root
-    $ vendor-local/addsubmodules.sh
-    $ vim vendor-local/vendor.pth
+    $ vendor/addsubmodules.sh
+    $ vim vendor/vendor.pth
 
     <Add the new library's dir to vendor.pth>
 
-    $ git add vendor-local/vendor.pth
+    $ git add vendor/vendor.pth
     $ git ci -m "[bug xyz] Add <LIBRARY>"
-
-
-.. Note::
-
-   Use the ``git://`` url for a repository and not the ``http://``
-   one. The git protocol is more resilient and faster to clone over.
 
 
 Updating a library with pip
@@ -108,7 +89,7 @@ completely and then install the new version.
 
 Do::
 
-    $ cd vendor-local/packages
+    $ cd vendor/packages
     $ git rm -r <LIBRARY-DIR>
     $ cd ../..
 
@@ -116,12 +97,12 @@ This puts you in the repository root directory.
 
 After removing the old version, go ahead and install the new one::
 
-    $ pip install --no-install --build=vendor-local/packages \
-        --src=vendor-local/src -I <LIBRARY>
+    $ pip install --no-install --build=vendor/packages \
+        --src=vendor/src -I <LIBRARY>
 
 Finally, add the new library to git::
 
-    $ cd vendor-local
+    $ cd vendor
     $ git add packages
     $ git ci -m "Adding version <VERSION> of <LIBRARY>"
 
@@ -138,10 +119,10 @@ Adding a library with pip
 
 Adding a new library with pip is easy using pip::
 
-    $ pip install --no-install --build=vendor-local/packages \
-        --src=vendor-local/src -I <LIBRARY>
-    $ cd vendor-local
-    $ git add packages
+    $ pip install --no-install --build=vendor/packages \
+        --src=vendor/src -I <LIBRARY>
+    $ cd vendor
+    $ git add <LIBRARY>
     $ vim vendor.pth
 
     <Add the new library's path>
@@ -155,5 +136,5 @@ Make sure you add any dependencies from the new library, as well.
    Need to add a specific version of the library? You can tell pip to install
    a specific version using ``==``. For example::
 
-       $ pip install --no-install --build=vendor-local/packages \
-           --src=vendor-local/src -I pyes==0.16
+       $ pip install --no-install --build=vendor/packages \
+           --src=vendor/src -I pyes==0.16

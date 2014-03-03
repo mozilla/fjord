@@ -120,7 +120,7 @@ Python Packages
 ---------------
 
 All the pure-Python requirements are provided in the "vendor library"
-which is the ``fjord/vendor`` and ``fjord/vendor-local`` directories.
+in the ``vendor/`` directory.
 
 This makes the packages available to Python without installing them
 globally and keeps them pinned to known-compatible versions.
