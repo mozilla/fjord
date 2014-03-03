@@ -17,6 +17,7 @@ packages/importlib
 packages/kombu
 packages/mock
 packages/nose
+packages/ordereddict
 packages/polib
 packages/pyquery
 packages/python-dateutil
