@@ -1,6 +1,15 @@
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-35433268-26']);
- _gaq.push(['_trackPageview']);
+
+// Add any extra pushes from body[data-ga-push].
+var extraPush = $('body').data('ga-push');
+if (extraPush && extraPush.length) {
+  for (var i = 0, l = extraPush.length; i < l; i++) {
+    _gaq.push(extraPush[i]);
+  }
+}
+
+_gaq.push(['_trackPageview']);
 
 (function() {
     var ga = document.createElement('script');

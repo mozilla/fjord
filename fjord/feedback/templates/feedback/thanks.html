@@ -11,6 +11,8 @@
 {# Remove site header. #}
 {% block site_header %}{% endblock %}
 
+{% set extra_body_attrs = {'data-ga-push': '[["_trackEvent", "FeedbackFlow", "generic-thanks"]]'} %}
+
 {% block page_title %}{{ _('Thanks') }}{% endblock %}
 
 {% block content %}
