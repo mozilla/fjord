@@ -124,3 +124,6 @@
 [submodule "vendor/src/celery"]
 	path = vendor/src/celery
 	url = git://github.com/celery/celery.git
+[submodule "vendor/src/billiard"]
+	path = vendor/src/billiard
+	url = git://github.com/celery/billiard
