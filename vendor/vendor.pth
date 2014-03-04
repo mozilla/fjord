@@ -14,7 +14,6 @@ packages/django-picklefield/src
 packages/fancy-tag
 packages/html5lib
 packages/importlib
-packages/kombu
 packages/mock
 packages/nose
 packages/ordereddict
@@ -52,6 +51,7 @@ src/elasticutils
 src/funfactory
 src/jingo
 src/jingo-minify
+src/kombu
 src/nuggets
 src/pyelasticsearch
 src/pystatsd
