@@ -24,7 +24,7 @@ import time
 
 # Add site path to pick up libs
 SCRIPTS_DIR = os.path.dirname(__file__)
-site.addsitedir(os.path.join(SCRIPTS_DIR, '..', 'vendor-local'))
+site.addsitedir(os.path.join(SCRIPTS_DIR, '..', 'vendor'))
 
 import polib
 
