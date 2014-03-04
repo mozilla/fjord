@@ -324,6 +324,18 @@ class TestFeedback(TestCase):
         self.assertRedirects(r, reverse('thanks'))
         eq_(models.Response.objects.count(), 1)
 
+    def test_url_cleaning(self):
+        """Clean urls before saving"""
+        url = reverse('feedback')
+        resp = self.client.post(url, {
+            'url': u'http://mozilla.org:8000/path/?foo=bar#bar',
+            'happy': 0,
+            'description': u'foo'
+        })
+
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(feedback.url, u'http://mozilla.org/path/')
+
     def test_feedback_router(self):
         """Requesting a generic template should give a feedback form."""
         # TODO: This test might need to change when the router starts routing.
