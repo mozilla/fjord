@@ -5,7 +5,7 @@ import sys
 from django.conf import settings
 from django.db.models.signals import post_save, pre_delete
 
-from celery.task import task
+from celery import task
 from multidb.pinning import pin_this_thread, unpin_this_thread
 
 from fjord.search.index import index_chunk
@@ -15,7 +15,7 @@ from fjord.search.models import Record
 log = logging.getLogger('i.task')
 
 
-@task
+@task()
 def index_chunk_task(index, batch_id, rec_id, chunk):
     """Index a chunk of things.
 
@@ -65,7 +65,7 @@ RETRY_TIMES = (
 MAX_RETRIES = len(RETRY_TIMES)
 
 
-@task
+@task()
 def index_item_task(mapping_type, item_id, **kwargs):
     """Index an item given it's mapping_type and id."""
     retries = kwargs.get('task_retries', 0)
@@ -89,7 +89,7 @@ def index_item_task(mapping_type, item_id, **kwargs):
         index_item_task.retry(args, kwargs, exc, countdown=retry_time)
 
 
-@task
+@task()
 def unindex_item_task(mapping_type, item_id, **kwargs):
     """Remove an item from the index, given it's mapping_type and id."""
     try:
