@@ -1,4 +1,5 @@
 from datetime import datetime
+import urlparse
 
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
@@ -161,6 +162,16 @@ class Response(ModelBase):
         super(Response, self).save(*args, **kwargs)
 
     @property
+    def url_domain(self):
+        """Returns the domain part of a url"""
+        if not self.url:
+            return u''
+        parsed = urlparse.urlparse(self.url)
+        if parsed.scheme not in ['http', 'https']:
+            return u''
+        return u'.'.join(parsed.hostname.split('.')[-2:])
+
+    @property
     def user_email(self):
         """Associated email address or u''"""
         if self.responseemail_set.count() > 0:
@@ -229,6 +240,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'prodchan': keyword_type(),
             'happy': boolean_type(),
             'url': keyword_type(),
+            'url_domain': keyword_type(),
             'has_email': boolean_type(),
             'description': text_type(),
             'description_bigrams': keyword_type(),
@@ -259,6 +271,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'prodchan': obj.prodchan,
             'happy': obj.happy,
             'url': obj.url,
+            'url_domain': obj.url_domain,
             'has_email': bool(obj.user_email),
             'description': obj.description,
             'user_agent': obj.user_agent,
