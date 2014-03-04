@@ -5,7 +5,6 @@ packages/amqplib
 packages/anyjson
 packages/carrot
 packages/cef
-packages/celery
 packages/certifi
 packages/chardet
 packages/cssselect
@@ -26,6 +25,7 @@ packages/selenium/py
 packages/simplejson
 packages/six
 src/bleach
+src/celery
 src/commonware
 src/dennis
 src/django
