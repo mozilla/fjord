@@ -39,6 +39,9 @@
       {% endif %}
       <li><a href="{{ request.get_full_path()|urlparams(platform=feedback.platform) }}">{{ feedback.platform|unknown }}</a></li>
       <li><a href="{{ request.get_full_path()|urlparams(locale=feedback.locale) }}">{{ feedback.locale|locale_name }}</a></li>
+      {% if feedback.url_domain %}
+        <li>{{ feedback.url_domain }}</li>
+      {% endif %}
       <li><a href="{{ url('response_view', responseid=feedback.id) }}">{{ _('Permalink') }}</a></li>
     </ul>
   </li>

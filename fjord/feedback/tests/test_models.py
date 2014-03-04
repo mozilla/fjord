@@ -21,6 +21,27 @@ class TestResponseModel(TestCase):
 
         eq_(resp.description, u'ou812')
 
+    def test_url_domain(self):
+        data = [
+            # These have domains.
+            (u'http://example.com/', u'example.com'),
+            (u'http://foo.example.com/', u'example.com'),
+            (u'http://foo.example.com:8000/bar/?foo=bar#foobar',
+             u'example.com'),
+            (u'https://foo.bar.baz.example.com/', u'example.com'),
+
+            # These don't have domains we like, so we should get an
+            # empty string.
+            (None, u''),
+            (u'', u''),
+            (u'about:home', u''),
+            (u'chrome://whatever', u''),
+            (u'ftp://blah@example.com', u''),
+        ]
+        for url, expected in data:
+            resp = response(url=url)
+            eq_(resp.url_domain, expected)
+
 
 class TestComputeGrams(ElasticTestCase):
     def test_empty(self):
