@@ -92,7 +92,7 @@ def generate_atom_feed(request, search):
             link=link_url,
             pubdate=response.created,
             categories=categories,
-            # link_related=response.url
+            link_related=response.url_domain,
         )
     return HttpResponse(
         feed.writeString('utf-8'), mimetype='application/atom+xml')
