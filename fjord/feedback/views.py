@@ -1,6 +1,6 @@
 from functools import wraps
 
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import translation
 from django.views.decorators.cache import never_cache
@@ -12,11 +12,11 @@ from mobility.decorators import mobile_template
 from rest_framework import generics
 
 from fjord.base.browsers import UNKNOWN
-from fjord.base.util import smart_bool, smart_str, translate_country_name
+from fjord.base.util import smart_str, translate_country_name
 from fjord.feedback import config
 from fjord.feedback import models
 from fjord.feedback.forms import ResponseForm
-from fjord.feedback.utils import actual_ip_plus_desc, ratelimit
+from fjord.feedback.utils import actual_ip_plus_desc, clean_url, ratelimit
 
 
 def happy_redirect(request):
@@ -107,7 +107,7 @@ def _handle_feedback_post(request, locale=None, product=None,
     opinion = models.Response(
         # Data coming from the user
         happy=data['happy'],
-        url=data.get('url', u''),
+        url=clean_url(data.get('url', u'')),
         description=data['description'].strip(),
 
         # Inferred data from user agent

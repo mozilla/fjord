@@ -1,9 +1,9 @@
 from django.test.client import RequestFactory
 
-from nose.tools import ok_
+from nose.tools import eq_, ok_
 
 from fjord.base.tests import TestCase, reverse
-from fjord.feedback.utils import actual_ip_plus_desc
+from fjord.feedback.utils import actual_ip_plus_desc, clean_url
 
 
 class Testactual_ip_plus_desc(TestCase):
@@ -53,3 +53,21 @@ class Testactual_ip_plus_desc(TestCase):
         # Key can't exceed memcached 250 character max
         length = len(key)
         ok_(length < 250)
+
+
+class Testclean_url(TestCase):
+    def test_basic(self):
+        data = [
+            (None, None),
+            ('', ''),
+            ('http://example.com/', 'http://example.com/'),
+            ('http://example.com/#foo', 'http://example.com/'),
+            ('http://example.com/?foo=bar', 'http://example.com/'),
+            ('http://example.com:8000/', 'http://example.com/'),
+            ('ftp://foo.bar/', ''),
+            ('chrome://something', 'chrome://something'),
+            ('about:home', 'about:home'),
+        ]
+
+        for url, expected in data:
+            eq_(clean_url(url), expected)
