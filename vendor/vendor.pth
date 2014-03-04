@@ -24,6 +24,7 @@ packages/requests
 packages/selenium/py
 packages/simplejson
 packages/six
+src/billiard
 src/bleach
 src/celery
 src/commonware
