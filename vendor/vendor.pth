@@ -9,7 +9,6 @@ packages/celery
 packages/certifi
 packages/chardet
 packages/cssselect
-packages/django-celery
 packages/django-picklefield/src
 packages/fancy-tag
 packages/html5lib
@@ -35,6 +34,7 @@ src/django-appconf
 src/django-arecibo
 src/django-browserid
 src/django-cache-machine
+src/django-celery
 src/django_compressor
 src/django-cronjobs
 src/django-eadred
