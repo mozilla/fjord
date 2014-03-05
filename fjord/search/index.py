@@ -289,33 +289,29 @@ def index_chunk(cls, id_list, reraise=False, es=None):
         if you want errors to be thrown.
     :arg es: The ES to use. Defaults to creating a new indexing ES.
 
-    .. Note::
-
-       This indexes all the documents in the chunk in one single bulk
-       indexing call. Keep that in mind when you break your indexing
-       task into chunks.
-
     """
     if es is None:
         es = get_es()
 
-    for ids in chunked(id_list, 80):
+    for ids in chunked(id_list, 200):
         documents = []
-        for id_ in ids:
+        obj_list = cls.get_model().objects.filter(id__in=ids)
+        for obj in obj_list:
             try:
-                documents.append(cls.extract_document(id_))
+                documents.append(cls.extract_document(obj_id=obj.id, obj=obj))
             except Exception:
                 log.exception('Unable to extract/index document (id: %d)',
-                              id_)
+                              obj.id)
                 if reraise:
                     raise
+
         if documents:
             cls.bulk_index(documents, id_field='id', es=es)
 
-        if settings.DEBUG:
-            # Nix queries so that this doesn't become a complete
-            # memory hog and make Will's computer sad when DEBUG=True.
-            reset_queries()
+    if settings.DEBUG:
+        # Nix queries so that this doesn't become a complete
+        # memory hog and make Will's computer sad when DEBUG=True.
+        reset_queries()
 
 
 def requires_good_connection(fun):
