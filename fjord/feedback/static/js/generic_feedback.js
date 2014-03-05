@@ -54,7 +54,7 @@
             $('#moreinfo')
                 .removeClass(happy ? 'sad' : 'happy')
                 .addClass(happy ? 'happy' : 'sad');
-            $('#happy').val(happy ? '1' : '0');
+            $('#id_happy').val(happy ? '1' : '0');
             goNext();
             return false;
         });
