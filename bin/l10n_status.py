@@ -22,7 +22,7 @@ DESC = 'Displays translation progress data'
 
 def is_good(day):
     try:
-        day['locales']['fr']['apps']['feedback']
+        day['locales']['fr']['apps']
         return True
     except KeyError:
         return False
@@ -85,6 +85,20 @@ def display_summary(last_item, app, highlight):
         print '{0:>8}: {1}'.format(loc, format_bar(perc))
 
 
+def mark_movement(data):
+    """Adds ^ and v for up and down movement based on previous day"""
+    for i, day in enumerate(data):
+        if i == 0:
+            continue
+
+        if data[i-1] > data[i]:
+            data[i] = TERM.bold_red('v' + data[i])
+        elif data[i-1] < data[i]:
+            data[i] = TERM.bold_green('^' + data[i])
+
+    return data
+
+
 def display_history(data, app, highlight):
     # Get a list of the locales we'll iterate through
     locales = sorted(data[-1]['locales'].keys())
@@ -96,7 +110,7 @@ def display_history(data, app, highlight):
     data = data[-num_days:]
 
     # Build the template: locale, completed per day, tags
-    tmpl = '{:>6} ' + ('{:>6}' * len(data)) + '  {:10}'
+    tmpl = '{:>8} ' + ('{:>6}' * len(data)) + '  {:10}'
 
     # Get a list of dates -- show last 2 weeks
     dates = [item['created'] for item in data]
@@ -118,7 +132,8 @@ def display_history(data, app, highlight):
         for loc in hlocales:
             values = []
             values.append(loc)
-            values.extend([get_data(day['locales'][loc]) for day in data])
+            day_data = mark_movement([get_data(day['locales'][loc]) for day in data])
+            values.extend(day_data)
 
             if values[-1] < 90:
                 values.append('**')
