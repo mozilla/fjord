@@ -33,6 +33,8 @@ To get the localizations, do::
     $ svn checkout https://svn.mozilla.org/projects/l10n-misc/trunk/input/locale locale
 
 
+.. _l10n-update-strings:
+
 Updating strings in svn
 =======================
 

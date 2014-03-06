@@ -83,6 +83,39 @@ and so that people can see the site in that language and submit feedback:
    to git.
 
 
+Making strings changes to feedback forms
+========================================
+
+Feedback forms must be fully translated in specific target locales *before*
+they can be pushed to production.
+
+Process for making feedback form strings changes:
+
+1. create a new branch
+
+2. make the changes you need to make
+
+3. submit a pull request
+
+4. after the pull request is approved (r+), extract and merge strings
+   from that branch
+
+5. send an email to the dev-l10n-web mailing list---see :ref:`l10n-update-strings`
+   for details
+
+
+Now you have to wait until the target locales have fully translated the new
+strings.
+
+Use the ``bin/l10n_status.py`` script to tell you whether things are good
+to go or not.
+
+Once they're good to go, you can land the changes in master and push to
+stage and production.
+
+For the list of target locales per form, see Cheng, Matt or Will.
+
+
 Dealing with errors in translated strings
 =========================================
 
