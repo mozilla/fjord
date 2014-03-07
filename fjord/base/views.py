@@ -9,10 +9,9 @@ from django.utils.http import is_safe_url
 from django.views.decorators.cache import never_cache
 
 from celery.messaging import establish_connection
+from elasticsearch.exceptions import ConnectionError, NotFoundError
 from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
-from pyelasticsearch.exceptions import (
-    ConnectionError, ElasticHttpNotFoundError, Timeout)
 
 from fjord.base.models import Profile
 from fjord.search.index import get_index, get_index_stats
@@ -161,11 +160,11 @@ def monitor_view(request):
             (INFO, ('Successfully connected to ElasticSearch and index '
                     'exists.')))
 
-    except (ConnectionError, Timeout) as exc:
+    except ConnectionError as exc:
         es_results.append(
             (ERROR, 'Cannot connect to ElasticSearch: %s' % str(exc)))
 
-    except ElasticHttpNotFoundError:
+    except NotFoundError:
         es_results.append(
             (ERROR, 'Index "%s" missing.' % get_index()))
 

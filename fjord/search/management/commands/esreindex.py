@@ -18,6 +18,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         logging.basicConfig(level=logging.INFO)
+        es_logger = logging.getLogger('elasticsearch')
+        es_logger.setLevel(logging.ERROR)
+
         percent = options['percent']
         mappingtypes = options['mappingtypes']
         if not 1 <= percent <= 100:

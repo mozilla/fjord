@@ -7,8 +7,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 import requests
-from pyelasticsearch.exceptions import (
-    ConnectionError, ElasticHttpNotFoundError, Timeout)
+from elasticsearch.exceptions import ConnectionError, NotFoundError
 
 from fjord.search.index import (
     chunked, get_index, get_index_stats, get_indexes, get_indexable,
@@ -90,7 +89,7 @@ def search_admin_view(request):
         # a bad state.
         try:
             stats = get_index_stats()
-        except ElasticHttpNotFoundError:
+        except NotFoundError:
             stats = None
 
         indexes = get_indexes()
@@ -100,11 +99,11 @@ def search_admin_view(request):
         # the balancing. If that ever changes and we have multiple
         # ES_URLs, then this should get fixed.
         es_deets = requests.get(settings.ES_URLS[0]).json()
-    except (ConnectionError, Timeout):
+    except ConnectionError:
         error_messages.append('Error: Elastic Search is not set up on this '
                               'machine or timed out trying to respond. '
                               '(ConnectionError/Timeout)')
-    except ElasticHttpNotFoundError:
+    except NotFoundError:
         error_messages.append('Error: Index is missing. Press the reindex '
                               'button below. (ElasticHttpNotFoundError)')
 

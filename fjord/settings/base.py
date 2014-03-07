@@ -2,6 +2,8 @@
 # your repo. If you need to override a setting locally, use
 # settings_local.py
 
+import logging
+
 from funfactory.settings_base import *
 
 
@@ -406,4 +408,13 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
     )
+}
+
+try:
+    len(LOGGING)
+except AttributeError:
+    LOGGING = {}
+
+LOGGING.setdefault('loggers', {})['elasticsearch'] = {
+    'level': logging.ERROR
 }

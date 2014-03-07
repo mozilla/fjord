@@ -144,7 +144,7 @@ class TestFeedback(TestCase):
             # LocalizingClient back to en-US otherwise it breaks all
             # tests ever. This is goofy-pants since it should get
             # reset in test teardown.
-            resp = self.client.get('/en-US/')
+            resp = self.client.get('/en-US/feedback/')
 
     def test_urls_product(self):
         """Test setting product from the url"""
