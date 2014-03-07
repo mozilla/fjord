@@ -7,8 +7,7 @@ from django.db import reset_queries
 
 import requests
 from elasticutils.contrib.django import get_es, S, MappingType
-from pyelasticsearch.exceptions import (ConnectionError, Timeout,
-                                        ElasticHttpNotFoundError)
+from elasticsearch.exceptions import ConnectionError, NotFoundError
 
 
 # Note: This module should not import any Fjord modules. Otherwise we
@@ -34,17 +33,9 @@ def es_analyze(text, analyzer=None):
     """
     es = get_es()
     index = get_index()
-
     analyzer = analyzer or 'snowball'
 
-    # pyelasticsearch doesn't support analyze, so we do it "manually"
-    # using pyelasticsearch's innards. When we update to
-    # elasticsearch-py we should rewrite this.
-    ret = es.send_request(
-        'GET',
-        [index, '_analyze'],
-        query_params={'analyzer': analyzer},
-        body=text)
+    ret = es.indices.analyze(index, body=text, analyzer=analyzer)
 
     return ret['tokens']
 
@@ -170,9 +161,7 @@ def get_indexes(all_indexes=False):
     :returns: list of (name, count) tuples.
 
     """
-    es = get_es()
-
-    status = es.status()
+    status = get_es().indices.status()
     indexes = status['indices']
 
     if not all_indexes:
@@ -191,8 +180,8 @@ def delete_index_if_exists(index):
 
     """
     try:
-        get_es().delete_index(index)
-    except ElasticHttpNotFoundError:
+        get_es().indices.delete(index)
+    except NotFoundError:
         # Can ignore this since it indicates the index doesn't exist
         # and therefore there's nothing to delete.
         pass
@@ -213,11 +202,9 @@ def get_index_stats():
 
     :returns: mapping type name -> count for documents indexes.
 
-    :throws pyelasticsearch.exceptions.Timeout: if the request
-        times out
-    :throws pyelasticsearch.exceptions.ConnectionError: if there's a
+    :throws elasticsearch.exceptions.ConnectionError: if there's a
         connection error
-    :throws pyelasticsearch.exceptions.ElasticHttpNotFound: if the
+    :throws elasticsearch.exceptions.NotFoundError: if the
         index doesn't exist
 
     """
@@ -256,7 +243,7 @@ def recreate_index(es=None):
     # freak out if the inferred mapping is incompatible with the
     # explicit mapping).
 
-    es.create_index(index, settings={'mappings': mappings})
+    es.indices.create(index, body={'mappings': mappings})
 
 
 def get_indexable(percent=100, mapping_types=None):
@@ -329,9 +316,9 @@ def requires_good_connection(fun):
     def _requires_good_connection(*args, **kwargs):
         try:
             return fun(*args, **kwargs)
-        except (ConnectionError, Timeout):
+        except ConnectionError:
             log.error('Either your ElasticSearch process is not quite '
-                      'ready to rumble, is not running at all, or ES_URLS'
+                      'ready to rumble, is not running at all, or ES_URLS '
                       'is set wrong in your settings_local.py file.')
     return _requires_good_connection
 
@@ -422,6 +409,7 @@ def es_status_cmd(checkindex=False, log=log):
     log.info('  ES_INDEX_PREFIX       : %s', settings.ES_INDEX_PREFIX)
     log.info('  ES_INDEXES            : %s', settings.ES_INDEXES)
 
+    # FIXME - can do this better with elasticsearch API.
     try:
         es_deets = requests.get(settings.ES_URLS[0]).json()
         log.info('  Elasticsearch version : %s', es_deets['version']['number'])
@@ -436,5 +424,5 @@ def es_status_cmd(checkindex=False, log=log):
         for name, count in mt_stats.items():
             log.info('    %-20s: %d', name, count)
 
-    except ElasticHttpNotFoundError:
+    except NotFoundError:
         log.info('  Index does not exist. (%s)', get_index())

@@ -26,6 +26,7 @@ packages/simplejson
 packages/six
 packages/tldextract
 packages/translate-toolkit
+packages/urllib3
 src/billiard
 src/bleach
 src/celery
@@ -58,6 +59,5 @@ src/jingo
 src/jingo-minify
 src/kombu
 src/nuggets
-src/pyelasticsearch
 src/pystatsd
 src/tower

@@ -3,7 +3,7 @@ from hashlib import md5
 import re
 import urlparse
 
-from pyelasticsearch.exceptions import ElasticHttpError
+from elasticsearch.exceptions import ElasticsearchException
 from ratelimit.helpers import is_ratelimited
 from statsd import statsd
 
@@ -96,7 +96,7 @@ def compute_grams(text):
     try:
         tokens = [item['token'] for item in es_analyze(
             text, analyzer='snowball')]
-    except ElasticHttpError:
+    except ElasticsearchException:
         return []
 
     # Remove configured stopwords.

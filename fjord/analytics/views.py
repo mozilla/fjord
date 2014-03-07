@@ -244,9 +244,9 @@ def dashboard(request):
     for param, terms in facets.facet_counts().items():
         for term in terms:
             name = term['term']
-            if name == 'T':
+            if name.upper() == 'T':
                 name = True
-            elif name == 'F':
+            elif name.upper() == 'F':
                 name = False
 
             counts[param][name] = term['count']

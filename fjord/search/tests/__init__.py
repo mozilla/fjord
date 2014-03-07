@@ -2,9 +2,8 @@ import time
 
 from django.conf import settings
 
+from elasticsearch.exceptions import ConnectionError, NotFoundError
 from nose import SkipTest
-from pyelasticsearch.exceptions import (Timeout, ConnectionError,
-                                        ElasticHttpNotFoundError)
 
 from fjord.base.tests import BaseTestCase, with_save
 from fjord.search.index import get_index, get_es
@@ -25,8 +24,8 @@ class ElasticTestCase(BaseTestCase):
 
         # try to connect to ES and if it fails, skip ElasticTestCases.
         try:
-            get_es().health()
-        except (Timeout, ConnectionError):
+            get_es().cluster.health()
+        except ConnectionError:
             cls.skipme = True
             return
 
@@ -61,7 +60,7 @@ class ElasticTestCase(BaseTestCase):
         # TODO: uncomment this when we have live indexing.
         # generate_tasks()
 
-        get_es().refresh(index)
+        get_es().indices.refresh(index)
         if timesleep > 0:
             time.sleep(timesleep)
 
@@ -80,13 +79,13 @@ class ElasticTestCase(BaseTestCase):
 
         self.refresh()
         if wait:
-            get_es().health(wait_for_status='yellow')
+            get_es().cluster.health(wait_for_status='yellow')
 
     def teardown_indexes(self):
         es = get_es()
         try:
-            es.delete_index(get_index())
-        except ElasticHttpNotFoundError:
+            es.indices.delete(get_index())
+        except NotFoundError:
             # If we get this error, it means the index didn't exist
             # so there's nothing to delete.
             pass

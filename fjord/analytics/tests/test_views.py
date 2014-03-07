@@ -2,15 +2,14 @@ import json
 import logging
 from datetime import datetime, timedelta
 
+from elasticsearch.exceptions import ConnectionError
 from nose.tools import eq_
-from pyelasticsearch.exceptions import Timeout
 from pyquery import PyQuery
 
-from django.contrib.auth.models import Group
 from django.http import QueryDict
 
 from fjord.analytics import views
-from fjord.base.tests import LocalizingClient, profile, reverse, user
+from fjord.base.tests import LocalizingClient, reverse
 from fjord.feedback.tests import response
 from fjord.search.tests import ElasticTestCase
 
@@ -327,7 +326,7 @@ class TestDashboardView(ElasticTestCase):
         old_counts_to_options = views.counts_to_options
         try:
             def mock_counts_to_options(*args, **kwargs):
-                raise Timeout()
+                raise ConnectionError()
             views.counts_to_options = mock_counts_to_options
 
             resp = self.client.get(reverse('dashboard'))
