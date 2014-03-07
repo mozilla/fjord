@@ -130,3 +130,6 @@
 [submodule "vendor/src/django-extensions"]
 	path = vendor/src/django-extensions
 	url = https://github.com/django-extensions/django-extensions.git
+[submodule "vendor/src/elasticsearch-py"]
+	path = vendor/src/elasticsearch-py
+	url = https://github.com/elasticsearch/elasticsearch-py.git
