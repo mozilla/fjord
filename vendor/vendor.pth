@@ -52,6 +52,7 @@ src/django-session-csrf
 src/django-sha2
 src/django-statsd
 src/elasticutils
+src/elasticsearch-py
 src/funfactory
 src/jingo
 src/jingo-minify
