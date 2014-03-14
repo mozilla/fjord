@@ -33,7 +33,7 @@ class Product(ModelBase):
     enabled = models.BooleanField(default=True)
 
     # Used internally for notes to make it easier to manage products
-    notes = models.CharField(max_length=255)
+    notes = models.CharField(max_length=255, blank=True, default=u'')
 
     # This is the name we display everywhere
     display_name = models.CharField(max_length=20)
@@ -48,6 +48,17 @@ class Product(ModelBase):
 
     # Whether or not this product shows up on the dashboard
     on_dashboard = models.BooleanField(default=True)
+
+    # System slated for automatic translation, or null if none;
+    # See translation app for details.
+    translation_system = models.CharField(
+        choices=(
+            (u'', u'None'),
+        ),
+        null=True,
+        blank=True,
+        max_length=20,
+    )
 
     @classmethod
     def get_product_map(cls):
