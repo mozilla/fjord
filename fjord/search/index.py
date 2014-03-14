@@ -107,6 +107,10 @@ def keyword_type():
     return {'type': 'string', 'analyzer': 'keyword'}
 
 
+def terms_type():
+    return {'type': 'string', 'analyzer': 'standard'}
+
+
 def text_type():
     return {'type': 'string', 'analyzer': 'snowball'}
 

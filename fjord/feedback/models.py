@@ -16,7 +16,8 @@ from fjord.feedback.config import CODE_TO_COUNTRY
 from fjord.feedback.utils import compute_grams
 from fjord.search.index import (
     register_mapping_type, FjordMappingType,
-    boolean_type, date_type, integer_type, keyword_type, text_type)
+    boolean_type, date_type, integer_type, keyword_type, terms_type,
+    text_type)
 from fjord.search.tasks import register_live_index
 
 
@@ -244,6 +245,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'has_email': boolean_type(),
             'description': text_type(),
             'description_bigrams': keyword_type(),
+            'description_terms': terms_type(),
             'user_agent': keyword_type(),
             'product': keyword_type(),
             'channel': keyword_type(),
@@ -274,6 +276,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'url_domain': obj.url_domain,
             'has_email': bool(obj.user_email),
             'description': obj.description,
+            'description_terms': obj.description,
             'user_agent': obj.user_agent,
             'product': obj.product,
             'channel': obj.channel,
