@@ -9,7 +9,9 @@ html, body {
 }
 
 body {
-  background: url("../../img/mobile/background.png") repeat-x scroll 0px 0px rgb(249, 249, 249);
+  background: #f1f1f1;
+  color: #333;
+  line-height: 140%;
 }
 
 .content {
@@ -99,17 +101,57 @@ header {
   }
 }
 
-.btn.submit {
-  border-bottom: 2px solid #548322;
-  display: block;
+input[type='text'],
+input[type='password'],
+input[type='email'],
+input[type='url'],
+textarea {
+  background: #fff;
+  border: 1px solid #c6c6c6;
+  color: #000;
+  .border-radius(3px);
+  .box-shadow(0 1px 2px 0 rgba(0, 0, 0, 0.1) inset);
+  .box-sizing(border-box);
+  display: inline-block;
   font-size: 1.1em;
-  .gradient(#81bc2e, #81bc2e, #629827);
-  margin: 0 auto 20px;
-  padding: 5px;
-  width: 80%;
+  margin: 0 0 12px 0;
+  outline: none;
+  padding: 10px 12px;
+  width: 100%;
 }
 
-.btn.submit:disabled {
-  border-bottom: 2px solid #607755;
-  .gradient(#a0aa88, #a0aa88, #708855);
+.btn,
+.btn:visited,
+input[type="submit"],
+input[type="submit"]:visited {
+  .gradient(#e3e3e3, #fafafa, #cdcdcd);
+  border: 1px solid #ababab;
+  .border-radius(2px);
+  .box-sizing(border-box);
+  color: #333;
+  cursor: pointer;
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  outline: none;
+  margin: 0 0 6px 0;
+  padding: 4px 0;
+  text-align: center;
+  text-decoration: none;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+  width: 100%;
+
+  &.submit {
+    .gradient(#81bc2e, #81bc2e, #629827);
+    border: 0;
+    border-bottom: 3px solid #548322;
+    color: #fff;
+    font-size: 17px;
+    padding: 8px 0;
+    text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.2);
+
+    &:disabled {
+      opacity: 0.5;
+    }
+  }
 }

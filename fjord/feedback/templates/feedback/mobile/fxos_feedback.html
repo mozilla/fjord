@@ -18,25 +18,30 @@
 {% block content_block %}
 <x-deck transition-type="slide-left">
   <x-card id="intro">
-    <x-appbar>
-      <header>{{ _('Submit feedback') }}</header>
-    </x-appbar>
+    <x-appbar heading="{{ _('Submit feedback') }}" subheading=""></x-appbar>
 
-    <section>
-      <p>{{ _('Your feedback helps us improve Firefox OS.') }}</p>
-      <button class="happy">{{ _('Firefox OS made me happy') }}</button>
-      <button class="sad">{{ _('Firefox OS made me sad') }}</button>
+    <section class="cf">
+      <div>
+        <p>{{ _('Your feedback helps us improve Firefox OS.') }}</p>
 
-      <aside>
-        <span>
-        {% trans support_url='http://support.mozilla.org/' %}
-        If you need help or have a problem
-        with Firefox OS, please visit <a href="{{ support_url }}">Mozilla Support</a>.
-        {% endtrans %}
-        </span>
-      </aside>
+        <div class="emotions">
+          <div>
+            <button class="happy">{{ _('Firefox OS made me happy') }}</button>
+            <button class="sad">{{ _('Firefox OS made me sad') }}</button>
+          </div>
+        </div>
 
-      <input type="hidden" name="happy" id="happy" value="0"/>
+        <aside>
+          <span>
+          {% trans support_url='http://support.mozilla.org/' %}
+          If you need help or have a problem
+          with Firefox OS, please visit <a href="{{ support_url }}">Mozilla Support</a>.
+          {% endtrans %}
+          </span>
+        </aside>
+
+        <input type="hidden" name="happy" id="happy" value="0"/>
+      </div>
     </section>
   </x-card>
 
@@ -46,18 +51,20 @@
       <header>{{ _('Country') }}</header>
     </x-appbar>
 
-    <section>
-      <p>
-        {{ _('In what country did you purchase your Firefox OS device?') }}
-      </p>
-      <select name="country">
-        {% for value, display in countries %}
-          <option value="{{ value }}">{{ display }}</option>
-        {% endfor %}
-        <option value="">{{ _('Other') }}</option>
-      </select>
-      <button class="next btn submit">{{ _('Next') }}</button>
-      <input type="hidden" id="locale" name="locale" value="{{ request.locale }}"/>
+    <section class="cf">
+      <div>
+        <p>
+          {{ _('In what country did you purchase your Firefox OS device?') }}
+        </p>
+        <select name="country">
+          {% for value, display in countries %}
+            <option value="{{ value }}">{{ display }}</option>
+          {% endfor %}
+          <option value="">{{ _('Other') }}</option>
+        </select>
+        <button class="next btn submit">{{ _('Next') }}</button>
+        <input type="hidden" id="locale" name="locale" value="{{ request.locale }}"/>
+      </div>
     </section>
   </x-card>
 
@@ -67,17 +74,19 @@
       <header>{{ _('Device') }}</header>
     </x-appbar>
 
-    <section>
-      <p>
-        {{ _('What Firefox OS device are you using?') }}
-      </p>
-      <select name="device">
-        {% for value in devices %}
-          <option value="{{ value }}">{{ value }}</option>
-        {% endfor %}
-        <option value="">{{ _('Other') }}</option>
-      </select>
-      <button class="next btn submit">{{ _('Next') }}</button>
+    <section class="cf">
+      <div>
+        <p>
+          {{ _('What Firefox OS device are you using?') }}
+        </p>
+        <select name="device">
+          {% for value in devices %}
+            <option value="{{ value }}">{{ value }}</option>
+          {% endfor %}
+          <option value="">{{ _('Other') }}</option>
+        </select>
+        <button class="next btn submit">{{ _('Next') }}</button>
+      </div>
     </section>
   </x-card>
 
@@ -87,26 +96,28 @@
       <header>{{ _('Details') }}</header>
     </x-appbar>
 
-    <section>
-      <div id="description-counter" class="characters-remaining"></div>
-      <label class="happy" for="description">
-        {{ _('Please describe what you liked.') }}
-      </label>
-      <label class="sad" for="description">
-        {{ _('Please describe your problem below and be as specific as you can.') }}
-      </label>
+    <section class="cf">
+      <div>
+        <label class="happy" for="description">
+          {{ _('Please describe what you liked.') }}
+        </label>
+        <label class="sad" for="description">
+          {{ _('Please describe your problem below and be as specific as you can.') }}
+        </label>
 
-      <p>
-        <textarea data-max-length="10000" id="description" name="description" cols="40" rows="4"></textarea>
-      </p>
+        <p class="cf">
+          <textarea data-max-length="10000" id="description" name="description" cols="40" rows="4"></textarea>
+          <span id="description-counter" class="characters-remaining"></span>
+        </p>
 
-      <p>
-        {% trans %}
-        The content of your feedback will be public, so please be
-        sure not to include any personal information.
-        {% endtrans %}
-      </p>
-      <button id="description-next-btn" class="next btn submit">{{ _('Next') }}</button>
+        <p>
+          {% trans %}
+          The content of your feedback will be public, so please be
+          sure not to include any personal information.
+          {% endtrans %}
+        </p>
+        <button id="description-next-btn" class="next btn submit">{{ _('Next') }}</button>
+      </div>
     </section>
   </x-card>
 
@@ -116,31 +127,33 @@
       <header>{{ _('Can we contact you?') }}</header>
     </x-appbar>
 
-    <section>
-      <label class="email-ok">
+    <section class="cf">
+      <div>
         <p>
-          <input id="email-ok" type="checkbox" name="email_ok"/>
-          {{ _('Check here to let us contact you to follow up on your feedback.') }}
+          <label class="email-ok">
+            <input id="email-ok" type="checkbox" name="email_ok"/>
+            {{ _('Check here to let us contact you to follow up on your feedback.') }}
+          </label>
         </p>
-      </label>
 
-      <div class="email">
-        <label for="id_email">
-          {{ _('Email address (optional):') }}
-        </label>
-        <input type="text" id="email-input" name="email"/>
-        <p id="email-error" class="error">
-          {{ _('Please enter a valid email address.') }}
+        <div class="email">
+          <label for="id_email">
+            {{ _('Email address (optional):') }}
+          </label>
+          <input type="text" id="email-input" name="email"/>
+          <p id="email-error" class="error">
+            {{ _('Please enter a valid email address.') }}
+          </p>
+        </div>
+
+        <p>
+          <span id="privacy-email">
+            {{ _("Don't worry, your email will always be kept private.") }}
+          </span>
         </p>
+
+        <button class="complete btn submit">{{ _('Send Feedback') }}</button>
       </div>
-
-      <p>
-        <span id="privacy-email">
-          {{ _("Don't worry, your email will always be kept private.") }}
-        </span>
-      </p>
-
-      <button class="complete btn submit">{{ _('Send Feedback') }}</button>
     </section>
   </x-card>
 
@@ -149,8 +162,10 @@
       <header>{{ _('Submitting....') }}</header>
     </x-appbar>
 
-    <section>
-      <img class="in-progress" src="{{ settings.STATIC_URL }}img/wait-trans.gif"/>
+    <section class="cf">
+      <div>
+        <img class="in-progress" src="{{ settings.STATIC_URL }}img/wait-trans.gif"/>
+      </div>
     </section>
   </x-card>
 
@@ -159,19 +174,21 @@
       <header>{{ _('Success!') }}</header>
     </x-appbar>
 
-    <section>
-      <p>
-        {% trans %}
-        Thank you for your feedback! We will use it to help us create a better
-        experience in future versions of Firefox OS.
-        {% endtrans %}
-      </p>
-      <p>
-        {% trans url='http://www.mozilla.org/contribute' %}
-        Learn how you can <a href="{{ url }}">make Firefox OS and Mozilla
-        better</a>.
-        {% endtrans %}
-      </p>
+    <section class="cf">
+      <div>
+        <p>
+          {% trans %}
+          Thank you for your feedback! We will use it to help us create a better
+          experience in future versions of Firefox OS.
+          {% endtrans %}
+        </p>
+        <p>
+          {% trans url='http://www.mozilla.org/contribute' %}
+          Learn how you can <a href="{{ url }}">make Firefox OS and Mozilla
+          better</a>.
+          {% endtrans %}
+        </p>
+      </div>
     </section>
   </x-card>
 
@@ -180,15 +197,17 @@
       <header>{{ _('We\'re sorry!') }}</header>
     </x-appbar>
 
-    <section>
-      <p>
-        {% trans %}
-        Something has happened and we can't submit your feedback. Feedback will
-        be saved on your device so you can try sending it again later.
-        {% endtrans %}
-      </p>
-      <button class="complete btn submit">{{ _('Try again') }}</button>
-      <button class="cancel btn submit">{{ _('Cancel') }}</button>
+    <section class="cf">
+      <div>
+        <p>
+          {% trans %}
+          Something has happened and we can't submit your feedback. Feedback will
+          be saved on your device so you can try sending it again later.
+          {% endtrans %}
+        </p>
+        <button class="complete btn submit">{{ _('Try again') }}</button>
+        <button class="cancel btn submit">{{ _('Cancel') }}</button>
+      </div>
     </section>
   </x-card>
 
@@ -197,15 +216,17 @@
       <header>{{ _('Try again') }}</header>
     </x-appbar>
 
-    <section>
-      <p>
-        {% trans %}
-        You have unsubmitted feedback data. Would you like to try submitting
-        it again?
-        {% endtrans %}
-      </p>
-      <button class="complete btn submit">{{ _('Try again') }}</button>
-      <button class="cancel btn submit">{{ _('Cancel') }}</button>
+    <section class="cf">
+      <div>
+        <p>
+          {% trans %}
+          You have unsubmitted feedback data. Would you like to try submitting
+          it again?
+          {% endtrans %}
+        </p>
+        <button class="complete btn submit">{{ _('Try again') }}</button>
+        <button class="cancel btn submit">{{ _('Cancel') }}</button>
+      </div>
     </section>
   </x-card>
 </x-deck>
