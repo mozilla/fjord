@@ -10,6 +10,31 @@
 .content-box(){
   .box-sizing(content-box);
 }
+.gradient(@default,@start,@stop) {
+  .linear-gradient-top(@default,@start,0%,@stop,100%);
+}
+.linear-gradient-top(@default,@color1,@stop1,@color2,@stop2) {
+  background-color: @default;
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(@stop1, @color1), color-stop(@stop2 @color2));
+  background-image: -webkit-linear-gradient(top, @color1 @stop1, @color2 @stop2);
+  background-image: -moz-linear-gradient(top, @color1 @stop1, @color2 @stop2);
+  background-image: -ms-linear-gradient(top, @color1 @stop1, @color2 @stop2);
+  background-image: -o-linear-gradient(top, @color1 @stop1, @color2 @stop2);
+  background-image: linear-gradient(top, @color1 @stop1, @color2 @stop2);
+}
+.border-radius(@args) {
+  -webkit-border-radius: @args;
+  -moz-border-radius: @args;
+  border-radius: @args;
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
+}
+.box-shadow(@args) {
+  -webkit-box-shadow: @args;
+  -moz-box-shadow: @args;
+  box-shadow: @args;
+}
 
 .error {
   color: red;
@@ -25,8 +50,8 @@ textarea.error {
   color: green;
   float: right;
   font-size: 0.9em;
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
   text-align: right;
   width: 3em;
 
@@ -44,7 +69,7 @@ textarea.error {
 aside {
   background-color: #D8E9F5;
   border: 1px solid #A4C5DB;
-  padding: 5px;
+  padding: 12px;
 }
 
 x-card {
@@ -52,16 +77,25 @@ x-card {
 
   section {
     display: block;
+    height: ~"-webkit-calc(100% - 45px)";
+    height: ~"-mo-calc(100% - 45px)";
+    height: ~"calc(100% - 45px)";
     margin: 0 auto;
-    max-width: 340px;
-    overflow: visible;
-    padding: 5px;
+    overflow: auto;
+
+    > div {
+      padding: 20px;
+
+      > p:first-child {
+        margin-top: 0;
+      }
+    }
 
     .in-progress {
       display: block;
       margin: 0 auto;
       max-width: 340px;
-      padding: 80px 0px 0px 0px;
+      padding: 80px 0 0 0;
     }
 
     .country {
@@ -76,8 +110,8 @@ x-card {
 
     select {
       font-size: 1.1em;
-      margin: 10px 0px;
-      padding: 5px 0px;
+      margin: 10px 0 20px 0;
+      padding: 5px 0;
       text-align: center;
       width: 100%;
     }
@@ -102,6 +136,9 @@ x-card {
 }
 
 x-appbar {
+  .gradient(#1B3C59, #2C6191, #1B3C59);
+  border-bottom: 1px solid #00202F;
+  .box-shadow(0 0 4px 0 rgba(0, 0, 0, 0.75));
   display: block;
 
   button.back {
@@ -120,34 +157,60 @@ x-appbar {
 
 #intro {
   section {
-    button.happy, button.sad {
-      background: 0;
-      border: 0;
-      display: inline-block;
-      margin: 10px;
-      padding-top: 100px;
-      position: relative;
-      vertical-align: top;
-      width: 130px;
+    position: relative;
 
-      &:before {
-        background: no-repeat url("../../img/type.png");
-        content: "";
-        display: block;
-        height: 100px;
-        left: 15px;
-        position: absolute;
-        top: 0px;
-        width: 100px;
-      }
-    }
+    .emotions {
+      display: table;
+      height: 100%;
+      margin: 32px 0;
+      overflow: hidden;
+      width: 100%;
 
-    button.sad {
-      &:before {
-        background-position: -100px 0;
+      > div {
+        display: table-row;
+        height: 100%;
+
+        > button {
+          background: #fff;
+          border: 1px solid #ccc;
+          .border-radius(6px);
+          .box-shadow(0 2px 6px 0 rgba(0, 0, 0, 0.05));
+          color: #000;
+          display: table-cell;
+          font-size: 1.1em;
+          height: 100%;
+          margin: 0 2%;
+          padding: 124px 12px 12px 12px;
+          position: relative;
+          text-align: center;
+          vertical-align: top;
+          width: 46%;
+
+          &:before {
+            background: no-repeat 2px 0 url("../../img/type.png");
+            content: "";
+            display: block;
+            height: 100px;
+            left: 50%;
+            margin-left: -50px;
+            position: absolute;
+            top: 12px;
+            width: 100px;
+          }
+
+          &.sad {
+            &:before {
+              background-position: -98px 0;
+            }
+          }
+        }
       }
     }
   }
+}
+
+#description {
+  height: 120px;
 }
 
 #moreinfo {
