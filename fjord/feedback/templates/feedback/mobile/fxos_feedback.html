@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block site_js %}
-  <script src="{{ settings.STATIC_URL }}js/lib/brick-1.0.0rc1.byob.min.js"></script>
+  <script src="{{ settings.STATIC_URL }}js/lib/brick-1.0.0.byob.min.js"></script>
   {{ js('mobile/fxos_feedback') }}
 {% endblock %}
 
@@ -16,7 +16,7 @@
 {% block site_header %}{% endblock %}
 
 {% block content_block %}
-<x-deck>
+<x-deck transition-type="slide-left">
   <x-card id="intro">
     <x-appbar>
       <header>{{ _('Submit feedback') }}</header>
