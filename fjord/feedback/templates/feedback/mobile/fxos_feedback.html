@@ -18,14 +18,15 @@
 {% block content_block %}
 <x-deck>
   <x-card id="intro">
-    <x-appbar>
-      <header>{{ _('Submit feedback') }}</header>
-    </x-appbar>
+    <x-appbar heading="{{ _('Submit feedback') }}" subheading=""></x-appbar>
 
     <section>
       <p>{{ _('Your feedback helps us improve Firefox OS.') }}</p>
-      <button class="happy">{{ _('Firefox OS made me happy') }}</button>
-      <button class="sad">{{ _('Firefox OS made me sad') }}</button>
+
+      <div class="emotions">
+          <button class="happy">{{ _('Firefox OS made me happy') }}</button>
+          <button class="sad">{{ _('Firefox OS made me sad') }}</button>
+      </div>
 
       <aside>
         <span>
@@ -88,7 +89,6 @@
     </x-appbar>
 
     <section>
-      <div id="description-counter" class="characters-remaining"></div>
       <label class="happy" for="description">
         {{ _('Please describe what you liked.') }}
       </label>
@@ -96,8 +96,9 @@
         {{ _('Please describe your problem below and be as specific as you can.') }}
       </label>
 
-      <p>
+      <p class="cf">
         <textarea data-max-length="10000" id="description" name="description" cols="40" rows="4"></textarea>
+        <span id="description-counter" class="characters-remaining"></span>
       </p>
 
       <p>
@@ -117,12 +118,12 @@
     </x-appbar>
 
     <section>
-      <label class="email-ok">
-        <p>
+      <p>
+        <label class="email-ok">
           <input id="email-ok" type="checkbox" name="email_ok"/>
           {{ _('Check here to let us contact you to follow up on your feedback.') }}
-        </p>
-      </label>
+        </label>
+      </p>
 
       <div class="email">
         <label for="id_email">

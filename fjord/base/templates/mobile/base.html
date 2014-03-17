@@ -4,9 +4,8 @@
     <title>{% block page_title %}{{ _('Welcome') }}{% endblock %} :: {{ _('Firefox Input') }}</title>
     <meta name="viewport" content="width=320, initial-scale=1, maximum-scale=1, minimum-scale=1">
 
-    {% block site_css %}
-      {{ css('mobile/base') }}
-    {% endblock %}
+    {{ css('mobile/base') }}
+    {% block site_css %}{% endblock %}
 
     <link rel="shortcut icon" type="image/png" href="{{ settings.STATIC_URL }}img/favicon.png"/>
     {% block extra_headers %}{% endblock %}
