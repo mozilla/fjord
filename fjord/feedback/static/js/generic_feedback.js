@@ -37,7 +37,7 @@
             // to the next card or, if on the last card, submit the
             // form.
             if (event.which == 13) {
-                if (xdeck.selectedIndex < (xdeck.numCards - 1)) {
+                if (xdeck.selectedIndex < (xdeck.cards.length - 1)) {
                     // If it's not on the last card, nextCard().
                     goNext();
                 } else {
