@@ -218,7 +218,7 @@ MINIFY_BUNDLES = {
         ),
         'generic_feedback': (
             'css/lib/normalize.css',
-            'css/lib/brick-1.0.0rc1.byob.min.css',
+            'css/lib/brick-1.0.0.byob.min.css',
             # FIXME - This should become feedback.less and move out of
             # mobile/.
             'css/mobile/base.less',
@@ -243,7 +243,7 @@ MINIFY_BUNDLES = {
         ),
         'mobile/fxos_feedback': (
             'css/lib/normalize.css',
-            'css/lib/brick-1.0.0rc1.byob.min.css',
+            'css/lib/brick-1.0.0.byob.min.css',
             'css/mobile/base.less',
             'css/mobile/fxos_feedback.less',
         ),
