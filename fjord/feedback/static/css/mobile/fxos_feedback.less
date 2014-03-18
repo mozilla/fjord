@@ -161,40 +161,47 @@ x-appbar {
 
     .emotions {
       display: table;
+      height: 100%;
       margin: 32px 0;
+      overflow: hidden;
       width: 100%;
 
-      > button {
-        background: #fff;
-        border: 1px solid #ccc;
-        .border-radius(6px);
-        .box-shadow(0 2px 6px 0 rgba(0, 0, 0, 0.05));
-        color: #000;
-        display: table-cell;
-        font-size: 1.1em;
-        margin: 0 2%;
+      > div {
+        display: table-row;
         height: 100%;
-        padding: 124px 12px 12px 12px;
-        position: relative;
-        text-align: center;
-        vertical-align: top;
-        width: 46%;
 
-        &:before {
-          background: no-repeat 2px 0 url("../../img/type.png");
-          content: "";
-          display: block;
-          height: 100px;
-          left: 50%;
-          margin-left: -50px;
-          position: absolute;
-          top: 12px;
-          width: 100px;
-        }
+        > button {
+          background: #fff;
+          border: 1px solid #ccc;
+          .border-radius(6px);
+          .box-shadow(0 2px 6px 0 rgba(0, 0, 0, 0.05));
+          color: #000;
+          display: table-cell;
+          font-size: 1.1em;
+          margin: 0 2%;
+          height: 100%;
+          padding: 124px 12px 12px 12px;
+          position: relative;
+          text-align: center;
+          vertical-align: top;
+          width: 46%;
 
-        &.sad {
           &:before {
-            background-position: -98px 0;
+            background: no-repeat 2px 0 url("../../img/type.png");
+            content: "";
+            display: block;
+            height: 100px;
+            left: 50%;
+            margin-left: -50px;
+            position: absolute;
+            top: 12px;
+            width: 100px;
+          }
+
+          &.sad {
+            &:before {
+              background-position: -98px 0;
+            }
           }
         }
       }
