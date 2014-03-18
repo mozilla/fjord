@@ -77,12 +77,18 @@ x-card {
 
   section {
     display: block;
+    height: ~"-webkit-calc(100% - 45px)";
+    height: ~"-mo-calc(100% - 45px)";
+    height: ~"calc(100% - 45px)";
     margin: 0 auto;
-    overflow: visible;
-    padding: 20px;
+    overflow: auto;
 
-    > p:first-child {
-      margin-top: 0;
+    > div {
+      padding: 20px;
+
+      > p:first-child {
+        margin-top: 0;
+      }
     }
 
     .in-progress {
@@ -155,7 +161,6 @@ x-appbar {
 
     .emotions {
       display: table;
-      height: 100%;
       margin: 32px 0;
       width: 100%;
 
