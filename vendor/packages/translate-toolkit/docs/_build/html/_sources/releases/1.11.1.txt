@@ -1,0 +1,364 @@
+commit 14820c4b20ce90cd4e5681d7ee1a8bdcc3dda352
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Jan 29 10:41:07 2014 +0000
+
+    PHP: Another array variant
+    
+    If we see arrray() then we don't assume that the user will be using
+    array synx x => y but rather leave parsing as normal.
+
+commit 589b217e41e952e2f73ac99f48eb00f88c4fd6db
+Author: Leandro Regueiro <leandro.regueiro@gmail.com>
+Date:   Fri Jan 24 22:23:45 2014 +0100
+
+    Styleguide: Add guideline on using opposite quoting to avoid escaping
+
+commit 5f12db1efe410d1f895d24c526fc9ecd7dbe3ade
+Author: Leandro Regueiro <leandro.regueiro@gmail.com>
+Date:   Fri Jan 24 22:23:07 2014 +0100
+
+    Styleguide: Add guideline on using single quoted strings for dict keys
+
+commit 91d3aa2f3f6dbef89313aa18b236eb88e1ea69c1
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Fri Jan 24 21:52:56 2014 +0000
+
+    Drop obsolete __future__ imports
+    
+    - Generators became mandatory in Python 2.3
+    - with statement mandatory in 2.6
+    
+    Since Python 2.6 is our minimum supported version we can drop these.
+
+commit c06d50d589b53a4df475821b5c089a27cccbcfc7
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Fri Jan 24 22:02:38 2014 +0000
+
+    Clarify that Python 2.6 is our new minimum
+
+commit bef763fea1c399c3a6cd953759d7e2e66f689615
+Author: Leandro Regueiro <leandro.regueiro@gmail.com>
+Date:   Fri Jan 24 22:19:35 2014 +0100
+
+    Styleguide: Add section to encompass all Python guidelines
+
+commit ae422ae7435ff44025f53b31662d398e85334951
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Nov 27 16:22:41 2013 +0000
+
+    pypy: Enable travis testing for pypy
+    
+    Travis allows failures in pypy tests
+    
+    Note: lxml was a blocker but seems to build now
+
+commit e66f77715540c7572493fa6afc5be8f3b86c0961
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Thu Nov 28 03:06:24 2013 +0000
+
+    PEP8: E303 too many blank lines
+
+commit dbbff4612eb8788ad10859ef7aba34e7bd1f3f28
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Thu Nov 28 03:04:06 2013 +0000
+
+    PEP8: W291 trailing whitespace
+
+commit 267c811a4990a2e097fd0bd970a88e3f991dda55
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Thu Nov 28 03:01:33 2013 +0000
+
+    PEP8: E124 closing bracket does not match visual indentation
+
+commit 1ec84e9baa13e417a2bd2c4856fb185114a8e035
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Thu Nov 28 02:41:47 2013 +0000
+
+    PEP8: E501 line too long
+
+commit bd25be2fdc125e968dda29727928fea4593980f8
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Thu Nov 28 02:15:18 2013 +0000
+
+    PEP8: E502 the backslash is redundant between brackets
+
+commit adc1681ce6d093555422c91190438ab786cbe92d
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Thu Nov 28 01:47:23 2013 +0000
+
+    PEP8: E302 expected 2 blank lines, found 1
+
+commit 8380295f2702c73c528329616c7607daa71f7c28
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Thu Nov 28 01:43:01 2013 +0000
+
+    PEP8: E301 expected 1 blank line, found 0
+
+commit d2a26f871863948a536c5d10746889c7ddc41813
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Nov 27 19:10:39 2013 +0000
+
+    PEP8: W293 blank line contains whitespace
+
+commit 65b6031556881a153e26be465e9a876cc341b60b
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Nov 27 18:50:01 2013 +0000
+
+    PEP8: E124 closing bracket does not match visual indentation
+
+commit daca9c9cace0eed25f0feea4464043c134cee57e
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Nov 27 18:45:19 2013 +0000
+
+    PEP8: E123 closing bracket does not match indentation of opening bracket's line
+
+commit 09e9f701994cc649fdcb73cefa34ede319a0b1ac
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Nov 27 18:35:45 2013 +0000
+
+    PEP8: E122 continuation line missing indentation or outdented
+
+commit 33d969f2502204e5dae216343bc723c005191151
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Nov 27 18:10:57 2013 +0000
+
+    PEP8: E251 unexpected spaces around keyword / parameter equals
+
+commit fdef31274c46426b9d4ab05767e7209a1550a79d
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Nov 27 17:52:29 2013 +0000
+
+    PEP8: E272 multiple spaces before keyword
+
+commit bfe9527b075decf2015ea9e70f1e0284529d630f
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Nov 27 17:51:07 2013 +0000
+
+    PEP8: E271 multiple spaces after keyword
+
+commit 0eb9562ea6cc86643f615aef863b32495cc10eef
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Nov 27 17:50:14 2013 +0000
+
+    PEP8: E261 at least two spaces before inline comment
+
+commit fcc19cee8107478e0a8e2c21917112793b39ed68
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Nov 27 17:48:08 2013 +0000
+
+    PEP8: E712 comparison to True/False
+    
+    Fixes to poheader.py break things so are left out for now
+
+commit f26bf7013836e3167593675e8bc21941790af7d5
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Nov 27 17:37:16 2013 +0000
+
+    PEP8: E225 missing whitespace around operator
+
+commit ea2103d71585619a39ebed436249e6b336033391
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Nov 27 17:22:32 2013 +0000
+
+    PEP8: W293 blank line contains whitespace
+
+commit 53450c4b98d61e653c0d11d508c2d870816f93b2
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Nov 27 17:11:04 2013 +0000
+
+    PEP8: E202 whitespace before ']'
+
+commit 1b1914d0642e792f0443eff3588c7268f33c1a6c
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Nov 27 17:05:56 2013 +0000
+
+    PEP8: W191 indentation contains tabs
+
+commit 2c36d05aac6eaf0b3131b8026393999ebc8b0b75
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Nov 27 16:40:42 2013 +0000
+
+    PEP8: E711 comparison to None
+
+commit c39b7aa54138275aa0c40ccd5d058c790cd1e503
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Sat Nov 23 03:29:41 2013 +0000
+
+    PEP8: E502 the backslash is redundant between brackets
+
+commit 20d5708f53245f6aaaddc1267660026dfb6c191a
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Sat Nov 23 03:19:04 2013 +0000
+
+    PEP8: E302 expected 2 blank lines, found 1
+
+commit 674f5e44426e1cb8a556a409996deaec12c6db15
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Sat Nov 23 03:11:31 2013 +0000
+
+    PEP8: W391 blank line at end of file
+
+commit d6306a900928760c2abb82b749293d5dd12e0255
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Sat Nov 23 03:10:24 2013 +0000
+
+    PEP8: E225 missing whitespace around operator
+
+commit 0b59be74efbf21a2c7628bd05ef51d26d65eab2a
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Sat Nov 23 03:08:53 2013 +0000
+
+    PEP8: E272 multiple spaces before keyword
+
+commit d998eae808223a7f00c71e8e378a1f6465f01a51
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Sat Nov 23 03:07:29 2013 +0000
+
+    PEP8: E271 multiple spaces after keyword
+
+commit 87136a6a74a4c3978d8e9f0062604a86aeec04e7
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Sat Nov 23 03:04:34 2013 +0000
+
+    PEP8: E261 at least two spaces before inline comment
+
+commit fbb1dfb18458b999872ccd9ffdcfce6b0cdaedc5
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Sat Nov 23 03:02:20 2013 +0000
+
+    PEP8: W293 blank line contains whitespace
+
+commit d09c9ac1c43a1556e030492496ae6f022c49dc6d
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Sat Nov 23 02:58:40 2013 +0000
+
+    PEP8: W291 trailing whitespace
+
+commit 6a1f00edba962d6bcc20668d9acd8d95e396f9fa
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Sat Nov 23 02:42:17 2013 +0000
+
+    PEP8: E101 indentation contains mixed spaces and tabs
+
+commit 76cb4dc58a551e192c60a862ad447c155deef3c2
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Nov 27 19:24:10 2013 +0000
+
+    PEP8: Travis runs pep8 checks and builds docs
+
+commit 6be74539ebf89c4c38478f51e17de8c090f5a00f
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Jan 22 14:18:04 2014 +0000
+
+    PEP8: make tool usable by Pootle and Toolkit
+
+commit 5a740909953d86291f6bfe09ef447bb2974ee48a
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Nov 27 19:14:41 2013 +0000
+
+    PEP8: A pep8 test wrapper
+    
+    Has the following features:
+    - Excludes files we don't want to check e.g. those we don't maintain.
+    - Allow you to test all of the Toolkit or just a single file.
+    - Check everything, a type of check or a travis selection, where travis means
+      checks we that are consistent and we think you should pass when you check in
+      code.
+
+commit fca4078bfc819f58f8fe9048e5ae41dfb56ecbac
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Jan 22 21:46:05 2014 +0000
+
+    Bump version to 0.11.0 final
+
+commit deb64f104a8b8b92e71a3a04c689d83d2a9c34ca
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Jan 22 17:02:27 2014 +0000
+
+    Add 1.11.0 release notes
+
+commit f4076e317420373760697dec04a3e399063d65f4
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Jan 22 22:58:38 2014 +0000
+
+    Update releasing docs post 1.11.0
+
+commit 681628f9570c6506edb0ea1ce4d6a28693b610f3
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Jan 22 15:07:55 2014 +0000
+
+    Allow older python-Levenshtein to be used
+    
+    Just prohibit the broken version of python-Levenshtein. But all others
+    are still valid.
+
+commit ed9298bb97e649e2afd6cb7234a84b20aa18b45d
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Thu Dec 19 15:51:08 2013 +0200
+
+    Exclude ALSA, too
+
+commit 24e7114f49349833658f2bcc0c6eab0922f41db8
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Wed Dec 18 21:32:26 2013 +0000
+
+    Exclude pulse audio when building XPI
+
+commit fb00c82ceb93a71d17f8e8744d1a7d7bb6162bfe
+Author: Leandro Regueiro <leandro.regueiro@gmail.com>
+Date:   Wed Dec 4 18:17:42 2013 +0100
+
+    Extend NewlinePlaceable to support more cases
+
+commit e52e6fa1387bd14d403bafc839c576bae2608a70
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Mon Dec 2 14:42:08 2013 +0000
+
+    PEP8: fix some tab whitespace errors
+
+commit d29002e4083e40368f94accfd0bc13b495f48ca9
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Mon Dec 2 14:27:12 2013 +0000
+
+    Improve po2tmx for cPO and fPO
+    
+    Slight changes to code and tests to ensure that the extraction works for other
+    PO parsers.
+
+commit 2cdf3e29496af76a8bd0190be8b1bfa4e08d166f
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Sun Dec 1 19:58:01 2013 +0000
+
+    Release: retrieve the releasers sourceforge username
+
+commit c160dff91e1a93c9d0de50f45bbb15d845c8df7f
+Author: Dwayne Bailey <dwayne@translate.org.za>
+Date:   Sun Dec 1 19:56:55 2013 +0000
+
+    Docs: Toolkit born circa 2002
+
+commit 586250c6d57200eae6651fc5db9cdd34ed9c9afd
+Author: Leandro Regueiro <leandro.regueiro@gmail.com>
+Date:   Sun Dec 1 20:00:27 2013 +0100
+
+    Minor change in Travis config
+
+commit cbb2435f108b485d1ba6038aaf7193e14dc46ed2
+Author: Leandro Regueiro <leandro.regueiro@gmail.com>
+Date:   Sun Dec 1 19:26:52 2013 +0100
+
+    Cleanups
+
+commit a7bbe0602d429e714dc1d1abd7086011cd132904
+Author: Leandro Regueiro <leandro.regueiro@gmail.com>
+Date:   Sun Dec 1 18:34:20 2013 +0100
+
+    Cleanups
+
+commit 696821f95b375e036530cdf1915a935392e24103
+Author: Leandro Regueiro <leandro.regueiro@gmail.com>
+Date:   Sat Nov 30 14:44:52 2013 +0100
+
+    Travis: Install the development requirements
+    
+    Previously used requirements was not providing pytest nor Sphinx.

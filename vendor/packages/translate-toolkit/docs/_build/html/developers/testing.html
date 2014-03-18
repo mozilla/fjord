@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Testing &mdash; Translate Toolkit 1.11.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.11.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap.js"></script>
+    <script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+    <link rel="top" title="Translate Toolkit 1.11.0 documentation" href="../index.html" />
+    <link rel="next" title="Contributing" href="contributing.html" />
+    <link rel="prev" title="Building" href="building.html" /> 
+  </head>
+  <body>
+  <div id="navbar" class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container-fluid">
+        <a class="brand" href="../index.html">Translate Toolkit</a>
+        <span class="navbar-text pull-left"><b>1.11.0</b></span>
+          <ul class="nav">
+            <li class="divider-vertical"></li>
+            
+              <li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"><ul class="simple">
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/index.html">Converters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/index.html#tools">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../commands/index.html#scripts">Scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../guides/index.html">Use Cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formats/index.html">Supported formats</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="styleguide.html">Translate Styleguide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="styleguide.html#documentation">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building.html">Building</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developers.html">Translate Toolkit Developers Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="releasing.html">Making a Translate Toolkit Release</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../releases/index.html">Release Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../history.html">History of the Translate Toolkit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API</a></li>
+</ul>
+</ul>
+</li>
+              
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"><ul>
+<li><a class="reference internal" href="#">Testing</a><ul>
+<li><a class="reference internal" href="#skipping-tests">Skipping tests</a><ul>
+<li><a class="reference internal" href="#importorskip">importorskip</a></li>
+<li><a class="reference internal" href="#skipif">skipif</a></li>
+<li><a class="reference internal" href="#xfail">xfail</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#testing-for-warnings">Testing for Warnings</a><ul>
+<li><a class="reference internal" href="#deprecated-call">deprecated_call</a></li>
+<li><a class="reference internal" href="#recwarn">recwarn</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+            
+            
+              
+  <li><a href="building.html"
+         title="previous chapter">&laquo; Building</a></li>
+  <li><a href="contributing.html"
+         title="next chapter">Contributing &raquo;</a></li>
+            
+          </ul>
+          <ul class="nav pull-right">
+            
+              
+            
+          
+            
+<form class="navbar-search pull-right" action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="container content">
+   
+  <div class="section" id="testing">
+<span id="id1"></span><h1>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h1>
+<p>Our aim is that all new functionality is adequately tested. Adding tests for
+existing functionality is highly recommended before any major reimplementation
+(refactoring, etcetera).</p>
+<p>We use <a class="reference external" href="http://pytest.org/">py.test</a> for (unit) testing. You need at least pytest &gt;= 1.0.0, but
+pytest &gt;= 2.1 is strongly recommended.</p>
+<p>To run tests in the current directory and its subdirectories:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span class="nv">$ </span>py.test  <span class="c"># runs all tests</span>
+<span class="nv">$ </span>py.test storage/test_dtd.py  <span class="c"># runs just a single test module</span>
+</pre></div>
+</div>
+<p>We use several py.test features to simplify testing, and to suppress errors in
+circumstances where the tests cannot possibly succeed (limitations of
+tests and missing dependencies).</p>
+<div class="section" id="skipping-tests">
+<h2>Skipping tests<a class="headerlink" href="#skipping-tests" title="Permalink to this headline">¶</a></h2>
+<p>Pytest allows tests, test classes, and modules to be skipped or marked as
+&#8220;expected to fail&#8221; (xfail).
+Generally you should <em>skip</em> only if the test cannot run at all (throws uncaught
+exception); otherwise <em>xfail</em> is preferred as it provides more test coverage.</p>
+<div class="section" id="importorskip">
+<h3>importorskip<a class="headerlink" href="#importorskip" title="Permalink to this headline">¶</a></h3>
+<p>Use the builtin <a class="reference external" href="http://pytest.org/latest/builtin.html#_pytest.runner.importorskip" title="(in pytest v2.5.2)"><tt class="xref py py-func docutils literal"><span class="pre">importorskip()</span></tt></a> function
+to skip a test module if a dependency cannot be imported:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pytest</span> <span class="kn">import</span> <span class="n">importorskip</span>
+<span class="n">importorskip</span><span class="p">(</span><span class="s">&quot;vobject&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If <em>vobject</em> can be imported, it will be; otherwise it raises an exception
+that causes pytest to skip the entire module rather than failing.</p>
+</div>
+<div class="section" id="skipif">
+<h3>skipif<a class="headerlink" href="#skipif" title="Permalink to this headline">¶</a></h3>
+<p>Use the <tt class="docutils literal"><span class="pre">skipif</span></tt> decorator to <a class="reference external" href="http://pytest.org/latest/skipping.html#skipif" title="(in pytest v2.5.2)"><em class="xref std std-ref">mark tests to be skipped</em></a>
+unless certain criteria are met.  The following skips a test if the version of
+<em>mymodule</em> is too old:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">mymodule</span>
+
+<span class="nd">@pytest.mark.skipif</span><span class="p">(</span><span class="s">&quot;mymodule.__version__ &lt; &#39;1.2&#39;&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">test_function</span><span class="p">():</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>In Python 2.6 and later, you can apply this decorator to classes as well as
+functions and methods.</p>
+<p>It is also possible to skip an entire test module by creating a <tt class="docutils literal"><span class="pre">pytestmark</span></tt>
+static variable in the module:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># mark entire module as skipped for py.test if no indexer available</span>
+<span class="n">pytestmark</span> <span class="o">=</span> <span class="n">pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">skipif</span><span class="p">(</span><span class="s">&quot;noindexer&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="xfail">
+<h3>xfail<a class="headerlink" href="#xfail" title="Permalink to this headline">¶</a></h3>
+<p>Use the <tt class="docutils literal"><span class="pre">xfail</span></tt> decorator to <a class="reference external" href="http://pytest.org/latest/skipping.html#xfail" title="(in pytest v2.5.2)"><em class="xref std std-ref">mark tests as expected to fail</em></a>. This allows you to do the following:</p>
+<ul class="simple">
+<li>Build tests for functionality that we haven&#8217;t implemented yet</li>
+<li>Mark tests that will fail on certain platforms or Python versions</li>
+<li>Mark tests that we should fix but haven&#8217;t got round to fixing yet</li>
+</ul>
+<p>The simplest form is the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pytest</span> <span class="kn">import</span> <span class="n">pytest</span><span class="o">.</span><span class="n">mark</span>
+
+<span class="nd">@mark.xfail</span>
+<span class="k">def</span> <span class="nf">test_function</span><span class="p">():</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>You can also pass parameters to the decorator to mark expected failure only
+under some condition (like <em>skipif</em>), to document the reason failure is
+expected, or to actually skip the test:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="nd">@mark.xfail</span><span class="p">(</span><span class="s">&quot;sys.version_info &gt;= (3,0)&quot;</span><span class="p">)</span>  <span class="c"># only expect failure for Python 3</span>
+<span class="nd">@mark.xfail</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s">&quot;Not implemented&quot;</span><span class="p">)</span>  <span class="c"># provide a reason for the xfail</span>
+<span class="nd">@mark.xfail</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">run</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>  <span class="c"># skip the test but still regard it as xfailed</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="testing-for-warnings">
+<h2>Testing for Warnings<a class="headerlink" href="#testing-for-warnings" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="deprecated-call">
+<h3>deprecated_call<a class="headerlink" href="#deprecated-call" title="Permalink to this headline">¶</a></h3>
+<p>The builtin <a class="reference external" href="http://pytest.org/latest/builtin.html#pytest.deprecated_call" title="(in pytest v2.5.2)"><tt class="xref py py-func docutils literal"><span class="pre">deprecated_call()</span></tt></a> function checks that a
+function that we run raises a DeprecationWarning:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pytest</span> <span class="kn">import</span> <span class="n">deprecated_call</span>
+
+<span class="k">def</span> <span class="nf">test_something</span><span class="p">():</span>
+    <span class="n">deprecated_call</span><span class="p">(</span><span class="n">function_to_run</span><span class="p">,</span> <span class="n">arguments_for_function</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="recwarn">
+<h3>recwarn<a class="headerlink" href="#recwarn" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference external" href="http://pytest.org/latest/recwarn.html"><em>recwarn plugin</em></a> allows us to test for other warnings. Note that
+<tt class="docutils literal"><span class="pre">recwarn</span></tt> is a funcargs plugin, which means that you need it in your test
+function parameters:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">test_example</span><span class="p">(</span><span class="n">recwarn</span><span class="p">):</span>
+    <span class="c"># do something</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">recwarn</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+    <span class="c"># w.{message,category,filename,lineno}</span>
+    <span class="k">assert</span> <span class="s">&#39;something&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+</div>
+<hr>
+
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right"><a href="#">Back to top ↑</a></p>
+    <ul class="unstyled muted">
+      <li><small>
+        &copy; 2012, Translate.org.za.<br/>
+      </small></li>
+      <li><small>
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.2.1.
+      </small></li>
+    </ul>
+  </div>
+</footer>
+  </body>
+</html>
