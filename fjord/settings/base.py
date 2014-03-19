@@ -175,6 +175,7 @@ INSTALLED_APPS = get_apps(
         'fjord.base',
         'fjord.feedback',
         'fjord.search',
+        'fjord.translations',
     ))
 
 MIDDLEWARE_CLASSES = get_middleware(
