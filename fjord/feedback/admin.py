@@ -11,6 +11,7 @@ class ProductAdmin(admin.ModelAdmin):
         'on_dashboard',
         'display_name',
         'db_name',
+        'translation_system',
         'notes',
         'slug')
     list_filter = ('enabled', 'on_dashboard')

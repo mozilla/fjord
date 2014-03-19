@@ -14,6 +14,7 @@
           <th>display name</th>
           <th>db name</th>
           <th>slug</th>
+          <th>automatic translations?</th>
           <th>feedback product url</th>
           <th>notes</th>
         </tr>
@@ -25,6 +26,7 @@
             <td>{{ prod.display_name }}</td>
             <td>{{ prod.db_name }}</td>
             <td>{{ prod.slug }}</td>
+            <td>{{ prod.translation_system }}</td>
             {# FIXME - URL is hard-coded so it doesn't include the locale. Need better way to do this. #}
             <td><a href="https://input.mozilla.org/feedback/{{ prod.slug }}">https://input.mozilla.org/feedback/{{ prod.slug }}</a></td>
             <td>{{ prod.notes }}</td>
