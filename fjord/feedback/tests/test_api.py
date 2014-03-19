@@ -6,17 +6,9 @@ from nose.tools import eq_
 
 from fjord.base.tests import TestCase, reverse
 from fjord.feedback import models
-from fjord.feedback.tests import product
 
 
 class TestFeedbackAPI(TestCase):
-    def setUp(self):
-        super(TestFeedbackAPI, self).setUp()
-        product(display_name=u'Firefox', save=True)
-        product(display_name=u'Firefox OS', save=True)
-        product(display_name=u'Firefox for Android', save=True)
-        product(display_name=u'Firefox Metro', save=True)
-
     def test_minimal(self):
         data = {
             'happy': True,

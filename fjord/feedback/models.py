@@ -19,6 +19,9 @@ from fjord.search.index import (
     boolean_type, date_type, integer_type, keyword_type, terms_type,
     text_type)
 from fjord.search.tasks import register_live_index
+from fjord.translations.models import get_translation_system_choices
+from fjord.translations.tasks import register_auto_translation
+from fjord.translations.utils import compose_key
 
 
 # This defines the number of characters the description can have.  We
@@ -52,9 +55,7 @@ class Product(ModelBase):
     # System slated for automatic translation, or null if none;
     # See translation app for details.
     translation_system = models.CharField(
-        choices=(
-            (u'', u'None'),
-        ),
+        choices=get_translation_system_choices(),
         null=True,
         blank=True,
         max_length=20,
@@ -67,6 +68,7 @@ class Product(ModelBase):
         return dict(prod for prod in products)
 
 
+@register_auto_translation
 @register_live_index
 class Response(ModelBase):
     """Basic feedback response
@@ -132,6 +134,68 @@ class Response(ModelBase):
 
     def __repr__(self):
         return self.__unicode__().encode('ascii', 'ignore')
+
+    def generate_translation_jobs(self):
+        """Returns a list of tuples, one for each translation job
+
+        If the locale of this response is English, then we just copy over
+        the description and we're done.
+
+        If the product of this response isn't set up for auto-translation,
+        then we're done.
+
+        If we already have a response with this text that's
+        translated, we copy the most recent translation over.
+
+        Otherwise we generate a list of jobs to be done.
+
+        .. Note::
+
+           This happens in a celery task, so feel free to do what you need
+           to do here.
+
+        """
+        # If the text is in English, we copy it over and we're
+        # done. We do this regardless of whether auto-translation is
+        # enabled or not for this product.
+        if self.locale == 'en-US':
+            self.translated_description = self.description
+            self.save()
+            return []
+
+        try:
+            prod = Product.objects.get(db_name=self.product)
+            system = prod.translation_system
+        except Product.DoesNotExist:
+            # If the product doesn't exist, then I don't know what's
+            # going on, but we shouldn't create any translation jobs
+            return []
+
+        if not system:
+            # If this product isn't set up for translation, don't
+            # translate it.
+            return []
+
+        try:
+            # See if this text has been translated already--if so, use
+            # the most recent translation.
+            existing_obj = (
+                Response.objects
+                .filter(description=self.description)
+                .exclude(translated_description__isnull=True)
+                .exclude(translated_description=u'')
+                .latest('id'))
+            self.translated_description = existing_obj.translated_description
+            self.save()
+            return []
+        except Response.DoesNotExist:
+            pass
+
+        return [
+            # key, system, src language, src field, dst language, dst field
+            (compose_key(self), system, self.locale, 'description',
+             u'en-US', 'translated_description')
+        ]
 
     @classmethod
     def get_export_keys(cls, confidential=False):
