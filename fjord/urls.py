@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.conf.urls.defaults import patterns, include
+from django.conf.urls import patterns, include
 from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.http import HttpResponse
