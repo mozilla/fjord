@@ -127,3 +127,6 @@
 [submodule "vendor/src/billiard"]
 	path = vendor/src/billiard
 	url = git://github.com/celery/billiard
+[submodule "vendor/src/django-extensions"]
+	path = vendor/src/django-extensions
+	url = https://github.com/django-extensions/django-extensions.git
