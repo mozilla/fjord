@@ -262,6 +262,11 @@ MINIFY_BUNDLES = {
             'js/init.js',
             'js/ga.js',
         ),
+        'cyoa': (
+            'js/lib/jquery.min.js',
+            'js/cyoa.js',
+            'js/ga.js',
+        ),
         'generic_feedback': (
             'js/lib/jquery.min.js',
             'js/common_feedback.js',
