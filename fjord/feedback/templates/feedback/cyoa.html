@@ -3,12 +3,15 @@
 
 {% block page_title %}Which product?{% endblock %}
 
+{% block site_js %}
+  <script src="{{ settings.STATIC_URL }}js/lib/brick-1.0.0.byob.min.js"></script>
+  {{ js('cyoa') }}
+{% endblock %}
+
 {% block body %}
   <x-deck>
     <x-card id="picker">
-      <x-appbar>
-        <header>Which product?</header>
-      </x-appbar>
+      <x-appbar heading="Which product?" subheading=""></x-appbar>
 
       <section>
         <p>
