@@ -40,6 +40,7 @@ src/django-celery
 src/django_compressor
 src/django-cronjobs
 src/django-eadred
+src/django-extensions
 src/django-mobility
 src/django-mozilla-product-details
 src/django-multidb-router

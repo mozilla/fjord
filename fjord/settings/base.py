@@ -165,6 +165,7 @@ INSTALLED_APPS = get_apps(
         'django_browserid',
         'adminplus',
         'django.contrib.admin',
+        'django_extensions',
         'django_nose',
         'djcelery',
         'eadred',
