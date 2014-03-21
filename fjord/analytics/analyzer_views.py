@@ -327,6 +327,7 @@ def analytics_search(request):
     search_locale = request.GET.get('locale', None)
     search_country = request.GET.get('country', None)
     search_product = request.GET.get('product', None)
+    search_domain = request.GET.get('domain', None)
     search_version = request.GET.get('version', None)
     search_query = request.GET.get('q', None)
     search_date_start = smart_date(
@@ -379,6 +380,9 @@ def analytics_search(request):
         if search_country is not None and search_product == 'Firefox OS':
             f &= F(country=unknown_to_empty(search_country))
             current_search['country'] = search_country
+    if search_domain is not None:
+        f &= F(url_domain=unknown_to_empty(search_domain))
+        current_search['domain'] = search_domain
 
     if search_date_start is None and search_date_end is None:
         selected = '7d'
@@ -441,7 +445,7 @@ def analytics_search(request):
     # Navigation facet data
     facets = search.facet(
         'happy', 'platform', 'locale', 'country', 'product', 'version',
-        'has_email',
+        'url_domain', 'has_email',
         filtered=bool(search._process_filters(f.filters)))
 
     # This loop does two things. First it maps 'T' -> True and 'F' ->
@@ -456,6 +460,7 @@ def analytics_search(request):
         'country': {},
         'product': {},
         'version': {},
+        'url_domain': {},
     }
     for param, terms in facets.facet_counts().items():
         for term in terms:
@@ -528,6 +533,12 @@ def analytics_search(request):
                 display='Locale',
                 checked=search_locale,
                 display_map=locale_name),
+            counts_to_options(
+                counts['url_domain'].items(),
+                name='domain',
+                display='Domain',
+                checked=search_domain,
+                display_map=empty_to_unknown),
         ]
     )
 
