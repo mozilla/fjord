@@ -1,0 +1,12 @@
+MANIFEST.in
+setup.cfg
+pip-egg-info/tldextract.egg-info/PKG-INFO
+pip-egg-info/tldextract.egg-info/SOURCES.txt
+pip-egg-info/tldextract.egg-info/dependency_links.txt
+pip-egg-info/tldextract.egg-info/entry_points.txt
+pip-egg-info/tldextract.egg-info/top_level.txt
+tldextract/.tld_set_snapshot
+tldextract/__init__.py
+tldextract/tldextract.py
+tldextract/tests/__init__.py
+tldextract/tests/all.py

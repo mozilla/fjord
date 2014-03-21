@@ -10,6 +10,7 @@ from rest_framework import serializers
 from tower import ugettext_lazy as _
 from product_details import product_details
 
+from fjord.base.domain import get_domain
 from fjord.base.models import ModelBase
 from fjord.base.util import smart_truncate
 from fjord.feedback.config import CODE_TO_COUNTRY
@@ -240,12 +241,7 @@ class Response(ModelBase):
     @property
     def url_domain(self):
         """Returns the domain part of a url"""
-        if not self.url:
-            return u''
-        parsed = urlparse.urlparse(self.url)
-        if parsed.scheme not in ['http', 'https']:
-            return u''
-        return u'.'.join(parsed.hostname.split('.')[-2:])
+        return get_domain(self.url)
 
     @property
     def user_email(self):
