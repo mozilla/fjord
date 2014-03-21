@@ -24,6 +24,7 @@ packages/requests
 packages/selenium/py
 packages/simplejson
 packages/six
+packages/tldextract
 packages/translate-toolkit
 src/billiard
 src/bleach
