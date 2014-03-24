@@ -10,17 +10,26 @@ from fjord.search.tests import ElasticTestCase
 class TestResponseModel(TestCase):
     def test_description_truncate_on_save(self):
         # Extra 10 characters get lopped off on save.
-        resp = response(description=('a' * 10010))
-        resp.save()
-
+        resp = response(description=('a' * 10010), save=True)
         eq_(resp.description, 'a' * 10000)
 
     def test_description_strip_on_save(self):
         # Nix leading and trailing whitespace.
-        resp = response(description=u'   \n\tou812\t\n   ')
-        resp.save()
-
+        resp = response(description=u'   \n\tou812\t\n   ', save=True)
         eq_(resp.description, u'ou812')
+
+    def test_url_domain(self):
+        # Test a "normal domain"
+        resp = response(url=u'http://foo.example.com.br/blah')
+        eq_(resp.url_domain, u'example.com.br')
+        assert isinstance(resp.url_domain, unicode)
+
+        # Test a unicode domain
+        resp = response(
+            url=u'http://\u30c9\u30e9\u30af\u30a810.jp/dq10_skillpoint.html',
+            save=True)
+        eq_(resp.url_domain, u'\u30c9\u30e9\u30af\u30a810.jp')
+        assert isinstance(resp.url_domain, unicode)
 
 
 class TestAutoTranslation(TestCase):

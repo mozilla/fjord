@@ -13,25 +13,27 @@ def get_domain(url):
     This nicely deals with about: and chrome:// urls, too.
 
     >>> get_domain('http://foo.example.com/some-path')
-    'example.com'
+    u'example.com'
     >>> get_domain('http://foo.example.com.br')
-    'example.com.br'
+    u'example.com.br'
     >>> get_domain('about:home')
-    ''
+    u''
     >>> get_domain('127.0.0.1')
-    ''
+    u''
     >>> get_domain('chrome://whatever')
-    ''
+    u''
     >>> get_domain('ftp://blah@example.com')
-    ''
+    u''
     >>> get_domain('')
-    ''
+    u''
 
     """
     if not url:
         return u''
 
     if isinstance(url, unicode):
+        # Do this because tldextract does some stuff that only
+        # operates on strings.
         url = url.encode('utf-8')
 
     # If there's a : in the url, then it either separates the scheme
@@ -63,4 +65,4 @@ def get_domain(url):
         return u''
 
     # Suffix is the tld. We want that plus the next level up.
-    return res.domain + '.' + res.suffix
+    return res.domain.decode('utf-8') + u'.' + res.suffix.decode('utf-8')
