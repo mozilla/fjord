@@ -31,6 +31,25 @@
         $counter.toggleClass('warning', (remaining >= 0 && remaining <= Math.round(max * 0.2)));
     }
 
+    function toggleNextButton(id) {
+        // Toggles the enabling of the next button
+        // id is the id of the button we want to affect
+        var isValid = true;
+        if (id == 'description-next-btn') {
+            // Check if the description and url fields are valid
+            if ($('#description').hasClass('invalid') ||
+                    $('#id_url').hasClass('invalid')) {
+                isValid = false;
+            }
+        }
+
+        if (isValid) {
+            $('#'+id).prop('disabled', false);
+        } else {
+            $('#'+id).prop('disabled', true);
+        }
+    }
+
     function init() {
         $('input[type="text"]').keypress(function(event) {
             // Tweak handling for CR for input text fields so they go
@@ -72,13 +91,25 @@
 
         countRemaining($('#description'));
 
-        $('#description').on('keyup', function() {
+        $('#description').on('input', function() {
             countRemaining(this);
-            if ($('#description').val().replace(/^\s+/, '') === '') {
-                $('#description-next-btn').prop('disabled', true);
+            if ($(this).val().replace(/^\s+/, '') === '') {
+                $(this).addClass('invalid');
             } else {
-                $('#description-next-btn').prop('disabled', false);
+                $(this).removeClass('invalid');
             }
+            toggleNextButton('description-next-btn');
+        });
+
+        $('#id_url').on('input', function() {
+            var urlRegExp = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
+            if ($(this).val().length > 0 &&
+                    !$(this).val().match(urlRegExp)) {
+                $(this).addClass('invalid');
+            } else {
+                $(this).removeClass('invalid');
+            }
+            toggleNextButton('description-next-btn');
         });
 
         $('#email-ok').on('change', function() {
