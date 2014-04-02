@@ -21,9 +21,9 @@ There's an installation guide on the ElasticSearch site:
 
 http://www.elasticsearch.org/guide/reference/setup/installation.html
 
-Use version 0.20.5:
+Use version 0.90.10:
 
-http://www.elasticsearch.org/downloads/version-0-20-5/
+http://www.elasticsearch.org/downloads/0-90-10/
 
 The directory you install Elastic in will hereafter be referred to as
 ``ELASTICDIR``.
