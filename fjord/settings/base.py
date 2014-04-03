@@ -262,9 +262,8 @@ MINIFY_BUNDLES = {
             'js/init.js',
             'js/ga.js',
         ),
-        'cyoa': (
+        'singlecard': (
             'js/lib/jquery.min.js',
-            'js/cyoa.js',
             'js/ga.js',
         ),
         'generic_feedback': (

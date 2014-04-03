@@ -2,12 +2,15 @@
 
 {% block page_title %}{{ _('Unknown product') }}{% endblock %}
 
+{% block site_js %}
+  <script src="{{ settings.STATIC_URL }}js/lib/brick-1.0.0.byob.min.js"></script>
+  {{ js('singlecard') }}
+{% endblock %}
+
 {% block body %}
-  <x-deck>
+  <x-deck selected-index=0>
     <x-card id="unknownproduct">
-      <x-appbar>
-        <header>{{ _('Unknown product') }}</header>
-      </x-appbar>
+      <x-appbar heading="{{ _('Unknown product') }}" subheading=""></x-appbar>
 
       <section>
         <div class="content">
