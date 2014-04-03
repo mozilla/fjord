@@ -5,11 +5,11 @@
 
 {% block site_js %}
   <script src="{{ settings.STATIC_URL }}js/lib/brick-1.0.0.byob.min.js"></script>
-  {{ js('cyoa') }}
+  {{ js('singlecard') }}
 {% endblock %}
 
 {% block body %}
-  <x-deck>
+  <x-deck selected-index=0>
     <x-card id="picker">
       <x-appbar heading="Which product?" subheading=""></x-appbar>
 
