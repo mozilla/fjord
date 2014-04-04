@@ -35,8 +35,12 @@ To run the test suite, do::
     $ ./manage.py test
 
 
-However, that doesn't provide the most sensible defaults. Here is a
-good command to alias to something short::
+However, that doesn't provide the most sensible defaults. Amongst
+other things, you see tons and tons and tons and tons and tons and
+tons and tons and tons and tons and tons and tons and tons and tons of
+debugging output. Ew.
+
+I suggest you run it this way::
 
     $ ./manage.py test -s --noinput --logging-clear-handlers
 
