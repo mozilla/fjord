@@ -1,36 +1,3 @@
-[submodule "vendor-local/src/django-cache-machine"]
-	path = vendor-local/src/django-cache-machine
-	url = git://github.com/jbalogh/django-cache-machine.git
-[submodule "vendor-local/src/django-adminplus"]
-	path = vendor-local/src/django-adminplus
-	url = git://github.com/jsocol/django-adminplus.git
-[submodule "vendor-local/src/elasticutils"]
-	path = vendor-local/src/elasticutils
-	url = git://github.com/mozilla/elasticutils.git
-[submodule "vendor-local/src/django-eadred"]
-	path = vendor-local/src/django-eadred
-	url = git://github.com/willkg/django-eadred.git
-[submodule "vendor-local/src/django-statsd"]
-	path = vendor-local/src/django-statsd
-	url = https://github.com/andymckay/django-statsd.git
-[submodule "vendor-local/src/statsd"]
-	path = vendor-local/src/statsd
-	url = https://github.com/jsocol/pystatsd.git
-[submodule "vendor-local/src/pyelasticsearch"]
-	path = vendor-local/src/pyelasticsearch
-	url = git://github.com/rhec/pyelasticsearch.git
-[submodule "vendor-local/src/django-browserid"]
-	path = vendor-local/src/django-browserid
-	url = git://github.com/mozilla/django-browserid.git
-[submodule "vendor-local/src/dennis"]
-	path = vendor-local/src/dennis
-	url = https://github.com/willkg/dennis.git
-[submodule "vendor-local/src/django-rest-framework"]
-	path = vendor-local/src/django-rest-framework
-	url = https://github.com/tomchristie/django-rest-framework.git
-[submodule "vendor-local/src/django-ratelimit"]
-	path = vendor-local/src/django-ratelimit
-	url = https://github.com/jsocol/django-ratelimit.git
 [submodule "vendor/src/dennis"]
 	path = vendor/src/dennis
 	url = https://github.com/willkg/dennis.git
@@ -58,9 +25,6 @@
 [submodule "vendor/src/elasticutils"]
 	path = vendor/src/elasticutils
 	url = https://github.com/mozilla/elasticutils.git
-[submodule "vendor/src/pyelasticsearch"]
-	path = vendor/src/pyelasticsearch
-	url = https://github.com/rhec/pyelasticsearch.git
 [submodule "vendor/src/pystatsd"]
 	path = vendor/src/pystatsd
 	url = https://github.com/jsocol/pystatsd.git
