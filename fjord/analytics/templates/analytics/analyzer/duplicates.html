@@ -50,6 +50,11 @@
                 <p>{{ desc }}</p>
               </td>
               <td>
+                <p>
+                  <b>Actions:</b>
+{# FIXME: This is hardcoded and goofy. Better delete measures will come later in bug #949461. #}
+                  <a href="/admin/feedback/response/?q={{ desc|replace('\n', ' ')|truncate(100, False, '') }}">Delete in admin</a>
+                </p>
                 <table class="details">
                   <tbody>
                     {% for resp in responses %}
