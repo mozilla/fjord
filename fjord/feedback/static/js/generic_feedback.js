@@ -44,9 +44,9 @@
         }
 
         if (isValid) {
-            $('#'+id).prop('disabled', false);
+            $('#' + id).prop('disabled', false);
         } else {
-            $('#'+id).prop('disabled', true);
+            $('#' + id).prop('disabled', true);
         }
     }
 
@@ -102,9 +102,9 @@
         });
 
         $('#id_url').on('input', function() {
-            var urlRegExp = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
-            if ($(this).val().length > 0 &&
-                    !$(this).val().match(urlRegExp)) {
+            var urlRegExp = /^((ftp|http|https):\/\/)?(\w+:{0,1}\w*@)?(\S+\.\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
+
+            if ($(this).val().length > 0 && !$(this).val().match(urlRegExp)) {
                 $(this).addClass('invalid');
             } else {
                 $(this).removeClass('invalid');
