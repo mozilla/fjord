@@ -35,13 +35,22 @@
         // Toggles the enabling of the next button
         // id is the id of the button we want to affect
         var isValid = true;
-        if (id == 'description-next-btn') {
-            // Check if the description and url fields are valid
-            if ($('#description').hasClass('invalid') ||
-                    $('#id_url').hasClass('invalid')) {
-                isValid = false;
-            }
+        switch (id) {
+            case 'description-next-btn':
+                // Check if the description and url fields are valid
+                if ($('#description').hasClass('invalid') ||
+                        $('#id_url').hasClass('invalid')) {
+                    isValid = false;
+                }
+                break;
+            case 'form-submit-btn':
+                if ($('#email-ok').is(':checked') &&
+                        $('#id_email').hasClass('invalid')) {
+                    isValid = false;
+                }
+                break;
         }
+
 
         if (isValid) {
             $('#' + id).prop('disabled', false);
@@ -115,29 +124,18 @@
         $('#email-ok').on('change', function() {
             var on = $(this).is(':checked');
             $('#email-details').toggle(on);
+            toggleNextButton('form-submit-btn');
         });
 
-        $('button.complete').click(function(event) {
-            var data, email, numCards;
+        $('#id_email').on('input', function() {
+            var emailRegExp = /^[a-zA-Z0-9._\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,6}$/;
 
-            // verify email address
-            if ($('#email-ok').is(':checked')) {
-                email = $.trim($('#email-input').val());
-
-                if (email !== '') {
-                    // this should be close enough to what django is doing that we
-                    // can catch issues client-side
-                    if (!email.match(/^[a-zA-Z0-9._\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,6}$/)) {
-                        $('#email-error').show();
-                        return;
-                    }
-                }
-
-                // in case it was showing, we hide it again
-                $('#email-error').hide();
+            if ($(this).val().length > 0 && !$(this).val().match(emailRegExp)) {
+                $(this).addClass('invalid');
+            } else {
+                $(this).removeClass('invalid');
             }
-
-            // Lack of 'return false;' here submits the form.
+            toggleNextButton('form-submit-btn');
         });
 
         // If there's a hash and a number, wipe it out with a
