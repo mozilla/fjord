@@ -26,6 +26,8 @@ urlpatterns += patterns(
         name='analytics_products'),
     url(r'^analytics/search/?$', 'analytics_search',
         name='analytics_search'),
+    url(r'^analytics/hourly/?$', 'analytics_hourly_histogram',
+        name='analytics_hourly_histogram'),
 
     url(r'^analytics/duplicates/?$', 'analytics_duplicates', name='analytics_duplicates'),
 )

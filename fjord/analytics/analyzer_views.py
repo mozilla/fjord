@@ -26,8 +26,9 @@ from django.utils.encoding import force_bytes
 
 from fjord.analytics.forms import OccurrencesComparisonForm
 from fjord.analytics.tools import (
+    counts_to_options,
     generate_query_parsed,
-    counts_to_options)
+    zero_fill)
 from fjord.base.helpers import locale_name
 from fjord.base.util import (
     analyzer_required,
@@ -537,4 +538,46 @@ def analytics_search(request):
         'next_page': page + 1 if end < search_count else None,
         'current_search': current_search,
         'selected': selected,
+    })
+
+
+@check_new_user
+@analyzer_required
+@es_required_or_50x(error_template='analytics/es_down.html')
+def analytics_hourly_histogram(request):
+    """Shows an hourly histogram for the last 5 days of all responses"""
+    template = 'analytics/analyzer/hourly_histogram.html'
+
+    search_date_end = datetime.now()
+    search_date_start = search_date_end - timedelta(days=5)
+
+    search = ResponseMappingType.search()
+    filters = F(created__gte=search_date_start)
+    search.filter(filters)
+
+    hourly_histogram = search.facet_raw(
+        hourly={
+            'date_histogram': {'interval': 'hour', 'field': 'created'},
+            'facet_filter': search._process_filters(filters.filters)
+        }).facet_counts()
+
+    hourly_data = dict((p['time'], p['count']) for p in hourly_histogram['hourly'])
+
+    hour = 60 * 60 * 1000.0
+    zero_fill(search_date_start, search_date_end, [hourly_data], spacing=hour)
+
+    # FIXME: This is goofy. After zero_fill, we end up with a bunch of trailing
+    # zeros for reasons I don't really understand, so instead of fixing that, I'm
+    # just going to remove them here.
+    hourly_data = sorted(hourly_data.items())
+    while hourly_data and hourly_data[-1][1] == 0:
+        hourly_data.pop(-1)
+
+    histogram = [
+        {'label': 'Hourly', 'name': 'hourly',
+         'data': hourly_data},
+    ]
+
+    return render(request, template, {
+        'histogram': histogram
     })
