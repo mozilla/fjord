@@ -61,7 +61,7 @@ $(function() {
                     $("#tooltip").remove();
                     var x = item.datapoint[0].toFixed(2);
                     var y = item.datapoint[1].toFixed(2);
-                    var text = new Date(Math.floor(x)).toLocaleString();
+                    var text = new Date(Math.floor(x)).toUTCString();
 
                     showTooltip(item.pageX, item.pageY, text + ' = ' + y);
                 }
