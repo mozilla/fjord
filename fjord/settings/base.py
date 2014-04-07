@@ -286,6 +286,18 @@ MINIFY_BUNDLES = {
             'browserid/browserid.js',
             'js/ga.js',
         ),
+        'hourlydashboard': (
+            'js/lib/jquery.min.js',
+            'js/lib/jquery-ui.min.js',
+            'js/init.js',
+            'js/lib/excanvas.js',
+            'js/lib/jquery.flot.js',
+            'js/lib/jquery.flot.time.js',
+            'js/lib/jquery.flot.resize.js',
+            'js/hourly_dashboard.js',
+            'browserid/browserid.js',
+            'js/ga.js',
+        ),
         'thanks': (
             'js/lib/jquery.min.js',
             'js/init.js',
