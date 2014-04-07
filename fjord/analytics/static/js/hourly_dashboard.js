@@ -63,6 +63,12 @@ $(function() {
                     var y = item.datapoint[1].toFixed(2);
                     var text = new Date(Math.floor(x)).toUTCString();
 
+                    // FIXME: So, the data is actuall Pacific time and
+                    // not UTC. Doing toUTCString() tacks on a "GMT"
+                    // to the end.  We remove that here in order to
+                    // put a band-aid on the band-aid.
+                    text = text.substring(0, text.length - 4);
+
                     showTooltip(item.pageX, item.pageY, text + ' = ' + y);
                 }
             } else {
