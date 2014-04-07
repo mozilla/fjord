@@ -6,7 +6,7 @@ $(function() {
         // Draw histogram in the middle column.
         var data = $histogram.data('histogram');
         colors = {
-            'hourly': '#723EBF',
+            'hourly': '#723EBF'
         };
         for (var i = 0; i < data.length; i++) {
             var name = data[i]['name'];
