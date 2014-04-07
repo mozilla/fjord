@@ -114,15 +114,8 @@ def analytics_occurrences(request):
                 first_params['date_start'] = '2013-01-01'
 
             # Have to do raw because we want a size > 10.
-            first_resp_s = first_resp_s.facet_raw(
-                description_bigrams={
-                    'terms': {
-                        'field': 'description_bigrams',
-                        'size': '30',
-                    },
-                    'facet_filter': first_resp_s._build_query()['filter']
-                }
-            )
+            first_resp_s = first_resp_s.facet('description_bigrams',
+                                              size=30, filtered=True)
             first_resp_s = first_resp_s[0:0]
 
             first_facet_total = first_resp_s.count()
@@ -173,15 +166,8 @@ def analytics_occurrences(request):
                     second_params['date_start'] = '2013-01-01'
 
                 # Have to do raw because we want a size > 10.
-                second_resp_s = second_resp_s.facet_raw(
-                    description_bigrams={
-                        'terms': {
-                            'field': 'description_bigrams',
-                            'size': '30',
-                        },
-                        'facet_filter': second_resp_s._build_query()['filter']
-                    }
-                )
+                second_resp_s = second_resp_s.facet('description_bigrams',
+                                                    size=30, filtered=True)
                 second_resp_s = second_resp_s[0:0]
 
                 second_facet_total = second_resp_s.count()
