@@ -1,0 +1,19 @@
+{% extends "analytics/analyzer/dashboard.html" %}
+{# Note: This is not l10n-ized since it's only available to analyzers for now. #}
+
+{% block content_middle %}
+  <div class="col full">
+    <div class="block graph">
+      <h1>Hourly number of responses over last 5 days</h1>
+      {# A graph will be dynamically inserted in these divs by Flot. #}
+      <div class="histogram" data-histogram="{{ histogram|to_json }}"></div>
+      <div class="legend"></div>
+      <div class="note">{{ _('Note: All dates and times are in Cheng Time.') }}</div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block site_js %}
+  {{ js('hourlydashboard') }}
+  <script type="text/javascript" src="https://login.persona.org/include.js"></script>
+{% endblock %}
