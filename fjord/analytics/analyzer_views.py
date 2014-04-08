@@ -15,7 +15,7 @@
 # English. Ergo, there's no localization here.
 
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 import csv
 
 from elasticutils.contrib.django import F, es_required_or_50x
@@ -548,11 +548,16 @@ def analytics_hourly_histogram(request):
     """Shows an hourly histogram for the last 5 days of all responses"""
     template = 'analytics/analyzer/hourly_histogram.html'
 
-    search_date_end = datetime.now()
-    search_date_start = search_date_end - timedelta(days=5)
+    date_end = smart_date(
+        request.GET.get('date_end', None), fallback=None)
+
+    if date_end is None:
+        date_end = date.today()
+
+    date_start = date_end - timedelta(days=5)
 
     search = ResponseMappingType.search()
-    filters = F(created__gte=search_date_start)
+    filters = F(created__gte=date_start, created__lte=date_end)
     search.filter(filters)
 
     hourly_histogram = search.facet_raw(
@@ -564,7 +569,7 @@ def analytics_hourly_histogram(request):
     hourly_data = dict((p['time'], p['count']) for p in hourly_histogram['hourly'])
 
     hour = 60 * 60 * 1000.0
-    zero_fill(search_date_start, search_date_end, [hourly_data], spacing=hour)
+    zero_fill(date_start, date_end, [hourly_data], spacing=hour)
 
     # FIXME: This is goofy. After zero_fill, we end up with a bunch of trailing
     # zeros for reasons I don't really understand, so instead of fixing that, I'm
@@ -579,5 +584,7 @@ def analytics_hourly_histogram(request):
     ]
 
     return render(request, template, {
-        'histogram': histogram
+        'histogram': histogram,
+        'start_date': date_start,
+        'end_date': date_end
     })
