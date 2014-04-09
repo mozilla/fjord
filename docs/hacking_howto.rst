@@ -98,7 +98,10 @@ with ``pip``.
 
 To use pip, do this::
 
-    $ sudo pip install -r requirements/compiled.txt
+    # Create your virtual environment
+    $ mkvirtualenv input
+    # Then run
+    $ pip install -r requirements/compiled.txt
 
 If you want to use your system's package manager, you'll need to go
 through ``requirements/compiled.txt`` and install the dependencies by
@@ -215,6 +218,7 @@ installed it to ``node_modules/less/bin/lessc`` and
 
 If it's not, add::
 
+    # to find the path type 'which lessc' in a terminal
     LESS_BIN = '/path/to/lessc'
 
 to your ``fjord/settings/local.py`` file.
