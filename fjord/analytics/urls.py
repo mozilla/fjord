@@ -7,6 +7,10 @@ urlpatterns = patterns(
     # This covers / and /dashboard
     url(r'^(?:dashboard/?)?$', 'dashboard', name='dashboard'),
 
+    # This covers / and /dashboard
+    url(r'^dashboard/(?P<productslug>[^/]+)/?$',
+        'product_dashboard_router', name='product_dashboard'),
+
     # Show a specific response
     url(r'^dashboard/response/(?P<responseid>\d+)/?$',
         'response_view', name='response_view'),

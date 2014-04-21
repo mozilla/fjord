@@ -23,7 +23,7 @@ from fjord.base.util import (
     smart_int,
     smart_date,
     Atom1FeedWithRelatedLinks)
-from fjord.feedback.models import Response, ResponseMappingType
+from fjord.feedback.models import Product, Response, ResponseMappingType
 
 
 @check_new_user
@@ -341,3 +341,238 @@ def dashboard(request):
 @check_new_user
 def underconstruction(request):
     return render(request, 'analytics/underconstruction.html')
+
+
+def generate_totals_histogram(search_date_start, search_date_end, prod):
+    search_date_start = search_date_start - timedelta(days=1)
+
+    search = ResponseMappingType.search()
+    f = F()
+    f &= F(product=prod.db_name)
+
+    f &= F(created__gte=search_date_start)
+    f &= F(created__lt=search_date_end)
+
+    happy_f = f & F(happy=True)
+
+    totals_histogram = search.facet_raw(
+        total={
+            'date_histogram': {'interval': 'day', 'field': 'created'},
+            'facet_filter': search._process_filters(f.filters)
+        },
+        happy={
+            'date_histogram': {'interval': 'day', 'field': 'created'},
+            'facet_filter': search._process_filters(happy_f.filters)
+        },
+    ).facet_counts()
+
+    totals_data = dict((p['time'], p['count']) for p in totals_histogram['total'])
+    zero_fill(search_date_start, search_date_end, [totals_data])
+    totals_data = sorted(totals_data.items())
+
+    happy_data = dict((p['time'], p['count']) for p in totals_histogram['happy'])
+    zero_fill(search_date_start, search_date_end, [happy_data])
+    happy_data = sorted(happy_data.items())
+
+    up_deltas = []
+    down_deltas = []
+    for i, hap in enumerate(happy_data):
+        if i == 0:
+            continue
+
+        yesterday = 0
+        today = 0
+
+        # Figure out yesterday and today as a percent to one
+        # significant digit.
+        if happy_data[i-1][1] and totals_data[i-1][1]:
+            yesterday = int(happy_data[i-1][1] * 1.0 / totals_data[i-1][1] * 1000) / 10.0
+
+        if happy_data[i][1] and totals_data[i][1]:
+            today = int(happy_data[i][1] * 1.0 / totals_data[i][1] * 1000) / 10.0
+
+        if (today - yesterday) >= 0:
+            up_deltas.append((happy_data[i][0], today - yesterday))
+        else:
+            down_deltas.append((happy_data[i][0], today - yesterday))
+
+
+    # Nix the first total because it's not in our date range
+    totals_data = totals_data[1:]
+
+    histogram = [
+        {
+            'name': 'zero',
+            'data': [(totals_data[0][0], 0), (totals_data[-1][0], 0)],
+            'yaxis': 2,
+            'lines': {'show': True, 'fill': False, 'lineWidth': 1, 'shadowSize': 0},
+            'color': '#dddddd',
+        },
+        {
+            'name': 'total',
+            'label': _('Total # responses'),
+            'data': totals_data,
+            'yaxis': 1,
+            'lines': {'show': True, 'fill': False},
+            'points': {'show': True},
+            'color': '#3E72BF',
+        },
+        {
+            'name': 'updeltas',
+            'label': _('Percent change in sentiment upwards'),
+            'data': up_deltas,
+            'yaxis': 2,
+            'bars': {'show': True, 'lineWidth': 3,},
+            'points': {'show': True},
+            'color': '#55E744',
+        },
+        {
+            'name': 'downdeltas',
+            'label': _('Percent change in sentiment downwards'),
+            'data': down_deltas,
+            'yaxis': 2,
+            'bars': {'show': True, 'lineWidth': 3},
+            'points': {'show': True},
+            'color': '#E73E3E',
+        }
+    ]
+
+    return histogram
+
+
+def product_dashboard_firefox(request, prod):
+    template = 'analytics/product_dashboard_firefox.html'
+
+    search_date_end = smart_date(
+        request.GET.get('date_end', None), fallback=None)
+    if search_date_end is None:
+        search_date_end = date.today()
+
+    search_date_start = smart_date(
+        request.GET.get('date_start', None), fallback=None)
+    if search_date_start is None:
+        search_date_start = search_date_end - timedelta(days=7)
+
+    histogram = generate_totals_histogram(
+        search_date_start, search_date_end, prod)
+
+    # FIXME: This is lame, but we need to make sure the item we're
+    # looking at is the totals.
+    assert histogram[1]['name'] == 'total'
+    totals_sum = sum([p[1] for p in histogram[1]['data']])
+
+    search = ResponseMappingType.search()
+    base_f = F()
+    base_f &= F(product=prod.db_name)
+    base_f &= F(created__gte=search_date_start)
+    base_f &= F(created__lt=search_date_end)
+
+    search = search.filter(base_f)
+
+    # Figure out the list of platforms and versions for this range.
+    plats_and_vers = search.facet('platform', 'version', size=50).facet_counts()
+
+    # Figure out the "by platform" histogram
+    platforms = [part['term'] for part in plats_and_vers['platform']]
+    platform_facet = {}
+    for plat in platforms:
+        plat_f = base_f & F(platform=plat)
+        platform_facet[plat if plat else 'unknown'] = {
+            'date_histogram': {'interval': 'day', 'field': 'created'},
+            'facet_filter': search._process_filters(plat_f.filters)
+        }
+
+    platform_counts = search.facet_raw(**platform_facet).facet_counts()
+    platforms_histogram = []
+    for key in platform_counts.keys():
+        data = dict((p['time'], p['count']) for p in platform_counts[key])
+
+        if sum([p['count'] for p in platform_counts[key]]) < (totals_sum * 0.02):
+            # Skip platforms where the number of responses is less than
+            # 2% of the total.
+            continue
+
+        zero_fill(search_date_start, search_date_end, [data])
+        platforms_histogram.append({
+            'name': key,
+            'label': key,
+            'data': sorted(data.items()),
+            'lines': {'show': True, 'fill': False},
+            'points': {'show': True},
+        })
+
+    # Figure out the "by version" histogram
+    versions = [part['term'] for part in plats_and_vers['version']]
+    version_facet = {}
+    for vers in versions:
+        vers_f = base_f & F(version=vers)
+        version_facet['v' + vers if vers else 'unknown'] = {
+            'date_histogram': {'interval': 'day', 'field': 'created'},
+            'facet_filter': search._process_filters(vers_f.filters)
+        }
+
+    version_counts = search.facet_raw(**version_facet).facet_counts()
+    versions_histogram = []
+    for key in version_counts.keys():
+        data = dict((p['time'], p['count']) for p in version_counts[key])
+
+        if sum([p['count'] for p in version_counts[key]]) < (totals_sum * 0.02):
+            # Skip versions where the number of responses is less than
+            # 2% of the total.
+            continue
+
+        zero_fill(search_date_start, search_date_end, [data])
+        versions_histogram.append({
+            'name': key,
+            'label': key,
+            'data': sorted(data.items()),
+            'lines': {'show': True, 'fill': False},
+            'points': {'show': True},
+        })
+
+    return render(request, template, {
+        'start_date': search_date_start,
+        'end_date': search_date_end,
+        'platforms_histogram': platforms_histogram,
+        'versions_histogram': versions_histogram,
+        'histogram': histogram,
+        'product': prod
+    })
+
+
+def product_dashboard_generic(request, prod):
+    template = 'analytics/product_dashboard.html'
+
+    search_date_end = smart_date(
+        request.GET.get('date_end', None), fallback=None)
+    if search_date_end is None:
+        search_date_end = date.today()
+
+    search_date_start = smart_date(
+        request.GET.get('date_start', None), fallback=None)
+    if search_date_start is None:
+        search_date_start = search_date_end - timedelta(days=7)
+
+    histogram = generate_totals_histogram(
+        search_date_start, search_date_end, prod)
+
+    return render(request, template, {
+        'start_date': search_date_start,
+        'end_date': search_date_end,
+        'histogram': histogram,
+        'product': prod
+    })
+
+
+PRODUCT_TO_DASHBOARD = {
+    'firefox': product_dashboard_firefox
+}
+
+@check_new_user
+@es_required_or_50x(error_template='analytics/es_down.html')
+def product_dashboard_router(request, productslug):
+    prod = get_object_or_404(Product, slug=productslug)
+    # FIXME - Some products should never have public dashboards. This
+    # should handle that.
+    fun = PRODUCT_TO_DASHBOARD.get(productslug, product_dashboard_generic)
+    return fun(request, prod)
