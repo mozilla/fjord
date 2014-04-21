@@ -1,0 +1,71 @@
+{% extends "analytics/dashboard_base.html" %}
+
+{% block body_id %}dashboard{% endblock %}
+
+{% block content %}
+  <div class="col">
+    <div class="block">
+      <div class="expando">
+        <label for="date_start">Start date</label>
+        <input id="date_start" type="date" name="date_start" value="{{ start_date }}" placeholder="{{ _('Start') }}">
+        <label for="date_end">End date</label>
+        <input id="date_end" type="date" name="date_end" value="{{ end_date }}" placeholder="{{ _('End') }}">
+        <a href="#" class="button" id="whensubmit">{{ _('Set') }}</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col doublewide">
+    <div class="info">
+      <p>
+        <b>Warning: Very alpha version!</b>
+      </p>
+      <p>
+        {% trans %}
+          This is an alpha version of a Firefox desktop product
+          dashboard I threw together in a couple of days on a lark before
+          Australis.
+        {% endtrans %}
+      </p>
+      <p>
+        {% trans survey_url="http://www.surveygizmo.com/s3/1629097/Firefox-Input-Dashboard" %}
+          Want to help? <a href="{{ survey_url }}">Fill out this quick survey</a>
+          about how you use Input.
+        {% endtrans %}
+      </p>
+    </div>
+
+    <div class="block">
+      <h1>{{ product.display_name }}</h1>
+
+      <h2>Totals</h2>
+      <div class="graph">
+        {# A graph will be dynamically inserted in these divs by Flot. #}
+        <div class="histogram" data-histogram="{{ histogram|to_json }}"></div>
+        <div id="totalslegend" class="legend"></div>
+        <div class="note">{{ _('Note: All dates and times are in Pacific Time.') }}</div>
+      </div>
+
+      <h2>By platform</h2>
+      <div class="graph">
+        {# A graph will be dynamically inserted in these divs by Flot. #}
+        <div class="platformshistogram" data-histogram="{{ platforms_histogram|to_json }}"></div>
+        <div id="platformslegend" class="legend"></div>
+        <div class="note">{{ _('Note: All dates and times are in Pacific Time.') }}</div>
+      </div>
+
+      <h2>By version</h2>
+      <div class="graph">
+        {# A graph will be dynamically inserted in these divs by Flot. #}
+        <div class="versionshistogram" data-histogram="{{ versions_histogram|to_json }}"></div>
+        <div id="versionslegend" class="legend"></div>
+        <div class="note">{{ _('Note: All dates and times are in Pacific Time.') }}</div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block site_js %}
+  {{ js('productdashboardfirefox') }}
+  <script type="text/javascript" src="https://login.persona.org/include.js"></script>
+{% endblock %}
