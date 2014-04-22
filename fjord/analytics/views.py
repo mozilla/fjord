@@ -340,3 +340,8 @@ def dashboard(request):
         'selected': selected,
         'atom_url': generate_dashboard_url(request),
     })
+
+
+@check_new_user
+def underconstruction(request):
+    return render(request, 'analytics/underconstruction.html')

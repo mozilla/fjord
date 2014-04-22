@@ -11,6 +11,8 @@ urlpatterns = patterns(
     url(r'^dashboard/response/(?P<responseid>\d+)/?$',
         'response_view', name='response_view'),
 
+    # Temporary!: The under construction view
+    url(r'^underc/?$', 'underconstruction', name='underconstruction'),
 )
 
 # These are analyzer-group only views.
