@@ -93,11 +93,45 @@ $(function() {
             }
             data[i]['color'] = color;
         }
+
+        function weekends(axes) {
+            var markings = [];
+
+            // Start with the minimum xaxis tick
+            var d = new Date(axes.xaxis.min);
+
+            // Move to the first weekend day
+            d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 1) % 7));
+            d.setUTCSeconds(0);
+            d.setUTCMinutes(0);
+            d.setUTCHours(0);
+
+            var stamp = d.getTime();
+            var day = 24 * 60 * 60 * 1000;
+
+            // Iterate to the maximum xaxis figuring out each weekend
+            // block and adding a thing to the xaxis markings.
+            while (stamp < axes.xaxis.max) {
+                markings.push({
+                    xaxis: {
+                        from: stamp,
+                        to: stamp + (2 * day)
+                    }
+                });
+                stamp += 7 * day;
+            }
+
+            return markings;
+        }
+
         var options = {
             series: {
                 hover: true,
                 lines: { show: true, fill: false },
                 points: { show: true }
+            },
+            grid: {
+                markings: weekends
             },
             xaxis: {
                 mode: 'time',
@@ -108,7 +142,7 @@ $(function() {
             },
             legend: {
                 container: $('.graph .legend'),
-                noColumns: 2 // number of columns
+                noColumns: 2
             }
         };
         var plot = $.plot($histogram, data, options);

@@ -241,7 +241,7 @@ class TestZeroFillHelper(TestCase):
         }
         zero_fill(start, end, [data1, data2])
 
-        for day in range(1, 8):
+        for day in range(1, 7):
             millis = epoch_milliseconds(datetime(2012, 1, day))
             assert millis in data1, "Day %s was not zero filled." % day
             assert millis in data2, "Day %s was not zero filled." % day
