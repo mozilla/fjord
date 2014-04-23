@@ -2,7 +2,7 @@
 # which has "secure" parts to it in the template.
 
 import json
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
@@ -173,16 +173,12 @@ def dashboard(request):
         selected = '7d'
 
     if search_date_end is None:
-        search_date_end = datetime.now()
+        search_date_end = date.today()
     if search_date_start is None:
         search_date_start = search_date_end - timedelta(days=7)
 
     current_search['date_end'] = search_date_end.strftime('%Y-%m-%d')
-    # Add one day, so that the search range includes the entire day.
-    end = search_date_end + timedelta(days=1)
-    # Note 'less than', not 'less than or equal', because of the added
-    # day above.
-    f &= F(created__lt=end)
+    f &= F(created__lte=search_date_end)
 
     current_search['date_start'] = search_date_start.strftime('%Y-%m-%d')
     f &= F(created__gte=search_date_start)

@@ -1,5 +1,6 @@
-from math import floor
+import datetime
 import json
+from math import floor
 
 from django.template.defaultfilters import slugify
 
@@ -293,7 +294,7 @@ def zero_fill(start, end, data_sets, spacing=DAY_IN_MILLIS):
     equally spaced. If they are not, extra points will be added.
 
     This method works with milliseconds because that is the format
-    elasticsearch and Javascript use.
+    Elasticsearch and Javascript use.
 
     :arg start: Datetime to start zero filling.
     :arg end: Datetime to stop zero filling at.
@@ -301,8 +302,7 @@ def zero_fill(start, end, data_sets, spacing=DAY_IN_MILLIS):
     :arg spacing: Number of milliseconds between data points.
     """
     start_millis = epoch_milliseconds(start)
-    # Date ranges are inclusive on both ends.
-    end_millis = epoch_milliseconds(end) + spacing
+    end_millis = epoch_milliseconds(end)
 
     # `timestamp` is a loop counter that iterates over the timestamps
     # from start to end. It can't just be `timestamp = start`, because
