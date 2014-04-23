@@ -7,16 +7,15 @@
   </div>
 
   <div class="col wide">
-    <div class="block feedback">
-      {# FIXME - under construction graphic on left side #}
-      <p>
+    <div class="block feedback uc">
+      <h1>
         {% trans %}
-          Hi, welcome to Firefox Input dashboard.
+          Hi,
         {% endtrans %}
-      </p>
+    </h1>
       <p>
         {% trans %}
-          Pardon our dust. The Mozilla User Advocacy team is currently
+          Welcome to Firefox Input dashboard. Pardon our dust. The Mozilla User Advocacy team is currently
           in the process of redesigning our feedback dashboards to make
           them clearer, easier to understand and more useful. Don't
           worry, we're still collecting feedback from Firefox users
@@ -24,24 +23,27 @@
         {% endtrans %}
       </p>
 
-      <ul>
-        <li>
-          {% trans survey_url="http://www.surveygizmo.com/s3/1629097/Firefox-Input-Dashboard" %}
-            Want to help? <a href="{{ survey_url }}">Fill out this quick survey</a> about how you use Input.
-          {% endtrans %}
-        </li>
-        <li>
-          {% trans bug_url="https://bugzilla.mozilla.org/enter_bug.cgi?product=Input&rep_platform=all&op_sys=all&short_desc=Request info" %}
-            Need some data right now? We're happy to help! <a href="{{ bug_url }}">File a bug</a>.
-          {% endtrans %}
-        </li>
-      </ul>
+      <section class="uc-help">
+          <h2>Want to help?</h2>
 
-      <p>
-        {% trans feedback_url="https://input.mozilla.org/feedback/firefox" %}
-          <a href="{{ feedback_url }}">I want to give feedback about Firefox</a>
-        {% endtrans %}
-      </p>
+          <ul>
+            <li>
+              {% trans survey_url="http://www.surveygizmo.com/s3/1629097/Firefox-Input-Dashboard" %}
+                <a href="{{ survey_url }}">Fill out this quick survey</a> about how you use Input.
+              {% endtrans %}
+            </li>
+            <li>
+              {% trans bug_url="https://bugzilla.mozilla.org/enter_bug.cgi?product=Input&rep_platform=all&op_sys=all&short_desc=Request info" %}
+                Need some data right now? We're happy to help! <a href="{{ bug_url }}">File a bug</a>.
+              {% endtrans %}
+            </li>
+            <li>
+                {% trans feedback_url="https://input.mozilla.org/feedback/firefox" %}
+                  <a href="{{ feedback_url }}">I want to give feedback about Firefox</a>
+                {% endtrans %}
+            </li>
+          </ul>
+      </div>
     </div>
   </div>
 
