@@ -38,6 +38,13 @@ class ResponseFeedbackAdmin(admin.ModelAdmin):
     list_filter = ('happy', ('product', EmptyFriendlyAVFLF),
                    ('locale', EmptyFriendlyAVFLF))
     search_fields = ('description',)
+    actions = ['nix_product']
+    list_per_page = 200
+
+    def nix_product(self, request, queryset):
+        ret = queryset.update(product=u'')
+        self.message_user(request, '%s responses updated.' % ret)
+    nix_product.short_description = u'Remove product for selected responses'
 
     def queryset(self, request):
         # Note: This ignores the super() queryset and uses the
