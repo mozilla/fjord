@@ -64,7 +64,7 @@ $(function() {
         var data = $histogram.data('histogram');
         var options = {
             series: {
-                hover: true,
+                hover: true
             },
             grid: {
                 hoverable: true,
@@ -82,7 +82,7 @@ $(function() {
                 {
                     max: 30,
                     min: -30,
-                    position: 'right',
+                    position: 'right'
                 }
             ],
             legend: {
@@ -121,7 +121,7 @@ $(function() {
         var data = $histogram.data('histogram');
         var options = {
             series: {
-                hover: true,
+                hover: true
             },
             grid: {
                 hoverable: true,
@@ -172,7 +172,7 @@ $(function() {
         var data = $histogram.data('histogram');
         var options = {
             series: {
-                hover: true,
+                hover: true
             },
             grid: {
                 hoverable: true,
