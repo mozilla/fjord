@@ -3,7 +3,7 @@ $(function() {
 
     // Datepickers.
     $('input[type=date]').datepicker({
-        dateFormat: 'yy-mm-dd',
+        dateFormat: 'yy-mm-dd'
     });
 
     // Set up the when selector.
