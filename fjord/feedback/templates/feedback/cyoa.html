@@ -8,30 +8,27 @@
   {{ js('singlecard') }}
 {% endblock %}
 
+{% block site_css %}
+  {{ css('product_picker') }}
+{% endblock %}
+
 {% block body %}
   <x-deck selected-index=0>
     <x-card id="picker">
-      <x-appbar heading="Which product?" subheading=""></x-appbar>
+    <x-appbar>
+        <header>{{ _('Select A Product To Leave Feedback') }}</header>
+      </x-appbar>
 
-      <section>
-        <p>
-          Here's a list of products you can leave feedback for:
-        </p>
-
-        <div class="content">
+      <section class="product-picker">
+        <ul class="content">
           {% for prod in products %}
-            <p>
-              <a href="{{ url('feedback', product=prod.slug) }}">{{ prod.display_name }}</a>
-            </p>
+            <a href="{{ url('feedback', product=prod.slug) }}" class="product-card {{ prod.slug }}">
+              <li>
+                <h3>{{ prod.display_name }}</h3>
+              </li>
+            </a>
           {% endfor %}
-        </div>
-
-        <aside>
-          <div>
-            Note: This is a prototype page and thus is not localized so as
-            to reduce l10n work.
-          </div>
-        </aside>
+        </ul>
       </section>
     </x-card>
   </x-deck>
