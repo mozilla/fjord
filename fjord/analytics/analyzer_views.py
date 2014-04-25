@@ -218,7 +218,7 @@ def analytics_duplicates(request):
                  .filter(created__gte=datetime.now() - timedelta(days=n))
                  .values_dict('description', 'happy', 'created', 'locale',
                               'user_agent', 'id')
-                 .order_by('created').all())
+                 .order_by('created').everything())
 
     total_count = len(responses)
 
