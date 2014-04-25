@@ -228,6 +228,15 @@ MINIFY_BUNDLES = {
             'css/mobile/base.less',
             'css/generic_feedback.less',
         ),
+        'product_picker': (
+            'css/lib/normalize.css',
+            'css/lib/brick-1.0.0.byob.min.css',
+            # FIXME - This should become feedback.less and move out of
+            # mobile/.
+            'css/mobile/base.less',
+            'css/generic_feedback.less',
+            'css/product_picker.less',
+        ),
         'dashboard': (
             'css/ui-lightness/jquery-ui.css',
             'css/lib/normalize.css',
