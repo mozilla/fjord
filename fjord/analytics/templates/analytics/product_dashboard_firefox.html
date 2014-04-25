@@ -4,13 +4,14 @@
 
 {% block content %}
   <div class="col">
-    <div class="block">
-      <div class="expando">
-        <label for="date_start">Start date</label>
-        <input id="date_start" type="date" name="date_start" value="{{ start_date }}" placeholder="{{ _('Start') }}">
-        <label for="date_end">End date</label>
-        <input id="date_end" type="date" name="date_end" value="{{ end_date }}" placeholder="{{ _('End') }}">
-        <a href="#" class="button" id="whensubmit">{{ _('Set') }}</a>
+    <div class="block search">
+      <div class="filter">
+        <div class="expando" id="whentext">
+          <input id="date_start" type="date" name="date_start" value="{{ start_date }}" placeholder="{{ _('Start') }}">
+          -
+          <input id="date_end" type="date" name="date_end" value="{{ end_date }}" placeholder="{{ _('End') }}">
+          <a href="#" class="button" id="whensubmit">{{ _('Set') }}</a>
+        </div>
       </div>
     </div>
   </div>
