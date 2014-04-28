@@ -14,7 +14,6 @@ from tower import ugettext as _
 
 from fjord.analytics.tools import (
     JSONDatetimeEncoder,
-    generate_query_parsed,
     counts_to_options,
     zero_fill)
 from fjord.base.helpers import locale_name
@@ -192,8 +191,7 @@ def dashboard(request):
 
     if search_query:
         current_search['q'] = search_query
-        es_query = generate_query_parsed('description', search_query)
-        search = search.query_raw(es_query)
+        search = search.query(description__sqs=search_query)
 
     if search_bigram is not None:
         f &= F(description_bigrams=search_bigram)
@@ -362,8 +360,7 @@ def generate_totals_histogram(search_date_start, search_date_end,
     search = ResponseMappingType.search()
 
     if search_query:
-        es_query = generate_query_parsed('description', search_query)
-        search = search.query_raw(es_query)
+        search = search.query(description__sqs=search_query)
 
     f = F()
     f &= F(product=prod.db_name)
@@ -488,8 +485,7 @@ def product_dashboard_firefox(request, prod):
 
     search = ResponseMappingType.search()
     if search_query:
-        es_query = generate_query_parsed('description', search_query)
-        search = search.query_raw(es_query)
+        search = search.query(description__sqs=search_query)
 
     base_f = F()
     base_f &= F(product=prod.db_name)

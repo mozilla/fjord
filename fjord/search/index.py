@@ -6,7 +6,8 @@ from django.conf import settings
 from django.db import reset_queries
 
 import requests
-from elasticutils.contrib.django import get_es, S, MappingType
+from elasticutils.contrib.django import get_es, MappingType
+from elasticutils.contrib.django import S as BaseS
 from elasticsearch.exceptions import ConnectionError, NotFoundError
 
 
@@ -75,11 +76,28 @@ def get_index():
     return '%s-%s' % (settings.ES_INDEX_PREFIX, settings.ES_INDEXES['default'])
 
 
+class FjordS(BaseS):
+    def process_query_sqs(self, key, val, action):
+        """Implements simple_query_string query"""
+        return {
+            'simple_query_string': {
+                'fields': [key],
+                'query': val,
+                'analyzer': 'snowball',
+                'default_operator': 'or',
+            }
+        }
+
+
 class FjordMappingType(MappingType):
     """DjangoMappingType with correct index."""
     @classmethod
     def get_index(cls):
         return get_index()
+
+    @classmethod
+    def search(cls):
+        return FjordS(cls)
 
 
 def boolean_type():
@@ -210,7 +228,7 @@ def get_index_stats():
     """
     stats = {}
     for name, cls in get_mapping_types().items():
-        stats[name] = S(cls).count()
+        stats[name] = FjordS(cls).count()
 
     return stats
 
