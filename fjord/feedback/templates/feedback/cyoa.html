@@ -15,7 +15,9 @@
 {% block body %}
   <x-deck selected-index=0>
     <x-card id="picker">
-      <x-appbar heading="Select A Product To Leave Feedback For" subheading=""></x-appbar>
+    <x-appbar>
+        <header>{{ _('Select A Product To Leave Feedback') }}</header>
+      </x-appbar>
 
       <section class="product-picker">
         <ul class="content">
