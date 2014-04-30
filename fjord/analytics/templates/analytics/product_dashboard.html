@@ -12,6 +12,17 @@
           <input id="date_end" type="date" name="date_end" value="{{ end_date }}" placeholder="{{ _('End') }}">
           <a href="#" class="button" id="whensubmit">{{ _('Set') }}</a>
         </div>
+
+        <form id="feedback_search" action="{{ request.get_full_path() }}" method="get">
+          <input class="search_box" type="text" name="q"
+                 placeholder="{{ _('Search by keyword') }}" value="{{ current_search.q }}" />
+
+          {% for key, value in current_search.items() %}
+            {% if key != 'q' %}
+              <input type="hidden" name="{{ key }}" value="{{ value }}" />
+            {% endif %}
+          {% endfor %}
+        </form>
       </div>
     </div>
   </div>

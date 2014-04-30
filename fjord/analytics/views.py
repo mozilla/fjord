@@ -343,10 +343,16 @@ def underconstruction(request):
     return render(request, 'analytics/underconstruction.html')
 
 
-def generate_totals_histogram(search_date_start, search_date_end, prod):
+def generate_totals_histogram(search_date_start, search_date_end,
+                              search_query, prod):
     search_date_start = search_date_start - timedelta(days=1)
 
     search = ResponseMappingType.search()
+
+    if search_query:
+        es_query = generate_query_parsed('description', search_query)
+        search = search.query_raw(es_query)
+
     f = F()
     f &= F(product=prod.db_name)
 
@@ -442,19 +448,26 @@ def generate_totals_histogram(search_date_start, search_date_end, prod):
 
 def product_dashboard_firefox(request, prod):
     template = 'analytics/product_dashboard_firefox.html'
+    current_search = {}
+
+    search_query = request.GET.get('q', None)
+    if search_query:
+        current_search['q'] = search_query
 
     search_date_end = smart_date(
         request.GET.get('date_end', None), fallback=None)
     if search_date_end is None:
         search_date_end = date.today()
+    current_search['date_end'] = search_date_end.strftime('%Y-%m-%d')
 
     search_date_start = smart_date(
         request.GET.get('date_start', None), fallback=None)
     if search_date_start is None:
         search_date_start = search_date_end - timedelta(days=7)
+    current_search['date_start'] = search_date_start.strftime('%Y-%m-%d')
 
     histogram = generate_totals_histogram(
-        search_date_start, search_date_end, prod)
+        search_date_start, search_date_end, search_query, prod)
 
     # FIXME: This is lame, but we need to make sure the item we're
     # looking at is the totals.
@@ -462,6 +475,10 @@ def product_dashboard_firefox(request, prod):
     totals_sum = sum([p[1] for p in histogram[1]['data']])
 
     search = ResponseMappingType.search()
+    if search_query:
+        es_query = generate_query_parsed('description', search_query)
+        search = search.query_raw(es_query)
+
     base_f = F()
     base_f &= F(product=prod.db_name)
     base_f &= F(created__gte=search_date_start)
@@ -533,6 +550,7 @@ def product_dashboard_firefox(request, prod):
     return render(request, template, {
         'start_date': search_date_start,
         'end_date': search_date_end,
+        'current_search': current_search,
         'platforms_histogram': platforms_histogram,
         'versions_histogram': versions_histogram,
         'histogram': histogram,
@@ -542,23 +560,31 @@ def product_dashboard_firefox(request, prod):
 
 def product_dashboard_generic(request, prod):
     template = 'analytics/product_dashboard.html'
+    current_search = {}
+
+    search_query = request.GET.get('q', None)
+    if search_query:
+        current_search['q'] = search_query
 
     search_date_end = smart_date(
         request.GET.get('date_end', None), fallback=None)
     if search_date_end is None:
         search_date_end = date.today()
+    current_search['date_end'] = search_date_end.strftime('%Y-%m-%d')
 
     search_date_start = smart_date(
         request.GET.get('date_start', None), fallback=None)
     if search_date_start is None:
         search_date_start = search_date_end - timedelta(days=7)
+    current_search['date_start'] = search_date_start.strftime('%Y-%m-%d')
 
     histogram = generate_totals_histogram(
-        search_date_start, search_date_end, prod)
+        search_date_start, search_date_end, search_query, prod)
 
     return render(request, template, {
         'start_date': search_date_start,
         'end_date': search_date_end,
+        'current_search': current_search,
         'histogram': histogram,
         'product': prod
     })
