@@ -10,6 +10,7 @@ from django.views.decorators.http import require_POST
 from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
 from rest_framework import generics
+from statsd import statsd
 
 from fjord.base.browsers import UNKNOWN
 from fjord.base.util import smart_str, translate_country_name
@@ -162,6 +163,11 @@ def _handle_feedback_post(request, locale=None, product=None,
     if data.get('email_ok') and data.get('email'):
         e = models.ResponseEmail(email=data['email'], opinion=opinion)
         e.save()
+
+    if data['happy']:
+        statsd.incr('feedback.happy')
+    else:
+        statsd.incr('feedback.sad')
 
     return HttpResponseRedirect(reverse('thanks'))
 
