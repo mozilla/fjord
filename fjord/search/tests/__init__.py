@@ -2,7 +2,7 @@ import time
 
 from django.conf import settings
 
-from elasticsearch.exceptions import ConnectionError, NotFoundError
+from elasticsearch.exceptions import NotFoundError
 from nose import SkipTest
 
 from fjord.base.tests import BaseTestCase, with_save
@@ -10,24 +10,23 @@ from fjord.search.index import get_index, get_es
 from fjord.search.models import Record
 
 
+
+ES_SKIPME = False
+
+if not getattr(settings, 'ES_URLS', None):
+    # If no ES_URLS, then skip Elasticsearch tests.
+    ES_SKIPME = True
+elif not get_es().ping():
+    # If we can't connect to Elasticsearch, then skip Elasticsearch
+    # tests.
+    ES_SKIPME = True
+
+
 class ElasticTestCase(BaseTestCase):
     """Base class for Elastic Search tests, providing some conveniences"""
-    skipme = False
-
     @classmethod
     def setUpClass(cls):
         super(ElasticTestCase, cls).setUpClass()
-
-        if not getattr(settings, 'ES_URLS', None):
-            cls.skipme = True
-            return
-
-        # try to connect to ES and if it fails, skip ElasticTestCases.
-        try:
-            get_es().cluster.health()
-        except ConnectionError:
-            cls.skipme = True
-            return
 
         cls._old_es_index_prefix = settings.ES_INDEX_PREFIX
         settings.ES_INDEX_PREFIX = settings.ES_INDEX_PREFIX + 'test'
@@ -35,12 +34,12 @@ class ElasticTestCase(BaseTestCase):
     @classmethod
     def tearDownClass(cls):
         super(ElasticTestCase, cls).tearDownClass()
-        if not cls.skipme:
+        if not ES_SKIPME:
             # Restore old setting.
             settings.ES_INDEX_PREFIX = cls._old_es_index_prefix
 
     def setUp(self):
-        if self.skipme:
+        if ES_SKIPME:
             raise SkipTest
 
         super(ElasticTestCase, self).setUp()
