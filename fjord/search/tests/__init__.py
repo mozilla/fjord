@@ -2,7 +2,7 @@ import time
 
 from django.conf import settings
 
-from elasticsearch.exceptions import ConnectionError, NotFoundError
+from elasticsearch.exceptions import NotFoundError
 from nose import SkipTest
 
 from fjord.base.tests import BaseTestCase, with_save
@@ -18,14 +18,8 @@ class ElasticTestCase(BaseTestCase):
     def setUpClass(cls):
         super(ElasticTestCase, cls).setUpClass()
 
-        if not getattr(settings, 'ES_URLS', None):
-            cls.skipme = True
-            return
-
-        # try to connect to ES and if it fails, skip ElasticTestCases.
-        try:
-            get_es().cluster.health()
-        except ConnectionError:
+        # If Elasticsearch isn't running, skip ES tests
+        if not get_es().ping():
             cls.skipme = True
             return
 
