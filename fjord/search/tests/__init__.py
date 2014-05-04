@@ -10,23 +10,18 @@ from fjord.search.index import get_index, get_es
 from fjord.search.models import Record
 
 
-
-ES_SKIPME = False
-
-if not getattr(settings, 'ES_URLS', None):
-    # If no ES_URLS, then skip Elasticsearch tests.
-    ES_SKIPME = True
-elif not get_es().ping():
-    # If we can't connect to Elasticsearch, then skip Elasticsearch
-    # tests.
-    ES_SKIPME = True
-
-
 class ElasticTestCase(BaseTestCase):
     """Base class for Elastic Search tests, providing some conveniences"""
+    skipme = False
+
     @classmethod
     def setUpClass(cls):
         super(ElasticTestCase, cls).setUpClass()
+
+        # If Elasticsearch isn't running, skip ES tests
+        if not get_es().ping():
+            cls.skipme = True
+            return
 
         cls._old_es_index_prefix = settings.ES_INDEX_PREFIX
         settings.ES_INDEX_PREFIX = settings.ES_INDEX_PREFIX + 'test'
@@ -34,12 +29,12 @@ class ElasticTestCase(BaseTestCase):
     @classmethod
     def tearDownClass(cls):
         super(ElasticTestCase, cls).tearDownClass()
-        if not ES_SKIPME:
+        if not cls.skipme:
             # Restore old setting.
             settings.ES_INDEX_PREFIX = cls._old_es_index_prefix
 
     def setUp(self):
-        if ES_SKIPME:
+        if self.skipme:
             raise SkipTest
 
         super(ElasticTestCase, self).setUp()
