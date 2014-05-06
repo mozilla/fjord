@@ -36,7 +36,7 @@
             {% set created_date = to_date_string(response.created) %}
             <a href="{{ url('dashboard')|urlparams(date_start=created_date, date_end=created_date) }}">
               <time datetime="{{ created_date }}-08:00" title="{{ created_date }} PST">
-                {{ response.created|naturaltime }}
+                {{ response.created }} ({{ response.created|naturaltime }})
               </time>
             </a>
           </dd>
