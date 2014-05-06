@@ -114,6 +114,10 @@ class Response(ModelBase):
     manufacturer = models.CharField(max_length=255, blank=True)
     device = models.CharField(max_length=255, blank=True)
 
+    # If using the api, this is the version of the api used. Otherwise
+    # null.
+    api = models.IntegerField(null=True)
+
     # User agent and inferred data from the user agent
     user_agent = models.CharField(max_length=255, blank=True)
     browser = models.CharField(max_length=30, blank=True)
@@ -311,6 +315,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'id': integer_type(),
             'prodchan': keyword_type(),
             'happy': boolean_type(),
+            'api': integer_type(),
             'url': keyword_type(),
             'url_domain': keyword_type(),
             'has_email': boolean_type(),
@@ -328,7 +333,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'country': keyword_type(),
             'device': keyword_type(),
             'manufacturer': keyword_type(),
-            'created': date_type()
+            'created': date_type(),
         }
 
     @classmethod
@@ -343,6 +348,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'id': obj.id,
             'prodchan': obj.prodchan,
             'happy': obj.happy,
+            'api': obj.api,
             'url': obj.url,
             'url_domain': obj.url_domain,
             'has_email': bool(obj.user_email),
@@ -429,9 +435,6 @@ class ResponseSerializer(serializers.Serializer):
     url = serializers.URLField(required=False, default=u'')
     description = serializers.CharField(required=True)
 
-    # Note: API clients don't provide a user_agent, so we skip that and
-    # browser since those don't make sense.
-
     # product, channel, version, locale, platform
     product = NoNullsCharField(max_length=20, required=True)
     channel = NoNullsCharField(max_length=30, required=False, default=u'')
@@ -475,7 +478,6 @@ class ResponseSerializer(serializers.Serializer):
             happy=attrs['happy'],
             url=attrs['url'].strip(),
             description=attrs['description'].strip(),
-            user_agent=u'api',  # Hard-coded
             product=attrs['product'].strip(),
             channel=attrs['channel'].strip(),
             version=attrs['version'].strip(),
@@ -483,7 +485,8 @@ class ResponseSerializer(serializers.Serializer):
             locale=attrs['locale'].strip(),
             manufacturer=attrs['manufacturer'].strip(),
             device=attrs['device'].strip(),
-            country=attrs['country'].strip()
+            country=attrs['country'].strip(),
+            api=1,  # Hard-coded api version number
         )
 
         # If there is an email address, stash it on this instance so

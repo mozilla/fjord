@@ -26,7 +26,8 @@ class TestFeedbackAPI(TestCase):
 
         # Fills in defaults
         eq_(feedback.url, u'')
-        eq_(feedback.user_agent, u'api')
+        eq_(feedback.api, 1)
+        eq_(feedback.user_agent, u'')
 
     def test_maximal(self):
         """Tests an API call with all possible data"""
@@ -91,7 +92,8 @@ class TestFeedbackAPI(TestCase):
 
         # Fills in defaults
         eq_(feedback.url, u'')
-        eq_(feedback.user_agent, u'api')
+        eq_(feedback.user_agent, u'')
+        eq_(feedback.api, 1)
 
         email = models.ResponseEmail.objects.latest(field_name='id')
         eq_(email.email, data['email'])

@@ -315,6 +315,7 @@ def analytics_search(request):
     search_country = request.GET.get('country', None)
     search_product = request.GET.get('product', None)
     search_domain = request.GET.get('domain', None)
+    search_api = smart_int(request.GET.get('api', None), fallback=None)
     search_version = request.GET.get('version', None)
     search_query = request.GET.get('q', None)
     search_date_start = smart_date(
@@ -370,6 +371,9 @@ def analytics_search(request):
     if search_domain is not None:
         f &= F(url_domain=unknown_to_empty(search_domain))
         current_search['domain'] = search_domain
+    if search_api is not None:
+        f &= F(api=search_api)
+        current_search['api'] = search_api
 
     if search_date_start is None and search_date_end is None:
         selected = '7d'
@@ -432,7 +436,7 @@ def analytics_search(request):
     # Navigation facet data
     facets = search.facet(
         'happy', 'platform', 'locale', 'country', 'product', 'version',
-        'url_domain', 'has_email',
+        'url_domain', 'has_email', 'api',
         filtered=bool(search._process_filters(f.filters)))
 
     # This loop does two things. First it maps 'T' -> True and 'F' ->
@@ -448,6 +452,7 @@ def analytics_search(request):
         'product': {},
         'version': {},
         'url_domain': {},
+        'api': {},
     }
     for param, terms in facets.facet_counts().items():
         for term in terms:
@@ -525,6 +530,12 @@ def analytics_search(request):
                 name='domain',
                 display='Domain',
                 checked=search_domain,
+                display_map=empty_to_unknown),
+            counts_to_options(
+                counts['api'].items(),
+                name='api',
+                display='API version',
+                checked=search_api,
                 display_map=empty_to_unknown),
         ]
     )
