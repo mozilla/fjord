@@ -5,7 +5,8 @@ test("basic email validation", function() {
         ['abc', false],
         ['foo@', false],
         ['foo@example.com', true],
-        ['foo.bar@baz.example.com', true]
+        ['foo.bar@baz.example.com', true],
+        ['foo+bar@baz.example.com', true]
     ];
 
     for (i=0; i < test_data.length; i++) {
