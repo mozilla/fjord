@@ -135,9 +135,7 @@
                 email = $.trim($('#email-input').val());
 
                 if (email !== '') {
-                    // this should be close enough to what django is doing that we
-                    // can catch issues client-side
-                    if (!email.match(/^[a-zA-Z0-9._\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,6}$/)) {
+                    if (!fjord.validateEmail(email)) {
                         $('#email-error').show();
                         return;
                     }

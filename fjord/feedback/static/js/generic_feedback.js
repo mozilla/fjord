@@ -128,12 +128,10 @@
         });
 
         $('#id_email').on('input', function() {
-            var emailRegExp = /^[a-zA-Z0-9._\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,6}$/;
-
-            if ($(this).val().length > 0 && !$(this).val().match(emailRegExp)) {
-                $(this).addClass('invalid');
-            } else {
+            if (fjord.validateEmail($(this).val())) {
                 $(this).removeClass('invalid');
+            } else {
+                $(this).addClass('invalid');
             }
             toggleNextButton('form-submit-btn');
         });

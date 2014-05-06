@@ -279,6 +279,7 @@ MINIFY_BUNDLES = {
         ),
         'generic_feedback': (
             'js/lib/jquery.min.js',
+            'js/fjord_utils.js',
             'js/common_feedback.js',
             'js/generic_feedback.js',
             'js/ga.js',
@@ -342,6 +343,7 @@ MINIFY_BUNDLES = {
         ),
         'mobile/fxos_feedback': (
             'js/lib/jquery.min.js',
+            'js/fjord_utils.js',
             'js/common_feedback.js',
             'js/mobile/fxos_feedback.js',
             'js/ga.js',
