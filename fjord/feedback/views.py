@@ -305,6 +305,12 @@ def feedback_router(request, product=None, version=None, channel=None,
         view = android_about_feedback
         product = None
 
+        # This lets us measure how often this section of code kicks
+        # off and thus how often old android stuff is happening. When
+        # we're not seeing this anymore, we can nix all the old
+        # android stuff.
+        statsd.incr('feedback.oldandroid')
+
     else:
         if product:
             # If they passed in a product and we don't know about it, stop
