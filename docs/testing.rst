@@ -169,6 +169,18 @@ runner as long as the look like a test.
 .. _guide: http://docs.seleniumhq.org/docs/03_webdriver.jsp
 
 
+Writing New JavaScript Tests
+============================
+
+We test JavaScript utility functions using `QUnit <http://qunitjs.com/>`_.
+
+These tests are in ``fjord/base/static/tests/``.
+
+To add a new test suite, add a couple of ``script`` lines to ``index.html`` in
+the relevant place and then create a new ``test_FILENAMEHERE.js`` file
+with your QUnit tests.
+
+
 Changing tests
 ==============
 
