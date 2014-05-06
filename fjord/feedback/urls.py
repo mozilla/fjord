@@ -26,6 +26,8 @@ urlpatterns = patterns(
     url(r'^sad/?$', 'sad_redirect', name='sad-redirect'),
 
     # API for posting feedback
+    # Note: If we change the version number here, we also have to change it
+    # in the ResponseSerializer.
     url(r'^api/v1/feedback/?$',
         views.PostFeedbackAPI.as_view(), name='api-post-feedback'),
 )

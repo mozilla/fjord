@@ -100,8 +100,12 @@
                 &mdash;
               {% endif %}
             </dd>
+            <dt>{{ _('API version')  }}</dt>
+            <dd>
+              {{ response.api or '--' }}
+            </dd>
             {% if user.is_superuser %}
-              <dt>Actions:</dt>
+              <dt>Actions</dt>
               <dd>
 {# FIXME: This is hardcoded and goofy. Better delete measures will come later in bug #949461. #}
                   <a href="/admin/feedback/response/?q={{ response.description|replace('\n', ' ')|truncate(100, False, '') }}">Delete in admin</a>
