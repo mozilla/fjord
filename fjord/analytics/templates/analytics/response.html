@@ -103,6 +103,20 @@
             <dt>{{ _('API version')  }}</dt>
             <dd>
               {{ response.api or '--' }}
+            <dt>More like this</dt>
+            <dd id="mlt">
+              {% if mlt %}
+                {% for item in mlt %}
+                  <div class="mlt-response">
+                    <strong>
+                      <a href="{{ url('response_view', responseid=item.id) }}">{{ item.created }}, {{ item.product or 'Unknown' }} - {{ item.version or 'Unknown' }}</a>
+                    </strong><br />
+                    {{ item.description }}
+                  </div>
+                {% endfor %}
+              {% else %}
+                --
+              {% endif %}
             </dd>
             {% if user.is_superuser %}
               <dt>Actions</dt>

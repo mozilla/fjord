@@ -30,11 +30,18 @@ from fjord.feedback.models import Product, Response, ResponseMappingType
 @mobile_template('analytics/{mobile/}response.html')
 def response_view(request, responseid, template):
     response = get_object_or_404(Response, id=responseid)
+    mlt = None
+
+    if (request.user.is_authenticated()
+        and request.user.has_perm('analytics.can_view_dashboard')):
+
+        mlt = ResponseMappingType.morelikethis(response)
 
     # We don't pass the response directly to the template and instead
     # do some data tweaks here to make it more palatable for viewing.
     return render(request, template, {
         'response': response,
+        'mlt': mlt,
     })
 
 

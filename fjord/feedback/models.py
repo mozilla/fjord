@@ -1,11 +1,10 @@
 from datetime import datetime
-import urlparse
 
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from elasticutils.contrib.django import Indexable
+from elasticutils.contrib.django import Indexable, MLT
 from rest_framework import serializers
 from tower import ugettext_lazy as _
 from product_details import product_details
@@ -13,7 +12,7 @@ from product_details import product_details
 from fjord.base.domain import get_domain
 from fjord.base.models import ModelBase
 from fjord.base.util import smart_truncate
-from fjord.feedback.config import CODE_TO_COUNTRY
+from fjord.feedback.config import CODE_TO_COUNTRY, ANALYSIS_STOPWORDS
 from fjord.feedback.utils import compute_grams
 from fjord.search.index import (
     register_mapping_type, FjordMappingType,
@@ -402,6 +401,31 @@ class ResponseMappingType(FjordMappingType, Indexable):
     @classmethod
     def get_indexable(cls):
         return super(ResponseMappingType, cls).get_indexable().reverse()
+
+    @classmethod
+    def morelikethis(cls, resp):
+        """Returns a list of responses that are like the specified one"""
+        s = cls.search()
+        s = s.filter(happy=resp.happy)
+        if resp.product:
+            s = s.filter(product=resp.product)
+        if resp.platform:
+            s = s.filter(platform=resp.platform)
+
+        # Short responses tend to not repeat any words, so then MLT
+        # returns nothing. This fixes that by setting min_term_freq to
+        # 1. Longer responses tend to repeat important words, so we can
+        # set min_term_freq to 2.
+        num_words = len(resp.description.split(' '))
+        if num_words > 40:
+            min_term_freq = 2
+        else:
+            min_term_freq = 1
+
+        return MLT(id_=resp.id, s = s, mlt_fields=['description'],
+                   index=cls.get_index(), doctype=cls.get_mapping_type_name(),
+                   stop_words=list(ANALYSIS_STOPWORDS),
+                   min_term_freq=min_term_freq)
 
 
 class ResponseEmail(ModelBase):
