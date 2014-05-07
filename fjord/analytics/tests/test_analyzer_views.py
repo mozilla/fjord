@@ -1,12 +1,10 @@
-from datetime import datetime, timedelta
-import json
 import logging
+from datetime import datetime, timedelta
 
 from nose.tools import eq_, ok_
 from pyquery import PyQuery
 
 from django.contrib.auth.models import Group
-from django.http import QueryDict
 
 from fjord.base.tests import LocalizingClient, profile, reverse, user
 from fjord.feedback.tests import response, responseemail
