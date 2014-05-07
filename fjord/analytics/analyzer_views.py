@@ -315,7 +315,7 @@ def analytics_search(request):
     search_country = request.GET.get('country', None)
     search_product = request.GET.get('product', None)
     search_domain = request.GET.get('domain', None)
-    search_api = request.GET.get('api', None)
+    search_api = smart_int(request.GET.get('api', None), fallback=None)
     search_version = request.GET.get('version', None)
     search_query = request.GET.get('q', None)
     search_date_start = smart_date(
@@ -371,6 +371,10 @@ def analytics_search(request):
     if search_domain is not None:
         f &= F(url_domain=unknown_to_empty(search_domain))
         current_search['domain'] = search_domain
+    if search_api is not None:
+        print search_api
+        f &= F(api=search_api)
+        current_search['api'] = search_api
 
     if search_date_start is None and search_date_end is None:
         selected = '7d'
