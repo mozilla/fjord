@@ -14,45 +14,6 @@ Input uses `ElasticUtils <https://github.com/mozilla/elasticutils>`_
 to interface with ElasticSearch.
 
 
-Installing ElasticSearch
-========================
-
-There's an installation guide on the ElasticSearch site:
-
-http://www.elasticsearch.org/guide/reference/setup/installation.html
-
-Use version 0.90.10:
-
-http://www.elasticsearch.org/downloads/0-90-10/
-
-The directory you install Elastic in will hereafter be referred to as
-``ELASTICDIR``.
-
-
-Running ElasticSearch
-=====================
-
-Start Elastic Search by::
-
-    $ ELASTICDIR/bin/elasticsearch
-
-That launches ElasticSearch in the background.
-
-
-Configuring ElasticUtils
-========================
-
-You can configure ElasticSearch with the configuration file at
-``ELASTICDIR/config/elasticsearch.yml``.
-
-There are a series of ``ES_*`` settings in ``fjord/settings/base.py``
-that affect ElasticUtils. The defaults will probably work fine. To
-override any of the settings, do so in your
-``fjord/settings/local.py`` file.
-
-See ``fjord/settings/base.py`` for the list of settings and what they
-do.
-
 Command line tools
 ==================
 

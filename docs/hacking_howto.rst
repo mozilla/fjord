@@ -1,15 +1,18 @@
 .. _hacking-howto-chapter:
 
-==============================
-Hacking HOWTO for Contributors
-==============================
+==================================================
+Hacking HOWTO for Contributors: Install, run, test
+==================================================
+
+.. contents::
+   :local:
 
 
 Summary
 =======
 
-This chapter helps you get a minimal installation of Fjord up and
-running so as to make it easier for contributing.
+This chapter covers getting Fjord set up locally, running tests and
+some other basic things to make it easier for contributing.
 
 If you're interested in setting up Fjord for a production deployment,
 this is not the chapter for you---look elsewhere.
@@ -18,58 +21,68 @@ If you have any problems getting Fjord running, let us know. See the
 :ref:`project-details`.
 
 
-Operating systems
-=================
+Installing
+==========
 
-Windows
--------
+**Windows**
 
-If you're using Windows as your operating system, you'll need to set
-up a virtual machine and run Fjord in that. Fjord won't run in
-Windows.
+    If you're using Windows as your operating system, you'll need to
+    set up a virtual machine with Linux and run Fjord in that. Fjord
+    won't run on Windows.
 
-If you've never set up a virtual machine before, let us know and we
-can walk you through it. Having said that, it's not easy to do for
-people who haven't done it before.
-
-
-Mac OSX
--------
-
-Just follow along with the instructions below. Several of us use OSX,
-so if you run into problems, let us know.
+    If you've never set up a virtual machine before, let us know and
+    we can walk you through it. Having said that, it's not easy to do
+    for people who haven't done it before.
 
 
-Linux
------
+**Mac OSX**
 
-We know these work in Debian Testing (Wheezy) and will probably work
-in Debian derivatives like Ubuntu. It's likely that you'll encounter
-some steps that are slightly different. If you run into problems, let
-us know.
+    Just follow along with the instructions below. Several of us use
+    OSX, so if you run into problems, let us know.
+
+    If worse comes to worse, you can set up a virtual machine with
+    Linux and follow those instructions.
+
+
+**Linux**
+
+    We know these work in Debian Testing (Wheezy) and will probably
+    work in Debian derivatives like Ubuntu. It's likely that you'll
+    encounter some steps that are slightly different. If you run into
+    problems, let us know.
+
+    Will was using Debian Testing, but is now using Fedora 20. Mike is
+    using Arch.
 
 
 Requirements
-============
+------------
 
-For the minimum installation, you'll need the following:
+You'll need the following installed on your system:
 
 * git
 * Python 2.6 or 2.7
 * Python development headers for the version of Python you're using
-* `pip <http://pip.readthedocs.org/en/latest/>`_
-* `virtualenv <http://www.virtualenv.org/en/latest/>`_
-* MySQL server
-* MySQL client development headers
-* Memcached server
-* `lessc <http://lesscss.org/>`_
+* `virtualenv <https://virtualenv.pypa.io/en/latest/>`_
+* `pip <https://pip.pypa.io/en/latest/>`_
+* MySQL or Mariadb
+
+  * the server
+  * the client development headers
+
+* `lessc <http://lesscss.org/>`_ -- see :ref:`hacking-howto-less`
+* Elasticsearch 0.90.10 (see section on Elasticsearch)
+* (optional) Memcached server -- see :ref:`hacking-howto-cache`
+
 
 Installation for these is very system dependent. Using a package
 manager, like yum, aptitude, or brew, is encouraged.
+    
+FIXME: Add package listing for Debian and Fedora here.
 
 
-Getting the Source
-==================
+Getting the Fjord Source
+------------------------
 
 Grab the source from Github using::
 
@@ -78,49 +91,60 @@ Grab the source from Github using::
 
 .. Note::
 
-   If you forgot to add ``--recursive``, you can get all the
+   If you forgot to add ``--recursive``, you can later get all the
    submodules with::
 
        $ git submodule update --init --recursive
 
 
+Creating a virtual environment
+------------------------------
+
+First create a Python virtual environment so that you don't have to
+install Python packages system-wide.
+
+In the Fjord repository directory, do::
+
+    $ virtualenv venv
+
+
+This creates a virtual environment in the directory ``venv/``.
+
+Every time you go to run Fjord commands, you'll need to activate your
+virtual environment. You can do that like this::
+
+    $ source venv/bin/activate
+
+
 Installing dependencies
-=======================
+-----------------------
 
 Compiled Packages
------------------
+~~~~~~~~~~~~~~~~~
 
 There are a small number of packages that need compiling, including
 the MySQL Python client.
 
-You can install these either with your system's package manager or
-with ``pip``.
+Install the compiled dependencies using ``pip``::
 
-To use pip, do this::
-
-    # Create your virtual environment
-    $ mkvirtualenv input
-    # Then run
     $ pip install -r requirements/compiled.txt
 
-If you want to use your system's package manager, you'll need to go
-through ``requirements/compiled.txt`` and install the dependencies by
-hand.
 
-**OSX Mountain Lion**: One of the things in
-``requirements/compiled.txt`` is MySQL Python library.  If you're
-using OSX Mountain Lion, then
-`<http://stackoverflow.com/questions/11787012/how-to-install-mysqldb-on-mountain-lion>`_
-should help you install it.
+.. Note::
 
-In addition, if you encounter an error stating
-``Library not loaded: libmysqlclient.18.dylib``, then
-`<http://stackoverflow.com/questions/6383310/python-mysqldb-library-not-loaded-libmysqlclient-18-dylib>`_
-explains how to fix this.
+   If you're using OSX Mountain Lion, you'll have problems compiling
+   the MySQL Python library.  See
+   `<http://stackoverflow.com/questions/11787012/how-to-install-mysqldb-on-mountain-lion>`_
+   for help.
+
+   In addition, if you encounter an error stating ``Library not
+   loaded: libmysqlclient.18.dylib``, then
+   `<http://stackoverflow.com/questions/6383310/python-mysqldb-library-not-loaded-libmysqlclient-18-dylib>`_
+   explains how to fix this.
 
 
 Python Packages
----------------
+~~~~~~~~~~~~~~~
 
 All the pure-Python requirements are provided in the "vendor library"
 in the ``vendor/`` directory.
@@ -136,7 +160,7 @@ keeping it up to date.
 .. _hacking-howto-db:
 
 Set up the database
-===================
+-------------------
 
 We need to create a database user and a database table. These
 instructions assume you use:
@@ -159,47 +183,65 @@ In a terminal, do::
     mysql> GRANT ALL ON fjord.* TO 'fjord'@'localhost';
 
 
+After that, do this to set up everything for the test environment::
+
+    $ mysql -u root -p
+    mysql> GRANT ALL ON test_fjord.* TO `fjord`@`localhost`;
+
+
 .. _hacking-howto-configuration:
 
 Configuration
-=============
+-------------
 
-In the ``fjord/settings/`` directory, copy ``local.py-dist`` to
-``local.py`` and edit it to fit your needs. In particular, you
-should:
+First copy the template::
 
-* Set the database options to fit what you configured above in
-  ``DATABASES``.
-* Fill in a value for ``SECRET_KEY``. This should be some random
-  string. It will be used to seed hashing algorithms.
-* Fill in a value for ``HMAC_KEYS``. This should also be a random
-  string, the longer the better. It is used as a sort of 'pepper'
-  analagous to the password salt. Not supplying this will make cause
-  user generation to fail.
-* Set ``SITE_URL`` to the protocol, host and port you're going to run
-  your fjord instance on. By default, when you type::
+    $ cp fjord/settings/local.py-dist fjord/settings/local.py
 
-      ./manage.py runserver
+Then edit ``fjord/settings/local.py`` to fit your system. In
+particular, you should:
 
-  it launches the server on ``http://127.0.0.1:8000``. If you're going
-  to use that then set::
+1. Set the ``DATABASES`` to match how you configured your database.
 
-      SITE_URL = 'http://127.0.0.1:8000'
+2. Fill in a value for ``SECRET_KEY``. This should be some random
+   string. It will be used to seed hashing algorithms. If you're
+   feeling unimaginative, use the elite secret string: "when ricky
+   goes on pto, everything catches on fire".
+
+3. Fill in a value for ``HMAC_KEYS``. This should also be a random
+   string, the longer the better. It is used as a sort of 'pepper'
+   analagous to the password salt. Not supplying this will make cause
+   user generation to fail.
+
+4. Set ``SITE_URL`` to the protocol, host and port you're going to run
+   your fjord instance on. By default, when you type::
+
+       ./manage.py runserver
+
+   it launches the server on ``http://127.0.0.1:8000``. If you're going
+   to use that then set::
+
+       SITE_URL = 'http://127.0.0.1:8000'
+
+5. Read through the rest of ``fjord/settings/local.py`` for things you
+   should change.
 
 
-Now you can copy and modify any settings from
-``fjord/settings/base.py`` and
-``vendor/src/funfactory/funfactory/settings_base.py`` into
-``fjord/settings/local.py`` and the value will override the default.
+After you finish with that, you should be all set.
 
-.. Warning::
+.. Note::
 
-   These instructions are to set up a development environment; more
-   care should be taken in production.
+   The settings in ``fjord/settings/local.py`` override default
+   settings in ``fjord/settings/base.py`` and
+   ``vendor/src/funfactory/funfactory/settings_base.py``. So if you
+   find you need to change other things, you can look at those files
+   for information.
 
 
-LESS
-----
+.. _hacking-howto-less:
+
+Setting up LESS
+---------------
 
 To install LESS you will first need to `install Node.js and NPM
 <https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager>`_.
@@ -234,6 +276,8 @@ LESS files are automatically converted by `jingo-minify
 
        $ rm static/css/*.css
 
+
+.. _hacking-howto-cache:
 
 Cache (optional)
 ----------------
@@ -272,8 +316,8 @@ installed and configured.
 
 .. _hacking-howto-schemas:
 
-Database Schemas
-----------------
+Setting up the database tables and data and superuser
+-----------------------------------------------------
 
 For instructions on how to create the database, see
 :ref:`hacking-howto-db`.
@@ -306,42 +350,45 @@ and follow the prompts.
    Persona.
 
 
-Testing it out
-==============
+.. _hacking-howto-es:
 
-To start the dev server, run ``./manage.py runserver``, then open up
-``http://127.0.0.1:8000``.
+Setting up Elasticsearch
+------------------------
 
-If everything's working, you should see a somewhat empty version of
-the Input home page!
+Installing
+~~~~~~~~~~
+
+There's an installation guide on the ElasticSearch site:
+
+http://www.elasticsearch.org/guide/reference/setup/installation.html
+
+Use version 0.90.10:
+
+http://www.elasticsearch.org/downloads/0-90-10/
+
+The directory you install Elastic in will hereafter be referred to as
+``ELASTICDIR``.
+
+Start Elastic Search by::
+
+    $ ELASTICDIR/bin/elasticsearch
+
+That launches ElasticSearch in the background.
 
 
-.. _setting-up-tests:
+Configuring Elasticsearch and ElasticUtils
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Setting up the tests
---------------------
+You can configure ElasticSearch with the configuration file at
+``ELASTICDIR/config/elasticsearch.yml``.
 
-Let's do the setup required for running tests.
+There are a series of ``ES_*`` settings in ``fjord/settings/base.py``
+that affect ElasticUtils. The defaults will probably work fine. To
+override any of the settings, do so in your
+``fjord/settings/local.py`` file.
 
-You'll need to add an extra grant in MySQL for your database user::
-
-    $ mysql -u root -p
-    mysql> GRANT ALL ON test_fjord.* TO fjord@localhost;
-
-.. Note::
-
-   If you used different values, make sure to substitute your values
-   in the correct places in the rest of the instructions.
-
-The test suite will create and use this database, to keep any data in
-your development database safe from tests.
-
-Running the test suite is easy::
-
-    $ ./manage.py test -s --noinput --logging-clear-handlers
-
-For more information, see the :ref:`test documentation
-<tests-chapter>`.
+See ``fjord/settings/base.py`` for the list of settings and what they
+do.
 
 
 Getting sample data
@@ -351,6 +398,7 @@ You can get sample data in your db by running::
 
     $ ./manage.py generatedata
 
+
 This will generate 5 happy things and 5 sad things so that your Fjord
 instance has something to look at.
 
@@ -358,9 +406,44 @@ If you want to generate a lot of random sample data, then do::
 
     $ ./manage.py generatedata --with=samplesize=1000
 
+
 That'll generate 1000 random responses. You can re-run that and also
 pass it different amounts. It'll generate random sample data starting
 at now and working backwards.
+
+
+Running the server
+==================
+
+To start the dev server, run::
+
+    $ ./manage.py runserver
+
+
+Then open up the url in your browser.
+
+
+.. _setting-up-tests:
+
+Running the tests
+=================
+
+The test suite will create and use this database, to keep any data in
+your development database safe from tests.
+
+Before you run the tests, you have to run these two commands::
+
+    $ ./manage.py collectstatic
+    $ ./manage.py compress_assets
+
+
+Run the test suite this way::
+
+    $ ./manage.py test -s --noinput --logging-clear-handlers
+
+
+For more information, see the :ref:`test documentation
+<tests-chapter>`.
 
 
 Advanced install
@@ -373,7 +456,6 @@ parts of it.
 However, it's missing some things:
 
 * locales: See :ref:`l10n-chapter` for details.
-* ElasticSearch: See :ref:`es-chapter` for details.
 
 
 Troubleshooting
