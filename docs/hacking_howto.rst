@@ -249,9 +249,8 @@ what we have in production, set ``CACHES`` in
 
     CACHES = {
         'default': {
-            'BACKEND': 'caching.backends.memcached.CacheClass',
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
             'LOCATION': 'localhost:11211',
-            'TIMEOUT': 600,
             'KEY_PREFIX': 'fjord'
             }
         }
