@@ -283,6 +283,11 @@ def dashboard(request):
                 display_map=empty_to_unknown,
                 checked=search_version)
         )
+    else:
+        filter_data.append({
+            'display': _('Version'),
+            'note': _('Select product to see version facet')
+        })
 
     filter_data.extend(
         [
