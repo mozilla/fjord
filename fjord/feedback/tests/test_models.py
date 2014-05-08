@@ -214,16 +214,16 @@ class TestComputeGrams(ElasticTestCase):
 
         # Two words is the minimum number to create a bigram
         eq_(sorted(compute_grams(u'youtube crash')),
-            ['crash youtub'])
+            ['crash youtube'])
 
         # Three words creates two bigrams
         eq_(sorted(compute_grams(u'youtube crash flash')),
-            ['crash flash', 'crash youtub'])
+            ['crash flash', 'crash youtube'])
 
         # Four words creates three bigrams
         eq_(sorted(compute_grams(u'youtube crash flash bridge')),
-            ['bridg flash', 'crash flash', 'crash youtub'])
+            ['bridge flash', 'crash flash', 'crash youtube'])
 
         # Nix duplicate bigrams
         eq_(sorted(compute_grams(u'youtube crash youtube flash')),
-            ['crash youtub', 'flash youtub'])
+            ['crash youtube', 'flash youtube'])

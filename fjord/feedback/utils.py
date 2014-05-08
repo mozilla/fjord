@@ -95,7 +95,7 @@ def compute_grams(text):
 
     try:
         tokens = [item['token'] for item in es_analyze(
-            text, analyzer='snowball')]
+            text, analyzer='standard')]
     except ElasticsearchException:
         return []
 
