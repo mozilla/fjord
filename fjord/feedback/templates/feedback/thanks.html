@@ -29,20 +29,6 @@
   </header>
 
   <div class="content">
-    {% if opinion %}
-      <div>
-        <h3>{{ _('Share your feedback.') }}</h3>
-        <p>
-            <a href="{{ 'http://twitter.com/share'|urlparams(
-              url=absolute_url('/feedback'),
-              text='%s #fxinput' % opinion.description|truncate(100),
-              related='firefox') }}"
-              class="tweet-this" target="_blank">{{ _('Tweet feedback to your followers') }}
-            </a>
-        </p>
-      </div>
-    {% endif %}
-
     <div id="thanks_download">
       <h3>{{ _('Shape the future of Firefox.') }}</h3>
       <p>
@@ -58,15 +44,6 @@
       <p>
         {% trans url='http://mozilla.org/contribute/' %}
         Learn how you can <a href="{{ url }}">make Firefox and Mozilla better</a>
-        {% endtrans %}
-      </p>
-    </div>
-
-    <div>
-      <h3>{{ _('Want to see where your feedback goes?') }}</h3>
-      <p>
-        {% trans dash_url='/' %}
-        Visit the <a href="{{ dash_url }}">Firefox Feedback Dashboard</a>
         {% endtrans %}
       </p>
     </div>
