@@ -340,9 +340,6 @@ class ResponseMappingType(FjordMappingType, Indexable):
         if obj is None:
             obj = cls.get_model().objects.get(pk=obj_id)
 
-        def empty_to_unknown(text):
-            return u'Unknown' if text == u'' else text
-
         doc = {
             'id': obj.id,
             'prodchan': obj.prodchan,
