@@ -50,17 +50,23 @@
 {% macro filter_block(filter_set) %}
   <div class="filter">
     <h3>{{ filter_set.display }}</h3>
-    <ul class="bars" data-total="{{ opinion_count }}" name="{{ filter_set.name }}">
-      {% for item in filter_set.options %}
-        {% set count = item.count if item.count != 'all' else opinion_count %}
-        <li data-value="{{ count }}">
-          <input name="{{ item.name }}" type="checkbox" value="{{ item.value }}"{% if item.checked %}checked{% endif %} />
-          <label class="bar" for="{{ item.name }}">
-            <span>{{ item.display }}</span>
-          </label>
-        </li>
-      {% endfor %}
-    </ul>
+    {% if filter_set.note %}
+      <p>
+        {{ filter_set.note }}
+      </p>
+    {% else %}
+      <ul class="bars" data-total="{{ opinion_count }}" name="{{ filter_set.name }}">
+        {% for item in filter_set.options %}
+          {% set count = item.count if item.count != 'all' else opinion_count %}
+          <li data-value="{{ count }}">
+            <input name="{{ item.name }}" type="checkbox" value="{{ item.value }}"{% if item.checked %}checked{% endif %} />
+            <label class="bar" for="{{ item.name }}">
+              <span>{{ item.display }}</span>
+            </label>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
   </div>
 {% endmacro %}
 
