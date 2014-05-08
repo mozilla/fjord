@@ -271,13 +271,11 @@ def get_indexable(percent=100, mapping_types=None):
     return to_index
 
 
-def index_chunk(cls, id_list, reraise=False, es=None):
+def index_chunk(cls, id_list, es=None):
     """Index a chunk of documents.
 
     :arg cls: The MappingType class.
     :arg id_list: Iterable of ids of that MappingType to index.
-    :arg reraise: False if you want errors to be swallowed and True
-        if you want errors to be thrown.
     :arg es: The ES to use. Defaults to creating a new indexing ES.
 
     """
@@ -286,15 +284,9 @@ def index_chunk(cls, id_list, reraise=False, es=None):
 
     for ids in chunked(id_list, 200):
         documents = []
-        obj_list = cls.get_model().objects.filter(id__in=ids)
-        for obj in obj_list:
-            try:
-                documents.append(cls.extract_document(obj_id=obj.id, obj=obj))
-            except Exception:
-                log.exception('Unable to extract/index document (id: %d)',
-                              obj.id)
-                if reraise:
-                    raise
+        obj_list = cls.get_model().uncached.filter(id__in=ids)
+        documents = [cls.extract_document(obj_id=obj.id, obj=obj)
+                     for obj in obj_list]
 
         if documents:
             cls.bulk_index(documents, id_field='id', es=es)
@@ -336,6 +328,16 @@ def es_reindex_cmd(percent=100, mapping_types=None):
     log.info('Wiping and recreating %s....', get_index())
     recreate_index(es=es)
 
+    # Shut off auto-refreshing.
+    index_settings = es.indices.get_settings(index=get_index())
+    old_refresh = (index_settings
+                   .get(get_index(), {})
+                   .get('settings', {})
+                   .get('index.refresh_interval', '1s'))
+
+    es.indices.put_settings(
+        index=get_index(), body={'index': {'refresh_interval': '-1'}})
+
     if mapping_types:
         indexable = get_indexable(percent, mapping_types)
     else:
@@ -374,6 +376,9 @@ def es_reindex_cmd(percent=100, mapping_types=None):
         log.info('   done! (%s total, %s/1000 avg)',
                  format_time(delta_time),
                  format_time(delta_time / (total / 1000.0)))
+
+    es.indices.put_settings(
+        index=get_index(), body={'index': {'refresh_interval': old_refresh}})
 
     delta_time = time.time() - start_time
     log.info('Done! (total time: %s)', format_time(delta_time))

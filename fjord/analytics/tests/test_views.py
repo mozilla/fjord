@@ -1,15 +1,17 @@
 import json
 import logging
+import textwrap
 from datetime import date, datetime, timedelta
 
 from elasticsearch.exceptions import ConnectionError
 from nose.tools import eq_
 from pyquery import PyQuery
 
+from django.contrib.auth.models import Group
 from django.http import QueryDict
 
 from fjord.analytics import views
-from fjord.base.tests import LocalizingClient, reverse
+from fjord.base.tests import LocalizingClient, reverse, user, profile
 from fjord.feedback.tests import response
 from fjord.search.tests import ElasticTestCase
 
@@ -378,3 +380,41 @@ class TestResponseview(ElasticTestCase):
         eq_(200, r.status_code)
         self.assertTemplateUsed(r, 'analytics/mobile/response.html')
         assert str(resp.description) in r.content
+
+    def test_response_view_analyzer(self):
+        """Test secret section only shows up for analyzers"""
+        resp = response(happy=True, description=u'the bestest best!',
+                        save=True)
+
+        self.refresh()
+        r = self.client.get(reverse('response_view', args=(resp.id,)))
+
+        eq_(200, r.status_code)
+        self.assertTemplateUsed(r, 'analytics/response.html')
+        assert str(resp.description) in r.content
+
+        # Verify there is no secret area visible for non-analyzers.
+        pq = PyQuery(r.content)
+        secretarea = pq('dl.secret')
+        eq_(len(secretarea), 0)
+
+        # Create an analyzer and log her in
+        jane = user(email='jane@example.com', save=True)
+        profile(user=jane, save=True)
+        jane.groups.add(Group.objects.get(name='analyzers'))
+
+        self.client_login_user(jane)
+        r = self.client.get(reverse('response_view', args=(resp.id,)))
+
+        eq_(200, r.status_code)
+        self.assertTemplateUsed(r, 'analytics/response.html')
+        assert str(resp.description) in r.content
+
+        # Verify the secret area is there.
+        pq = PyQuery(r.content)
+        secretarea = pq('dl.secret')
+        eq_(len(secretarea), 1)
+
+        # Verify there is an mlt section in the secret area.
+        mlt = pq('dd#mlt')
+        eq_(len(mlt), 1)

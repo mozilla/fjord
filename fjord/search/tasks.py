@@ -39,7 +39,7 @@ def index_chunk_task(index, batch_id, rec_id, chunk):
         rec.status = Record.STATUS_IN_PROGRESS
         rec.save()
 
-        index_chunk(cls, id_list, reraise=True)
+        index_chunk(cls, id_list)
 
         rec.mark_success()
 
