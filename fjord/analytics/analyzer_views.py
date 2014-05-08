@@ -27,7 +27,6 @@ from django.utils.encoding import force_bytes
 from fjord.analytics.forms import OccurrencesComparisonForm
 from fjord.analytics.tools import (
     counts_to_options,
-    generate_query_parsed,
     zero_fill)
 from fjord.base.helpers import locale_name
 from fjord.base.util import (
@@ -395,8 +394,7 @@ def analytics_search(request):
 
     if search_query:
         current_search['q'] = search_query
-        es_query = generate_query_parsed('description', search_query)
-        search = search.query_raw(es_query)
+        search = search.query(description__sqs=search_query)
 
     if search_bigram is not None:
         f &= F(description_bigrams=search_bigram)
