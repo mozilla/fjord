@@ -46,7 +46,8 @@
               <label for="id_first_search_term">Search term</label>
               <input id="id_first_search_term" type="text" name="first_search_term" value="{{ form.first_search_term.value() }}" />
               {{ form.first_search_term.errors }}
-            </div>
+              <a href="https://wiki.mozilla.org/Firefox/Input#Search_syntax" target="_blank"><img src="/static/img/help.png"/></a>
+           </div>
 
             <div class="container">
               <label for="first_start_date">Start date</label>
@@ -76,6 +77,7 @@
               <label for="id_second_search_term">Search term</label>
               <input id="id_second_search_term" type="text" name="second_search_term" value="{{ form.second_search_term.value() }}" />
               {{ form.second_search_term.errors }}
+              <a href="https://wiki.mozilla.org/Firefox/Input#Search_syntax" target="_blank"><img src="/static/img/help.png"/></a>
             </div>
 
             <div class="container">
