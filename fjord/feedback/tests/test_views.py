@@ -252,6 +252,54 @@ class TestFeedback(TestCase):
         eq_(u'29', feedback.version)
         eq_(u'nightly', feedback.channel)
 
+    def test_urls_product_inferred_platform(self):
+        """Test setting product from the url and platform inference"""
+        amount = models.Response.objects.count()
+
+        # Test that we infer the platform if the products are the
+        # same.
+        ua = 'Mozilla/5.0 (Windows NT 6.0; rv:14.0) Gecko/20100101 Firefox/14.0.1'  # noqa
+        url = reverse('feedback', args=(u'firefox',))
+        resp = self.client.post(
+            url,
+            {
+                'happy': 1,
+                'description': u'Firefox rocks FFA!',
+                'url': u'http://mozilla.org/'
+            },
+            HTTP_USER_AGENT=ua)
+
+        self.assertRedirects(resp, reverse('thanks'))
+        eq_(amount + 1, models.Response.objects.count())
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(u'en-US', feedback.locale)
+        eq_(u'Firefox', feedback.product)
+        eq_(u'Windows Vista', feedback.platform)
+
+    def test_urls_product_no_inferred_platform(self):
+        """Test setting product from the url and platform non-inference"""
+        amount = models.Response.objects.count()
+
+        # The UA is for a different browser than what the user is
+        # leaving feedback for, so we should not infer the platform.
+        ua = 'Mozilla/5.0 (Windows NT 6.0; rv:14.0) Gecko/20100101 Firefox/14.0.1'  # noqa
+        url = reverse('feedback', args=(u'android',))
+        resp = self.client.post(
+            url,
+            {
+                'happy': 1,
+                'description': u'Firefox rocks FFA!',
+                'url': u'http://mozilla.org/'
+            },
+            HTTP_USER_AGENT=ua)
+
+        self.assertRedirects(resp, reverse('thanks'))
+        eq_(amount + 1, models.Response.objects.count())
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(u'en-US', feedback.locale)
+        eq_(u'Firefox for Android', feedback.product)
+        eq_(u'', feedback.platform)
+
     def test_invalid_form(self):
         """Bad data gets ignored. Thanks!"""
         url = reverse('feedback')

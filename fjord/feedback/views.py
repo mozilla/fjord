@@ -66,6 +66,16 @@ def requires_firefox(func):
 @ratelimit(rulename='100ph', rate='100/h')
 def _handle_feedback_post(request, locale=None, product=None,
                           version=None, channel=None):
+    """Saves feedback post to db accounting for throttling
+
+    :arg request: request we're handling the post for
+    :arg locale: locale specified in the url
+    :arg product: validated and sanitized product slug specified in
+        the url
+    :arg version: validated and sanitized version specified in the url
+    :arg channel: validated and sanitized channel specified in the url
+
+    """
     if getattr(request, 'limited', False):
         # If we're throttled, then return the thanks page, but don't
         # add the response to the db.
@@ -87,10 +97,11 @@ def _handle_feedback_post(request, locale=None, product=None,
 
     # Do some data validation of product, channel and version
     # coming from the url.
-    product = models.Product.get_product_map().get(smart_str(product), u'')
-    # FIXME - validate these better
-    channel = smart_str(channel).lower()
-    version = smart_str(version)
+    if product:
+        # If there was a product in the url, that's a product slug, so
+        # we map it to a db_name which is what we want to save to the
+        # db.
+        product = models.Product.get_product_map()[product]
 
     # src, then source, then utm_source
     source = request.GET.get('src', u'')
@@ -99,11 +110,18 @@ def _handle_feedback_post(request, locale=None, product=None,
 
     campaign = request.GET.get('utm_campaign', u'')
 
-    # Most platforms aren't different enough between versions to care.
-    # Windows is.
-    platform = request.BROWSER.platform
-    if platform == 'Windows':
-        platform += ' ' + request.BROWSER.platform_version
+    # If the product came in on the url, then we only want to populate
+    # the platfrom from the user agent data iff the product specified
+    # by the url is the same as the browser product.
+    platform = u''
+    if product is None or product == request.BROWSER.browser:
+        # Most platforms aren't different enough between versions to care.
+        # Windows is.
+        platform = request.BROWSER.platform
+        if platform == 'Windows':
+            platform += ' ' + request.BROWSER.platform_version
+
+    product = product or u''
 
     opinion = models.Response(
         # Data coming from the user
@@ -312,7 +330,12 @@ def feedback_router(request, product=None, version=None, channel=None,
         statsd.incr('feedback.oldandroid')
 
     else:
+        # FIXME - validate these better
+        version = smart_str(version)
+        channel = smart_str(channel).lower()
+
         if product:
+            product = smart_str(product)
             # If they passed in a product and we don't know about it, stop
             # here.
             if product not in models.Product.get_product_map():
