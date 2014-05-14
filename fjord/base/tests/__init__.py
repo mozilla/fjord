@@ -64,7 +64,10 @@ class BaseTestCase(OriginalTestCase):
 
     def setUp(self):
         super(BaseTestCase, self).setUp()
-        # Clear the cache before running tests
+        cache.clear()
+
+    def tearDown(self):
+        super(BaseTestCase, self).tearDown()
         cache.clear()
 
 
@@ -81,38 +84,53 @@ class MobileTestCase(TestCase):
         self.client.cookies[settings.MOBILE_COOKIE] = 'on'
 
 
-class SeleniumTestCase(LiveServerTestCase):
+# FIXME: This doesn't work right in regards to transactions and data
+# in the db that's put there via data migrations.
+#
+# It's essentially this problem here:
+#
+# https://groups.google.com/forum/#!msg/south-users/U7tz5RmhJaU/8Ec-3N77O7QJ
+#
+# Need to fix that before we can re-enable this.
+#
+# Commenting this and the two Seleniunm test cases out for now because
+# I really want this to be a huge eyesore so it's likely to get fixed.
+# class SeleniumTestCase(LiveServerTestCase):
+#     skipme = False
 
-    skipme = False
+#     @classmethod
+#     def setUpClass(cls):
+#         try:
+#             firefox_path = getattr(settings, 'SELENIUM_FIREFOX_PATH', None)
+#             if firefox_path:
+#                 firefox_bin = firefox_binary.FirefoxBinary(
+#                     firefox_path=firefox_path)
+#                 kwargs = {'firefox_binary': firefox_bin}
+#             else:
+#                 kwargs = {}
+#             cls.webdriver = webdriver.Firefox(**kwargs)
+#         except (RuntimeError, WebDriverException):
+#             cls.skipme = True
+#         super(SeleniumTestCase, cls).setUpClass()
 
-    @classmethod
-    def setUpClass(cls):
-        try:
-            firefox_path = getattr(settings, 'SELENIUM_FIREFOX_PATH', None)
-            if firefox_path:
-                firefox_bin = firefox_binary.FirefoxBinary(
-                    firefox_path=firefox_path)
-                kwargs = {'firefox_binary': firefox_bin}
-            else:
-                kwargs = {}
-            cls.webdriver = webdriver.Firefox(**kwargs)
-        except (RuntimeError, WebDriverException):
-            cls.skipme = True
+#     @classmethod
+#     def tearDownClass(cls):
+#         super(SeleniumTestCase, cls).tearDownClass()
+#         if not cls.skipme:
+#             cls.webdriver.quit()
 
-        super(SeleniumTestCase, cls).setUpClass()
+#     def setUp(self):
+#         super(SeleniumTestCase, self).setUp()
+#         # Don't run if Selenium isn't available.
+#         if self.skipme:
+#             raise SkipTest('Selenium unavailable.')
+#         # Go to an empty page before every test.
+#         self.webdriver.get('')
+#         cache.clear()
 
-    @classmethod
-    def tearDownClass(cls):
-        if not cls.skipme:
-            cls.webdriver.quit()
-        super(SeleniumTestCase, cls).tearDownClass()
-
-    def setUp(self):
-        # Don't run if Selenium isn't available.
-        if self.skipme:
-            raise SkipTest('Selenium unavailable.')
-        # Go to an empty page before every test.
-        self.webdriver.get('')
+#     def tearDown(self):
+#         super(SeleniumTestCase, self).tearDown()
+#         cache.clear()
 
 
 def with_save(func):
