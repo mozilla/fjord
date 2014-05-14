@@ -230,6 +230,21 @@ def generic_feedback(request, locale=None, product=None, version=None,
     })
 
 
+@csrf_protect
+def generic_feedback_dev(request, locale=None, product=None, version=None,
+                         channel=None):
+    """IN DEVELOPMENT NEXT GENERATION GENERIC FEEDBACK FORM"""
+    form = ResponseForm()
+
+    if request.method == 'POST':
+        return _handle_feedback_post(request, locale, product,
+                                     version, channel)
+
+    return render(request, 'feedback/generic_feedback_dev.html', {
+        'form': form,
+    })
+
+
 @requires_firefox
 @csrf_exempt
 def firefox_os_stable_feedback(request, locale=None, product=None,
@@ -287,6 +302,11 @@ def android_about_feedback(request, locale=None, product=None,
     return _handle_feedback_post(request, locale)
 
 
+PRODUCT_OVERRIDE = {
+    'genericdev': generic_feedback_dev,
+    'fxos': firefox_os_stable_feedback,
+}
+
 @csrf_exempt
 @never_cache
 def feedback_router(request, product=None, version=None, channel=None,
@@ -307,6 +327,8 @@ def feedback_router(request, product=None, version=None, channel=None,
     Note: We never want to cache this view.
 
     """
+    view = None
+
     if '_type' in request.POST:
         # Checks to see if `_type` is in the POST data and if so this
         # is coming from Firefox for Android which doesn't know
@@ -334,22 +356,30 @@ def feedback_router(request, product=None, version=None, channel=None,
         version = smart_str(version)
         channel = smart_str(channel).lower()
 
-        if product:
+        if request.BROWSER.browser == 'Firefox OS':
+            # Firefox OS gets shunted to a different form which has
+            # different Firefox OS specific questions.
+            view = firefox_os_stable_feedback
+            product = 'fxos'
+
+        elif product:
             product = smart_str(product)
-            # If they passed in a product and we don't know about it, stop
-            # here.
-            if product not in models.Product.get_product_map():
+
+            if product in PRODUCT_OVERRIDE:
+                # If the product is really a form name, we use that
+                # form specifically.
+                view = PRODUCT_OVERRIDE[product]
+                product = None
+
+            elif product not in models.Product.get_product_map():
+                # If they passed in a product and we don't know about
+                # it, stop here.
                 return render(request, 'feedback/unknownproduct.html', {
                     'product': product
                 })
 
-        if product == 'fxos' or request.BROWSER.browser == 'Firefox OS':
-            # Firefox OS gets shunted to a different form which has
-            # different Firefox OS specific questions.
-            view = firefox_os_stable_feedback
-
-        else:
-            view = generic_feedback
+    if view is None:
+        view = generic_feedback
 
     return view(request, request.locale, product, version, channel,
                 *args, **kwargs)
