@@ -1,0 +1,117 @@
+{% extends "feedback/base.html" %}
+
+{% block page_title %}[DEV] {{ _('Submit Your Feedback') }}{% endblock %}
+
+{% set extra_body_attrs = {'data-form-name': 'generic'} %}
+
+{% block body %}
+<form id="responseform" action="" method="post">
+  <x-deck transition-type="slide-left">
+    <x-card id="intro">
+      <x-appbar>
+        <header>[DEV] {{ _('Submit Your Feedback') }}</header>
+      </x-appbar>
+
+      <section>
+        <div id="sentiment">
+          <p>{{ _('Your feedback helps us improve Firefox.') }}</p>
+          <div id="buttons">
+            <button class="happy">{{ _('Firefox made me happy') }}</button>
+            <button class="sad">{{ _('Firefox made me sad') }}</button>
+          </div>
+        </div>
+
+        <aside>
+          <div>
+            {% trans support_url='http://support.mozilla.org/' %}
+              If you need help or have a problem
+              with Firefox, please visit <a href="{{ support_url }}">Firefox Support</a>.
+            {% endtrans %}
+          </div>
+        </aside>
+      </section>
+    </x-card>
+
+    <x-card id="moreinfo">
+      <x-appbar>
+        <button class="back"></button>
+        <header>{{ _('Details') }}</header>
+      </x-appbar>
+
+      <section>
+        <aside>
+          <div>
+            {% trans %}
+              The content of your feedback will be public, so please be
+              sure not to include any personal information.
+            {% endtrans %}
+          </div>
+        </aside>
+
+        <p>
+          <label class="happy" for="description">
+            {{ _('Please describe what you liked.') }}
+          </label>
+          <label class="sad" for="description">
+            {{ _('Please describe your problem below.') }}
+            {{ _('Please be as specific as you can.') }}
+          </label>
+        </p>
+
+        <div id="description-counter"></div>
+        <textarea data-max-length="10000" id="description" name="description" cols="40" rows="4"></textarea>
+
+        <div>
+          <label for="id_url">
+            {{ _('If your feedback is related to a website, you can include it here.') }}
+          </label>
+          <p>{{ form.url }}</p>
+          {{ form.url.errors }}
+        </div>
+
+        <button id="description-next-btn" class="next btn submit">{{ _('Next') }}</button>
+      </section>
+    </x-card>
+
+    <x-card id="email">
+      <x-appbar>
+        <button class="back"></button>
+        <header>{{ _('Can we contact you?') }}</header>
+      </x-appbar>
+
+      <section>
+        <label class="email-ok">
+          <p>
+            <input id="email-ok" type="checkbox" name="email_ok"/>
+            {{ _('Check here to let us contact you to follow up on your feedback.') }}
+          </p>
+        </label>
+
+        <div id="email-details">
+          <label for="id_email">
+            {{ _('Email address (optional):') }}
+          </label>
+          <p>{{ form.email }}</p>
+          {{ form.email.errors }}
+
+          <aside>
+            <div>
+              {% trans %}
+                While your feedback will be publicly visible, email addresses are
+                kept private. We understand your privacy is important.
+              {% endtrans %}
+            </div>
+          </aside>
+        </div>
+
+        <button id="form-submit-btn" class="complete btn submit">{{ _('Send Feedback') }}</button>
+      </section>
+    </x-card>
+
+  </x-deck>
+  {% for hidden in form.hidden_fields() %}
+    {{ hidden }}
+  {% endfor %}
+  {{ csrf() }}
+</form>
+{% endblock %}

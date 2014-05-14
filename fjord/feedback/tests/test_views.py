@@ -113,12 +113,23 @@ class TestFeedback(TestCase):
 
     def test_firefox_os_view(self):
         """Firefox OS returns correct view"""
+        # Firefox OS is the user agent
         url = reverse('feedback')
         ua = 'Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0'
 
         r = self.client.get(url, HTTP_USER_AGENT=ua)
-
         self.assertTemplateUsed(r, 'feedback/mobile/fxos_feedback.html')
+
+        # Firefox OS specified in url
+        url = reverse('feedback', args=(u'fxos',))
+        r = self.client.get(url)
+        self.assertTemplateUsed(r, 'feedback/mobile/fxos_feedback.html')
+
+    def test_generic_dev_view(self):
+        # FIXME: Remove this when the dev view lands.
+        url = reverse('feedback', args=(u'genericdev',))
+        resp = self.client.get(url)
+        self.assertTemplateUsed(resp, 'feedback/generic_feedback_dev.html')
 
     def test_urls_locale(self):
         """Test setting locale from the locale part of the url"""
