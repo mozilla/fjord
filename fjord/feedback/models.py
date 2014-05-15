@@ -67,6 +67,12 @@ class Product(ModelBase):
         products = cls.objects.values_list('slug', 'db_name')
         return dict(prod for prod in products)
 
+    def __unicode__(self):
+        return self.display_name
+
+    def __repr__(self):
+        return self.__unicode__().encode('ascii', 'ignore')
+
 
 @register_auto_translation
 @register_live_index
@@ -430,6 +436,9 @@ class ResponseEmail(ModelBase):
 
     opinion = models.ForeignKey(Response)
     email = models.EmailField()
+
+    def __unicode__(self):
+        return self.id
 
 
 class NoNullsCharField(serializers.CharField):
