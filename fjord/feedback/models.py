@@ -192,6 +192,7 @@ class Response(ModelBase):
             existing_obj = (
                 Response.objects
                 .filter(description=self.description)
+                .filter(locale=self.locale)
                 .exclude(translated_description__isnull=True)
                 .exclude(translated_description=u'')
                 .latest('id'))
