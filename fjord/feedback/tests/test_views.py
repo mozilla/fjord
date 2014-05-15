@@ -1,4 +1,5 @@
 from django.test.client import RequestFactory
+
 from nose.tools import eq_
 from mock import NonCallableMock
 
@@ -24,16 +25,22 @@ class TestRedirectFeedback(TestCase):
 class TestCYOA(TestCase):
     client_class = LocalizingClient
 
-    def test_cyoa(self):
-        # Test with no products
+    def test_cyoa_no_products(self):
+        # FIXME: We can nix this when we stop doing data migrations in
+        # test setup.
+        models.Product.objects.all().delete()
+
         resp = self.client.get(reverse('cyoa'))
 
         eq_(resp.status_code, 200)
         self.assertTemplateUsed(resp, 'feedback/cyoa.html')
 
-        # Test with products
+    def test_cyoa_with_products(self):
         product(display_name=u'ProductFoo', slug=u'productfoo', save=True)
         product(display_name=u'ProductBar', slug=u'productbar', save=True)
+
+        from django.core.cache import cache
+        cache.clear()
 
         resp = self.client.get(reverse('cyoa'))
 
@@ -46,13 +53,6 @@ class TestCYOA(TestCase):
 
 class TestFeedback(TestCase):
     client_class = LocalizingClient
-
-    def setUp(self):
-        super(TestFeedback, self).setUp()
-        product(display_name=u'Firefox', slug=u'firefox', save=True)
-        product(display_name=u'Firefox OS', slug=u'fxos', save=True)
-        product(display_name=u'Firefox for Android', slug=u'android', save=True)
-        product(display_name=u'Firefox Metro', slug=u'metrofirefox', save=True)
 
     def test_valid_happy(self):
         """Submitting a valid happy form creates an item in the DB.
@@ -116,11 +116,10 @@ class TestFeedback(TestCase):
         # Firefox OS is the user agent
         url = reverse('feedback')
         ua = 'Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0'
-
         r = self.client.get(url, HTTP_USER_AGENT=ua)
         self.assertTemplateUsed(r, 'feedback/mobile/fxos_feedback.html')
 
-        # Firefox OS specified in url
+        # Specifying fxos as the product in the url
         url = reverse('feedback', args=(u'fxos',))
         r = self.client.get(url)
         self.assertTemplateUsed(r, 'feedback/mobile/fxos_feedback.html')
@@ -134,9 +133,10 @@ class TestFeedback(TestCase):
     def test_urls_locale(self):
         """Test setting locale from the locale part of the url"""
         try:
-            url = reverse('feedback')
-            # N.B. Cheating here to get the right localized url.
-            url = url.replace('/en-US/', '/es/')
+            count = models.Response.uncached.count()
+
+            # Hard-coded url so we're guaranteed to get /es/.
+            url = '/es/feedback'
             resp = self.client.post(url, {
                 'happy': 1,
                 'description': u'Firefox rocks for es!',
@@ -144,6 +144,7 @@ class TestFeedback(TestCase):
             })
 
             self.assertRedirects(resp, reverse('thanks'))
+            eq_(count + 1, models.Response.uncached.count())
             feedback = models.Response.objects.latest(field_name='id')
             eq_(u'es', feedback.locale)
             eq_(u'Firefox', feedback.product)
@@ -397,7 +398,6 @@ class TestFeedback(TestCase):
 
     def test_feedback_router(self):
         """Requesting a generic template should give a feedback form."""
-        # TODO: This test might need to change when the router starts routing.
         url = reverse('feedback')
         ua = ('Mozilla/5.0 (X11; Linux x86_64; rv:21.0) Gecko/20130212 '
               'Firefox/21.0')
