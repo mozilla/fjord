@@ -97,3 +97,6 @@
 [submodule "vendor/src/elasticsearch-py"]
 	path = vendor/src/elasticsearch-py
 	url = https://github.com/elasticsearch/elasticsearch-py.git
+[submodule "vendor/src/django-grappelli"]
+	path = vendor/src/django-grappelli
+	url = https://github.com/sehmaschine/django-grappelli
