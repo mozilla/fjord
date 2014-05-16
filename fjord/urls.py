@@ -32,6 +32,7 @@ urlpatterns = patterns('',
 
     (r'^browserid/', include('django_browserid.urls')),
 
+    (r'^grappelli/', include('grappelli.urls')),
     (r'^admin/', include(admin.site.urls)),
 )
 

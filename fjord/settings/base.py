@@ -166,6 +166,12 @@ INSTALLED_APPS = get_apps(
 
         'django_browserid',
         'adminplus',
+
+        # This has to come before Grappelli since it contains the
+        # admin/index.html template that overrides the Grappelli one
+        # and provides the adminplus stuff.
+        'fjord.grappellioverride',
+        'grappelli',
         'django.contrib.admin',
         'django_extensions',
         'django_nose',
@@ -210,6 +216,7 @@ SUPPORTED_NONLOCALES += (
 JINGO_EXCLUDE_APPS = [
     'admin',
     'adminplus',
+    'grappelli',
     'registration',
     'browserid',
 ]
@@ -413,8 +420,6 @@ DOMAIN_METHODS['messages'] = [
 # pages that this is not production.
 SHOW_STAGE_NOTICE = False
 
-# Explicitly set this because the one from funfactory includes
-# django-compressor which we don't use.
 # STATICFILES_FINDERS = (
 #     'django.contrib.staticfiles.finders.FileSystemFinder',
 #     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -456,6 +461,11 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     )
 }
+
+# Grappelli settings
+GRAPPELLI_ADMIN_TITLE = 'Input admin and diabolical dashboard'
+
+
 
 try:
     len(LOGGING)
