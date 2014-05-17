@@ -22,7 +22,7 @@
       <section class="product-picker">
         <ul class="content">
           {% for prod in products %}
-            <a href="{{ url('feedback', product=prod.slug) }}" class="product-card {{ prod.slug }}">
+            <a href="{{ url('feedback_dev', product=prod.slug) }}" class="product-card {{ prod.slug }}">
               <li>
                 <h3>{{ prod.display_name }}</h3>
               </li>

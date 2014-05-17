@@ -22,27 +22,27 @@ class TestRedirectFeedback(TestCase):
         self.assertRedirects(r, reverse('feedback') + '#sad')
 
 
-class TestCYOA(TestCase):
+class TestPicker(TestCase):
     client_class = LocalizingClient
 
-    def test_cyoa_no_products(self):
+    def test_picker_no_products(self):
         # FIXME: We can nix this when we stop doing data migrations in
         # test setup.
         models.Product.objects.all().delete()
 
-        resp = self.client.get(reverse('cyoa'))
+        resp = self.client.get(reverse('feedback_dev'))
 
         eq_(resp.status_code, 200)
-        self.assertTemplateUsed(resp, 'feedback/cyoa.html')
+        self.assertTemplateUsed(resp, 'feedback/picker.html')
 
-    def test_cyoa_with_products(self):
+    def test_picker_with_products(self):
         product(display_name=u'ProductFoo', slug=u'productfoo', save=True)
         product(display_name=u'ProductBar', slug=u'productbar', save=True)
 
         from django.core.cache import cache
         cache.clear()
 
-        resp = self.client.get(reverse('cyoa'))
+        resp = self.client.get(reverse('feedback_dev'))
 
         eq_(resp.status_code, 200)
         self.assertContains(resp, 'ProductFoo')
@@ -126,7 +126,7 @@ class TestFeedback(TestCase):
 
     def test_generic_dev_view(self):
         # FIXME: Remove this when the dev view lands.
-        url = reverse('feedback', args=(u'genericdev',))
+        url = reverse('feedback_dev', args=('firefox',))
         resp = self.client.get(url)
         self.assertTemplateUsed(resp, 'feedback/generic_feedback_dev.html')
 
