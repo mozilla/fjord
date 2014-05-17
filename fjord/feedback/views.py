@@ -231,8 +231,7 @@ def generic_feedback(request, locale=None, product=None, version=None,
 
 
 @csrf_protect
-def generic_feedback_dev(request, locale=None, product=None, version=None,
-                         channel=None):
+def generic_feedback_dev(request, locale, product, version=None, channel=None):
     """IN DEVELOPMENT NEXT GENERATION GENERIC FEEDBACK FORM"""
     form = ResponseForm()
 
@@ -242,6 +241,7 @@ def generic_feedback_dev(request, locale=None, product=None, version=None,
 
     return render(request, 'feedback/generic_feedback_dev.html', {
         'form': form,
+        'product': models.Product.from_slug(product),
     })
 
 
@@ -267,8 +267,7 @@ def firefox_os_stable_feedback(request, locale=None, product=None,
 
 @csrf_exempt
 @require_POST
-def android_about_feedback(request, locale=None, product=None,
-                           version=None, channel=None):
+def android_about_feedback(request, locale=None):
     """A view specifically for Firefox for Android.
 
     Firefox for Android has a feedback form built in that generates
@@ -304,8 +303,70 @@ def android_about_feedback(request, locale=None, product=None,
 
 PRODUCT_OVERRIDE = {
     'genericdev': generic_feedback_dev,
-    'fxos': firefox_os_stable_feedback,
 }
+
+
+@csrf_exempt
+@never_cache
+def feedback_router_dev(request, product=None, version=None, channel=None,
+                    *args, **kwargs):
+    """DEV ONLY FEEDBACK ROUTER"""
+    view = None
+
+    if '_type' in request.POST:
+        # Checks to see if `_type` is in the POST data and if so this
+        # is coming from Firefox for Android which doesn't know
+        # anything about csrf tokens. If that's the case, we send it
+        # to a view specifically for FfA Otherwise we pass it to one
+        # of the normal views, which enforces CSRF. Also, nix the
+        # product just in case we're crossing the streams and
+        # confusing new-style product urls with old-style backwards
+        # compatability for the Android form.
+        #
+        # FIXME: Remove this hairbrained monstrosity when we don't need to
+        # support the method that Firefox for Android currently uses to
+        # post feedback which worked with the old input.mozilla.org.
+
+        # This lets us measure how often this section of code kicks
+        # off and thus how often old android stuff is happening. When
+        # we're not seeing this anymore, we can nix all the old
+        # android stuff.
+        statsd.incr('feedback.oldandroid')
+
+        return android_about_feedback(request, request.locale)
+
+    product = smart_str(product, fallback=None)
+    # FIXME - validate these better
+    version = smart_str(version)
+    channel = smart_str(channel).lower()
+
+    if product == 'fxos' or request.BROWSER.browser == 'Firefox OS':
+        # Firefox OS gets shunted to a different form which has
+        # different Firefox OS specific questions.
+        view = firefox_os_stable_feedback
+        product = 'fxos'
+
+    elif product in PRODUCT_OVERRIDE:
+        # The "product" is really a specific form to use. So we None
+        # out the product and let that form view deal with everything.
+        view = PRODUCT_OVERRIDE[product]
+        product = None
+
+    elif product is None or product not in models.Product.get_product_map():
+        # The product wasn't specified or doesn't exist, so we spit
+        # out the product picker.
+        template = 'feedback/picker.html'
+
+        products = models.Product.objects.all()
+        return render(request, template, {
+            'products': products
+        })
+
+    view = view or generic_feedback_dev
+        
+    return view(request, request.locale, product, version, channel,
+                *args, **kwargs)
+
 
 @csrf_exempt
 @never_cache
@@ -351,32 +412,34 @@ def feedback_router(request, product=None, version=None, channel=None,
         # android stuff.
         statsd.incr('feedback.oldandroid')
 
-    else:
-        # FIXME - validate these better
-        version = smart_str(version)
-        channel = smart_str(channel).lower()
+        return android_about_feedback(request, request.locale)
 
-        if request.BROWSER.browser == 'Firefox OS':
-            # Firefox OS gets shunted to a different form which has
-            # different Firefox OS specific questions.
-            view = firefox_os_stable_feedback
-            product = 'fxos'
 
-        elif product:
-            product = smart_str(product)
+    # FIXME - validate these better
+    version = smart_str(version)
+    channel = smart_str(channel).lower()
 
-            if product in PRODUCT_OVERRIDE:
-                # If the product is really a form name, we use that
-                # form specifically.
-                view = PRODUCT_OVERRIDE[product]
-                product = None
+    if product == 'fxos' or request.BROWSER.browser == 'Firefox OS':
+        # Firefox OS gets shunted to a different form which has
+        # different Firefox OS specific questions.
+        view = firefox_os_stable_feedback
+        product = 'fxos'
 
-            elif product not in models.Product.get_product_map():
-                # If they passed in a product and we don't know about
-                # it, stop here.
-                return render(request, 'feedback/unknownproduct.html', {
-                    'product': product
-                })
+    elif product:
+        product = smart_str(product)
+
+        if product in PRODUCT_OVERRIDE:
+            # If the product is really a form name, we use that
+            # form specifically.
+            view = PRODUCT_OVERRIDE[product]
+            product = None
+
+        elif product not in models.Product.get_product_map():
+            # If they passed in a product and we don't know about
+            # it, stop here.
+            return render(request, 'feedback/unknownproduct.html', {
+                'product': product
+            })
 
     if view is None:
         view = generic_feedback
@@ -386,7 +449,7 @@ def feedback_router(request, product=None, version=None, channel=None,
 
 
 def cyoa(request):
-    template = 'feedback/cyoa.html'
+    template = 'feedback/picker.html'
 
     products = models.Product.objects.all()
     return render(request, template, {

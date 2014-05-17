@@ -62,6 +62,10 @@ class Product(ModelBase):
     )
 
     @classmethod
+    def from_slug(cls, slug):
+        return cls.objects.get(slug=slug)
+
+    @classmethod
     def get_product_map(cls):
         """Returns map of product slug -> db_name"""
         products = cls.objects.values_list('slug', 'db_name')
