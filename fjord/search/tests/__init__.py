@@ -12,16 +12,9 @@ from fjord.search.models import Record
 
 class ElasticTestCase(BaseTestCase):
     """Base class for Elastic Search tests, providing some conveniences"""
-    skipme = False
-
     @classmethod
     def setUpClass(cls):
         super(ElasticTestCase, cls).setUpClass()
-
-        # If Elasticsearch isn't running, skip ES tests
-        if not get_es().ping():
-            cls.skipme = True
-            return
 
         cls._old_es_index_prefix = settings.ES_INDEX_PREFIX
         settings.ES_INDEX_PREFIX = settings.ES_INDEX_PREFIX + 'test'
@@ -29,14 +22,11 @@ class ElasticTestCase(BaseTestCase):
     @classmethod
     def tearDownClass(cls):
         super(ElasticTestCase, cls).tearDownClass()
-        if not cls.skipme:
-            # Restore old setting.
-            settings.ES_INDEX_PREFIX = cls._old_es_index_prefix
+
+        # Restore old setting.
+        settings.ES_INDEX_PREFIX = cls._old_es_index_prefix
 
     def setUp(self):
-        if self.skipme:
-            raise SkipTest
-
         super(ElasticTestCase, self).setUp()
         self.setup_indexes()
 
