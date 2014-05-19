@@ -343,6 +343,10 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'country': keyword_type(),
             'device': keyword_type(),
             'manufacturer': keyword_type(),
+            'source': keyword_type(),
+            'campaign': keyword_type(),
+            'source_campaign': keyword_type(),
+            'organic': boolean_type(),
             'created': date_type(),
         }
 
@@ -372,6 +376,13 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'country': obj.country,
             'device': obj.device,
             'manufacturer': obj.manufacturer,
+            'source': obj.source,
+            'campaign': obj.campaign,
+            'source_campaign': '::'.join([
+                (obj.source or '--'),
+                (obj.campaign or '--')
+            ]),
+            'organic': (not obj.source and not obj.campaign),
             'created': obj.created,
         }
 

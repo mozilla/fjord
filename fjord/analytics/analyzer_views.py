@@ -322,6 +322,9 @@ def analytics_search(request):
     search_date_end = smart_date(
         request.GET.get('date_end', None), fallback=None)
     search_bigram = request.GET.get('bigram', None)
+    search_source = request.GET.get('source', None)
+    search_campaign = request.GET.get('campaign', None)
+    search_organic = request.GET.get('organic', None)
     selected = request.GET.get('selected', None)
 
     filter_data = []
@@ -410,6 +413,17 @@ def analytics_search(request):
             }]
         })
 
+    if search_source is not None:
+        f &= F(source=search_source)
+        current_search['source'] = search_source
+    if search_campaign is not None:
+        f &= F(campaign=search_campaign)
+        current_search['campaign'] = search_campaign
+    search_organic = {'0': False, '1': True}.get(search_organic, None)
+    if search_organic in [False, True]:
+        f &= F(organic=search_organic)
+        current_search['organic'] = int(search_organic)
+
     search = search.filter(f).order_by('-created')
 
     # If they're asking for a CSV export, then send them to the export
@@ -432,10 +446,6 @@ def analytics_search(request):
     opinion_page = Response.objects.filter(id__in=opinion_page_ids)
 
     # Navigation facet data
-    facets = search.facet(
-        'happy', 'platform', 'locale', 'country', 'product', 'version',
-        'url_domain', 'has_email', 'api',
-        filtered=bool(search._process_filters(f.filters)))
 
     # This loop does two things. First it maps 'T' -> True and 'F' ->
     # False.  This is probably something EU should be doing for
@@ -451,7 +461,14 @@ def analytics_search(request):
         'version': {},
         'url_domain': {},
         'api': {},
+        'source': {},
+        'campaign': {},
+        'organic': {},
     }
+    facets = search.facet(*(counts.keys()),
+        filtered=bool(search._process_filters(f.filters)),
+        size=25)
+
     for param, terms in facets.facet_counts().items():
         for term in terms:
             name = term['term']
@@ -534,6 +551,25 @@ def analytics_search(request):
                 name='api',
                 display='API version',
                 checked=search_api,
+                display_map=empty_to_unknown),
+            counts_to_options(
+                counts['organic'].items(),
+                name='organic',
+                display='Organic',
+                display_map={True: 'Yes', False: 'No'},
+                value_map={True: 1, False: 0},
+                checked=search_organic),
+            counts_to_options(
+                counts['source'].items(),
+                name='source',
+                display='Source',
+                checked=search_source,
+                display_map=empty_to_unknown),
+            counts_to_options(
+                counts['campaign'].items(),
+                name='campaign',
+                display='Campaign',
+                checked=search_campaign,
                 display_map=empty_to_unknown),
         ]
     )
