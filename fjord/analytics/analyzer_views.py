@@ -97,7 +97,7 @@ def analytics_occurrences(request):
                 first_params['date_end'] = cleaned['first_end_date']
             if cleaned['first_search_term']:
                 first_resp_s = first_resp_s.query(
-                    description__text=cleaned['first_search_term'])
+                    description__match=cleaned['first_search_term'])
                 first_params['q'] = cleaned['first_search_term']
 
             if ('date_start' not in first_params
@@ -149,7 +149,7 @@ def analytics_occurrences(request):
                     second_params['date_end'] = cleaned['second_end_date']
                 if form.cleaned_data['second_search_term']:
                     second_resp_s = second_resp_s.query(
-                        description__text=cleaned['second_search_term'])
+                        description__match=cleaned['second_search_term'])
                     second_params['q'] = cleaned['second_search_term']
 
                 if ('date_start' not in second_params
