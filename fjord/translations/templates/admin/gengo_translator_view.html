@@ -1,0 +1,41 @@
+{% extends "admin/base_site.html" %}
+{% block content_title %}
+  <h1>Gengo - Maintenance</h1>
+{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style type="text/css">
+    section {
+      margin: 1em 0em 1em 0em;
+    }
+    div#content div {
+      margin-bottom: .5em;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  {% if configured %}
+    <section>
+      <h1>Account balance</h1>
+      <table>
+        <tr><th>Balance</th><td>{{ balance }}</td></tr>
+      </table>
+    </section>
+  {% else %}
+    <section>
+      <p class="errornote">
+        Gengo is not configured properly.
+      </p>
+    </section>
+  {% endif %}
+
+  <section>
+    <h1>Configuration</h1>
+    <table>
+      <tr><th>GENGO_PUBLIC_KEY</th><td>{{ settings.GENGO_PUBLIC_KEY }}</td></tr>
+      <tr><th>GENGO_PRIVATE_KEY</th><td>{{ settings.GENGO_PRIVATE_KEY }}</td></tr>
+    </table>
+  </section>
+{% endblock %}

@@ -420,6 +420,10 @@ DOMAIN_METHODS['messages'] = [
 # pages that this is not production.
 SHOW_STAGE_NOTICE = False
 
+# Gengo settings
+GENGO_PUBLIC_KEY = None
+GENGO_PRIVATE_KEY = None
+
 # STATICFILES_FINDERS = (
 #     'django.contrib.staticfiles.finders.FileSystemFinder',
 #     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -464,8 +468,6 @@ REST_FRAMEWORK = {
 
 # Grappelli settings
 GRAPPELLI_ADMIN_TITLE = 'Input admin and diabolical dashboard'
-
-
 
 try:
     len(LOGGING)
