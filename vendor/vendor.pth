@@ -56,6 +56,7 @@ src/django-statsd
 src/elasticutils
 src/elasticsearch-py
 src/funfactory
+src/gengo-python
 src/jingo
 src/jingo-minify
 src/kombu

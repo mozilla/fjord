@@ -100,3 +100,6 @@
 [submodule "vendor/src/django-grappelli"]
 	path = vendor/src/django-grappelli
 	url = https://github.com/sehmaschine/django-grappelli
+[submodule "vendor/src/gengo-python"]
+	path = vendor/src/gengo-python
+	url = https://github.com/gengo/gengo-python.git
