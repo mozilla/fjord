@@ -2,6 +2,8 @@ from django.conf import settings
 from django.contrib import admin
 from django.shortcuts import render
 
+from fjord.translations.gengo_utils import FjordGengo
+
 from gengo import Gengo
 
 
@@ -12,18 +14,9 @@ def gengo_translator_view(request):
             'configured': False
         })
 
-    gengo = Gengo(
-        public_key=settings.GENGO_PUBLIC_KEY,
-        private_key=settings.GENGO_PRIVATE_KEY,
-        # FIXME - sandbox?
-    )
+    gengo_api = FjordGengo()
 
-    balance = gengo.getAccountBalance()
-
-    balance = ' '.join([
-        balance['response']['credits'],
-        balance['response']['currency']]
-    )
+    balance = gengo_api.get_balance()
 
     return render(request, 'admin/gengo_translator_view.html', {
         'configured': True,

@@ -9,37 +9,59 @@ from .utils import (
 )
 
 
-@task()
-def translate_task(instance_key):
-    """Celery task to kick off translation
+@task(rate_limit='60/m')
+def translate_task(instance_key, system, src_lang, src_field,
+                   dst_lang, dst_field):
+    """Celery task to perform a single translation
+
+    .. Note::
+
+       This is rate-limited at 60/m.
+
+       We really want the translate call to be rate-limited based on
+       the translation system, but given we're only supporting Gengo
+       right now, I'm going to do the rate limiting here across all
+       translation systems rather than figure out how to do it just
+       for Gengo.
 
     :arg instance_key: The key for the instance we're translating
+    :arg system: The name of the translation system to use
+    :arg src_lang: The source language
+    :arg src_field: The field in the instance holding the text to
+         translate
+    :arg dst_lang: The destination language
+    :arg dst_field: The field in the instance to shove the translated
+        text into
 
     """
     instance = decompose_key(instance_key)
-    jobs = instance.generate_translation_jobs()
-    if not jobs:
-        return
-
-    # Handle each job
-    for key, system, src_lang, src_field, dst_lang, dst_field in jobs:
-        instance = decompose_key(key)
-
-        translate(instance, system, src_lang, src_field, dst_lang, dst_field)
+    translate(instance, system, src_lang, src_field, dst_lang, dst_field)
 
 
 def translate_handler(sender, instance=None, created=False, **kwargs):
-    """Handles possible translation
+    """post-save handler that generates translation jobs
 
-    This asks the instance to generate translation jobs. If there
-    are translation jobs to do, then this throws them into a celery
-    task.
+    This only does translation work on instance creation--not update.
+
+    This asks the instance to generate translation jobs. If there are
+    translation jobs to do, then this throws each one into a separate
+    celery task.
 
     """
     if not created or instance is None:
         return
 
-    translate_task.delay(compose_key(instance))
+    jobs = instance.generate_translation_jobs()
+    if not jobs:
+        return
+
+    for key, system, src_lang, src_field, dst_lang, dst_field in jobs:
+        if not getattr(instance, src_field).strip():
+            # Don't create a job unless there's something to translate.
+            continue
+
+        translate_task.delay(key, system, src_lang, src_field,
+                             dst_lang, dst_field)
 
 
 def register_auto_translation(model_cls):

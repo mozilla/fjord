@@ -1,4 +1,11 @@
 from dennis.translator import Translator
+from statsd import statsd
+
+from .gengo_utils import (
+    FjordGengo,
+    GengoMachineTranslationFailure,
+    GengoUnknownLanguage,
+)
 
 
 _translation_systems = {}
@@ -122,3 +129,37 @@ class DennisTranslator(TranslationSystem):
             translated = Translator([], pipeline).translate_string(text)
             setattr(instance, dst_field, translated)
             instance.save()
+
+
+# ---------------------------------------------------------
+# Gengo machine translator system AI 9000 of doom
+# ---------------------------------------------------------
+
+class GengoMachineTranslator(TranslationSystem):
+    """Translates using Gengo machine translation"""
+    name = 'gengo_machine'
+
+    def translate(self, instance, src_lang, src_field, dst_lang, dst_field):
+        text = getattr(instance, src_field)
+
+        gengo_api = FjordGengo()
+        try:
+            translated = gengo_api.get_machine_translation(instance.id, text)
+            if translated:
+                setattr(instance, dst_field, translated)
+                instance.save()
+                statsd.incr('translation.gengo_machine.success')
+
+            else:
+                statsd.incr('translation.gengo_machine.failure')
+
+        except GengoUnknownLanguage:
+            # FIXME: This might be an indicator that this response is
+            # spam. At some point p, we can write code to account for
+            # that.
+            statsd.incr('translation.gengo_machine.unknown')
+
+        except GengoMachineTranslationFailure:
+            # FIXME: For now, if we have a machine translation
+            # failure, we're just going to ignore it and move on.
+            statsd.incr('translation.gengo_machine.failure')
