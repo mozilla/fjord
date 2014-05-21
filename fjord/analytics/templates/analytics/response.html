@@ -26,6 +26,12 @@
           <dd>
             <p>{{ response.description|nl2br }}</p>
           </dd>
+          {% if response.locale != 'en-US' %}
+            <dt>{{ _('Translated') }}</dt>
+            <dd>
+              <p>{{ response.translated_description|nl2br }}&nbsp;</p>
+            </dd>
+          {% endif %}
           <dt>{{ _('Created') }}</dt>
           <dd>
             {#
