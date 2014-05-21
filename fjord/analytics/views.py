@@ -2,10 +2,11 @@
 # which has "secure" parts to it in the template.
 
 import json
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.views.decorators.http import require_POST
 
 from elasticutils.contrib.django import F, es_required_or_50x
 from funfactory.urlresolvers import reverse
@@ -15,14 +16,33 @@ from tower import ugettext as _
 from fjord.analytics.tools import (
     JSONDatetimeEncoder,
     counts_to_options,
-    zero_fill)
+    zero_fill
+)
 from fjord.base.helpers import locale_name
 from fjord.base.util import (
+    analyzer_required,
     check_new_user,
     smart_int,
     smart_date,
-    Atom1FeedWithRelatedLinks)
+    Atom1FeedWithRelatedLinks
+)
 from fjord.feedback.models import Product, Response, ResponseMappingType
+from fjord.translations.tasks import create_translation_tasks
+
+
+@check_new_user
+@require_POST
+@analyzer_required
+def spot_translate(request, responseid):
+    # FIXME: This is gengo-machine specific for now.
+    resp = get_object_or_404(Response, id=responseid)
+    create_translation_tasks(resp, system='gengo_machine')
+
+    # FIXME: We should return a message to the user, so they know
+    # it'll happen at some point. Plus we need to let the user know
+    # when it's failed.
+    return HttpResponseRedirect(
+        reverse('response_view', args=(responseid,)))
 
 
 @check_new_user

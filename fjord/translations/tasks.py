@@ -38,6 +38,21 @@ def translate_task(instance_key, system, src_lang, src_field,
     translate(instance, system, src_lang, src_field, dst_lang, dst_field)
 
 
+def create_translation_tasks(instance, system=None):
+    """Generate translation tasks for a given translateable instance"""
+    jobs = instance.generate_translation_jobs(system=system)
+    if not jobs:
+        return
+
+    for key, system, src_lang, src_field, dst_lang, dst_field in jobs:
+        if not getattr(instance, src_field).strip():
+            # Don't create a job unless there's something to translate.
+            continue
+
+        translate_task.delay(key, system, src_lang, src_field,
+                             dst_lang, dst_field)
+
+
 def translate_handler(sender, instance=None, created=False, **kwargs):
     """post-save handler that generates translation jobs
 
@@ -51,17 +66,7 @@ def translate_handler(sender, instance=None, created=False, **kwargs):
     if not created or instance is None:
         return
 
-    jobs = instance.generate_translation_jobs()
-    if not jobs:
-        return
-
-    for key, system, src_lang, src_field, dst_lang, dst_field in jobs:
-        if not getattr(instance, src_field).strip():
-            # Don't create a job unless there's something to translate.
-            continue
-
-        translate_task.delay(key, system, src_lang, src_field,
-                             dst_lang, dst_field)
+    return create_translation_tasks(instance)
 
 
 def register_auto_translation(model_cls):

@@ -5,6 +5,7 @@ from .gengo_utils import (
     FjordGengo,
     GengoMachineTranslationFailure,
     GengoUnknownLanguage,
+    GengoUnsupportedLanguage,
 )
 
 
@@ -158,6 +159,12 @@ class GengoMachineTranslator(TranslationSystem):
             # spam. At some point p, we can write code to account for
             # that.
             statsd.incr('translation.gengo_machine.unknown')
+
+        except GengoUnsupportedLanguage:
+            # FIXME: This is a similar boat to GengoUnknownLanguage
+            # where for now, we're just going to ignore it because I'm
+            # not sure what to do about it and I'd like more data.
+            statsd.incr('translation.gengo_machine.unsupported')
 
         except GengoMachineTranslationFailure:
             # FIXME: For now, if we have a machine translation

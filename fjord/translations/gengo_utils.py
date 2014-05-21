@@ -4,30 +4,45 @@ from django.conf import settings
 
 import json
 import requests
-from gengo import Gengo
+from gengo import Gengo, GengoError
 
 
-class GengoError(Exception):
+# Cache of supported languages from Gengo. Theoretically, these don't
+# change often, so the first time we request it, we cache it and then
+# keep that until the next deployment.
+GENGO_LANGUAGE_CACHE = None
+
+
+class FjordGengoError(Exception):
     """Superclass for all Gengo translation errors"""
     pass
 
 
-class GengoConfigurationError(GengoError):
+class GengoConfigurationError(FjordGengoError):
     """Raised when the Gengo-centric keys aren't set in settings"""
-    pass
 
 
-class GengoUnknownLanguage(GengoError):
+class GengoUnknownLanguage(FjordGengoError):
     """Raised when the guesser can't guess the language"""
-    pass
 
 
-class GengoMachineTranslationFailure(GengoError):
+class GengoUnsupportedLanguage(FjordGengoError):
+    """Raised when the guesser guesses a language Gengo doesn't support
+
+    .. Note::
+
+       If you buy me a beer, I'll happily tell you how I feel about
+       this.
+
+    """
+
+
+class GengoMachineTranslationFailure(FjordGengoError):
     """Raised when machine translation didn't work"""
-    pass
 
 
 def requires_keys(fun):
+    """Throw GengoConfigurationError if keys aren't set"""
     @wraps(fun)
     def _requires_keys(self, *args, **kwargs):
         if not self.gengo_api:
@@ -41,8 +56,11 @@ class FjordGengo(object):
         """Constructs a FjordGengo wrapper around the Gengo class
 
         We do this to make using the API a little easier in the
-        context for Fjord. Also, it'll make it easier to mock out the
-        Gengo instance for testing.
+        context for Fjord as it includes the business logic around
+        specific use cases we have.
+
+        Also, having all the Gengo API stuff in one place makes it
+        easier for mocking when testing.
 
         """
         if settings.GENGO_PUBLIC_KEY and settings.GENGO_PRIVATE_KEY:
@@ -61,12 +79,27 @@ class FjordGengo(object):
         balance = self.gengo_api.getAccountBalance()
         return float(balance['response']['credits'])
 
-    def get_language(self, text):
+    @requires_keys
+    def get_languages(self):
+        """Returns the list of supported language targets
+
+        .. Note::
+
+           This is cached until the next deployment.
+
+        """
+        global GENGO_LANGUAGE_CACHE
+        if not GENGO_LANGUAGE_CACHE:
+            resp = self.gengo_api.getServiceLanguages()
+            GENGO_LANGUAGE_CACHE = [item['lc'] for item in resp['response']]
+        return GENGO_LANGUAGE_CACHE
+
+    def guess_language(self, text):
         """Guesses the language of the text
 
-        :arg text: The text to guess the language of
+        :arg text: text to guess the language of
 
-        :raises GengoUnknownLanguage: If the request wasn't successful
+        :raises GengoUnknownLanguage: if the request wasn't successful
             or the guesser can't figure out which language the text is
 
         """
@@ -86,6 +119,13 @@ class FjordGengo(object):
             lang = resp_json['detected_lang_code']
             if lang == 'un':
                 raise GengoUnknownLanguage('unknown language')
+
+            if lang not in self.get_languages():
+                # If Gengo doesn't support the language, then we might
+                # as well throw the guess away because there's not
+                # much we can do with it.
+                raise GengoUnsupportedLanguage(
+                    'unsupported language: {0}'.format(lang))
             return lang
 
         raise GengoUnknownLanguage('request failure: {0}'.format(resp.content))
@@ -100,13 +140,16 @@ class FjordGengo(object):
         :raises GengoUnknownLanguage: if the guesser fails to identify the
             source language of the text
 
+        :raises GengoUnsupportedLanguage: if the guesser guesses a language
+            that Gengo doesn't support
+
         :raises GengoMachineTranslationFailure: if calling machine translation
             fails
 
         """
-        # Note: This will throw GengoUnknownLanguage if it fails to
-        # guess the language.
-        lc_src = self.get_language(text)
+        # Note: This will throw GengoUnknownLanguage or
+        # GengoUnsupportedLanguage if it fails to guess the language.
+        lc_src = self.guess_language(text)
 
         data = {
             'jobs': {
@@ -122,8 +165,19 @@ class FjordGengo(object):
             }
         }
 
-        resp = self.gengo_api.postTranslationJobs(
-            jobs=data, as_group=0, allow_fork=0)
+        try:
+            resp = self.gengo_api.postTranslationJobs(
+                jobs=data, as_group=0, allow_fork=0)
+        except GengoError as ge:
+            # It's possible for the guesser to guess a language that's
+            # in the list of supported languages, but for some reason
+            # it's not actually supported which can throw a 1551
+            # GengoError. In that case, we treat it as an unsupported
+            # language.
+            if ge.error_code == 1551:
+                raise GengoUnsupportedLanguage(
+                    'unsupported language: {0}'.format(lc_src))
+            raise
 
         if resp['opstat'] == 'ok':
             job = resp['response']['jobs']['job_1']

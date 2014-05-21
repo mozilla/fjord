@@ -9,7 +9,10 @@ from fjord.translations import gengo_utils
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
 class GengoTestCase(TestCase):
-    def test_get_language_throws_error(self):
+    def setUp(self):
+        gengo_utils.GENGO_LANGUAGE_CACHE = [u'es']
+
+    def test_guess_language_throws_error(self):
         with patch('fjord.translations.gengo_utils.requests') as requests_mock:
             post_return = MagicMock()
             post_return.json.return_value = {
@@ -25,11 +28,11 @@ class GengoTestCase(TestCase):
             gengo_api = gengo_utils.FjordGengo()
             self.assertRaises(
                 gengo_utils.GengoUnknownLanguage,
-                gengo_api.get_language,
+                gengo_api.guess_language,
                 u'Muy lento',
             )
 
-    def test_get_language_returns_language(self):
+    def test_guess_language_returns_language(self):
         with patch('fjord.translations.gengo_utils.requests') as requests_mock:
             post_return = MagicMock()
             post_return.json.return_value = {
@@ -47,7 +50,34 @@ class GengoTestCase(TestCase):
 
             gengo_api = gengo_utils.FjordGengo()
             text = u'Facebook no se puede enlazar con peru'
-            eq_(gengo_api.get_language(text), u'es')
+            eq_(gengo_api.guess_language(text), u'es')
+
+    def test_get_languages(self):
+        gengo_utils.GENGO_LANGUAGE_CACHE = None
+
+        with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
+            # Note: We're mocking with "Muy lento" because it's
+            # short, but the Gengo language guesser actually can't
+            # figure out what language that is.
+            instance = GengoMock.return_value
+            instance.getServiceLanguages.return_value = {
+                u'opstat': u'ok',
+                u'response': [
+                    {u'unit_type': u'word', u'localized_name': u'Espa\xf1ol',
+                     u'lc': u'es', u'language': u'Spanish (Spain)'},
+                ]
+            }
+
+            # Make sure the cache is empty
+            eq_(gengo_utils.GENGO_LANGUAGE_CACHE, None)
+
+            # Test that we generate a list based on what we think the
+            # response is.
+            gengo_api = gengo_utils.FjordGengo()
+            eq_(gengo_api.get_languages(), [u'es'])
+
+            # Test that the new list is cached.
+            eq_(gengo_utils.GENGO_LANGUAGE_CACHE, [u'es'])
 
     def test_machine_translation(self):
         with patch('fjord.translations.gengo_utils.requests') as requests_mock:

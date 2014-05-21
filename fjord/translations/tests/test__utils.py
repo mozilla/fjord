@@ -7,6 +7,7 @@ from nose.tools import eq_
 
 from . import fakeinstance
 from ..utils import compose_key, decompose_key, translate
+from fjord.translations import gengo_utils
 from fjord.base.tests import TestCase as FjordTestCase
 
 
@@ -41,6 +42,9 @@ class TestKeys(TestCase):
 
 
 class GeneralTranslateTests(TestCase):
+    def setUp(self):
+        gengo_utils.GENGO_LANGUAGE_CACHE = [u'es']
+
     def test_translate_fake(self):
         obj = fakeinstance(
             fields={'desc': 'trans_desc'},
@@ -119,3 +123,70 @@ class GengoMachineTests(FjordTestCase):
                 eq_(getattr(obj, 'trans_desc', None), None)
                 translate(obj, 'gengo_machine', 'es', 'desc', 'en-US', 'trans_desc')
                 eq_(getattr(obj, 'trans_desc', None), u'Very slow')
+
+    def test_translate_gengo_machine_unknown_language(self):
+        """Translation should handle unknown languages without erroring"""
+        with patch('fjord.translations.gengo_utils.requests') as requests_mock:
+            post_return = MagicMock()
+            post_return.json.return_value = {
+                u'text_bytes_found': 10,
+                u'opstat': u'ok',
+                u'is_reliable': True,
+                u'detected_lang_code': u'un',
+                u'details': [],
+                u'detected_lang_name': u'Unknown'
+            }
+            requests_mock.post.return_value = post_return
+
+            with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
+                gengo_mock_instance = GengoMock.return_value
+
+                obj = fakeinstance(
+                    id=10101,
+                    fields={'desc': 'trans_desc'},
+                    translate_with=lambda x: 'gengo_machine',
+                    desc=u'Muy lento'
+                )
+                eq_(getattr(obj, 'trans_desc', None), None)
+                translate(obj, 'gengo_machine', 'es', 'desc', 'en-US',
+                          'trans_desc')
+                eq_(getattr(obj, 'trans_desc', None), None)
+
+                # Make sure we don't call postTranslationJobs().
+                eq_(gengo_mock_instance.postTranslationJobs.call_count, 0)
+
+    def test_translate_gengo_machine_unsupported_language(self):
+        """Translation should handle unsupported languages without erroring"""
+        gengo_utils.GENGO_LANGUAGE_CACHE = [u'de']
+
+        with patch('fjord.translations.gengo_utils.requests') as requests_mock:
+            post_return = MagicMock()
+            post_return.json.return_value = {
+                u'text_bytes_found': 40,
+                u'opstat': u'ok',
+                u'is_reliable': False,
+                u'detected_lang_code': u'es',
+                u'details': [
+                    [u'SPANISH', u'es', 62, 46.728971962616825],
+                    [u'ITALIAN', u'it', 38, 9.237875288683602]
+                ],
+                u'detected_lang_name': u'SPANISH'
+            }
+            requests_mock.post.return_value = post_return
+
+            with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
+                gengo_mock_instance = GengoMock.return_value
+
+                obj = fakeinstance(
+                    id=10101,
+                    fields={'desc': 'trans_desc'},
+                    translate_with=lambda x: 'gengo_machine',
+                    desc=u'Muy lento'
+                )
+                eq_(getattr(obj, 'trans_desc', None), None)
+                translate(obj, 'gengo_machine', 'es', 'desc', 'en-US',
+                          'trans_desc')
+                eq_(getattr(obj, 'trans_desc', None), None)
+
+                # Make sure we don't call postTranslationJobs().
+                eq_(gengo_mock_instance.postTranslationJobs.call_count, 0)

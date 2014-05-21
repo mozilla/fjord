@@ -15,6 +15,10 @@ urlpatterns = patterns(
     url(r'^dashboard/response/(?P<responseid>\d+)/?$',
         'response_view', name='response_view'),
 
+    # Show a specific response
+    url(r'^dashboard/translate/(?P<responseid>\d+)/?$',
+        'spot_translate', name='spot_translate'),
+
     # Temporary!: The under construction view
     url(r'^underc/?$', 'underconstruction', name='underconstruction'),
 )

@@ -149,24 +149,20 @@ class Response(ModelBase):
     def __repr__(self):
         return self.__unicode__().encode('ascii', 'ignore')
 
-    def generate_translation_jobs(self):
+    def generate_translation_jobs(self, system=None):
         """Returns a list of tuples, one for each translation job
 
         If the locale of this response is English, then we just copy over
         the description and we're done.
 
-        If the product of this response isn't set up for auto-translation,
-        then we're done.
+        If the product of this response isn't set up for
+        auto-translation and no translation system was specified in
+        the arguments, then we're done.
 
         If we already have a response with this text that's
         translated, we copy the most recent translation over.
 
         Otherwise we generate a list of jobs to be done.
-
-        .. Note::
-
-           This happens in a celery task, so feel free to do what you need
-           to do here.
 
         """
         # If the text is in English, we copy it over and we're
@@ -177,13 +173,14 @@ class Response(ModelBase):
             self.save()
             return []
 
-        try:
-            prod = Product.objects.get(db_name=self.product)
-            system = prod.translation_system
-        except Product.DoesNotExist:
-            # If the product doesn't exist, then I don't know what's
-            # going on, but we shouldn't create any translation jobs
-            return []
+        if not system:
+            try:
+                prod = Product.objects.get(db_name=self.product)
+                system = prod.translation_system
+            except Product.DoesNotExist:
+                # If the product doesn't exist, then I don't know what's
+                # going on, but we shouldn't create any translation jobs
+                return []
 
         if not system:
             # If this product isn't set up for translation, don't

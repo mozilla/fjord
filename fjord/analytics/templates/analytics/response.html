@@ -26,12 +26,30 @@
           <dd>
             <p>{{ response.description|nl2br }}</p>
           </dd>
-          {% if response.locale != 'en-US' %}
-            <dt>{{ _('Translated') }}</dt>
-            <dd>
-              <p>{{ response.translated_description|nl2br }}&nbsp;</p>
-            </dd>
-          {% endif %}
+          <dt>{{ _('Translated') }}</dt>
+          <dd>
+            <p>
+              {% if response.translated_description %}
+                {{ response.translated_description|nl2br }}
+
+              {% elif user.is_authenticated() and user.has_perm('analytics.can_view_dashboard') %}
+                <div class="inline secret">
+                  <form method="POST" action="{{ url('spot_translate', response.id) }}">
+                    {{ csrf() }}
+                    <button type="submit">{{ _('Translate') }}</button>
+                  </form>
+                  <div>
+                    Note: Clicking this redirects back to this page
+                    and does the translation asynchronously at some
+                    point in the future. If the translation attempt
+                    fails, it won't bubble up the error. All that will
+                    get fixed at some point.
+                  </div>
+                </div>
+              {% endif %}
+              &nbsp;
+            </p>
+          </dd>
           <dt>{{ _('Created') }}</dt>
           <dd>
             {#
