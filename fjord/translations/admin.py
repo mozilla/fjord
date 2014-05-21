@@ -2,25 +2,24 @@ from django.conf import settings
 from django.contrib import admin
 from django.shortcuts import render
 
+from fjord.feedback.models import Product
 from fjord.translations.gengo_utils import FjordGengo
-
-from gengo import Gengo
 
 
 def gengo_translator_view(request):
-    if not settings.GENGO_PUBLIC_KEY or not settings.GENGO_PRIVATE_KEY:
-        return render(request, 'admin/gengo_translator_view.html', {
-            'settings': settings,
-            'configured': False
-        })
+    gengo_machiners = Product.objects.filter(translation_system='gengo_machine')
+    balance = None
+    configured = False
 
-    gengo_api = FjordGengo()
-
-    balance = gengo_api.get_balance()
+    if settings.GENGO_PUBLIC_KEY and settings.GENGO_PRIVATE_KEY:
+        gengo_api = FjordGengo()
+        balance = gengo_api.get_balance()
+        configured = True
 
     return render(request, 'admin/gengo_translator_view.html', {
-        'configured': True,
+        'configured': configured,
         'settings': settings,
+        'gengo_machiners': gengo_machiners,
         'balance': balance
     })
 
