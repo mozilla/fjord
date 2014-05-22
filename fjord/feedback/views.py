@@ -37,8 +37,8 @@ def download_firefox(request, template):
     return render(request, template)
 
 
-@mobile_template('feedback/{mobile/}thanks.html')
-def thanks(request, template):
+def thanks(request):
+    template = 'feedback/thanks.html'
     return render(request, template)
 
 
@@ -259,7 +259,7 @@ def firefox_os_stable_feedback(request, locale=None, product=None,
         for code, name, name_l10n in config.FIREFOX_OS_COUNTRIES
     ]
 
-    return render(request, 'feedback/mobile/fxos_feedback.html', {
+    return render(request, 'feedback/fxos_feedback.html', {
         'countries': countries,
         'devices': config.FIREFOX_OS_DEVICES,
     })

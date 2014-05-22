@@ -1,12 +1,12 @@
 {% extends "mobile/base.html" %}
 
 {% block site_css %}
-  {{ css('mobile/fxos_feedback') }}
+  {{ css('fxos_feedback') }}
 {% endblock %}
 
 {% block site_js %}
   <script src="{{ settings.STATIC_URL }}js/lib/brick-1.0.0.byob.min.js"></script>
-  {{ js('mobile/fxos_feedback') }}
+  {{ js('fxos_feedback') }}
 {% endblock %}
 
 {% block page_title %}{{ _('Submit Your Feedback') }}{% endblock %}

@@ -227,23 +227,6 @@ MINIFY_BUNDLES = {
             'css/lib/normalize.css',
             'css/fjord.less',
         ),
-        'generic_feedback': (
-            'css/lib/normalize.css',
-            'css/lib/brick-1.0.0.byob.min.css',
-            # FIXME - This should become feedback.less and move out of
-            # mobile/.
-            'css/mobile/base.less',
-            'css/generic_feedback.less',
-        ),
-        'product_picker': (
-            'css/lib/normalize.css',
-            'css/lib/brick-1.0.0.byob.min.css',
-            # FIXME - This should become feedback.less and move out of
-            # mobile/.
-            'css/mobile/base.less',
-            'css/generic_feedback.less',
-            'css/product_picker.less',
-        ),
         'dashboard': (
             'css/ui-lightness/jquery-ui.css',
             'css/lib/normalize.css',
@@ -259,42 +242,39 @@ MINIFY_BUNDLES = {
         'stage': (
             'css/stage.less',
         ),
-        'thanks': (
-            'css/lib/normalize.css',
-            'css/thanks.less',
-        ),
         'mobile/base': (
             'css/lib/normalize.css',
             'css/mobile/base.less',
         ),
-        'mobile/fxos_feedback': (
+        'generic_feedback': (
             'css/lib/normalize.css',
             'css/lib/brick-1.0.0.byob.min.css',
-            'css/mobile/base.less',
-            'css/mobile/fxos_feedback.less',
+            'css/feedback_base.less',
+            'css/generic_feedback.less',
         ),
-        'mobile/thanks': (
+        'product_picker': (
             'css/lib/normalize.css',
-            'css/mobile/base.less',
-            'css/mobile/thanks.less',
-        )
+            'css/lib/brick-1.0.0.byob.min.css',
+            'css/feedback_base.less',
+            'css/generic_feedback.less',
+            'css/product_picker.less',
+        ),
+        'thanks': (
+            'css/lib/normalize.css',
+            'css/thanks.less',
+        ),
+        'fxos_feedback': (
+            'css/lib/normalize.css',
+            'css/lib/brick-1.0.0.byob.min.css',
+            'css/feedback_base.less',
+            'css/fxos_feedback.less',
+        ),
     },
     'js': {
         'base': (
             'js/lib/jquery.min.js',
             'browserid/browserid.js',
             'js/init.js',
-            'js/ga.js',
-        ),
-        'singlecard': (
-            'js/lib/jquery.min.js',
-            'js/ga.js',
-        ),
-        'generic_feedback': (
-            'js/lib/jquery.min.js',
-            'js/fjord_utils.js',
-            'js/common_feedback.js',
-            'js/generic_feedback.js',
             'js/ga.js',
         ),
         'dashboard': (
@@ -345,20 +325,27 @@ MINIFY_BUNDLES = {
             'browserid/browserid.js',
             'js/ga.js',
         ),
+        'singlecard': (
+            'js/lib/jquery.min.js',
+            'js/ga.js',
+        ),
+        'generic_feedback': (
+            'js/lib/jquery.min.js',
+            'js/fjord_utils.js',
+            'js/common_feedback.js',
+            'js/generic_feedback.js',
+            'js/ga.js',
+        ),
         'thanks': (
             'js/lib/jquery.min.js',
             'js/init.js',
             'js/ga.js',
         ),
-        'mobile/base': (
-            'js/lib/jquery.min.js',
-            'js/ga.js',
-        ),
-        'mobile/fxos_feedback': (
+        'fxos_feedback': (
             'js/lib/jquery.min.js',
             'js/fjord_utils.js',
             'js/common_feedback.js',
-            'js/mobile/fxos_feedback.js',
+            'js/fxos_feedback.js',
             'js/ga.js',
         ),
     }
