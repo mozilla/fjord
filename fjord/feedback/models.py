@@ -499,6 +499,10 @@ class ResponseSerializer(serializers.Serializer):
     # user agent
     user_agent = NoNullsCharField(max_length=255, required=False, default=u'')
 
+    # source and campaign
+    source = NoNullsCharField(max_length=100, required=False, default=u'')
+    campaign = NoNullsCharField(max_length=100, required=False, default=u'')
+
     def validate_product(self, attrs, source):
         """Validates the product against Product model"""
         value = attrs[source]
@@ -536,6 +540,8 @@ class ResponseSerializer(serializers.Serializer):
             device=attrs['device'].strip(),
             country=attrs['country'].strip(),
             user_agent=attrs['user_agent'].strip(),
+            source=attrs['source'].strip(),
+            campaign=attrs['campaign'].strip(),
             api=1,  # Hard-coded api version number
         )
 

@@ -130,6 +130,32 @@ Posting feedback
 
         Example: ``"joe@example.com"``
 
+    **user_agent**
+        String. The user agent of the client if applicable. For example
+        if the user is using a Firefox OS device, this would be
+        the user agent of the browser used to send feedback.
+
+        Example: ``'Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0'``
+
+    **source**
+        String. If this response was initiated by a blog post, wiki page,
+        search, newsletter, tweet or something like that, this is the source
+        that initiated the response. It has the same semantics as the 
+        utm_source querystring parameter:
+
+        https://support.google.com/analytics/answer/1033867
+
+        Example: ``'wiki'``
+
+    **campaign**
+        String. If this response was initiated by a marketing campaign,
+        this is the name of the campaign. It has the same semantics as
+        the utm_campaign querystring parameter:
+
+        https://support.google.com/analytics/answer/1033867
+      
+        Example: ``'show-the-love'``
+
 
 Minimal example::
 

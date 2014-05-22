@@ -47,6 +47,8 @@ class TestFeedbackAPI(TestCase):
             'user_agent': (
                 'Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0'
             ),
+            'source': 'email',
+            'campaign': 'email_test',
         }
 
         # This makes sure the test is up-to-date. If we add fields
