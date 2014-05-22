@@ -250,6 +250,12 @@ MINIFY_BUNDLES = {
             'css/fjord.less',
             'css/dashboard.less',
         ),
+        'monitor': (
+            'css/ui-lightness/jquery-ui.css',
+            'css/lib/normalize.css',
+            'css/fjord.less',
+            'css/monitor.less',
+        ),
         'stage': (
             'css/stage.less',
         ),

@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block site_css %}
+  {{ css('monitor') }}
+{% endblock %}
+
 {% block page_title %}{{ _('Input Services Monitor') }}{% endblock %}
 
 {% macro status(b) %}
