@@ -245,7 +245,6 @@ def generic_feedback_dev(request, locale, product, version=None, channel=None):
     })
 
 
-@requires_firefox
 @csrf_exempt
 def firefox_os_stable_feedback(request, locale=None, product=None,
                                version=None, channel=None):

@@ -124,6 +124,18 @@ class TestFeedback(TestCase):
         r = self.client.get(url)
         self.assertTemplateUsed(r, 'feedback/fxos_feedback.html')
 
+    def test_firefox_os_view_works_for_all_browsers(self):
+        """Firefox OS feedback form should work for all browsers"""
+        # Firefox OS is the user agent
+        url = reverse('feedback', args=(u'fxos',))
+        ua = (
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_2) '
+            'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1944.0 '
+            'Safari/537.36'
+        )
+        r = self.client.get(url, HTTP_USER_AGENT=ua)
+        self.assertTemplateUsed(r, 'feedback/fxos_feedback.html')
+
     def test_generic_dev_view(self):
         # FIXME: Remove this when the dev view lands.
         url = reverse('feedback_dev', args=('firefox',))
