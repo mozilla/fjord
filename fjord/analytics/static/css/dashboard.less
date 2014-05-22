@@ -1,3 +1,81 @@
+.block.count {
+  font-weight: bold;
+
+  strong, em {
+    &:not(:first-child) {
+      margin-left: 1em;
+    }
+  }
+  strong {
+    font-size: 3em;
+    display: block;
+  }
+  em {
+    font-size: 1.75em;
+    font-style: normal;
+  }
+}
+
+.block.feedback {
+  ul {
+    padding: 0;
+  }
+
+  .opinion {
+    @opinion_border: 1px dotted #B6BCC0;
+    border-top: @opinion_border;
+    display: block;
+    list-style: none;
+    padding: 10px 40px;
+    position: relative;
+
+    &:last-child {
+      border-bottom: @opinion_border;
+    }
+
+    .sprite {
+      position: absolute;
+      top: 15px;
+      left: 5px;
+    }
+
+    p {
+      margin: 0 0 3px 0;
+      font-size: 14px;
+      line-height: 18px;
+      word-wrap: break-word;
+      word-break: normal;
+      white-space: normal;
+    }
+
+    ul.meta {
+      padding: 0;
+
+      li {
+        display: inline;
+        font-size: 11px;
+        color: #888;
+
+        &:not(:first-child):before {
+          content: "•";
+          padding-right: 0.5em;
+        }
+      }
+    }
+  }
+
+  #feedback_search {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+
+    .search_box {
+      background: url('../img/search.png') no-repeat scroll 4px center transparent;
+      padding-left: 16px;
+    }
+  }
+}
+
 .filter {
   padding: 15px 0;
 
@@ -258,6 +336,13 @@ ul.bars {
   }
 }
 
+#whentext {
+  margin-top: 5px;
+  input[type=date] {
+    width: 75px;
+  }
+}
+
 #permalink {
   margin: 0px 0px 15px 0px;
 
@@ -346,4 +431,16 @@ ul.bars {
       }
     }
   }
+}
+
+.sprite {
+  background: url("../img/sprites.png") no-repeat scroll 0 0 transparent;
+  font-size: 0;
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  vertical-align: top;
+
+  &.sad { background-position: 0 0; }
+  &.happy { background-position: 0 -30px; }
 }
