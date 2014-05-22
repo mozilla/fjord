@@ -154,7 +154,8 @@
                 'platform': 'Firefox OS',
                 'locale': $('#locale').val(),
                 'country': $('#country select').val(),
-                'device': $('#device select').val()
+                'device': $('#device select').val(),
+                'user_agent': navigator.userAgent
             };
 
             version = inferFxosVersion();
