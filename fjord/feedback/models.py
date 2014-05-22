@@ -5,9 +5,10 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from elasticutils.contrib.django import Indexable, MLT
-from rest_framework import serializers
-from tower import ugettext_lazy as _
 from product_details import product_details
+from rest_framework import serializers
+from statsd import statsd
+from tower import ugettext_lazy as _
 
 from fjord.base.domain import get_domain
 from fjord.base.models import ModelBase
@@ -178,8 +179,9 @@ class Response(ModelBase):
                 prod = Product.objects.get(db_name=self.product)
                 system = prod.translation_system
             except Product.DoesNotExist:
-                # If the product doesn't exist, then I don't know what's
-                # going on, but we shouldn't create any translation jobs
+                # If the product doesn't exist, then I don't know
+                # what's going on. Regardless, we shouldn't create any
+                # translation jobs.
                 return []
 
         if not system:
@@ -190,15 +192,18 @@ class Response(ModelBase):
         try:
             # See if this text has been translated already--if so, use
             # the most recent translation.
-            existing_obj = (
+            existing_translation = (
                 Response.objects
                 .filter(description=self.description)
                 .filter(locale=self.locale)
                 .exclude(translated_description__isnull=True)
                 .exclude(translated_description=u'')
-                .latest('id'))
-            self.translated_description = existing_obj.translated_description
+                .values_list('translated_description')
+                .latest('id')
+            )
+            self.translated_description = existing_translation[0]
             self.save()
+            statsd.incr('feedback.translation.used_existing')
             return []
         except Response.DoesNotExist:
             pass

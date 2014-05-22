@@ -74,10 +74,10 @@ class GengoTestCase(TestCase):
             # Test that we generate a list based on what we think the
             # response is.
             gengo_api = gengo_utils.FjordGengo()
-            eq_(gengo_api.get_languages(), [u'es'])
+            eq_(gengo_api.get_languages(), (u'es',))
 
             # Test that the new list is cached.
-            eq_(gengo_utils.GENGO_LANGUAGE_CACHE, [u'es'])
+            eq_(gengo_utils.GENGO_LANGUAGE_CACHE, (u'es',))
 
     def test_machine_translation(self):
         with patch('fjord.translations.gengo_utils.requests') as requests_mock:

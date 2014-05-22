@@ -91,7 +91,8 @@ class FjordGengo(object):
         global GENGO_LANGUAGE_CACHE
         if not GENGO_LANGUAGE_CACHE:
             resp = self.gengo_api.getServiceLanguages()
-            GENGO_LANGUAGE_CACHE = [item['lc'] for item in resp['response']]
+            GENGO_LANGUAGE_CACHE = tuple(
+                [item['lc'] for item in resp['response']])
         return GENGO_LANGUAGE_CACHE
 
     def guess_language(self, text):
