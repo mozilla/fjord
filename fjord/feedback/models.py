@@ -496,6 +496,9 @@ class ResponseSerializer(serializers.Serializer):
     # user's email address
     email = serializers.EmailField(required=False)
 
+    # user agent
+    user_agent = NoNullsCharField(max_length=255, required=False, default=u'')
+
     def validate_product(self, attrs, source):
         """Validates the product against Product model"""
         value = attrs[source]
@@ -532,6 +535,7 @@ class ResponseSerializer(serializers.Serializer):
             manufacturer=attrs['manufacturer'].strip(),
             device=attrs['device'].strip(),
             country=attrs['country'].strip(),
+            user_agent=attrs['user_agent'].strip(),
             api=1,  # Hard-coded api version number
         )
 

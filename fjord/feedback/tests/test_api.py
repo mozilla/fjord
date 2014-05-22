@@ -44,6 +44,9 @@ class TestFeedbackAPI(TestCase):
             'manufacturer': 'OmniCorp',
             'device': 'OmniCorp',
             'country': 'US',
+            'user_agent': (
+                'Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0'
+            ),
         }
 
         # This makes sure the test is up-to-date. If we add fields
