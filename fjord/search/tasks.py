@@ -10,6 +10,7 @@ from multidb.pinning import pin_this_thread, unpin_this_thread
 
 from fjord.search.index import index_chunk
 from fjord.search.models import Record
+from fjord.search.utils import from_class_path, to_class_path
 
 
 log = logging.getLogger('i.task')
@@ -22,9 +23,10 @@ def index_chunk_task(index, batch_id, rec_id, chunk):
     :arg index: the name of the index to index to
     :arg batch_id: the name for the batch this chunk belongs to
     :arg rec_id: the id for the record for this task
-    :arg chunk: a (class, id_list) of things to index
+    :arg chunk: a (cls_path, id_list) of things to index
     """
-    cls, id_list = chunk
+    cls_path, id_list = chunk
+    cls = from_class_path(cls_path)
     rec = None
 
     try:
@@ -66,8 +68,9 @@ MAX_RETRIES = len(RETRY_TIMES)
 
 
 @task()
-def index_item_task(mapping_type, item_id, **kwargs):
-    """Index an item given it's mapping_type and id."""
+def index_item_task(cls_path, item_id, **kwargs):
+    """Index an item given it's mapping_type cls_path and id"""
+    mapping_type = from_class_path(cls_path)
     retries = kwargs.get('task_retries', 0)
     log.debug('Index attempt #%s', retries)
     try:
@@ -90,8 +93,9 @@ def index_item_task(mapping_type, item_id, **kwargs):
 
 
 @task()
-def unindex_item_task(mapping_type, item_id, **kwargs):
-    """Remove an item from the index, given it's mapping_type and id."""
+def unindex_item_task(cls_path, item_id, **kwargs):
+    """Remove item from index, given it's mapping_type class_path and id"""
+    mapping_type = from_class_path(cls_path)
     try:
         mapping_type.unindex(item_id)
 
@@ -119,10 +123,12 @@ def _live_index_handler(sender, **kwargs):
     instance = kwargs['instance']
 
     if kwargs['signal'] == post_save:
-        index_item_task.delay(instance.get_mapping_type(), instance.id)
+        cls_path = to_class_path(instance.get_mapping_type())
+        index_item_task.delay(cls_path, instance.id)
 
     elif kwargs['signal'] == pre_delete:
-        unindex_item_task(instance.get_mapping_type(), instance.id)
+        cls_path = to_class_path(instance.get_mapping_type())
+        unindex_item_task(cls_path, instance.id)
 
 
 def register_live_index(model_cls):
