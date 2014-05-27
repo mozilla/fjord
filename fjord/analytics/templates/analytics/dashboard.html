@@ -152,12 +152,17 @@
       <a href="https://wiki.mozilla.org/Firefox/Input#Search_syntax" target="_blank"><img src="/static/img/help.png"/></a>
     </form>
 
-    <ul>
-    {% for opinion in opinions %}
-      {{ feedback_block(opinion) }}
-    {% endfor %}
-    </ul>
-
+    {% if opinions %}
+      <ul>
+        {% for opinion in opinions %}
+          {{ feedback_block(opinion) }}
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>
+        {{ _('No feedback matches that criteria.') }}
+      </p>
+    {% endif %}
     <div class="pager">
       {% if next_page %}
         <a class="older" href="{{ request.get_full_path()|urlparams(page=next_page) }}">

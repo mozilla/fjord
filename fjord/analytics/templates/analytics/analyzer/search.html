@@ -174,11 +174,17 @@
         <a href="{{ request.get_full_path()|urlparams(format='csv') }}">CSV export</a>
       </p>
 
-      <ul class="search_results">
-        {% for opinion in opinions %}
-          {{ feedback_block(opinion) }}
-        {% endfor %}
-      </ul>
+      {% if opinions %}
+        <ul class="search_results">
+          {% for opinion in opinions %}
+            {{ feedback_block(opinion) }}
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>
+          No feedback matches that criteria.
+        </p>
+      {% endif %}
 
       <div class="pager">
         {% if next_page %}
