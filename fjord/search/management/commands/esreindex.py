@@ -1,5 +1,6 @@
 import logging
 from optparse import make_option
+from textwrap import dedent
 
 from django.core.management.base import BaseCommand, CommandError
 
@@ -7,7 +8,11 @@ from fjord.search.index import es_reindex_cmd
 
 
 class Command(BaseCommand):
-    help = 'Reindex the database for Elastic.'
+    help = dedent("""\
+    Reindex the database for Elastic
+
+    Use --percent=20 for criticalmass indexing.
+    """)
     option_list = BaseCommand.option_list + (
         make_option('--percent', type='int', dest='percent', default=100,
                     help='Reindex a percentage of things'),
