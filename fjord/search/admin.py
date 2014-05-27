@@ -14,6 +14,7 @@ from fjord.search.index import (
     recreate_index, create_batch_id)
 from fjord.search.models import Record
 from fjord.search.tasks import index_chunk_task
+from fjord.search.utils import to_class_path
 
 
 log = logging.getLogger('i.search')
@@ -58,7 +59,8 @@ def handle_reindex(request):
                                       id_list[0], id_list[-1])
         rec = Record(batch_id=batch_id, name=chunk_name)
         rec.save()
-        index_chunk_task.delay(index, batch_id, rec.id, (cls, id_list))
+        index_chunk_task.delay(index, batch_id, rec.id,
+                               (to_class_path(cls), id_list))
 
     return HttpResponseRedirect(request.path)
 
