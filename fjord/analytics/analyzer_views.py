@@ -36,6 +36,7 @@ from fjord.base.util import (
     smart_date)
 from fjord.feedback.helpers import country_name
 from fjord.feedback.models import Product, Response, ResponseMappingType
+from fjord.search.utils import es_error_statsd
 
 
 @check_new_user
@@ -60,6 +61,7 @@ def analytics_products(request):
 @check_new_user
 @analyzer_required
 @es_required_or_50x(error_template='analytics/es_down.html')
+@es_error_statsd
 def analytics_occurrences(request):
     template = 'analytics/analyzer/occurrences.html'
 
@@ -207,6 +209,7 @@ def analytics_occurrences(request):
 @check_new_user
 @analyzer_required
 @es_required_or_50x(error_template='analytics/es_down.html')
+@es_error_statsd
 def analytics_duplicates(request):
     """Shows all duplicate descriptions over the last n days"""
     template = 'analytics/analyzer/duplicates.html'
@@ -299,6 +302,7 @@ def _analytics_search_export(request, opinions_s):
 @check_new_user
 @analyzer_required
 @es_required_or_50x(error_template='analytics/es_down.html')
+@es_error_statsd
 def analytics_search(request):
     template = 'analytics/analyzer/search.html'
 
@@ -589,6 +593,7 @@ def analytics_search(request):
 @check_new_user
 @analyzer_required
 @es_required_or_50x(error_template='analytics/es_down.html')
+@es_error_statsd
 def analytics_hourly_histogram(request):
     """Shows an hourly histogram for the last 5 days of all responses"""
     template = 'analytics/analyzer/hourly_histogram.html'

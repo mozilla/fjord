@@ -27,6 +27,7 @@ from fjord.base.util import (
     Atom1FeedWithRelatedLinks
 )
 from fjord.feedback.models import Product, Response, ResponseMappingType
+from fjord.search.utils import es_error_statsd
 from fjord.translations.tasks import create_translation_tasks
 
 
@@ -143,6 +144,7 @@ def generate_dashboard_url(request, output_format='atom',
 
 @check_new_user
 @es_required_or_50x(error_template='analytics/es_down.html')
+@es_error_statsd
 def dashboard(request):
     template = 'analytics/dashboard.html'
 
