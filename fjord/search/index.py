@@ -353,53 +353,56 @@ def es_reindex_cmd(percent=100, mapping_types=None):
                    .get('settings', {})
                    .get('index.refresh_interval', '1s'))
 
-    es.indices.put_settings(
-        index=get_index(), body={'index': {'refresh_interval': '-1'}})
+    try:
+        es.indices.put_settings(
+            index=get_index(), body={'index': {'refresh_interval': '-1'}})
 
-    if mapping_types:
-        indexable = get_indexable(percent, mapping_types)
-    else:
-        indexable = get_indexable(percent)
+        if mapping_types:
+            indexable = get_indexable(percent, mapping_types)
+        else:
+            indexable = get_indexable(percent)
 
-    start_time = time.time()
-    for cls, indexable in indexable:
-        cls_start_time = time.time()
-        total = len(indexable)
+        start_time = time.time()
+        for cls, indexable in indexable:
+            cls_start_time = time.time()
+            total = len(indexable)
 
-        if total == 0:
-            continue
+            if total == 0:
+                continue
 
-        log.info('Reindex %s. %s to index....',
-                 cls.get_mapping_type_name(), total)
+            log.info('Reindex %s. %s to index....',
+                     cls.get_mapping_type_name(), total)
 
-        i = 0
-        for chunk in chunked(indexable, 1000):
-            chunk_start_time = time.time()
-            index_chunk(cls, chunk, es=es)
+            i = 0
+            for chunk in chunked(indexable, 1000):
+                chunk_start_time = time.time()
+                index_chunk(cls, chunk, es=es)
 
-            i += len(chunk)
-            time_to_go = (total - i) * ((time.time() - cls_start_time) / i)
-            per_1000 = (time.time() - cls_start_time) / (i / 1000.0)
-            this_1000 = time.time() - chunk_start_time
+                i += len(chunk)
+                time_to_go = (total - i) * ((time.time() - cls_start_time) / i)
+                per_1000 = (time.time() - cls_start_time) / (i / 1000.0)
+                this_1000 = time.time() - chunk_start_time
 
-            log.info('   %s/%s %s... (%s/1000 avg, %s ETA)',
-                     i,
-                     total,
-                     format_time(this_1000),
-                     format_time(per_1000),
-                     format_time(time_to_go)
-            )
+                log.info('   %s/%s %s... (%s/1000 avg, %s ETA)',
+                         i,
+                         total,
+                         format_time(this_1000),
+                         format_time(per_1000),
+                         format_time(time_to_go)
+                )
 
-        delta_time = time.time() - cls_start_time
-        log.info('   done! (%s total, %s/1000 avg)',
-                 format_time(delta_time),
-                 format_time(delta_time / (total / 1000.0)))
+            delta_time = time.time() - cls_start_time
+            log.info('   done! (%s total, %s/1000 avg)',
+                     format_time(delta_time),
+                     format_time(delta_time / (total / 1000.0)))
 
-    es.indices.put_settings(
-        index=get_index(), body={'index': {'refresh_interval': old_refresh}})
+        delta_time = time.time() - start_time
+        log.info('Done! (total time: %s)', format_time(delta_time))
 
-    delta_time = time.time() - start_time
-    log.info('Done! (total time: %s)', format_time(delta_time))
+    finally:
+        es.indices.put_settings(
+            index=get_index(),
+            body={'index': {'refresh_interval': old_refresh}})
 
 
 @requires_good_connection
