@@ -45,6 +45,10 @@ class Message(Page):
         return self._root_element.find_element(*self._locale_locator).text
 
     @property
+    def platform(self):
+        return self._root_element.find_element(*self._platform_locator).text
+
+    @property
     def site(self):
         return self._root_element.find_element(*self._site_locator).text
 
