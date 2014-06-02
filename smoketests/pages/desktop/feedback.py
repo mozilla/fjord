@@ -51,16 +51,6 @@ class FeedbackPage(BasePage):
         return TypeFilter.CheckboxFilter(self.testsetup)
 
     @property
-    def common_words_filter(self):
-        from pages.desktop.regions.common_words import CommonWordsRegion
-        return CommonWordsRegion(self.testsetup)
-
-    @property
-    def sites_filter(self):
-        from pages.desktop.regions.sites_filter import SitesFilter
-        return SitesFilter(self.testsetup)
-
-    @property
     def product_filter(self):
         from pages.desktop.regions.product_filter import ProductFilter
         return ProductFilter.ComboFilter(self.testsetup)
