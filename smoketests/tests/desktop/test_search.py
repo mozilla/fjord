@@ -32,6 +32,6 @@ class TestSearch(object):
         # responses on the page. So we check for one of two possible
         # scenarios: existences of responses or a message count of 0.
         Assert.true(
-            (len(feedback_pg.messages) > 0)
-            or feedback_pg.no_messages
+            feedback_pg.no_messages
+            or (len(feedback_pg.messages) > 0)
         )
