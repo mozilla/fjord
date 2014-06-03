@@ -35,22 +35,6 @@ directory::
 
     $ py.test --driver=firefox tests
 
-Running tests against the Input stage environment::
-
-    $ py.test --driver=firefox --baseurl=https://input.allizom.org tests
-
-Running tests against a local instance of Fjord::
-
-    $ py.test --driver=firefox --baseurl=http://localhost:8000 tests
-
-Note that to run it against a local instance, you probably need some
-data so that the dashboard tests have enough data to work with to
-run. You can generate some data and reindex like this::
-
-    $ cd ..
-    $ ./manage.py generatedata --with=samplesize=1000
-    $ ./manage.py esreindex
-
 
 .. Note::
 
@@ -58,6 +42,39 @@ run. You can generate some data and reindex like this::
 
 
 For more command line options see https://github.com/davehunt/pytest-mozwebqa
+
+
+Running tests against localhost
+-------------------------------
+
+Before running tests against a local instance of Fjord, make sure you generate
+some data and reindex first::
+
+    $ cd ..
+    $ ./manage.py generatedata
+    $ ./manage.py esreindex
+
+
+Many of the tests expect data in the last 7 days, so you'll need to
+generate new sample data before running smoke tests.
+
+Running tests against a local instance of Fjord::
+
+    $ py.test --driver=firefox --baseurl=http://localhost:8000 tests
+
+
+Running tests on stage
+----------------------
+
+Running tests against the Input stage environment::
+
+    $ py.test --driver=firefox --baseurl=https://input.allizom.org tests
+
+
+.. Note::
+
+   Some of the dashboard tests may fail depending on what data is on
+   stage.
 
 
 Running specific tests
