@@ -10,6 +10,7 @@ from unittestzero import Assert
 FIREFOX_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.5; rv:5.0) Gecko/20100101 Firefox/5.0'
 SAFARI_UA = 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_7; en-us) AppleWebKit/533.20.25 (KHTML, like Gecko) Version/5.0.4 Safari/533.20.27'
 
+
 class RedirectsBase(object):
     def _check_redirect(self, testsetup, url, expected_url, user_agent=FIREFOX_UA, locale='en-US'):
         url = testsetup.base_url + url
