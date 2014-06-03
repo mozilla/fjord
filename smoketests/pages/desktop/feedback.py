@@ -17,6 +17,7 @@ class FeedbackPage(BasePage):
 
     _page_title = 'Welcome :: Firefox Input'
 
+    _no_messages_locator = (By.ID, 'nomessages')
     _warning_heading_locator = (By.CSS_SELECTOR, '#message-warning h3')
     _search_box = (By.NAME, 'q')
     _chart_locator = (By.ID, 'feedback-chart')
@@ -114,3 +115,7 @@ class FeedbackPage(BasePage):
     @property
     def warning_heading(self):
         return self.selenium.find_element(*self._warning_heading_locator).text
+
+    @property
+    def no_messages_message(self):
+        return self.selenium.find_element(*self._no_messages_locator).text
