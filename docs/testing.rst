@@ -89,52 +89,6 @@ You can specify specific tests::
 See the output of ``./manage.py test --help`` for more arguments.
 
 
-Running tests with Xvfb
------------------------
-
-Because Selenium opens real browser windows, it can be kind of
-annoying as windows open and steal focus and switch
-workspaces. Unfortunatly, Firefox doesn't have a headless mode of
-operation, so we can't simply turn off the UI. Luckily, there is a way
-to work around this fairly easily on Linux, and with some effort on
-OSX.
-
-
-On Linux:
-
-    Install Xvfb and run the tests with it's xvfb-run binary. For
-    example, if you run tests like::
-
-        ./manage.py test -s --noinput --logging-clear-handlers
-
-
-    You can switch to this to run with Xvfb::
-
-        xvfb-run ./manage.py test -s --noinput --logging-clear-handlers
-
-
-    This creates a virtual X session for Firefox to run in, and sets
-    up all the fiddly environment variables to get this working
-    well. The tests will run as normal, and no windows will open, if
-    all is working right.
-
-
-On OSX:
-
-    The same method can be used for OSX, but it requires some
-    fiddliness.  The default version of Firefox for OSX does not use X
-    as it's graphic's backend, so by default Xvfb can't help. You can
-    however run an X11 enabled version of OSX and a OSX version of
-    Xvfb. You can find more details `here
-    <http://afitnerd.com/2011/09/06/headless-browser-testing-on-mac/>`_.
-
-    .. Note::
-
-       I don't use OSX, and that blog article is fairly out of
-       date. If you find a way to get this working bettter or easier,
-       or have better docs to share, please do!
-
-
 Writing New Tests
 =================
 
@@ -157,16 +111,8 @@ runner as long as the look like a test.
   ``fjord.feedback.tests.response`` is the modelmaker for
   ``fjord.feedback.models.Response``.
 
-* To add a Selenium test, subclass
-  ``fjord.base.tests.SeleniumTestCase``. The instance of Selenium's
-  webdriver will be automatically instantiated and is available at
-  ``self.webdriver``, and you can do things like
-  ``self.webdriver.get(url)`` and
-  ``self.webdriver.find_element_by_css_selector('div.baz')``. For more
-  details about how to work with Selenium, you can check out Selenium
-  HQ's guide_.
-
-.. _guide: http://docs.seleniumhq.org/docs/03_webdriver.jsp
+* To add a smoketest, see the ``README.rst`` file in the ``smoketests/``
+  directory.
 
 
 Writing New JavaScript Tests
