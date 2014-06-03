@@ -5,20 +5,16 @@ from string import letters
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.test import LiveServerTestCase
 from django.test import TestCase as OriginalTestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 
 from django_browserid.tests import mock_browserid
-from selenium import webdriver
-from selenium.common.exceptions import WebDriverException
-from selenium.webdriver.firefox import firefox_binary
-from nose import SkipTest
 
 # reverse is here for convenience so other test modules import it from
 # here rather than importing it from funfactory
-from funfactory.urlresolvers import split_path, reverse
+from funfactory.urlresolvers import reverse  # noqa
+from funfactory.urlresolvers import split_path
 
 from fjord.base.models import Profile
 
@@ -82,55 +78,6 @@ class MobileTestCase(TestCase):
     def setUp(self):
         super(MobileTestCase, self).setUp()
         self.client.cookies[settings.MOBILE_COOKIE] = 'on'
-
-
-# FIXME: This doesn't work right in regards to transactions and data
-# in the db that's put there via data migrations.
-#
-# It's essentially this problem here:
-#
-# https://groups.google.com/forum/#!msg/south-users/U7tz5RmhJaU/8Ec-3N77O7QJ
-#
-# Need to fix that before we can re-enable this.
-#
-# Commenting this and the two Seleniunm test cases out for now because
-# I really want this to be a huge eyesore so it's likely to get fixed.
-# class SeleniumTestCase(LiveServerTestCase):
-#     skipme = False
-
-#     @classmethod
-#     def setUpClass(cls):
-#         try:
-#             firefox_path = getattr(settings, 'SELENIUM_FIREFOX_PATH', None)
-#             if firefox_path:
-#                 firefox_bin = firefox_binary.FirefoxBinary(
-#                     firefox_path=firefox_path)
-#                 kwargs = {'firefox_binary': firefox_bin}
-#             else:
-#                 kwargs = {}
-#             cls.webdriver = webdriver.Firefox(**kwargs)
-#         except (RuntimeError, WebDriverException):
-#             cls.skipme = True
-#         super(SeleniumTestCase, cls).setUpClass()
-
-#     @classmethod
-#     def tearDownClass(cls):
-#         super(SeleniumTestCase, cls).tearDownClass()
-#         if not cls.skipme:
-#             cls.webdriver.quit()
-
-#     def setUp(self):
-#         super(SeleniumTestCase, self).setUp()
-#         # Don't run if Selenium isn't available.
-#         if self.skipme:
-#             raise SkipTest('Selenium unavailable.')
-#         # Go to an empty page before every test.
-#         self.webdriver.get('')
-#         cache.clear()
-
-#     def tearDown(self):
-#         super(SeleniumTestCase, self).tearDown()
-#         cache.clear()
 
 
 def with_save(func):
