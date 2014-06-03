@@ -12,26 +12,27 @@ from fjord.feedback.tests import response
 HAPPY_FEEDBACK = (
     u'This is the best!',
     u'Firefox is great!',
-    u'Made me pancakes!',
-    u'I love it!',
+    u'Firefox made me pancakes!',
+    u'I love Firefox!',
     u'Firefox now my default browser!',
     u'My bestest friend!',
     u'Can\'t live without addon that vacuums my kitchen!',
+    u'omg firefox awesome!',
     u'fast and secure',
     u'speedy in nature',
     u'emphasis on privacy is good',
     u'never got a virus from firefox',
-    u'looks awesome embedded in emacs',
-    u'about:about is the best!',
-    u'i reset my profile and now it is super again!',
+    u'firefox looks awesome embedded in emacs',
+    u'about:about is the best firefox page ever!',
+    u'i reset my firefox profile and now it is super again!',
     u'about:mozilla! lol!',
 )
 
 SAD_FEEDBACK = (
     u'Too much orange!',
     u'Ate my baby-sister!',
-    u'Too fast!',
-    u'Too easy to use!',
+    u'Firefox is too fast!',
+    u'Firefox is too easy to use!',
     u'garbage collection keeps downstairs neighbors awake.',
     u'Parked my car in wrong spot!',
     u'reminds me of succulant milk chocolate and i can\'t eat dairy.',
@@ -45,6 +46,24 @@ URLS = (
     u'http://github.com/mozilla/fjord',
     u'https://fjord.readthedocs.org/en/latest/',
     u'http://mozilla.org/',
+)
+
+PRODUCTS = (
+    (u'Firefox', u'29.0'),
+    (u'Firefox', u'28.0'),
+    (u'Firefox', u'27.0'),
+    (u'Firefox for Android', u'29.0'),
+    (u'Firefox for Android', u'28.0'),
+    (u'Firefox for Android', u'27.0'),
+    (u'Firefox OS', u'1.2'),
+    (u'Firefox OS', u'1.1'),
+    (u'Firefox OS', u'1.0'),
+)
+
+PLATFORMS = (
+    u'Linux',
+    u'Windows 8',
+    u'Mac OSX',
 )
 
 USER_AGENTS = (
@@ -71,6 +90,104 @@ USER_AGENTS = (
 )
 
 
+def create_basic_sampledata():
+    happy_feedback = sentence_generator(HAPPY_FEEDBACK)
+    sad_feedback = sentence_generator(SAD_FEEDBACK)
+
+    products = sentence_generator(PRODUCTS)
+    platforms = sentence_generator(PLATFORMS)
+    locales = sentence_generator(settings.DEV_LANGUAGES)
+    urls = sentence_generator(URLS)
+
+    now = time.time()
+
+    # Create 100 happy responses.
+    for i in range(100):
+        product = products.next()
+        now = now - random.randint(500, 2000)
+        response(
+            happy=True,
+            description=happy_feedback.next(),
+            product=product[0],
+            version=product[1],
+            platform=platforms.next(),
+            locale=locales.next(),
+            created=datetime.datetime.fromtimestamp(now),
+            save=True
+        )
+
+    now = time.time()
+
+    # Create 100 sad responses.
+    for i in range(100):
+        product = products.next()
+        now = now - random.randint(500, 2000)
+        response(
+            happy=False,
+            description=sad_feedback.next(),
+            product=product[0],
+            version=product[1],
+            platform=platforms.next(),
+            locale=locales.next(),
+            url=urls.next(),
+            created=datetime.datetime.fromtimestamp(now),
+            save=True
+        )
+
+
+def create_additional_sampledata(samplesize):
+    samplesize = int(samplesize)
+
+    print 'Working on generating {0} feedback responses....'.format(
+        samplesize)
+
+    happy_feedback = sentence_generator(HAPPY_FEEDBACK)
+    sad_feedback = sentence_generator(SAD_FEEDBACK)
+    products = sentence_generator(PRODUCTS)
+    urls = sentence_generator(URLS)
+    user_agents = sentence_generator(USER_AGENTS)
+    locales = sentence_generator(settings.DEV_LANGUAGES)
+
+    objs = []
+
+    now = time.time()
+    for i in range(samplesize):
+        now = now - random.randint(500, 2000)
+
+        happy = random.choice([True, False])
+        if happy:
+            description = happy_feedback.next()
+            url = u''
+        else:
+            description = sad_feedback.next()
+            url = urls.next()
+
+        product = products.next()
+        objs.append(
+            response(
+                happy=happy,
+                description=description,
+                product=product[0],
+                version=product[1],
+                url=url,
+                ua=user_agents.next(),
+                locale=locales.next(),
+                created=datetime.datetime.fromtimestamp(now))
+        )
+
+        # Bulk-save the objects to the db 500 at a time and
+        # print something to stdout about it.
+        if i % 500 == 0:
+            Response.objects.bulk_create(objs)
+            objs = []
+            print '  {0}...'.format(i)
+
+    if objs:
+        print '  {0}...'.format(samplesize)
+        Response.objects.bulk_create(objs)
+        objs = []
+
+
 def generate_sampledata(options):
     """Generates response data.
 
@@ -85,61 +202,8 @@ def generate_sampledata(options):
     samplesize = options.get('samplesize')
 
     if samplesize not in (None, True):
-        samplesize = int(samplesize)
-
-        print 'Working on generating {0} feedback responses....'.format(
-            samplesize)
-
-        happy_feedback = sentence_generator(HAPPY_FEEDBACK)
-        sad_feedback = sentence_generator(SAD_FEEDBACK)
-        urls = sentence_generator(URLS)
-        user_agents = sentence_generator(USER_AGENTS)
-        locales = sentence_generator(settings.DEV_LANGUAGES)
-
-        objs = []
-
-        now = time.time()
-        for i in range(samplesize):
-            now = now - random.randint(500, 2000)
-
-            happy = random.choice([True, False])
-            if happy:
-                description = happy_feedback.next()
-                url = u''
-            else:
-                description = sad_feedback.next()
-                url = urls.next()
-
-            objs.append(
-                response(
-                    happy=happy,
-                    description=description,
-                    url=url,
-                    ua=user_agents.next(),
-                    locale=locales.next(),
-                    created=datetime.datetime.fromtimestamp(now))
-            )
-
-            # Bulk-save the objects to the db 500 at a time and
-            # print something to stdout about it.
-            if i % 500 == 0:
-                Response.objects.bulk_create(objs)
-                objs = []
-                print '  {0}...'.format(i)
-
-        if objs:
-            print '  {0}...'.format(samplesize)
-            Response.objects.bulk_create(objs)
-            objs = []
-
+        create_additional_sampledata(samplesize)
         print 'Done!  Please reindex to pick up db changes.'
         return
 
-    # Create 5 happy responses.
-    for i in range(5):
-        response(happy=True, description=HAPPY_FEEDBACK[i], save=True)
-
-    # Create 5 sad responses.
-    for i in range(5):
-        response(happy=False, description=SAD_FEEDBACK[i], url=URLS[i],
-                 save=True)
+    create_basic_sampledata()
