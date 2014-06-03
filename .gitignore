@@ -25,3 +25,4 @@ tmp/*
 /locale/
 *.less.css
 james.ini
+/smoketests/results
