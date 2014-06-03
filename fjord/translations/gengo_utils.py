@@ -80,8 +80,11 @@ class FjordGengo(object):
         return float(balance['response']['credits'])
 
     @requires_keys
-    def get_languages(self):
+    def get_languages(self, raw=False):
         """Returns the list of supported language targets
+
+        :arg raw: True if you want the whole response, False if you
+            want just the list of languages
 
         .. Note::
 
@@ -91,9 +94,14 @@ class FjordGengo(object):
         global GENGO_LANGUAGE_CACHE
         if not GENGO_LANGUAGE_CACHE:
             resp = self.gengo_api.getServiceLanguages()
-            GENGO_LANGUAGE_CACHE = tuple(
-                [item['lc'] for item in resp['response']])
-        return GENGO_LANGUAGE_CACHE
+            GENGO_LANGUAGE_CACHE = (
+                resp,
+                tuple([item['lc'] for item in resp['response']])
+            )
+        if raw:
+            return GENGO_LANGUAGE_CACHE[0]
+        else:
+            return GENGO_LANGUAGE_CACHE[1]
 
     def guess_language(self, text):
         """Guesses the language of the text

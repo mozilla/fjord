@@ -10,7 +10,14 @@ from fjord.translations import gengo_utils
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
 class GengoTestCase(TestCase):
     def setUp(self):
-        gengo_utils.GENGO_LANGUAGE_CACHE = [u'es']
+        gengo_utils.GENGO_LANGUAGE_CACHE = (
+            {u'opstat': u'ok',
+             u'response': [
+                 {u'unit_type': u'word', u'localized_name': u'Espa\xf1ol',
+                  u'lc': u'es', u'language': u'Spanish (Spain)'}
+             ]},
+            (u'es',)
+        )
 
     def test_guess_language_throws_error(self):
         with patch('fjord.translations.gengo_utils.requests') as requests_mock:
@@ -53,6 +60,14 @@ class GengoTestCase(TestCase):
             eq_(gengo_api.guess_language(text), u'es')
 
     def test_get_languages(self):
+        response = {
+            u'opstat': u'ok',
+            u'response': [
+                {u'unit_type': u'word', u'localized_name': u'Espa\xf1ol',
+                 u'lc': u'es', u'language': u'Spanish (Spain)'}
+            ]
+        }
+
         gengo_utils.GENGO_LANGUAGE_CACHE = None
 
         with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
@@ -60,13 +75,7 @@ class GengoTestCase(TestCase):
             # short, but the Gengo language guesser actually can't
             # figure out what language that is.
             instance = GengoMock.return_value
-            instance.getServiceLanguages.return_value = {
-                u'opstat': u'ok',
-                u'response': [
-                    {u'unit_type': u'word', u'localized_name': u'Espa\xf1ol',
-                     u'lc': u'es', u'language': u'Spanish (Spain)'},
-                ]
-            }
+            instance.getServiceLanguages.return_value = response
 
             # Make sure the cache is empty
             eq_(gengo_utils.GENGO_LANGUAGE_CACHE, None)
@@ -77,7 +86,7 @@ class GengoTestCase(TestCase):
             eq_(gengo_api.get_languages(), (u'es',))
 
             # Test that the new list is cached.
-            eq_(gengo_utils.GENGO_LANGUAGE_CACHE, (u'es',))
+            eq_(gengo_utils.GENGO_LANGUAGE_CACHE, (response, (u'es',)))
 
     def test_machine_translation(self):
         with patch('fjord.translations.gengo_utils.requests') as requests_mock:

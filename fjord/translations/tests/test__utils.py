@@ -43,7 +43,14 @@ class TestKeys(TestCase):
 
 class GeneralTranslateTests(TestCase):
     def setUp(self):
-        gengo_utils.GENGO_LANGUAGE_CACHE = [u'es']
+        gengo_utils.GENGO_LANGUAGE_CACHE = (
+            {u'opstat': u'ok',
+             u'response': [
+                 {u'unit_type': u'word', u'localized_name': u'Espa\xf1ol',
+                  u'lc': u'es', u'language': u'Spanish (Spain)'}
+             ]},
+            (u'es',)
+        )
 
     def test_translate_fake(self):
         obj = fakeinstance(
@@ -158,6 +165,14 @@ class GengoMachineTests(FjordTestCase):
     def test_translate_gengo_machine_unsupported_language(self):
         """Translation should handle unsupported languages without erroring"""
         gengo_utils.GENGO_LANGUAGE_CACHE = [u'de']
+        gengo_utils.GENGO_LANGUAGE_CACHE = (
+            {u'opstat': u'ok',
+             u'response': [
+                 {u'unit_type': u'word', u'localized_name': u'Deutsch',
+                  u'lc': u'de', u'language': u'German'}
+             ]},
+            (u'de',)
+        )
 
         with patch('fjord.translations.gengo_utils.requests') as requests_mock:
             post_return = MagicMock()

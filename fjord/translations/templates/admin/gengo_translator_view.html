@@ -48,4 +48,25 @@
       <tr><th>GENGO_PRIVATE_KEY</th><td>{{ settings.GENGO_PRIVATE_KEY }}</td></tr>
     </table>
   </section>
+  {% if configured %}
+    <section>
+      <h1>Supported languages</h1>
+      <table>
+        <tr><th>Gengo language code (lc)</th><th>Gengo language</th><th>related prod locale</th></tr>
+        {% for lang in gengo_languages %}
+          <tr><td>{{ lang.0 }}</td><td>{{ lang.1 }}</td><td>{{ lang.2 }}</td></tr>
+        {% endfor %}
+      </table>
+    </section>
+
+    <section>
+      <h1>Fjord locales that probably have no Gengo supported language</h1>
+      <table>
+        <tr><th>Locale</th></tr>
+        {% for locale in missing_prod_locales %}
+          <tr><td>{{ locale }}</td></tr>
+        {% endfor %}
+      </table>
+    </section>
+  {% endif %}
 {% endblock %}
