@@ -13,15 +13,17 @@ from pages.base import Page
 
 class DateFilter(Page):
 
-    _current_when_link_locator = (By.CSS_SELECTOR, '#when a.selected')
+    _current_when_link_locator = (By.CSS_SELECTOR, 'a.when.selected')
+
     _last_day_locator = (By.LINK_TEXT, '1d')
     _last_seven_days_locator = (By.LINK_TEXT, '7d')
     _last_thirty_days_locator = (By.LINK_TEXT, '30d')
-    _show_custom_dates_locator = (By.ID, 'show-custom-date')
-    _custom_dates_locator = (By.ID, 'custom-date')
-    _custom_start_date_locator = (By.ID, 'id_date_start')
-    _custom_end_date_locator = (By.ID, 'id_date_end')
-    _set_custom_date_locator = (By.CSS_SELECTOR, '#custom-date button')
+    _show_custom_dates_locator = (By.CSS_SELECTOR, 'a.expander')
+    _custom_dates_locator = (By.CSS_SELECTOR, 'div.filter a.custom-date')
+    _custom_start_date_locator = (By.CSS_SELECTOR, 'input[name=date_start]')
+    _custom_end_date_locator = (By.CSS_SELECTOR, 'input[name=date_end]')
+
+    _set_custom_date_locator = (By.ID, 'whensubmit')
 
     _datepicker_locator = (By.ID, 'ui-datepicker-div')
     _datepicker_calendar_locator = (By.CSS_SELECTOR, '.ui-datepicker-calendar')
@@ -40,18 +42,6 @@ class DateFilter(Page):
         """Returns the link text of the currently applied days filter."""
         return self.selenium.find_element(*self._current_when_link_locator).text
 
-    @property
-    def last_day_tooltip(self):
-        return self.selenium.find_element(*self._last_day_locator).get_attribute('title')
-
-    @property
-    def last_seven_days_tooltip(self):
-        return self.selenium.find_element(*self._last_seven_days_locator).get_attribute('title')
-
-    @property
-    def last_thirty_days_tooltip(self):
-        return self.selenium.find_element(*self._last_thirty_days_locator).get_attribute('title')
-
     def click_last_day(self):
         return self.selenium.find_element(*self._last_day_locator).click()
 
@@ -61,14 +51,11 @@ class DateFilter(Page):
     def click_last_thirty_days(self):
         return self.selenium.find_element(*self._last_thirty_days_locator).click()
 
-    @property
-    def custom_dates_tooltip(self):
-        """Returns the tooltip for the custom dates filter link."""
-        return self.selenium.find_element(*self._show_custom_dates_locator).get_attribute('title')
-
-    def click_custom_dates(self):
+    def enable_custom_dates(self):
         """Clicks the custom date filter button and waits for the form to appear."""
-        self.selenium.find_element(*self._show_custom_dates_locator).click()
+        custom_dates = self.selenium.find_element(*self._show_custom_dates_locator)
+        if 'selected' not in custom_dates.get_attribute('class'):
+            custom_dates.click()
 
     @property
     def is_custom_date_filter_visible(self):
@@ -164,11 +151,15 @@ class DateFilter(Page):
             count = count + 1
         self.click_day(target_date.day)
 
-    def type_custom_start_date(self, date):
-        self.selenium.find_element(*self._custom_start_date_locator).send_keys(date)
+    def type_custom_start_date(self, date_start):
+        date_start_box = self.selenium.find_element(*self._custom_start_date_locator)
+        date_start_box.clear()
+        date_start_box.send_keys(date_start)
 
-    def type_custom_end_date(self, date):
-        self.selenium.find_element(*self._custom_end_date_locator).send_keys(date)
+    def type_custom_end_date(self, date_end):
+        date_end_box = self.selenium.find_element(*self._custom_end_date_locator)
+        date_end_box.clear()
+        date_end_box.send_keys(date_end)
 
     def select_custom_start_date_using_datepicker(self, date):
         self.click_start_date()
@@ -180,7 +171,7 @@ class DateFilter(Page):
 
     def filter_by_custom_dates_using_datepicker(self, start_date, end_date):
         """Filters by a custom date range."""
-        self.click_custom_dates()
+        self.enable_custom_dates()
         self.select_custom_start_date_using_datepicker(start_date)
         self.select_custom_end_date_using_datepicker(end_date)
         self.selenium.find_element(*self._set_custom_date_locator).click()
@@ -191,7 +182,7 @@ class DateFilter(Page):
         This uses selenium.type_keys in an attempt to mimic actual typing
 
         """
-        self.click_custom_dates()
+        self.enable_custom_dates()
         self.type_custom_start_date(start_date)
         self.type_custom_end_date(end_date)
         self.selenium.find_element(*self._set_custom_date_locator).click()
