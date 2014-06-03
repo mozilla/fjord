@@ -1,11 +1,9 @@
-#!/usr/bin/env python
-
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from unittestzero import Assert
 import pytest
+from unittestzero import Assert
 
 from pages.desktop.feedback import FeedbackPage
 
@@ -15,7 +13,6 @@ class TestPagination:
 
     @pytest.mark.nondestructive
     def test_search_pagination(self, mozwebqa):
-        """Litmus 13636 - Input: Verify Search results have pagination."""
         feedback_pg = FeedbackPage(mozwebqa)
         feedback_pg.go_to_feedback_page()
         # Set the date range to 2013-01-01 -> today so that we're more

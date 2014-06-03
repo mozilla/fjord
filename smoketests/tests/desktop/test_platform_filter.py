@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -14,7 +12,7 @@ class TestPlatformFilter(object):
 
     @pytest.mark.nondestructive
     def test_feedback_can_be_filtered_by_platform(self, mozwebqa):
-        """This testcase covers # 15215 in Litmus.
+        """Tests platform filtering in dashboard
 
         1. Verify that the selected platform is the only one to appear in the list and is selected
         2. Verify that the number of messages is less than the total messages

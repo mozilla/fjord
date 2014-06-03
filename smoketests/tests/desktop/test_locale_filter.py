@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -14,7 +12,7 @@ class TestLocaleFilter(object):
 
     @pytest.mark.nondestructive
     def test_feedback_can_be_filtered_by_locale(self, mozwebqa):
-        """This testcase covers # 15120 in Litmus.
+        """Tests locale filtering in dashboard
 
         1. Verify we see at least one locale
         2. Select that locale

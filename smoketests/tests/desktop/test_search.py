@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -14,7 +12,6 @@ class TestSearch(object):
 
     @pytest.mark.nondestructive
     def test_that_empty_search_of_feedback_returns_some_data(self, mozwebqa):
-        """Litmus 13847"""
         feedback_pg = FeedbackPage(mozwebqa)
 
         feedback_pg.go_to_feedback_page()
@@ -23,7 +20,6 @@ class TestSearch(object):
 
     @pytest.mark.nondestructive
     def test_that_we_can_search_feedback_with_unicode(self, mozwebqa):
-        """Litmus 13697"""
         feedback_pg = FeedbackPage(mozwebqa)
 
         feedback_pg.go_to_feedback_page()

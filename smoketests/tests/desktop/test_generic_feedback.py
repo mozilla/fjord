@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -16,7 +14,6 @@ from pages.desktop.feedback import FeedbackPage
 class TestFeedback(object):
 
     def test_submit_happy_feedback(self, mozwebqa):
-        """Fill out happy feedback"""
         timestamp = str(time.time())
         desc = 'input-tests testing happy feedback ' + timestamp
         url = 'http://happy.example.com/' + timestamp
@@ -52,7 +49,6 @@ class TestFeedback(object):
         Assert.equal(resp.site.strip(), 'example.com')
 
     def test_submit_sad_feedback(self, mozwebqa):
-        """Fill out sad feedback"""
         timestamp = str(time.time())
         desc = 'input-tests testing sad feedback ' + timestamp
         url = 'http://sad.example.com/' + timestamp

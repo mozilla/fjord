@@ -1,11 +1,9 @@
-#!/usr/bin/env python
-
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from unittestzero import Assert
 import pytest
+from unittestzero import Assert
 
 from pages.desktop.feedback import FeedbackPage
 
@@ -14,7 +12,7 @@ class TestProductFilter(object):
 
     @pytest.mark.nondestructive
     def test_feedback_can_be_filtered_by_all_products_and_versions(self, mozwebqa):
-        """This testcase covers # 13602 & 13603 & 15149 in Litmus.
+        """Tests product filtering in dashboard
 
         1. Verify that at least one product exists
         2. Verify that filtering by product returns results
