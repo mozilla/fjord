@@ -26,7 +26,7 @@ $(function() {
     }
 
     $('#whensubmit').bind('click', function() {
-        setQuerystring(getQuerystring(), {
+        fjord.setQuerystring(fjord.getQuerystring(), {
             date_start: $date_start.val(),
             date_end: $date_end.val()
         });
@@ -72,7 +72,7 @@ $(function() {
                 } else {
                     params[name] = undefined;
                 }
-                setQuerystring(getQuerystring(), params);
+                fjord.setQuerystring(fjord.getQuerystring(), params);
             });
         });
     });

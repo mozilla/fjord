@@ -9,7 +9,7 @@ $(function() {
     // Set up the when selector.
     var $date_end = $('#whensubmit').siblings('input[name=date_end]');
     $('#whensubmit').bind('click', function() {
-        setQuerystring(getQuerystring(), {
+        fjord.setQuerystring(fjord.getQuerystring(), {
             date_end: $date_end.val()
         });
     });

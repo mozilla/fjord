@@ -14,3 +14,16 @@ test("basic email validation", function() {
         ok(fjord.validateEmail(item[0]) == item[1], item);
     }
 });
+
+// FIXME: This causes qunit to reload the page which causes problems.
+// It'd be nice if we could test this without causing problems.
+// test("set and get querystring", function() {
+//     var data = {
+//         'foo': 'bar'
+//     };
+
+//     fjord.setQuerystring(data);
+//     var qs = fjord.getQuerystring();
+
+//     ok(qs.foo == 'bar');
+// });

@@ -10,7 +10,7 @@ $(function() {
     var $date_start = $('#whensubmit').siblings('input[name=date_start]');
     var $date_end = $('#whensubmit').siblings('input[name=date_end]');
     $('#whensubmit').bind('click', function() {
-        setQuerystring(getQuerystring(), {
+        fjord.setQuerystring(fjord.getQuerystring(), {
             date_start: $date_start.val(),
             date_end: $date_end.val()
         });
