@@ -219,3 +219,50 @@ def check_new_user(fun):
 analyzer_required = permission_required(
     'analytics.can_view_dashboard',
     raise_exception=True)
+
+
+def class_to_path(cls):
+    """Given a class, returns the class path"""
+    return ':'.join([cls.__module__, cls.__name__])
+
+
+def path_to_class(path):
+    """Given a class path, returns the class"""
+    module_path, cls_name = path.split(':')
+    module = __import__(module_path, fromlist=[cls_name])
+    cls = getattr(module, cls_name)
+    return cls
+
+
+def instance_to_key(instance):
+    """Given an instance, returns a key
+
+    :arg instance: The model instance to generate a key for
+
+    :returns: A string representing that specific instance
+
+    .. Note::
+
+       If you ever make a code change that moves the model to some
+       other Python module, then the keys for those model instances
+       will fail.
+
+    """
+    cls = instance.__class__
+    return ':'.join([cls.__module__, cls.__name__, str(instance.pk)])
+
+
+def key_to_instance(key):
+    """Given a key, returns the instance
+
+    :raises DoesNotExist: if the instance doesn't exist
+    :raises ImportError: if there's an import error
+    :raises AttributeError: if the class doesn't exist in the module
+
+    """
+    module_path, cls_name, id_ = key.split(':')
+    module = __import__(module_path, fromlist=[cls_name])
+    cls = getattr(module, cls_name)
+    instance = cls.objects.get(pk=int(id_))
+
+    return instance

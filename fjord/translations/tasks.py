@@ -2,11 +2,8 @@ from django.db.models.signals import post_save
 
 from celery import task
 
-from .utils import (
-    compose_key,
-    decompose_key,
-    translate
-)
+from fjord.base.util import key_to_instance
+from .utils import translate
 
 
 @task(rate_limit='60/m')
@@ -34,7 +31,7 @@ def translate_task(instance_key, system, src_lang, src_field,
         text into
 
     """
-    instance = decompose_key(instance_key)
+    instance = key_to_instance(instance_key)
     translate(instance, system, src_lang, src_field, dst_lang, dst_field)
 
 

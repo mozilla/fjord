@@ -10,7 +10,7 @@ def fakeinstance(fields=None, translate_with=lambda x: None, **kwargs):
        we don't want this saving to the db, so we make it a no-op
 
     """
-    class FakeModel(object):
+    class FakeInstanceModel(object):
         def __init__(self):
             for key, val in kwargs.items():
                 setattr(self, key, val)
@@ -24,4 +24,4 @@ def fakeinstance(fields=None, translate_with=lambda x: None, **kwargs):
         def save(self):
             pass
 
-    return FakeModel()
+    return FakeInstanceModel()

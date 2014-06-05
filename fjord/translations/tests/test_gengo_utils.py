@@ -135,5 +135,5 @@ class GengoTestCase(TestCase):
 
                 gengo_api = gengo_utils.FjordGengo()
                 text = u'Muy lento'
-                eq_(gengo_api.get_machine_translation(1010, text),
+                eq_(gengo_api.get_machine_translation(1010, 'es', 'en', text),
                     u'Very slow')

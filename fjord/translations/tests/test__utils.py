@@ -6,39 +6,9 @@ from mock import MagicMock, patch
 from nose.tools import eq_
 
 from . import fakeinstance
-from ..utils import compose_key, decompose_key, translate
-from fjord.translations import gengo_utils
+from ..utils import translate
 from fjord.base.tests import TestCase as FjordTestCase
-
-
-_foo_cache = {}
-
-
-class FakeModelManager(object):
-    def get(self, **kwargs):
-        return _foo_cache[kwargs['id']]
-
-
-class FakeModel(object):
-    def __init__(self, id_):
-        self.id = id_
-        _foo_cache[id_] = self
-
-    objects = FakeModelManager()
-
-
-class TestKeys(TestCase):
-    def tearDown(self):
-        _foo_cache.clear()
-
-    def test_compose_key(self):
-        foo = FakeModel(15)
-        eq_(compose_key(foo), 'fjord.translations.tests.test__utils:FakeModel:15')
-
-    def test_decompose_key(self):
-        foo = FakeModel(15)
-        key = 'fjord.translations.tests.test__utils:FakeModel:15'
-        eq_(decompose_key(key), foo)
+from fjord.translations import gengo_utils
 
 
 class GeneralTranslateTests(TestCase):
@@ -54,6 +24,8 @@ class GeneralTranslateTests(TestCase):
 
     def test_translate_fake(self):
         obj = fakeinstance(
+            id=10101,
+            locale='fr',
             fields={'desc': 'trans_desc'},
             translate_with=lambda x: 'fake',
             desc=u'This is a test string'
@@ -64,6 +36,8 @@ class GeneralTranslateTests(TestCase):
 
     def test_translate_dennis(self):
         obj = fakeinstance(
+            id=10101,
+            locale='fr',
             fields={'desc': 'trans_desc'},
             translate_with=lambda x: 'dennis',
             desc=u'This is a test string'
@@ -123,6 +97,7 @@ class GengoMachineTests(FjordTestCase):
 
                 obj = fakeinstance(
                     id=10101,
+                    locale='fr',
                     fields={'desc': 'trans_desc'},
                     translate_with=lambda x: 'gengo_machine',
                     desc=u'Muy lento'
@@ -150,6 +125,7 @@ class GengoMachineTests(FjordTestCase):
 
                 obj = fakeinstance(
                     id=10101,
+                    locale='es',
                     fields={'desc': 'trans_desc'},
                     translate_with=lambda x: 'gengo_machine',
                     desc=u'Muy lento'
@@ -194,6 +170,7 @@ class GengoMachineTests(FjordTestCase):
 
                 obj = fakeinstance(
                     id=10101,
+                    locale='es',
                     fields={'desc': 'trans_desc'},
                     translate_with=lambda x: 'gengo_machine',
                     desc=u'Muy lento'

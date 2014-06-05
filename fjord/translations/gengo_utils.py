@@ -134,20 +134,21 @@ class FjordGengo(object):
                 # as well throw the guess away because there's not
                 # much we can do with it.
                 raise GengoUnsupportedLanguage(
-                    'unsupported language: {0}'.format(lang))
+                    'unsupported language (guesser): {0}'.format(lang))
             return lang
 
         raise GengoUnknownLanguage('request failure: {0}'.format(resp.content))
 
     @requires_keys
-    def get_machine_translation(self, id_, text):
+    def get_machine_translation(self, id_, lc_src, lc_dst, text):
         """Performs a machine translation through Gengo
 
         :arg id_: instance id
+        :arg lc_src: source language
+        :arg lc_dst: destination language
         :arg text: the text to translate
 
-        :raises GengoUnknownLanguage: if the guesser fails to identify the
-            source language of the text
+        :returns: text
 
         :raises GengoUnsupportedLanguage: if the guesser guesses a language
             that Gengo doesn't support
@@ -156,17 +157,13 @@ class FjordGengo(object):
             fails
 
         """
-        # Note: This will throw GengoUnknownLanguage or
-        # GengoUnsupportedLanguage if it fails to guess the language.
-        lc_src = self.guess_language(text)
-
         data = {
             'jobs': {
                 'job_1': {
                     'custom_data': str(id_),
                     'body_src': text,
                     'lc_src': lc_src,
-                    'lc_tgt': 'en',
+                    'lc_tgt': lc_dst,
                     'tier': 'machine',
                     'type': 'text',
                     'slug': 'Input machine translation',
@@ -185,13 +182,15 @@ class FjordGengo(object):
             # language.
             if ge.error_code == 1551:
                 raise GengoUnsupportedLanguage(
-                    'unsupported language: {0}'.format(lc_src))
+                    'unsupported language (translater)): {0} -> {1}'.format(
+                        lc_src, lc_dst))
             raise
 
         if resp['opstat'] == 'ok':
             job = resp['response']['jobs']['job_1']
             if 'body_tgt' not in job:
-                raise GengoMachineTranslationFailure('no body_tgt')
+                raise GengoMachineTranslationFailure(
+                    'no body_tgt: {0} -> {1}'.format(lc_src, lc_dst))
 
             return job['body_tgt']
 
