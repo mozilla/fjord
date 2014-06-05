@@ -35,10 +35,14 @@
     <h1>Products</h1>
     <h2>Automated Gengo machine translations</h2>
     <table>
-      <tr><th>Product name</th><td>Actions</td></tr>
-      {% for prod in gengo_machiners %}
-        <tr><th>{{ prod.display_name }}</th><td><a href="{% url 'admin:feedback_product_change' prod.id %}">Change</a></td></tr>
-      {% endfor %}
+      <thead>
+        <tr><th>Product name</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for prod in gengo_machiners %}
+          <tr><th>{{ prod.display_name }}</th><td><a href="{% url 'admin:feedback_product_change' prod.id %}">Change</a></td></tr>
+        {% endfor %}
+      </tbody>
     </table>
   </section>
   <section>
