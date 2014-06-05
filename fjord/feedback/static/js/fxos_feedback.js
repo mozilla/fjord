@@ -216,7 +216,7 @@
 
             document.addEventListener('DOMComponentsLoaded', function goToLastCard() {
                 // UNSUBSCRIBE!
-                document.removeEventListener('DOMComponentsLoaded', setupAnalytics);
+                document.removeEventListener('DOMComponentsLoaded', goToLastCard);
 
                 // if there's a description, this indicates that the previous
                 // attempt to submit failed so we go directly to the "try
