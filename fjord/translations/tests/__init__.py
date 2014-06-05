@@ -1,27 +1,15 @@
-def fakeinstance(fields=None, translate_with=lambda x: None, **kwargs):
-    """Generates a FakeModel instance with the right bits for translation
+from django.db import models
 
-    The translation system needs an object with:
+from fjord.base.util import instance_to_key
 
-    1. a Translation class property that has the source and destination fields
-    2. a translate_with function that takes the instance and returns the
-       system to translate with
-    3. a save function that takes the instance and saves it to the db, though
-       we don't want this saving to the db, so we make it a no-op
 
-    """
-    class FakeModel(object):
-        def __init__(self):
-            for key, val in kwargs.items():
-                setattr(self, key, val)
+class FakeModel(models.Model):
+    locale = models.CharField(max_length=2)
+    desc = models.CharField(blank=True, default=u'', max_length=100)
+    trans_desc = models.CharField(blank=True, default=u'', max_length=100)
 
-            self.translate_with = translate_with
-            self.Translation.fields = fields
-
-        class Translation(object):
-            pass
-
-        def save(self):
-            pass
-
-    return FakeModel()
+    def generate_translation_jobs(self, system=None):
+        return [
+            (instance_to_key(self), system, self.locale, 'desc',
+             'en-US', 'trans_desc')
+        ]

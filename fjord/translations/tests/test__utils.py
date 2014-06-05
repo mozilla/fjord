@@ -5,40 +5,10 @@ from django.test.utils import override_settings
 from mock import MagicMock, patch
 from nose.tools import eq_
 
-from . import fakeinstance
-from ..utils import compose_key, decompose_key, translate
-from fjord.translations import gengo_utils
+from ..utils import translate
 from fjord.base.tests import TestCase as FjordTestCase
-
-
-_foo_cache = {}
-
-
-class FakeModelManager(object):
-    def get(self, **kwargs):
-        return _foo_cache[kwargs['id']]
-
-
-class FakeModel(object):
-    def __init__(self, id_):
-        self.id = id_
-        _foo_cache[id_] = self
-
-    objects = FakeModelManager()
-
-
-class TestKeys(TestCase):
-    def tearDown(self):
-        _foo_cache.clear()
-
-    def test_compose_key(self):
-        foo = FakeModel(15)
-        eq_(compose_key(foo), 'fjord.translations.tests.test__utils:FakeModel:15')
-
-    def test_decompose_key(self):
-        foo = FakeModel(15)
-        key = 'fjord.translations.tests.test__utils:FakeModel:15'
-        eq_(decompose_key(key), foo)
+from fjord.translations import gengo_utils
+from fjord.translations.models import SuperModel
 
 
 class GeneralTranslateTests(TestCase):
@@ -53,25 +23,20 @@ class GeneralTranslateTests(TestCase):
         )
 
     def test_translate_fake(self):
-        obj = fakeinstance(
-            fields={'desc': 'trans_desc'},
-            translate_with=lambda x: 'fake',
-            desc=u'This is a test string'
-        )
-        eq_(getattr(obj, 'trans_desc', None), None)
+        obj = SuperModel(locale='br', desc=u'This is a test string')
+        obj.save()
+
+        eq_(obj.trans_desc, u'')
         translate(obj, 'fake', 'br', 'desc', 'en-US', 'trans_desc')
-        eq_(getattr(obj, 'trans_desc', None), u'THIS IS A TEST STRING')
+        eq_(obj.trans_desc, u'THIS IS A TEST STRING')
 
     def test_translate_dennis(self):
-        obj = fakeinstance(
-            fields={'desc': 'trans_desc'},
-            translate_with=lambda x: 'dennis',
-            desc=u'This is a test string'
-        )
-        eq_(getattr(obj, 'trans_desc', None), None)
+        obj = SuperModel(locale='fr', desc=u'This is a test string')
+        obj.save()
+
+        eq_(obj.trans_desc, u'')
         translate(obj, 'dennis', 'br', 'desc', 'en-US', 'trans_desc')
-        eq_(getattr(obj, 'trans_desc', None),
-            u'\xabTHIS IS A TEST STRING\xbb')
+        eq_(obj.trans_desc, u'\xabTHIS IS A TEST STRING\xbb')
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
@@ -121,15 +86,12 @@ class GengoMachineTests(FjordTestCase):
                     }
                 }
 
-                obj = fakeinstance(
-                    id=10101,
-                    fields={'desc': 'trans_desc'},
-                    translate_with=lambda x: 'gengo_machine',
-                    desc=u'Muy lento'
-                )
-                eq_(getattr(obj, 'trans_desc', None), None)
+                obj = SuperModel(locale='es', desc=u'Muy lento')
+                obj.save()
+
+                eq_(obj.trans_desc, u'')
                 translate(obj, 'gengo_machine', 'es', 'desc', 'en-US', 'trans_desc')
-                eq_(getattr(obj, 'trans_desc', None), u'Very slow')
+                eq_(obj.trans_desc, u'Very slow')
 
     def test_translate_gengo_machine_unknown_language(self):
         """Translation should handle unknown languages without erroring"""
@@ -148,16 +110,13 @@ class GengoMachineTests(FjordTestCase):
             with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
                 gengo_mock_instance = GengoMock.return_value
 
-                obj = fakeinstance(
-                    id=10101,
-                    fields={'desc': 'trans_desc'},
-                    translate_with=lambda x: 'gengo_machine',
-                    desc=u'Muy lento'
-                )
-                eq_(getattr(obj, 'trans_desc', None), None)
+                obj = SuperModel(locale='es', desc=u'Muy lento')
+                obj.save()
+
+                eq_(obj.trans_desc, u'')
                 translate(obj, 'gengo_machine', 'es', 'desc', 'en-US',
                           'trans_desc')
-                eq_(getattr(obj, 'trans_desc', None), None)
+                eq_(obj.trans_desc, u'')
 
                 # Make sure we don't call postTranslationJobs().
                 eq_(gengo_mock_instance.postTranslationJobs.call_count, 0)
@@ -192,16 +151,13 @@ class GengoMachineTests(FjordTestCase):
             with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
                 gengo_mock_instance = GengoMock.return_value
 
-                obj = fakeinstance(
-                    id=10101,
-                    fields={'desc': 'trans_desc'},
-                    translate_with=lambda x: 'gengo_machine',
-                    desc=u'Muy lento'
-                )
-                eq_(getattr(obj, 'trans_desc', None), None)
+                obj = SuperModel(locale='es', desc=u'Muy lento')
+                obj.save()
+
+                eq_(obj.trans_desc, u'')
                 translate(obj, 'gengo_machine', 'es', 'desc', 'en-US',
                           'trans_desc')
-                eq_(getattr(obj, 'trans_desc', None), None)
+                eq_(obj.trans_desc, u'')
 
                 # Make sure we don't call postTranslationJobs().
                 eq_(gengo_mock_instance.postTranslationJobs.call_count, 0)

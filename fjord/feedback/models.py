@@ -8,11 +8,11 @@ from elasticutils.contrib.django import Indexable, MLT
 from product_details import product_details
 from rest_framework import serializers
 from statsd import statsd
-from tower import ugettext_lazy as _
+from tower import ugettext_lazy as _lazy
 
 from fjord.base.domain import get_domain
 from fjord.base.models import ModelBase
-from fjord.base.util import smart_truncate
+from fjord.base.util import smart_truncate, instance_to_key
 from fjord.feedback.config import CODE_TO_COUNTRY, ANALYSIS_STOPWORDS
 from fjord.feedback.utils import compute_grams
 from fjord.search.index import (
@@ -22,7 +22,6 @@ from fjord.search.index import (
 from fjord.search.tasks import register_live_index
 from fjord.translations.models import get_translation_system_choices
 from fjord.translations.tasks import register_auto_translation
-from fjord.translations.utils import compose_key
 
 
 # This defines the number of characters the description can have.  We
@@ -210,7 +209,7 @@ class Response(ModelBase):
 
         return [
             # key, system, src language, src field, dst language, dst field
-            (compose_key(self), system, self.locale, 'description',
+            (instance_to_key(self), system, self.locale, 'description',
              u'en-US', 'translated_description')
         ]
 
@@ -269,8 +268,8 @@ class Response(ModelBase):
     @property
     def sentiment(self):
         if self.happy:
-            return _(u'Happy')
-        return _(u'Sad')
+            return _lazy(u'Happy')
+        return _lazy(u'Sad')
 
     @property
     def truncated_description(self):

@@ -1,3 +1,5 @@
+from django.db import models
+
 from dennis.translator import Translator
 from statsd import statsd
 
@@ -7,6 +9,15 @@ from .gengo_utils import (
     GengoUnknownLanguage,
     GengoUnsupportedLanguage,
 )
+from .utils import locale_equals_language
+from fjord.journal.utils import j_error, j_info
+
+
+class SuperModel(models.Model):
+    """Model used solely for testing"""
+    locale = models.CharField(max_length=5)
+    desc = models.CharField(blank=True, default=u'', max_length=100)
+    trans_desc = models.CharField(blank=True, default=u'', max_length=100)
 
 
 _translation_systems = {}
@@ -105,6 +116,12 @@ class FakeTranslator(TranslationSystem):
     def translate(self, instance, src_lang, src_field, dst_lang, dst_field):
         setattr(instance, dst_field, getattr(instance, src_field).upper())
         instance.save()
+        j_info(
+            app='translations',
+            src=self.name,
+            action='translate',
+            msg='success',
+            instance=instance)
 
     def pull_translations(self):
         # This is a no-op for testing purposes.
@@ -130,6 +147,12 @@ class DennisTranslator(TranslationSystem):
             translated = Translator([], pipeline).translate_string(text)
             setattr(instance, dst_field, translated)
             instance.save()
+            j_info(
+                app='translations',
+                src=self.name,
+                action='translate',
+                msg='success',
+                instance=instance)
 
 
 # ---------------------------------------------------------
@@ -140,33 +163,86 @@ class GengoMachineTranslator(TranslationSystem):
     """Translates using Gengo machine translation"""
     name = 'gengo_machine'
 
+    def info(self, instance, action='translate', msg=u'', text=u''):
+        msg = msg.encode('utf-8')
+        text = text or u''
+
+        j_info(
+            app='translations',
+            src=self.name,
+            action=action,
+            msg=msg,
+            instance=instance,
+            metadata={
+                'locale': instance.locale,
+                'length': len(text),
+                'body': text[:50].encode('utf-8'),
+            })
+
+    def error(self, instance, action='translate', msg=u'', text=u''):
+        msg = msg.encode('utf-8')
+        text = text or u''
+
+        j_error(
+            app='translations',
+            src=self.name,
+            action=action,
+            msg=msg,
+            instance=instance,
+            metadata={
+                'locale': instance.locale,
+                'length': len(text),
+                'body': text[:50].encode('utf-8'),
+            })
+
     def translate(self, instance, src_lang, src_field, dst_lang, dst_field):
         text = getattr(instance, src_field)
 
         gengo_api = FjordGengo()
         try:
-            translated = gengo_api.get_machine_translation(instance.id, text)
+            lc_src = gengo_api.guess_language(text)
+            if not locale_equals_language(instance.locale, lc_src):
+                self.error(
+                    instance,
+                    action='guess-language',
+                    msg='locale "{0}" != guessed language "{1}"'.format(
+                        instance.locale, lc_src),
+                    text=text)
+
+            translated = gengo_api.get_machine_translation(
+                instance.id, lc_src, 'en', text)
+
             if translated:
                 setattr(instance, dst_field, translated)
                 instance.save()
+                self.info(instance, action='translate', msg='success',
+                          text=text)
                 statsd.incr('translation.gengo_machine.success')
 
             else:
+                self.error(instance, action='translate',
+                           msg='did not translate', text=text)
                 statsd.incr('translation.gengo_machine.failure')
 
-        except GengoUnknownLanguage:
+        except GengoUnknownLanguage as exc:
             # FIXME: This might be an indicator that this response is
             # spam. At some point p, we can write code to account for
             # that.
+            self.error(instance, action='guess-language', msg=unicode(exc),
+                       text=text)
             statsd.incr('translation.gengo_machine.unknown')
 
-        except GengoUnsupportedLanguage:
+        except GengoUnsupportedLanguage as exc:
             # FIXME: This is a similar boat to GengoUnknownLanguage
             # where for now, we're just going to ignore it because I'm
             # not sure what to do about it and I'd like more data.
+            self.error(instance, action='translate', msg=unicode(exc),
+                       text=text)
             statsd.incr('translation.gengo_machine.unsupported')
 
         except GengoMachineTranslationFailure:
             # FIXME: For now, if we have a machine translation
             # failure, we're just going to ignore it and move on.
+            self.error(instance, action='translate', msg=unicode(exc),
+                       text=text)
             statsd.incr('translation.gengo_machine.failure')

@@ -1,0 +1,80 @@
+{% extends "admin/base_site.html" %}
+{% block content_title %}
+  <h1>Translations - Maintenance</h1>
+{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style type="text/css">
+    section {
+      margin: 1em 0em 1em 0em;
+    }
+    div#content div {
+      margin-bottom: .5em;
+    }
+    tr.fail td {
+      font-weight: bold;
+      color: #d00;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <section>
+    <h1>Products</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Product name</th>
+          <th>Translation system</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for prod in products %}
+          <tr>
+            <td>{{ prod.display_name }}</td>
+            <td>{{ prod.translation_system }}</td>
+            <td><a href="{% url 'admin:feedback_product_change' prod.id %}">Change</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section id="grp-changelist" class="">
+    <h1>Last 14 days of records</h1>
+    <div class="grp-module grp-changelist-results">
+      <table id="result_list" class="grp-sortable">
+        <thead>
+          <tr>
+            <th scope="col" class="sortable"><div class="grp-text"><a href="#">id</a></div></th>
+            <th scope="col" class="sortable"><div class="grp-text"><a href="?order=src">src</a></div></th>
+            <th scope="col" class="sortable"><div class="grp-text"><a href="?order=type">type</a></div></th>
+            <th scope="col" class="sortable"><div class="grp-text"><a href="?order=action">action</a></div></th>
+            <th scope="col" class="sortable"><div class="grp-text"><a href="?order=msg">msg</a></div></th>
+            <th scope="col" class="sortable"><div class="grp-text"><a href="#">object id</a></div></th>
+            <th scope="col" class="sortable"><div class="grp-text"><a href="#">object description</a></div></th>
+            <th scope="col" class="sortable"><div class="grp-text"><a href="?order=-created">created</a></div></th>
+            <th scope="col" class="sortable"><div class="grp-text"><a href="?order=metadata">metadata</a></div></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rec in records %}
+            <tr class="grp-row grp-row-{% cycle 'odd' 'even' %} {% if rec.type == 'error' %}fail{% endif %}">
+              <td>{{ rec.id }}</td>
+              <td>{{ rec.src }}</td>
+              <td>{{ rec.type }}</td>
+              <td>{{ rec.action }}</td>
+              <td>{{ rec.msg }}</td>
+              <td>{{ rec.content_object.id }}</td>
+              <td>{{ rec.content_object.description|truncatechars:200 }}</td>
+              <td>{{ rec.created }}</td>
+              <td>{{ rec.metadata }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}

@@ -5,7 +5,14 @@ from nose.tools import eq_
 
 from fjord.base.tests import TestCase
 from fjord.base.util import (
-    smart_truncate, smart_str, smart_int, smart_date, smart_bool)
+    instance_to_key,
+    key_to_instance,
+    smart_bool,
+    smart_date,
+    smart_int,
+    smart_str,
+    smart_truncate
+)
 
 
 def test_smart_truncate():
@@ -94,3 +101,36 @@ class SmartBoolTest(TestCase):
         for x in garbages:
             b = smart_bool(x, 'fallback')
             assert b == 'fallback', self.msg_template % (x, 'fallback', b)
+
+
+_foo_cache = {}
+
+
+class FakeModelManager(object):
+    def get(self, **kwargs):
+        return _foo_cache[kwargs['pk']]
+
+
+class FakeModel(object):
+    def __init__(self, pk):
+        self.pk = pk
+        _foo_cache[pk] = self
+
+    def __repr__(self):
+       return '<FakeModel:{0}>'.format(self.pk)
+
+    objects = FakeModelManager()
+
+
+class TestKeys(TestCase):
+    def tearDown(self):
+        _foo_cache.clear()
+
+    def test_instance_to_key(self):
+        foo = FakeModel(15)
+        eq_(instance_to_key(foo), 'fjord.base.tests.test__util:FakeModel:15')
+
+    def test_key_to_instance(self):
+        foo = FakeModel(15)
+        key = 'fjord.base.tests.test__util:FakeModel:15'
+        eq_(key_to_instance(key), foo)
