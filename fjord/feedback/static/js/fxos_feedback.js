@@ -167,6 +167,16 @@
                 data.email = $('#email-input').val();
             }
 
+            // Grab the source and campaign from the querystring if
+            // available.
+            var qs = fjord.getQuerystring();
+            if (qs.utm_source) {
+                data.source = unescape(qs.utm_source);
+            }
+            if (qs.utm_campaign) {
+                data.campaign = unescape(qs.utm_campaign);
+            }
+
             numCards = xdeck.cards.length;
 
             // here's the order of cards so it's easier to do the math here.
