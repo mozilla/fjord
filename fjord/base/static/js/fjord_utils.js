@@ -1,8 +1,10 @@
 window.fjord = window.fjord || {};
 
 (function() {
-    /*
+    /**
      * Validates a string as an email address
+     * @param {string} text - The text we're validating.
+     * @returns {boolean}
      */
     fjord.validateEmail = function(text) {
         var emailRegExp = /^[a-zA-Z0-9._\-\+]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,6}$/;
@@ -12,20 +14,26 @@ window.fjord = window.fjord || {};
         return false;
     };
 
-    /*
+    /**
      * Python(ish) string formatting:
-     * >>> format('{0}', ['zzz'])
-     * "zzz"
-     * >>> format('{x}', {x: 1})
-     * "1"
+     *
+     *     >>> format('{0}', ['zzz'])
+     *     "zzz"
+     *     >>> format('{x}', {x: 1})
+     *     "1"
+     *
+     * @param s {string} - The string to interpolate.
+     * @param args {varies} - The arguments to interpolate into the string.
+     * @returns {string}
      */
     fjord.format = function(s, args) {
         var re = /\{([^}]+)\}/g;
         return s.replace(re, function(_, match){ return args[match]; });
     };
 
-    /*
+    /**
      * Returns the current query string as a JavaScript object.
+     * @returns {Object}
      */
     fjord.getQuerystring = function() {
         var qs = window.location.search;
@@ -47,10 +55,8 @@ window.fjord = window.fjord || {};
         return parsed;
     };
 
-    /*
+    /**
      * Sets the querystring to the args specified.
-     *
-     * @param args: JavaScript object
      */
     fjord.setQuerystring = function(args) {
         var parts = [];
