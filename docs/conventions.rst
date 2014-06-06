@@ -13,12 +13,20 @@ We follow most of the practices as detailed in the `Mozilla webdev
 bootcamp guide
 <http://mozweb.readthedocs.org/en/latest/coding.html>`_.
 
+Python
+------
+
 If you don't have an editor that checks PEP-8 issues and runs pyflakes
 for you, it's worth setting it up. Use `flake8
 <https://flake8.readthedocs.org/en/latest/>`_ because it's awesome.
 
-Additionally, use `jshint <http://www.jshint.com/>`_ for JavaScript
-code.
+
+JavaScript
+----------
+
+Use `jshint <http://www.jshint.com/>`_ for JavaScript code.
+
+Use `jsdoc <http://usejsdoc.org/>`_ for JavaScript function documentation.
 
 
 Git conventions
