@@ -8,7 +8,7 @@ from elasticutils.contrib.django import Indexable, MLT
 from product_details import product_details
 from rest_framework import serializers
 from statsd import statsd
-from tower import ugettext_lazy as _
+from tower import ugettext_lazy as _lazy
 
 from fjord.base.domain import get_domain
 from fjord.base.models import ModelBase
@@ -268,8 +268,8 @@ class Response(ModelBase):
     @property
     def sentiment(self):
         if self.happy:
-            return _(u'Happy')
-        return _(u'Sad')
+            return _lazy(u'Happy')
+        return _lazy(u'Sad')
 
     @property
     def truncated_description(self):

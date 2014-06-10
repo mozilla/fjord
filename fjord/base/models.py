@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.db import models
 
 import caching.base
-from tower import ugettext as _
+from tower import ugettext_lazy as _lazy
 
 
 class ModelBase(caching.base.CachingMixin, models.Model):
@@ -30,7 +30,7 @@ class JSONObjectField(models.TextField):
 
     """
     empty_strings_allowed = False
-    description = _('JSON Object')
+    description = _lazy(u'JSON Object')
 
     def to_python(self, value):
         return json.loads(value)
