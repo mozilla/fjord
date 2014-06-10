@@ -3,7 +3,8 @@ from django.contrib import admin
 from django.shortcuts import render
 
 from fjord.feedback.models import Product
-from fjord.translations.gengo_utils import FjordGengo
+from .gengo_utils import FjordGengo
+from .models import Record
 
 
 def gengo_translator_view(request):
@@ -62,3 +63,26 @@ def gengo_translator_view(request):
 
 admin.site.register_view('gengo-translator-view', gengo_translator_view,
                          'Gengo - Maintenance')
+
+
+def translations_management_view(request):
+    # We want to order the record objects by whichever column was
+    # picked. We have some handling for reverse sort, but not in the
+    # form.
+    columns = ('src', 'type', 'action', 'msg', 'key', 'created', 'metadata')
+
+    order = request.GET.get('order', '-created')
+    if order.replace('-', '') not in columns:
+        order = '-created'
+
+    return render(request, 'admin/translations.html', {
+        'title': 'Translations Maintenance',
+        'settings': settings,
+        'products': Product.objects.all(),
+        'records': Record.objects.recent().order_by(order),
+    })
+
+
+admin.site.register_view(
+    'translations-management-view', translations_management_view,
+    'Translations - Management')

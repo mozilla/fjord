@@ -134,7 +134,7 @@ class FjordGengo(object):
                 # as well throw the guess away because there's not
                 # much we can do with it.
                 raise GengoUnsupportedLanguage(
-                    'unsupported language: {0}'.format(lang))
+                    'unsupported language (guesser): {0}'.format(lang))
             return lang
 
         raise GengoUnknownLanguage('request failure: {0}'.format(resp.content))
@@ -185,7 +185,7 @@ class FjordGengo(object):
             # language.
             if ge.error_code == 1551:
                 raise GengoUnsupportedLanguage(
-                    'unsupported language: {0}'.format(lc_src))
+                    'unsupported language (translater)): {0}'.format(lc_src))
             raise
 
         if resp['opstat'] == 'ok':
