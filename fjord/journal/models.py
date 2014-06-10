@@ -1,9 +1,11 @@
 from datetime import datetime, timedelta
 
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
 from django.db import models
 
 from fjord.base.models import ModelBase, JSONObjectField
-from fjord.base.util import path_to_class
+from fjord.base.util import class_to_path, path_to_class
 
 
 RECORD_INFO = u'info'
@@ -12,8 +14,7 @@ RECORD_ERROR = u'error'
 
 class RecordManager(models.Manager):
     @classmethod
-    def log(cls, type_, app, src, action, msg, cls_path=u'', obj_id=None,
-            instance=None, metadata=None):
+    def log(cls, type_, app, src, action, msg, instance=None, metadata=None):
         metadata = metadata or {}
 
         rec = Record(
@@ -21,8 +22,7 @@ class RecordManager(models.Manager):
             type=type_,
             src=src,
             action=action,
-            cls_path=cls_path,
-            obj_id=obj_id,
+            content_object=instance,
             msg=msg,
             metadata=metadata
         )
@@ -60,12 +60,10 @@ class Record(ModelBase):
     # "unsupported language", ...)
     msg = models.CharField(max_length=255)
 
-    # The class path for the model instance this record applies to (if any)
-    # (e.g. 'fjord.feedback.models:Response', ...)
-    cls_path = models.CharField(default=u'', blank=True, max_length=100)
-
-    # The id for the model instance in question (if any)
-    obj_id = models.IntegerField(null=True)
+    # Generic foreign key to the object this record is about if any
+    content_type = models.ForeignKey(ContentType, null=True)
+    object_id = models.PositiveIntegerField(null=True)
+    content_object = generic.GenericForeignKey()
 
     # When this log entry was created
     created = models.DateTimeField(default=datetime.now)
@@ -83,12 +81,3 @@ class Record(ModelBase):
         return u'<Record {key} {msg}>'.format(
             key=u':'.join([self.src, self.type, self.action]),
             msg=self.msg)
-
-    @property
-    def obj(self):
-        """Returns the instance this record applies to or None"""
-        if self.obj_id is None or not self.cls_path:
-            return None
-
-        cls = path_to_class(self.cls_path)
-        return cls.objects.get(pk=self.obj_id)

@@ -11,12 +11,13 @@ class RecordAdmin(admin.ModelAdmin):
         'type',
         'action',
         'msg',
-        'cls_path',
-        'obj_id',
+        'content_type',
+        'object_id',
+        'content_object',
         'created',
         'metadata'
     )
-    list_filter = ('app', 'src', 'type', 'action', 'cls_path')
+    list_filter = ('app', 'src', 'type', 'action', 'content_type')
 
 
 admin.site.register(Record, RecordAdmin)

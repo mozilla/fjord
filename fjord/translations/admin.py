@@ -67,8 +67,7 @@ def translations_management_view(request):
     # We want to order the record objects by whichever column was
     # picked. We have some handling for reverse sort, but not in the
     # form.
-    columns = ('src', 'type', 'action', 'msg', 'cls_path', 'obj_id',
-               'created', 'metadata')
+    columns = ('src', 'type', 'action', 'msg', 'created', 'metadata')
 
     order = request.GET.get('order', '-created')
     if order.replace('-', '') not in columns:

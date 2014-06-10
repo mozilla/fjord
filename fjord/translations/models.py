@@ -1,3 +1,5 @@
+from django.db import models
+
 from dennis.translator import Translator
 from statsd import statsd
 
@@ -9,6 +11,14 @@ from .gengo_utils import (
 )
 from .utils import locale_equals_language
 from fjord.journal.utils import j_error, j_info
+
+
+class SuperModel(models.Model):
+    """Model used solely for testing"""
+    locale = models.CharField(max_length=5)
+    desc = models.CharField(blank=True, default=u'', max_length=100)
+    trans_desc = models.CharField(blank=True, default=u'', max_length=100)
+
 
 _translation_systems = {}
 

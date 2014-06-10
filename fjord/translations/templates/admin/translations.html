@@ -53,8 +53,8 @@
             <th scope="col" class="sortable"><div class="grp-text"><a href="?order=type">type</a></div></th>
             <th scope="col" class="sortable"><div class="grp-text"><a href="?order=action">action</a></div></th>
             <th scope="col" class="sortable"><div class="grp-text"><a href="?order=msg">msg</a></div></th>
-            <th scope="col" class="sortable"><div class="grp-text"><a href="?order=cls_path">cls_path</a></div></th>
-            <th scope="col" class="sortable"><div class="grp-text"><a href="?order=obj_id">obj_id</a></div></th>
+            <th scope="col" class="sortable"><div class="grp-text"><a href="#">object id</a></div></th>
+            <th scope="col" class="sortable"><div class="grp-text"><a href="#">object description</a></div></th>
             <th scope="col" class="sortable"><div class="grp-text"><a href="?order=-created">created</a></div></th>
             <th scope="col" class="sortable"><div class="grp-text"><a href="?order=metadata">metadata</a></div></th>
           </tr>
@@ -67,8 +67,8 @@
               <td>{{ rec.type }}</td>
               <td>{{ rec.action }}</td>
               <td>{{ rec.msg }}</td>
-              <td>{{ rec.cls_path }}</td>
-              <td>{{ rec.obj_id }}</td>
+              <td>{{ rec.content_object.id }}</td>
+              <td>{{ rec.content_object.description|truncatechars:200 }}</td>
               <td>{{ rec.created }}</td>
               <td>{{ rec.metadata }}</td>
             </tr>

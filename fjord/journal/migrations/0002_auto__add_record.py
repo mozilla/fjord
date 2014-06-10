@@ -16,8 +16,8 @@ class Migration(SchemaMigration):
             ('type', self.gf('django.db.models.fields.CharField')(max_length=20)),
             ('action', self.gf('django.db.models.fields.CharField')(max_length=20)),
             ('msg', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('cls_path', self.gf('django.db.models.fields.CharField')(default=u'', max_length=100, blank=True)),
-            ('obj_id', self.gf('django.db.models.fields.IntegerField')(null=True)),
+            ('content_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['contenttypes.ContentType'], null=True)),
+            ('object_id', self.gf('django.db.models.fields.PositiveIntegerField')(null=True)),
             ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
             ('metadata', self.gf('fjord.base.models.JSONObjectField')(default=u'{}')),
         ))
@@ -30,16 +30,23 @@ class Migration(SchemaMigration):
 
 
     models = {
+        u'contenttypes.contenttype': {
+            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
+            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
+        },
         u'journal.record': {
             'Meta': {'object_name': 'Record'},
             'action': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
             'app': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'cls_path': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '100', 'blank': 'True'}),
+            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']", 'null': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'metadata': ('fjord.base.models.JSONObjectField', [], {'default': "u'{}'"}),
             'msg': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'obj_id': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
+            'object_id': ('django.db.models.fields.PositiveIntegerField', [], {'null': 'True'}),
             'src': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '20'})
         }
