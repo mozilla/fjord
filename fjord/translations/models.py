@@ -1,3 +1,7 @@
+from datetime import datetime
+
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
 from django.db import models
 
 from dennis.translator import Translator
@@ -10,11 +14,19 @@ from .gengo_utils import (
     GengoUnsupportedLanguage,
 )
 from .utils import locale_equals_language
+from fjord.journal.models import Record
 from fjord.journal.utils import j_error, j_info
 
 
 class SuperModel(models.Model):
-    """Model used solely for testing"""
+    """Model used for unit tests
+
+    It's really difficult to define a model in the test suite used
+    just for testing without a lot of shenanigans with South and the
+    db, so intead we define a "real" model, but only use it for
+    testing.
+
+    """
     locale = models.CharField(max_length=5)
     desc = models.CharField(blank=True, default=u'', max_length=100)
     trans_desc = models.CharField(blank=True, default=u'', max_length=100)
@@ -164,7 +176,6 @@ class GengoMachineTranslator(TranslationSystem):
     name = 'gengo_machine'
 
     def info(self, instance, action='translate', msg=u'', text=u''):
-        msg = msg.encode('utf-8')
         text = text or u''
 
         j_info(
@@ -180,7 +191,6 @@ class GengoMachineTranslator(TranslationSystem):
             })
 
     def error(self, instance, action='translate', msg=u'', text=u''):
-        msg = msg.encode('utf-8')
         text = text or u''
 
         j_error(
@@ -246,3 +256,80 @@ class GengoMachineTranslator(TranslationSystem):
             self.error(instance, action='translate', msg=unicode(exc),
                        text=text)
             statsd.incr('translation.gengo_machine.failure')
+
+
+# ---------------------------------------------------------
+# Gengo human translator system
+# ---------------------------------------------------------
+
+STATUS_CREATED = 'created'
+STATUS_IN_PROGRESS = 'in-progress'
+STATUS_COMPLETE = 'complete'
+
+STATUS_CHOICES = (
+    (STATUS_CREATED, STATUS_CREATED),
+    (STATUS_IN_PROGRESS, STATUS_IN_PROGRESS),
+    (STATUS_COMPLETE, STATUS_COMPLETE)
+)
+
+
+class GengoJob(models.Model):
+    """Represents a job for the Gengo human translation system"""
+    # Generic foreign key to the instance this record is about
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey()
+
+    # Source and destination fields for the translation
+    src_field = models.CharField(max_length=50)
+    dst_field = models.CharField(max_length=50)
+
+    # Source and destination languages
+    src_lang = models.CharField(default=u'', blank=True, max_length=10)
+    dst_lang = models.CharField(default=u'', blank=True, max_length=10)
+
+    # Status of the job and the order it's tied to
+    status = models.CharField(
+        choices=STATUS_CHOICES, default=STATUS_CREATED, max_length=12)
+    order = models.ForeignKey('translations.GengoJob', null=True)
+
+    # When the Gengo job is submitted, we generate an "id" that ties
+    # it back to our system. This is that id.
+    custom_data = models.CharField(default=u'', blank=True, max_length=100)
+
+    created = models.DateTimeField(default=datetime.now())
+
+    def log(self, action, metadata):
+        j_info(
+            app='translations',
+            src='gengo_human',
+            action=action,
+            msg='job event',
+            metadata=metadata
+        )
+
+    def records(self):
+        return Record.objects.records(self)
+
+
+class GengoOrder(models.Model):
+    """Represents a Gengo translation order which contains multiple jobs"""
+    order_id = models.CharField(max_length=100)
+    status = models.CharField(
+        choices=STATUS_CHOICES, default=STATUS_CREATED, max_length=12)
+
+    # When the record was submitted to Gengo. This isn't necessarily
+    # when the record was created, so we explicitly populate it.
+    submitted = models.DateTimeField(null=True)
+
+    def log(self, action, metadata):
+        j_info(
+            app='translations',
+            src='gengo_human',
+            action=action,
+            msg='order event',
+            metadata=metadata
+        )
+
+    def records(self):
+        return Record.objects.records(self)

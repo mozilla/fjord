@@ -5,7 +5,6 @@ from django.contrib.contenttypes import generic
 from django.db import models
 
 from fjord.base.models import ModelBase, JSONObjectField
-from fjord.base.util import class_to_path, path_to_class
 
 
 RECORD_INFO = u'info'
@@ -15,6 +14,7 @@ RECORD_ERROR = u'error'
 class RecordManager(models.Manager):
     @classmethod
     def log(cls, type_, app, src, action, msg, instance=None, metadata=None):
+        msg = msg.encode('utf-8')
         metadata = metadata or {}
 
         rec = Record(
@@ -33,6 +33,10 @@ class RecordManager(models.Manager):
         return (self
                 .filter(app=app)
                 .filter(created__gte=datetime.now() - timedelta(days=14)))
+
+    def records(self, instance):
+        return (self
+                .filter(content_object=instance))
 
 
 class Record(ModelBase):
