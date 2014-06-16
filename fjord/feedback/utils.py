@@ -79,6 +79,32 @@ def ratelimit(rulename, keyfun=None, rate='5/m'):
     return decorator
 
 
+TOKEN_SPLIT_RE = re.compile(r'[\s\.\,\/\\\?\;\:\"\*\&\^\%\$\#\@\!]+')
+
+
+def tokenize(text):
+    """Tokenizes the text
+
+    1. lowercases text
+    2. throws out all non-alpha-characters
+    3. nixes all stop words
+
+    """
+    # Lowercase the text
+    text = text.lower()
+
+    # Nix all non-word characters
+    tokens = TOKEN_SPLIT_RE.split(text)
+
+    # Nix all stopwords and one-letter characters
+    tokens = [token for token in tokens
+              if (token not in config.ANALYSIS_STOPWORDS
+                  and len(token) > 1)]
+
+    # Return whatever we have left
+    return tokens
+
+
 def compute_grams(text):
     """Computes bigrams from analyzed text
 
@@ -93,20 +119,7 @@ def compute_grams(text):
     if not text:
         return []
 
-    try:
-        tokens = [item['token'] for item in es_analyze(
-            text, analyzer='standard')]
-    except ElasticsearchException:
-        return []
-
-    # Remove configured stopwords.
-    tokens = [token for token in tokens
-              if token not in config.ANALYSIS_STOPWORDS]
-
-    # ES analyzes the text and returns tokens that look like u'u4231'
-    # for unicode characters. This nixes all of those.
-    unicode_re = re.compile(r'u\d')
-    tokens = [token for token in tokens if not unicode_re.match(token)]
+    tokens = tokenize(text)
 
     # Generate set of bigrams. A bigram is a set of two consecutive
     # tokens. We put them in a set because we don't want duplicates.
