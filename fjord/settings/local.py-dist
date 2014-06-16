@@ -9,7 +9,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'fjord',
-        'USER': 'fjord',
+        'USER': 'root',
         'PASSWORD': 'password',
         'HOST': 'localhost',
         'OPTIONS': {
@@ -52,14 +52,9 @@ PASSWORD_HASHERS = get_password_hashers(BASE_PASSWORD_HASHERS, HMAC_KEYS)
 
 # Make this unique, and don't share it with anybody.  It cannot be
 # blank.
-SECRET_KEY = ''
+SECRET_KEY = 'ou812'
 
 # Comment this out if you have a locale/ directory and want the
 # languages to be computed based on the contents of your locale/
 # directory.
 DEV_LANGUAGES = ('en-US',)
-
-# The hacking howto considers ElasticSearch advanced setup. If you
-# don't have it installed and running, then leave this False. If you
-# do have it installed and running, then set this to True.
-ES_LIVE_INDEXING = False

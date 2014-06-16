@@ -18,7 +18,7 @@ If you're interested in setting up Fjord for a production deployment,
 this is not the chapter for you---look elsewhere.
 
 If you have any problems getting Fjord running, let us know. See the
-:ref:`project-details`.
+:ref:`overview`.
 
 
 Installing
