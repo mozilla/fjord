@@ -38,6 +38,36 @@ Onboarding a new developer
 10. Bask in the tranquil rhythmic sounds of the Fjord
 
 
+Triaging bugs for contributors
+==============================
+
+Bugs designated for contributors fall into two groups:
+
+1. good first bugs
+2. good next bugs
+
+Good first bugs should ideally touch one aspect of the code base, be
+self-contained, and not require a lot of knowledge about how the
+system works.
+
+Good first bugs are denoted in Bugzilla with:
+
+* ``[good first bug]`` in the Whiteboard field
+* (for now) ``[mentor=xxx]`` in the Whiteboard field
+* a mentor listed in the Mentors field
+* a comment explaining the problem and what needs to be done to fix it
+
+Good next bugs are everything else and are denoted in Bugzilla with:
+
+* (for now) ``[mentor=xxx]`` in the Whiteboard field
+* a mentor listed in the Mentors field
+* a comment explaining the problem and what needs to be done to fix it
+
+It's good to go through bugs once a month to see if any new bugs
+popped up that'd be good for contributors as well as for bugs that
+currently exist that probably should get closed out.
+
+
 Adding support for a new product
 ================================
 
