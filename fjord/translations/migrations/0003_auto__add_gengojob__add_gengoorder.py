@@ -18,9 +18,9 @@ class Migration(SchemaMigration):
             ('src_lang', self.gf('django.db.models.fields.CharField')(default=u'', max_length=10, blank=True)),
             ('dst_lang', self.gf('django.db.models.fields.CharField')(default=u'', max_length=10, blank=True)),
             ('status', self.gf('django.db.models.fields.CharField')(default='created', max_length=12)),
-            ('order', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['translations.GengoJob'], null=True)),
+            ('order', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['translations.GengoOrder'], null=True)),
             ('custom_data', self.gf('django.db.models.fields.CharField')(default=u'', max_length=100, blank=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2014, 6, 17, 0, 0))),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2014, 6, 18, 0, 0))),
         ))
         db.send_create_signal(u'translations', ['GengoJob'])
 
@@ -53,13 +53,13 @@ class Migration(SchemaMigration):
         u'translations.gengojob': {
             'Meta': {'object_name': 'GengoJob'},
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['contenttypes.ContentType']"}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 6, 17, 0, 0)'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 6, 18, 0, 0)'}),
             'custom_data': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '100', 'blank': 'True'}),
             'dst_field': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'dst_lang': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '10', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'object_id': ('django.db.models.fields.PositiveIntegerField', [], {}),
-            'order': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['translations.GengoJob']", 'null': 'True'}),
+            'order': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['translations.GengoOrder']", 'null': 'True'}),
             'src_field': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
             'src_lang': ('django.db.models.fields.CharField', [], {'default': "u''", 'max_length': '10', 'blank': 'True'}),
             'status': ('django.db.models.fields.CharField', [], {'default': "'created'", 'max_length': '12'})

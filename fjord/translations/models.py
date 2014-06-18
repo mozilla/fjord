@@ -116,6 +116,30 @@ class TranslationSystem(object):
         """
         raise NotImplementedError()
 
+    def log_info(self, instance, action='translate', msg=u'', metadata=None):
+        metadata = metadata or {}
+
+        record = j_info(
+            app='translations',
+            src=self.name,
+            action=action,
+            msg=msg,
+            instance=instance,
+            metadata=metadata
+        )
+
+    def log_error(self, instance, action='translate', msg=u'', metadata=None):
+        metadata = metadata or {}
+
+        j_error(
+            app='translations',
+            src=self.name,
+            action=action,
+            msg=msg,
+            instance=instance,
+            metadata=metadata
+        )
+
 
 # ---------------------------------------------------------
 # Fake translation system
@@ -128,12 +152,7 @@ class FakeTranslator(TranslationSystem):
     def translate(self, instance, src_lang, src_field, dst_lang, dst_field):
         setattr(instance, dst_field, getattr(instance, src_field).upper())
         instance.save()
-        j_info(
-            app='translations',
-            src=self.name,
-            action='translate',
-            msg='success',
-            instance=instance)
+        self.log_info(instance=instance, action='translate', msg='success')
 
     def pull_translations(self):
         # This is a no-op for testing purposes.
@@ -159,12 +178,7 @@ class DennisTranslator(TranslationSystem):
             translated = Translator([], pipeline).translate_string(text)
             setattr(instance, dst_field, translated)
             instance.save()
-            j_info(
-                app='translations',
-                src=self.name,
-                action='translate',
-                msg='success',
-                instance=instance)
+            self.log_info(instance=instance, action='translate', msg='success')
 
 
 # ---------------------------------------------------------
@@ -174,36 +188,6 @@ class DennisTranslator(TranslationSystem):
 class GengoMachineTranslator(TranslationSystem):
     """Translates using Gengo machine translation"""
     name = 'gengo_machine'
-
-    def info(self, instance, action='translate', msg=u'', text=u''):
-        text = text or u''
-
-        j_info(
-            app='translations',
-            src=self.name,
-            action=action,
-            msg=msg,
-            instance=instance,
-            metadata={
-                'locale': instance.locale,
-                'length': len(text),
-                'body': text[:50].encode('utf-8'),
-            })
-
-    def error(self, instance, action='translate', msg=u'', text=u''):
-        text = text or u''
-
-        j_error(
-            app='translations',
-            src=self.name,
-            action=action,
-            msg=msg,
-            instance=instance,
-            metadata={
-                'locale': instance.locale,
-                'length': len(text),
-                'body': text[:50].encode('utf-8'),
-            })
 
     def translate(self, instance, src_lang, src_field, dst_lang, dst_field):
         text = getattr(instance, src_field)
@@ -225,36 +209,61 @@ class GengoMachineTranslator(TranslationSystem):
             if translated:
                 setattr(instance, dst_field, translated)
                 instance.save()
-                self.info(instance, action='translate', msg='success',
-                          text=text)
+                metadata = {
+                    'locale': instance.locale,
+                    'length': len(text),
+                    'body': text[:50].encode('utf-8')
+                }
+                self.log_info(instance, action='translate', msg='success',
+                              metadata=metadata)
                 statsd.incr('translation.gengo_machine.success')
 
             else:
-                self.error(instance, action='translate',
-                           msg='did not translate', text=text)
+                metadata = {
+                    'locale': instance.locale,
+                    'length': len(text),
+                    'body': text[:50].encode('utf-8')
+                }
+                self.log_error(instance, action='translate',
+                               msg='did not translate', metadata=metadata)
                 statsd.incr('translation.gengo_machine.failure')
 
         except GengoUnknownLanguage as exc:
             # FIXME: This might be an indicator that this response is
             # spam. At some point p, we can write code to account for
             # that.
-            self.error(instance, action='guess-language', msg=unicode(exc),
-                       text=text)
+            metadata = {
+                'locale': instance.locale,
+                'length': len(text),
+                'body': text[:50].encode('utf-8')
+            }
+            self.log_error(instance, action='guess-language', msg=unicode(exc),
+                           metadata=metadata)
             statsd.incr('translation.gengo_machine.unknown')
 
         except GengoUnsupportedLanguage as exc:
             # FIXME: This is a similar boat to GengoUnknownLanguage
             # where for now, we're just going to ignore it because I'm
             # not sure what to do about it and I'd like more data.
-            self.error(instance, action='translate', msg=unicode(exc),
-                       text=text)
+            metadata = {
+                'locale': instance.locale,
+                'length': len(text),
+                'body': text[:50].encode('utf-8')
+            }
+            self.log_error(instance, action='translate', msg=unicode(exc),
+                           metadata=metadata)
             statsd.incr('translation.gengo_machine.unsupported')
 
         except GengoMachineTranslationFailure:
             # FIXME: For now, if we have a machine translation
             # failure, we're just going to ignore it and move on.
-            self.error(instance, action='translate', msg=unicode(exc),
-                       text=text)
+            metadata = {
+                'locale': instance.locale,
+                'length': len(text),
+                'body': text[:50].encode('utf-8')
+            }
+            self.log_error(instance, action='translate', msg=unicode(exc),
+                           metadata=metadata)
             statsd.incr('translation.gengo_machine.failure')
 
 
@@ -291,7 +300,7 @@ class GengoJob(models.Model):
     # Status of the job and the order it's tied to
     status = models.CharField(
         choices=STATUS_CHOICES, default=STATUS_CREATED, max_length=12)
-    order = models.ForeignKey('translations.GengoJob', null=True)
+    order = models.ForeignKey('translations.GengoOrder', null=True)
 
     # When the Gengo job is submitted, we generate an "id" that ties
     # it back to our system. This is that id.
