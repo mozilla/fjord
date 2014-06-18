@@ -1,9 +1,10 @@
+from django.conf import settings
 from django.test.utils import override_settings
 
 from mock import MagicMock, patch
 from nose.tools import eq_
 
-from fjord.base.tests import TestCase
+from fjord.base.tests import TestCase, skip_if, has_environ_variable
 from fjord.translations import gengo_utils
 
 
@@ -18,6 +19,7 @@ class GengoTestCase(TestCase):
              ]},
             (u'es',)
         )
+        super(GengoTestCase, self).setUp()
 
     def test_guess_language_throws_error(self):
         with patch('fjord.translations.gengo_utils.requests') as requests_mock:
@@ -137,3 +139,44 @@ class GengoTestCase(TestCase):
                 text = u'Muy lento'
                 eq_(gengo_api.get_machine_translation(1010, 'es', 'en', text),
                     u'Very slow')
+
+
+def has_gengo_creds():
+    """Returns True if there are GENGO credentials set
+
+    Note: This doesn't verify the credentials--just checks to see if
+    they are set.
+
+    """
+    return settings.GENGO_PUBLIC_KEY and settings.GENGO_PRIVATE_KEY
+
+
+@skip_if(lambda: not has_gengo_creds())
+class GengoNoMocksTestCase(TestCase):
+    """Holds LIVE test cases that execute REAL Gengo calls
+
+    These tests require GENGO_PUBLIC_KEY and GENGO_PRIVATE_KEY to be
+    valid values in your settings_local.py file.
+
+    Please don't fake the credentials since then you'll just get API
+    authentication errors.
+
+    """
+    def setUp(self):
+        # Wipe out the GENGO_LANGUAGE_CACHE
+        gengo_utils.GENGO_LANGUAGE_CACHE = None
+        super(GengoNoMocksTestCase, self).setUp()
+
+    def test_get_language(self):
+        text = u'Facebook no se puede enlazar con peru'
+        gengo_api = gengo_utils.FjordGengo()
+        eq_(gengo_api.guess_language(text), u'es')
+
+    def test_machine_translation(self):
+        # Note: This test might be brittle since it's calling out to
+        # Gengo to do a machine translation and it's entirely possible
+        # that they might return a different translation some day.
+        text = u'Facebook no se puede enlazar con peru'
+        gengo_api = gengo_utils.FjordGengo()
+        eq_(gengo_api.get_machine_translation(1010, 'es', 'en', text),
+            u'Facebook can bind with peru')
