@@ -300,7 +300,7 @@ class GengoJob(models.Model):
     # Status of the job and the order it's tied to
     status = models.CharField(
         choices=STATUS_CHOICES, default=STATUS_CREATED, max_length=12)
-    order = models.ForeignKey('translations.GengoJob', null=True)
+    order = models.ForeignKey('translations.GengoOrder', null=True)
 
     # When the Gengo job is submitted, we generate an "id" that ties
     # it back to our system. This is that id.
