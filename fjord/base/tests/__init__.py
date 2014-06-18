@@ -1,6 +1,10 @@
+import inspect
+import os
 import random
 from functools import wraps
 from string import letters
+
+from nose import SkipTest
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -17,6 +21,49 @@ from funfactory.urlresolvers import reverse  # noqa
 from funfactory.urlresolvers import split_path
 
 from fjord.base.models import Profile
+
+
+def has_environ_variable(var):
+    """Returns True if a variable exists in the environment"""
+    return var in os.environ
+
+
+def skip_if(test_func, msg=''):
+    """Decorator that skips the test if the function returns True
+
+    This works for functions and classes.
+
+    """
+    msg = msg or test_func.__name__
+
+    def skipping_cls_or_fun(cls_or_func):
+        """Class or function decorator for skipping tests"""
+
+        def skipping_fun(func):
+            """Function decorator for skipping tests"""
+            @wraps(func)
+            def _skipping_fun(*args, **kwargs):
+                if test_func():
+                    raise SkipTest('Skipping because {0}'.format(msg))
+                return func(*args, **kwargs)
+            return _skipping_fun
+
+        if inspect.isclass(cls_or_func):
+            # If cls_or_func is a class, then we wrap all the callable
+            # methods that start with 'test'.
+            for attr in cls_or_func.__dict__.keys():
+                if (attr.startswith('test')
+                    and callable(getattr(cls_or_func, attr))):
+
+                    setattr(cls_or_func, attr,
+                            skipping_fun(getattr(cls_or_func, attr)))
+            return cls_or_func
+        else:
+            # If cls_or_func is a function, then we return the
+            # skipping_fun
+            return skipping_fun(cls_or_func)
+
+    return skipping_cls_or_fun
 
 
 class LocalizingClient(Client):
