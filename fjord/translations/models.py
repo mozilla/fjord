@@ -119,7 +119,7 @@ class TranslationSystem(object):
     def log_info(self, instance, action='translate', msg=u'', metadata=None):
         metadata = metadata or {}
 
-        record = j_info(
+        j_info(
             app='translations',
             src=self.name,
             action=action,
@@ -180,6 +180,14 @@ class DennisTranslator(TranslationSystem):
             instance.save()
             self.log_info(instance=instance, action='translate', msg='success')
 
+    def pull_translations(self):
+        # This is a no-op since translations happen synchronously.
+        pass
+
+    def push_translations(self):
+        # This is a no-op since translations happen synchronously.
+        pass
+
 
 # ---------------------------------------------------------
 # Gengo machine translator system AI 9000 of doom
@@ -191,17 +199,32 @@ class GengoMachineTranslator(TranslationSystem):
 
     def translate(self, instance, src_lang, src_field, dst_lang, dst_field):
         text = getattr(instance, src_field)
+        metadata = {
+            'locale': instance.locale,
+            'length': len(text),
+            'body': text[:50].encode('utf-8')
+        }
 
         gengo_api = FjordGengo()
         try:
             lc_src = gengo_api.guess_language(text)
             if not locale_equals_language(instance.locale, lc_src):
-                self.error(
+                self.log_error(
                     instance,
                     action='guess-language',
                     msg='locale "{0}" != guessed language "{1}"'.format(
                         instance.locale, lc_src),
-                    text=text)
+                    metadata=metadata)
+
+            # If the source language is english, we just copy it over.
+            if locale_equals_language(dst_lang, lc_src):
+                setattr(instance, dst_field, text)
+                instance.save()
+                self.log_info(
+                    instance, action='translate',
+                    msg=u'lc_src == dst_lang, so we copy src to dst',
+                    metadata=metadata)
+                return
 
             translated = gengo_api.get_machine_translation(
                 instance.id, lc_src, 'en', text)
@@ -209,21 +232,11 @@ class GengoMachineTranslator(TranslationSystem):
             if translated:
                 setattr(instance, dst_field, translated)
                 instance.save()
-                metadata = {
-                    'locale': instance.locale,
-                    'length': len(text),
-                    'body': text[:50].encode('utf-8')
-                }
                 self.log_info(instance, action='translate', msg='success',
                               metadata=metadata)
                 statsd.incr('translation.gengo_machine.success')
 
             else:
-                metadata = {
-                    'locale': instance.locale,
-                    'length': len(text),
-                    'body': text[:50].encode('utf-8')
-                }
                 self.log_error(instance, action='translate',
                                msg='did not translate', metadata=metadata)
                 statsd.incr('translation.gengo_machine.failure')
@@ -232,11 +245,6 @@ class GengoMachineTranslator(TranslationSystem):
             # FIXME: This might be an indicator that this response is
             # spam. At some point p, we can write code to account for
             # that.
-            metadata = {
-                'locale': instance.locale,
-                'length': len(text),
-                'body': text[:50].encode('utf-8')
-            }
             self.log_error(instance, action='guess-language', msg=unicode(exc),
                            metadata=metadata)
             statsd.incr('translation.gengo_machine.unknown')
@@ -245,11 +253,6 @@ class GengoMachineTranslator(TranslationSystem):
             # FIXME: This is a similar boat to GengoUnknownLanguage
             # where for now, we're just going to ignore it because I'm
             # not sure what to do about it and I'd like more data.
-            metadata = {
-                'locale': instance.locale,
-                'length': len(text),
-                'body': text[:50].encode('utf-8')
-            }
             self.log_error(instance, action='translate', msg=unicode(exc),
                            metadata=metadata)
             statsd.incr('translation.gengo_machine.unsupported')
@@ -257,14 +260,17 @@ class GengoMachineTranslator(TranslationSystem):
         except GengoMachineTranslationFailure:
             # FIXME: For now, if we have a machine translation
             # failure, we're just going to ignore it and move on.
-            metadata = {
-                'locale': instance.locale,
-                'length': len(text),
-                'body': text[:50].encode('utf-8')
-            }
             self.log_error(instance, action='translate', msg=unicode(exc),
                            metadata=metadata)
             statsd.incr('translation.gengo_machine.failure')
+
+    def pull_translations(self):
+        # This is a no-op since translations happen synchronously.
+        pass
+
+    def push_translations(self):
+        # This is a no-op since translations happen synchronously.
+        pass
 
 
 # ---------------------------------------------------------
@@ -308,6 +314,15 @@ class GengoJob(models.Model):
 
     created = models.DateTimeField(default=datetime.now())
 
+    def __unicode__(self):
+        return u'<GengoJob {0}>'.format(self.id)
+
+    def save(self, *args, **kwargs):
+        super(GengoJob, self).save(*args, **kwargs)
+
+        if not self.pk:
+            self.log('create GengoJob', {})
+
     def log(self, action, metadata):
         j_info(
             app='translations',
@@ -316,9 +331,6 @@ class GengoJob(models.Model):
             msg='job event',
             metadata=metadata
         )
-
-    def __unicode__(self):
-        return u'<GengoJob {0}>'.format(self.id)
 
     @property
     def records(self):
@@ -338,6 +350,12 @@ class GengoOrder(models.Model):
     def __unicode__(self):
         return u'<GengoOrder {0}>'.format(self.id)
 
+    def save(self, *args, **kwargs):
+        super(GengoOrder, self).save(*args, **kwargs)
+
+        if not self.pk:
+            self.log('create GengoOrder', {})
+
     def log(self, action, metadata):
         j_info(
             app='translations',
@@ -350,3 +368,77 @@ class GengoOrder(models.Model):
     @property
     def records(self):
         return Record.objects.records(self)
+
+
+class GengoHumanTranslator(TranslationSystem):
+    """Translates using Gengo human translation
+
+    Note: This costs real money!
+
+    """
+    name = 'gengo_human'
+
+    def translate(self, instance, src_lang, src_field, dst_lang, dst_field):
+        text = getattr(instance, src_field)
+        metadata = {
+            'locale': instance.locale,
+            'length': len(text),
+            'body': text[:50].encode('utf-8')
+        }
+
+        gengo_api = FjordGengo()
+
+        # Guess the language. If we can't guess the language, then we
+        # don't create a GengoJob.
+        try:
+            lc_src = gengo_api.guess_language(text)
+            if not locale_equals_language(instance.locale, lc_src):
+                self.log_error(
+                    instance,
+                    action='guess-language',
+                    msg='locale "{0}" != guessed language "{1}"'.format(
+                        instance.locale, lc_src),
+                    metadata=metadata)
+
+        except GengoUnknownLanguage as exc:
+            # FIXME: This might be an indicator that this response is
+            # spam. At some point p, we can write code to account for
+            # that.
+            self.log_error(instance, action='guess-language', msg=unicode(exc),
+                           metadata=metadata)
+            statsd.incr('translation.gengo_machine.unknown')
+            return
+
+        except GengoUnsupportedLanguage as exc:
+            # FIXME: This is a similar boat to GengoUnknownLanguage
+            # where for now, we're just going to ignore it because I'm
+            # not sure what to do about it and I'd like more data.
+            self.log_error(instance, action='translate', msg=unicode(exc),
+                           metadata=metadata)
+            statsd.incr('translation.gengo_machine.unsupported')
+            return
+
+        # If the source language is english, we just copy it over.
+        if locale_equals_language(dst_lang, lc_src):
+            setattr(instance, dst_field, text)
+            instance.save()
+            self.log_info(
+                instance, action='translate',
+                msg=u'lc_src == dst_lang, so we copy src to dst',
+                metadata=metadata)
+            return
+
+        job = GengoJob(
+            content_object=instance,
+            src_lang=lc_src,
+            src_field=src_field,
+            dst_lang=dst_lang,
+            dst_field=dst_field
+        )
+        job.save()
+
+    def push_translation(self):
+        pass
+
+    def pull_translations(self):
+        pass
