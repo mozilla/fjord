@@ -4,6 +4,7 @@
 import json
 from datetime import date, timedelta
 
+from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
@@ -27,7 +28,9 @@ from fjord.base.util import (
     Atom1FeedWithRelatedLinks
 )
 from fjord.feedback.models import Product, Response, ResponseMappingType
+from fjord.journal.models import Record
 from fjord.search.utils import es_error_statsd
+from fjord.translations.models import GengoJob
 from fjord.translations.tasks import create_translation_tasks
 
 
@@ -51,17 +54,30 @@ def spot_translate(request, responseid):
 def response_view(request, responseid, template):
     response = get_object_or_404(Response, id=responseid)
     mlt = None
+    records = None
 
     if (request.user.is_authenticated()
         and request.user.has_perm('analytics.can_view_dashboard')):
 
         mlt = ResponseMappingType.morelikethis(response)
+        records = [
+            (u'Response records', Record.objects.records(response)),
+        ]
+        jobs = GengoJob.objects.filter(
+            object_id=response.id,
+            content_type=ContentType.objects.get_for_model(response)
+        )
+        for job in jobs:
+            records.append(
+                (u'Gengo job record {0}'.format(job.id), job.records)
+            )
 
     # We don't pass the response directly to the template and instead
     # do some data tweaks here to make it more palatable for viewing.
     return render(request, template, {
         'response': response,
         'mlt': mlt,
+        'records': records,
     })
 
 

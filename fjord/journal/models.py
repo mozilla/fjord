@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 from fjord.base.models import ModelBase, JSONObjectField
@@ -35,8 +35,11 @@ class RecordManager(models.Manager):
                 .filter(created__gte=datetime.now() - timedelta(days=14)))
 
     def records(self, instance):
-        return (self
-                .filter(content_object=instance))
+        return (
+            self
+            .filter(object_id=instance.id,
+                    content_type=ContentType.objects.get_for_model(instance))
+        )
 
 
 class Record(ModelBase):

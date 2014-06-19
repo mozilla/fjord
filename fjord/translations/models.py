@@ -317,6 +317,10 @@ class GengoJob(models.Model):
             metadata=metadata
         )
 
+    def __unicode__(self):
+        return u'<GengoJob {0}>'.format(self.id)
+
+    @property
     def records(self):
         return Record.objects.records(self)
 
@@ -331,6 +335,9 @@ class GengoOrder(models.Model):
     # when the record was created, so we explicitly populate it.
     submitted = models.DateTimeField(null=True)
 
+    def __unicode__(self):
+        return u'<GengoOrder {0}>'.format(self.id)
+
     def log(self, action, metadata):
         j_info(
             app='translations',
@@ -340,5 +347,6 @@ class GengoOrder(models.Model):
             metadata=metadata
         )
 
+    @property
     def records(self):
         return Record.objects.records(self)

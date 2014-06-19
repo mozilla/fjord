@@ -159,9 +159,38 @@
             {% endif %}
           </dl>
         {% endif %}
-
       </li>
     </ul>
+
+    {% if user.is_superuser %}
+      <div class="secret">
+        <h3>Audit logs</h3>
+
+        {% if records %}
+          <table>
+            {% for name, entries in records %}
+              <tr>
+                <td colspan="2"><h4>{{ name }}</h4></td>
+              </tr>
+              <tr>
+                <th>created</th>
+                <th>app / src / type / action || msg || metadata</th>
+              </tr>
+              {% for entry in entries %}
+                <tr>
+                  <td>{{ entry.created }}</td>
+                  <td>
+                    {{ entry.app }} / {{ entry.src }} / {{ entry.type }} / {{ entry.action }}<br />
+                    <b>{{ entry.msg }}</b><br />
+                    {{ entry.metadata }}
+                  </td>
+                </tr>
+              {% endfor %}
+            {% endfor %}
+          </table>
+        {% endif %}
+      </div>
+    {% endif %}
   </div>
 {% endblock %}
 </div>
