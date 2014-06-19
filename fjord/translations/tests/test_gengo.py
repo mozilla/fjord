@@ -1,5 +1,6 @@
 from functools import wraps
 
+from django.conf import settings
 from django.test.utils import override_settings
 
 from mock import MagicMock, patch
@@ -300,6 +301,26 @@ class HumanTranslationTestCase(BaseGengoTestCase):
         eq_(obj.trans_desc, u'This is English.')
 
 
+def use_sandbox(fun):
+    """Decorator to force the use of the sandbox
+
+    This forces the test to use ths Gengo sandbox. This requires that
+    you have GENGO_SANDBOX_PUBLIC_KEY and GENGO_SANDBOX_PRIVATE_KEY
+    set up. If you don't, then they're made blank and the tests will
+    fail and we will all freeze in an ice storm of biblical
+    proportions!
+
+    """
+    public_key = getattr(settings, 'GENGO_SANDBOX_PUBLIC_KEY', '')
+    private_key = getattr(settings, 'GENGO_SANDBOX_PRIVATE_KEY', '')
+
+    return override_settings(
+        GENGO_PUBLIC_KEY=public_key,
+        GENGO_PRIVATE_KEY=private_key,
+        GENGO_USE_SANDBOX=True
+    )(fun)
+
+
 @skip_if(lambda: not has_gengo_creds())
 class LiveGengoTestCase(TestCase):
     """Holds LIVE test cases that execute REAL Gengo calls
@@ -323,7 +344,12 @@ class LiveGengoTestCase(TestCase):
         gengo_api = gengo_utils.FjordGengo()
         eq_(gengo_api.guess_language(text), u'es')
 
+    @skip_if(lambda: getattr(settings, 'GENGO_USE_SANDBOX', True))
     def test_gengo_machine_translation(self):
+        # Note: This doesn't work in the sandbox, so we skip it if
+        # we're in sandbox mode. That is some happy horseshit, but so
+        # it goes.
+
         # Note: This test might be brittle since it's calling out to
         # Gengo to do a machine translation and it's entirely possible
         # that they might return a different translation some day.

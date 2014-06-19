@@ -66,7 +66,8 @@ class FjordGengo(object):
         if settings.GENGO_PUBLIC_KEY and settings.GENGO_PRIVATE_KEY:
             gengo_api = Gengo(
                 public_key=settings.GENGO_PUBLIC_KEY,
-                private_key=settings.GENGO_PRIVATE_KEY
+                private_key=settings.GENGO_PRIVATE_KEY,
+                sandbox=getattr(settings, 'GENGO_USE_SANDBOX', True)
             )
         else:
             gengo_api = None
