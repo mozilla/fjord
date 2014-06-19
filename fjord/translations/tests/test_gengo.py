@@ -132,6 +132,23 @@ class GetLanguagesTestCase(BaseGengoTestCase):
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
+class GetBalanceTestCase(BaseGengoTestCase):
+    def test_get_balance(self):
+        with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
+            instance = GengoMock.return_value
+            instance.getAccountBalance.return_value = {
+                u'opstat': u'ok',
+                u'response': {
+                    u'credits': u'20.00',
+                    u'currency': u'USD'
+                }
+            }
+
+            gengo_api = gengo_utils.FjordGengo()
+            eq_(gengo_api.get_balance(), 20.0)
+
+
+@override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
 class MachineTranslationTestCase(BaseGengoTestCase):
     @guess_language('es')
     def test_machine_translation(self):
