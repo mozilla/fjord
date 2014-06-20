@@ -41,6 +41,10 @@ class GengoMachineTranslationFailure(FjordGengoError):
     """Raised when machine translation didn't work"""
 
 
+class GengoHumanTranslationFailure(FjordGengoError):
+    """Raised when human translation didn't work"""
+
+
 def requires_keys(fun):
     """Throw GengoConfigurationError if keys aren't set"""
     @wraps(fun)
@@ -173,8 +177,7 @@ class FjordGengo(object):
         }
 
         try:
-            resp = self.gengo_api.postTranslationJobs(
-                jobs=data, as_group=0, allow_fork=0)
+            resp = self.gengo_api.postTranslationJobs(jobs=data)
         except GengoError as ge:
             # It's possible for the guesser to guess a language that's
             # in the list of supported languages, but for some reason
@@ -197,3 +200,24 @@ class FjordGengo(object):
 
         raise GengoMachineTranslationFailure(
             'opstat: {0}'.format(resp['opstat']))
+
+    @requires_keys
+    def create_order(self, data):
+        """Posts the order to Gengo via API and returns response dict
+
+        Response dict includes:
+
+        * job_count: number of jobs processed
+        * order_id: the order id
+        * group_id: I have no idea what this is
+        * credits_used: the number of credits used
+        * currency: the currency the credits are in
+
+        """
+        resp = self.gengo_api.postTranslationJobs(jobs=data)
+
+        if resp['opstat'] != 'ok':
+            raise GengoHumanTranslationFailure(
+                'opstat: {0}, response: {1}'.format(resp['opstat'], resp))
+
+        return resp['response']

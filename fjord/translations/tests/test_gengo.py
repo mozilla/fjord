@@ -1,14 +1,20 @@
 from functools import wraps
 
 from django.conf import settings
+from django.core import mail
 from django.test.utils import override_settings
 
 from mock import MagicMock, patch
 from nose.tools import eq_
 
-from fjord.base.tests import TestCase, skip_if, has_environ_variable
+from fjord.base.tests import TestCase, skip_if
 from fjord.translations import gengo_utils
-from fjord.translations.models import SuperModel, GengoJob
+from fjord.translations.models import (
+    GengoHumanTranslator,
+    GengoJob,
+    GengoOrder,
+    SuperModel
+)
 from fjord.translations.tests import has_gengo_creds
 from fjord.translations.utils import translate
 
@@ -29,6 +35,31 @@ class BaseGengoTestCase(TestCase):
             (u'es', u'de', u'en')
         )
         super(BaseGengoTestCase, self).setUp()
+
+
+def account_balance(bal):
+    def account_balance_handler(fun):
+        @wraps(fun)
+        def _account_balance_handler(*args, **kwargs):
+            patcher = patch('fjord.translations.gengo_utils.Gengo')
+            mocker = patcher.start()
+
+            instance = mocker.return_value
+            instance.getAccountBalance.return_value = {
+                u'opstat': u'ok',
+                u'response': {
+                    u'credits': str(bal),
+                    u'currency': u'USD'
+                }
+            }
+
+            try:
+                return fun(*args, **kwargs)
+            finally:
+                patcher.stop()
+
+        return _account_balance_handler
+    return account_balance_handler
 
 
 def guess_language(lang):
@@ -133,19 +164,10 @@ class GetLanguagesTestCase(BaseGengoTestCase):
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
 class GetBalanceTestCase(BaseGengoTestCase):
+    @account_balance(20.0)
     def test_get_balance(self):
-        with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
-            instance = GengoMock.return_value
-            instance.getAccountBalance.return_value = {
-                u'opstat': u'ok',
-                u'response': {
-                    u'credits': u'20.00',
-                    u'currency': u'USD'
-                }
-            }
-
-            gengo_api = gengo_utils.FjordGengo()
-            eq_(gengo_api.get_balance(), 20.0)
+        gengo_api = gengo_utils.FjordGengo()
+        eq_(gengo_api.get_balance(), 20.0)
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
@@ -221,7 +243,7 @@ class MachineTranslationTestCase(BaseGengoTestCase):
             obj.save()
 
             eq_(obj.trans_desc, u'')
-            translate(obj, 'gengo_machine', 'es', 'desc', 'en-US', 'trans_desc')
+            translate(obj, 'gengo_machine', 'es', 'desc', 'en', 'trans_desc')
             eq_(obj.trans_desc, u'Very slow')
 
     @guess_language('un')
@@ -234,8 +256,7 @@ class MachineTranslationTestCase(BaseGengoTestCase):
             obj.save()
 
             eq_(obj.trans_desc, u'')
-            translate(obj, 'gengo_machine', 'es', 'desc', 'en-US',
-                      'trans_desc')
+            translate(obj, 'gengo_machine', 'es', 'desc', 'en', 'trans_desc')
             eq_(obj.trans_desc, u'')
 
             # Make sure we don't call postTranslationJobs().
@@ -260,8 +281,7 @@ class MachineTranslationTestCase(BaseGengoTestCase):
             obj.save()
 
             eq_(obj.trans_desc, u'')
-            translate(obj, 'gengo_machine', 'es', 'desc', 'en-US',
-                      'trans_desc')
+            translate(obj, 'gengo_machine', 'es', 'desc', 'en', 'trans_desc')
             eq_(obj.trans_desc, u'')
 
             # Make sure we don't call postTranslationJobs().
@@ -277,8 +297,7 @@ class MachineTranslationTestCase(BaseGengoTestCase):
             obj.save()
 
             eq_(obj.trans_desc, u'')
-            translate(obj, 'gengo_machine', 'es', 'desc', 'en-US',
-                      'trans_desc')
+            translate(obj, 'gengo_machine', 'es', 'desc', 'en', 'trans_desc')
             eq_(obj.trans_desc, u'This is English.')
 
             # Make sure we don't call postTranslationJobs().
@@ -298,7 +317,7 @@ class HumanTranslationTestCase(BaseGengoTestCase):
         obj.save()
 
         eq_(obj.trans_desc, u'')
-        translate(obj, 'gengo_human', 'es', 'desc', 'en-US', 'trans_desc')
+        translate(obj, 'gengo_human', 'es', 'desc', 'en', 'trans_desc')
         # Nothing should be translated
         eq_(obj.trans_desc, u'')
 
@@ -313,9 +332,172 @@ class HumanTranslationTestCase(BaseGengoTestCase):
         obj.save()
 
         eq_(obj.trans_desc, u'')
-        translate(obj, 'gengo_human', 'es', 'desc', 'en-US', 'trans_desc')
+        translate(obj, 'gengo_human', 'es', 'desc', 'en', 'trans_desc')
         # If the guesser guesses English, then we just copy it over.
         eq_(obj.trans_desc, u'This is English.')
+
+    @override_settings(
+        ADMINS=(('Jimmy Discotheque', 'jimmy@example.com'),),
+        GENGO_ACCOUNT_BALANCE_THRESHOLD=20.0
+    )
+    @account_balance(0.0)
+    def test_push_translations_low_balance_mails_admin(self):
+        """Tests that a low balance sends email and does nothing else"""
+        # Verify nothing is in the outbox
+        eq_(len(mail.outbox), 0)
+
+        # Call push_translation which should balk and email the
+        # admin
+        ght = GengoHumanTranslator()
+        ght.push_translations()
+
+        # Verify an email got sent and no jobs were created
+        eq_(len(mail.outbox), 1)
+        eq_(GengoJob.objects.count(), 0)
+
+    @override_settings(GENGO_ACCOUNT_BALANCE_THRESHOLD=20.0)
+    def test_gengo_push_translations(self):
+        """Tests GengoOrders get created"""
+        ght = GengoHumanTranslator()
+
+        # Create a few jobs covering multiple languages
+        descs = [
+            ('es', u'Facebook no se puede enlazar con peru'),
+            ('es', u'No es compatible con whatsap'),
+
+            ('de', u'Absturze und langsam unter Android'),
+        ]
+        for lang, desc in descs:
+            obj = SuperModel(locale=lang, desc=desc)
+            obj.save()
+
+            job = GengoJob(
+                content_object=obj,
+                src_field='desc',
+                dst_field='trans_desc',
+                src_lang=lang,
+                dst_lang='en'
+            )
+            job.save()
+
+        with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
+            # FIXME: This returns the same thing both times, but to
+            # make the test "more kosher" we'd have this return two
+            # different order_id values.
+            mocker = GengoMock.return_value
+            mocker.getAccountBalance.return_value = {
+                u'opstat': u'ok',
+                u'response': {
+                    u'credits': '400.00',
+                    u'currency': u'USD'
+                }
+            }
+            mocker.postTranslationJobs.return_value = {
+                u'opstat': u'ok',
+                u'response': {
+                    u'order_id': u'1337',
+                    u'job_count': 2,
+                    u'credits_used': u'0.35',
+                    u'currency': u'USD'
+                }
+            }
+
+            ght.push_translations()
+
+            eq_(GengoOrder.objects.count(), 2)
+
+            order_by_id = dict(
+                [(order.id, order) for order in GengoOrder.objects.all()]
+            )
+
+            jobs = GengoJob.objects.all()
+            for job in jobs:
+                assert job.order_id in order_by_id
+
+    @override_settings(
+        ADMINS=(('Jimmy Discotheque', 'jimmy@example.com'),),
+        GENGO_ACCOUNT_BALANCE_THRESHOLD=20.0
+    )
+    def test_gengo_push_translations_not_enough_balance(self):
+        """Tests enough balance for one order, but not both"""
+        ght = GengoHumanTranslator()
+
+        # Create a few jobs covering multiple languages
+        descs = [
+            ('es', u'Facebook no se puede enlazar con peru'),
+            ('de', u'Absturze und langsam unter Android'),
+        ]
+        for lang, desc in descs:
+            obj = SuperModel(locale=lang, desc=desc)
+            obj.save()
+
+            job = GengoJob(
+                content_object=obj,
+                src_field='desc',
+                dst_field='trans_desc',
+                src_lang=lang,
+                dst_lang='en'
+            )
+            job.save()
+
+        with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
+            # FIXME: This returns the same thing both times, but to
+            # make the test "more kosher" we'd have this return two
+            # different order_id values.
+            mocker = GengoMock.return_value
+            mocker.getAccountBalance.return_value = {
+                u'opstat': u'ok',
+                u'response': {
+                    # Enough for one order, but dips below threshold
+                    # for the second one.
+                    u'credits': '20.30',
+                    u'currency': u'USD'
+                }
+            }
+            mocker.postTranslationJobs.return_value = {
+                u'opstat': u'ok',
+                u'response': {
+                    u'order_id': u'1337',
+                    u'job_count': 2,
+                    u'credits_used': u'0.35',
+                    u'currency': u'USD'
+                }
+            }
+
+            ght.push_translations()
+
+            eq_(GengoOrder.objects.count(), 1)
+            eq_(len(mail.outbox), 1)
+
+        with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
+            # FIXME: This returns the same thing both times, but to
+            # make the test "more kosher" we'd have this return two
+            # different order_id values.
+            mocker = GengoMock.return_value
+            mocker.getAccountBalance.return_value = {
+                u'opstat': u'ok',
+                u'response': {
+                    # This is the balance after one order.
+                    u'credits': '19.95',
+                    u'currency': u'USD'
+                }
+            }
+            mocker.postTranslationJobs.return_value = {
+                u'opstat': u'ok',
+                u'response': {
+                    u'order_id': u'1337',
+                    u'job_count': 2,
+                    u'credits_used': u'0.35',
+                    u'currency': u'USD'
+                }
+            }
+
+            # The next time push_translations runs, it shouldn't
+            # create any new jobs, but should send an email.
+            ght.push_translations()
+
+            eq_(GengoOrder.objects.count(), 1)
+            eq_(len(mail.outbox), 2)
 
 
 def use_sandbox(fun):
@@ -340,10 +522,13 @@ def use_sandbox(fun):
 
 @skip_if(lambda: not has_gengo_creds())
 class LiveGengoTestCase(TestCase):
-    """Holds LIVE test cases that execute REAL Gengo calls
+    """These are tests that execute calls against the real live Gengo API
 
     These tests require GENGO_PUBLIC_KEY and GENGO_PRIVATE_KEY to be
     valid values in your settings_local.py file.
+
+    These tests will use the sandbox where possible, but otherwise use
+    the real live Gengo API.
 
     Please don't fake the credentials since then you'll just get API
     authentication errors.
@@ -377,5 +562,5 @@ class LiveGengoTestCase(TestCase):
         obj.save()
 
         eq_(obj.trans_desc, u'')
-        translate(obj, 'gengo_machine', 'es', 'desc', 'en-US', 'trans_desc')
+        translate(obj, 'gengo_machine', 'es', 'desc', 'en', 'trans_desc')
         eq_(obj.trans_desc, u'Facebook can bind with peru')

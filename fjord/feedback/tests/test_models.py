@@ -155,7 +155,7 @@ class TestGenerateTranslationJobs(TestCase):
         eq_(len(jobs), 1)
         job = jobs[0]
         eq_(job[1:], (u'dennis', u'es', u'description',
-                      u'en-US', 'translated_description'))
+                      u'en', 'translated_description'))
 
         eq_(resp.translated_description, u'')
 

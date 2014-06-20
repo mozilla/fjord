@@ -421,6 +421,8 @@ SHOW_STAGE_NOTICE = False
 # Gengo settings
 GENGO_PUBLIC_KEY = None
 GENGO_PRIVATE_KEY = None
+GENGO_USE_SANDBOX = True
+GENGO_ACCOUNT_BALANCE_THRESHOLD = 20.0
 
 # STATICFILES_FINDERS = (
 #     'django.contrib.staticfiles.finders.FileSystemFinder',

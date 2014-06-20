@@ -22,7 +22,7 @@ class GeneralTranslateTests(TestCase):
         obj.save()
 
         eq_(obj.trans_desc, u'')
-        translate(obj, 'fake', 'br', 'desc', 'en-US', 'trans_desc')
+        translate(obj, 'fake', 'br', 'desc', 'en', 'trans_desc')
         eq_(obj.trans_desc, u'THIS IS A TEST STRING')
 
     def test_translate_dennis(self):
@@ -30,5 +30,5 @@ class GeneralTranslateTests(TestCase):
         obj.save()
 
         eq_(obj.trans_desc, u'')
-        translate(obj, 'dennis', 'br', 'desc', 'en-US', 'trans_desc')
+        translate(obj, 'dennis', 'br', 'desc', 'en', 'trans_desc')
         eq_(obj.trans_desc, u'\xabTHIS IS A TEST STRING\xbb')
