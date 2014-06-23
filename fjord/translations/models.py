@@ -11,8 +11,8 @@ from statsd import statsd
 
 from .gengo_utils import (
     FjordGengo,
+    GengoAPIFailure,
     GengoMachineTranslationFailure,
-    GengoHumanTranslationFailure,
     GengoUnknownLanguage,
     GengoUnsupportedLanguage,
 )
@@ -229,7 +229,7 @@ class GengoMachineTranslator(TranslationSystem):
                     metadata=metadata)
                 return
 
-            translated = gengo_api.get_machine_translation(
+            translated = gengo_api.machine_translate(
                 instance.id, lc_src, dst_lang, text)
 
             if translated:
@@ -260,7 +260,7 @@ class GengoMachineTranslator(TranslationSystem):
                            metadata=metadata)
             statsd.incr('translation.gengo_machine.unsupported')
 
-        except GengoMachineTranslationFailure:
+        except (GengoAPIFailure, GengoMachineTranslationFailure):
             # FIXME: For now, if we have a machine translation
             # failure, we're just going to ignore it and move on.
             self.log_error(instance, action='translate', msg=unicode(exc),
@@ -390,19 +390,6 @@ class GengoOrder(models.Model):
         return Record.objects.records(self)
 
 
-COMMENT = """\
-This is a response from the Mozilla Input feedback system. It was
-submitted by an anonymous user in a non-English language. The feedback
-is used in aggregate to determine general user sentiment about Mozilla
-products and its features.
-
-This translation job was created by an automated system, so we're
-unable to respond to translator comments.
-
-If the response is nonsensical or junk text, then write "spam".
-"""
-
-
 class GengoHumanTranslator(TranslationSystem):
     """Translates using Gengo human translation
 
@@ -520,31 +507,23 @@ class GengoHumanTranslator(TranslationSystem):
 
         # For each bucket, assemble and order and post it.
         for lang, jobs in lang_buckets.items():
-            order_payload = {}
+            batch = []
             for job in jobs:
-                order_payload['job_{0}'.format(job.id)] = {
-                    'body_src': getattr(job.content_object, job.src_field),
+                batch.append({
+                    'id': job.id,
                     'lc_src': job.src_lang,
-                    'lc_tgt': job.dst_lang,
-                    'tier': 'standard',
-                    'type': 'text',
-                    'slug': 'Mozilla Input feedback response',
-                    'force': 1,
-                    'comment': COMMENT,
-                    'purpose': 'Online content',
-                    'tone': 'informal',
-                    'use_preferred': 0,
-                    'auto_approve': 1,
-                    'custom_data': job.unique_id
-                }
+                    'lc_dst': job.dst_lang,
+                    'text': getattr(job.content_object, job.src_field),
+                    'unique_id': job.unique_id
+                })
 
-            # This will kick up a GengoHumanTranslationFailure which
-            # has the complete response in the exception message. We
-            # want that to propagate that and end processing in cases
-            # where something bad happened because then we can learn
-            # more about the state things are in. Thus we don't catch
-            # it here.
-            resp = gengo_api.create_order({'jobs': order_payload})
+            # This will kick up a GengoAPIFailure which has the
+            # complete response in the exception message. We want that
+            # to propagate that and end processing in cases where
+            # something bad happened because then we can learn more
+            # about the state things are in. Thus we don't catch
+            # exceptions here.
+            resp = gengo_api.human_translate_bulk(batch)
 
             # We should have an order_id at this point, so we create a
             # GengoOrder with it.
