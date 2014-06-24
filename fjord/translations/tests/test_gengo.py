@@ -500,6 +500,177 @@ class HumanTranslationTestCase(BaseGengoTestCase):
             eq_(len(mail.outbox), 2)
 
 
+@override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
+class CompletedJobsForOrderTestCase(BaseGengoTestCase):
+    def test_no_approved_jobs(self):
+        gtoj_resp = {
+            u'opstat': u'ok',
+            u'response': {
+                u'order': {
+                    u'jobs_pending': [u'746197'],
+                    u'jobs_revising': [],
+                    u'as_group': 0,
+                    u'order_id': u'263413',
+                    u'jobs_queued': u'0',
+                    u'total_credits': u'0.35',
+                    u'currency': u'USD',
+                    u'total_units': u'7',
+                    u'jobs_approved': [],
+                    u'jobs_reviewable': [],
+                    u'jobs_available': [],
+                    u'total_jobs': u'1'
+                }
+            }
+        }
+
+        with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
+            instance = GengoMock.return_value
+            instance.getTranslationOrderJobs.return_value = gtoj_resp
+
+            gengo_api = gengo_utils.FjordGengo()
+            jobs = gengo_api.completed_jobs_for_order('263413')
+            eq_(jobs, [])
+
+    def test_approved_jobs(self):
+        gtoj_resp = {
+            u'opstat': u'ok',
+            u'response': {
+                u'order': {
+                    u'jobs_pending': [],
+                    u'jobs_revising': [],
+                    u'as_group': 0,
+                    u'order_id': u'263413',
+                    u'jobs_queued': u'0',
+                    u'total_credits': u'0.35',
+                    u'currency': u'USD',
+                    u'total_units': u'7',
+                    u'jobs_approved': [u'746197'],
+                    u'jobs_reviewable': [],
+                    u'jobs_available': [],
+                    u'total_jobs': u'1'
+                }
+            }
+        }
+
+        gtjb_resp = {
+            u'opstat': u'ok',
+            u'response': {
+                u'jobs': [
+                    {
+                        u'status': u'approved',
+                        u'job_id': u'746197',
+                        u'currency': u'USD',
+                        u'order_id': u'263413',
+                        u'body_tgt': u'Facebook can bind with peru',
+                        u'body_src': u'Facebook no se puede enlazar con peru',
+                        u'credits': u'0.35',
+                        u'eta': -1,
+                        u'custom_data': u'localhost:GengoJob:7',
+                        u'tier': u'standard',
+                        u'lc_tgt': u'en',
+                        u'lc_src': u'es',
+                        u'auto_approve': u'1',
+                        u'unit_count': u'7',
+                        u'slug': u'Mozilla Input feedback response',
+                        u'ctime': 1403296006
+                    }
+                ]
+            }
+        }
+
+        with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
+            instance = GengoMock.return_value
+            instance.getTranslationOrderJobs.return_value = gtoj_resp
+            instance.getTranslationJobBatch.return_value = gtjb_resp
+
+            gengo_api = gengo_utils.FjordGengo()
+            jobs = gengo_api.completed_jobs_for_order('263413')
+            eq_([item['custom_data'] for item in jobs],
+                [u'localhost:GengoJob:7'])
+
+    def test_pull_translations(self):
+        ght = GengoHumanTranslator()
+
+        obj = SuperModel(locale='es', desc=u'No es compatible con whatsap')
+        obj.save()
+
+        gj = GengoJob(
+            content_object=obj,
+            src_field='desc',
+            dst_field='trans_desc',
+            src_lang='es',
+            dst_lang='en'
+        )
+        gj.save()
+
+        order = GengoOrder(order_id=u'263413')
+        order.save()
+
+        gj.assign_to_order(order)
+
+        gtoj_resp = {
+            u'opstat': u'ok',
+            u'response': {
+                u'order': {
+                    u'jobs_pending': [],
+                    u'jobs_revising': [],
+                    u'as_group': 0,
+                    u'order_id': u'263413',
+                    u'jobs_queued': u'0',
+                    u'total_credits': u'0.35',
+                    u'currency': u'USD',
+                    u'total_units': u'7',
+                    u'jobs_approved': [u'746197'],
+                    u'jobs_reviewable': [],
+                    u'jobs_available': [],
+                    u'total_jobs': u'1'
+                }
+            }
+        }
+
+        gtjb_resp = {
+            u'opstat': u'ok',
+            u'response': {
+                u'jobs': [
+                    {
+                        u'status': u'approved',
+                        u'job_id': u'746197',
+                        u'currency': u'USD',
+                        u'order_id': u'263413',
+                        u'body_tgt': u'No es compatible con whatsap',
+                        u'body_src': u'Not compatible with whatsap',
+                        u'credits': u'0.35',
+                        u'eta': -1,
+                        u'custom_data': u'localhost:GengoJob:{0}'.format(
+                            gj.id),
+                        u'tier': u'standard',
+                        u'lc_tgt': u'en',
+                        u'lc_src': u'es',
+                        u'auto_approve': u'1',
+                        u'unit_count': u'7',
+                        u'slug': u'Mozilla Input feedback response',
+                        u'ctime': 1403296006
+                    }
+                ]
+            }
+        }
+
+        with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
+            instance = GengoMock.return_value
+            instance.getTranslationOrderJobs.return_value = gtoj_resp
+            instance.getTranslationJobBatch.return_value = gtjb_resp
+
+            ght.pull_translations()
+
+            jobs = GengoJob.uncached.all()
+            eq_(len(jobs), 1)
+            eq_(jobs[0].status, 'complete')
+
+            orders = GengoOrder.uncached.all()
+            eq_(len(orders), 1)
+            eq_(orders[0].status, 'complete')
+
+
 def use_sandbox(fun):
     """Decorator to force the use of the sandbox
 

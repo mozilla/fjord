@@ -17,6 +17,7 @@ from .gengo_utils import (
     GengoUnsupportedLanguage,
 )
 from .utils import locale_equals_language
+from fjord.base.models import ModelBase
 from fjord.journal.models import Record
 from fjord.journal.utils import j_error, j_info
 
@@ -291,7 +292,7 @@ STATUS_CHOICES = (
 )
 
 
-class GengoJob(models.Model):
+class GengoJob(ModelBase):
     """Represents a job for the Gengo human translation system"""
     # Generic foreign key to the instance this record is about
     content_type = models.ForeignKey(ContentType)
@@ -322,6 +323,10 @@ class GengoJob(models.Model):
         if not self.pk:
             self.log('create GengoJob', {})
 
+    @classmethod
+    def unique_id_to_id(self, unique_id):
+        return int(unique_id.split(':')[-1])
+
     @property
     def unique_id(self):
         """Returns a unique id for this job for this host
@@ -343,12 +348,18 @@ class GengoJob(models.Model):
             str(self.pk)
         )
 
+    def assign_to_order(self, order):
+        self.order = order
+        self.status = STATUS_IN_PROGRESS
+        self.save()
+
     def log(self, action, metadata):
         j_info(
             app='translations',
             src='gengo_human',
             action=action,
             msg='job event',
+            instance=self,
             metadata=metadata
         )
 
@@ -357,7 +368,7 @@ class GengoJob(models.Model):
         return Record.objects.records(self)
 
 
-class GengoOrder(models.Model):
+class GengoOrder(ModelBase):
     """Represents a Gengo translation order which contains multiple jobs"""
     order_id = models.CharField(max_length=100)
     status = models.CharField(
@@ -382,6 +393,7 @@ class GengoOrder(models.Model):
             src='gengo_human',
             action=action,
             msg='order event',
+            instance=self,
             metadata=metadata
         )
 
@@ -534,9 +546,7 @@ class GengoHumanTranslator(TranslationSystem):
             # Persist the order on all the jobs and change their
             # status.
             for job in jobs:
-                job.order = order
-                job.status = STATUS_IN_PROGRESS
-                job.save()
+                job.assign_to_order(order)
 
             # Update the balance and see if we're below the threshold.
             balance = balance - float(resp['credits_used'])
@@ -546,4 +556,45 @@ class GengoHumanTranslator(TranslationSystem):
                 return
 
     def pull_translations(self):
-        pass
+        gengo_api = FjordGengo()
+
+        # Get all the orders that are in progress
+        orders = GengoOrder.objects.filter(status=STATUS_IN_PROGRESS)
+        for order in orders:
+            # Get the list of all completed jobs
+            completed = gengo_api.completed_jobs_for_order(order.order_id)
+
+            # If there are no completed jobs, then we don't need to
+            # bother doing any additional processing for this order
+            if not completed:
+                continue
+
+            # For each complete job we haven't seen before, pull it
+            # from the db, save the translated text and update all the
+            # bookkeeping.
+            for comp in completed:
+                id_ = GengoJob.unique_id_to_id(comp['custom_data'])
+
+                job = GengoJob.objects.get(pk=id_)
+                if job.status == STATUS_COMPLETE:
+                    continue
+
+                instance = job.content_object
+                setattr(instance, job.dst_field, comp['body_tgt'])
+                instance.save()
+
+                job.status = STATUS_COMPLETE
+                job.save()
+
+                job.log('completed', {})
+
+            # Check to see if there are still outstanding jobs for
+            # this order. If there aren't, close the order out.
+            outstanding = (GengoJob.uncached
+                           .filter(order=order, status=STATUS_IN_PROGRESS)
+                           .count())
+
+            if outstanding == 0:
+                order.status = STATUS_COMPLETE
+                order.save()
+                order.log('completed', {})

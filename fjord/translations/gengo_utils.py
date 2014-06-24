@@ -126,6 +126,23 @@ class FjordGengo(object):
         else:
             return GENGO_LANGUAGE_CACHE[1]
 
+    @requires_keys
+    def get_job(self, job_id):
+        """Returns data for a specified job
+
+        :arg job_id: the job_id for the job we want data for
+
+        :returns: dict of job data
+
+        """
+        resp = self.gengo_api.getTranslationJob(id=str(job_id))
+
+        if resp['opstat'] != 'ok':
+            raise GengoAPIFailure(
+                'opstat: {0}, response: {1}'.format(resp['opstat'], resp))
+
+        return resp['response']['job']
+
     def guess_language(self, text):
         """Guesses the language of the text
 
@@ -266,3 +283,35 @@ class FjordGengo(object):
                 'opstat: {0}, response: {1}'.format(resp['opstat'], resp))
 
         return resp['response']
+
+    @requires_keys
+    def completed_jobs_for_order(self, order_id):
+        """Returns jobs for an order which are completed
+
+        Gengo uses the status "approved" for jobs that have been
+        translated and approved and are completed.
+
+        :arg order_id: the order_id for the jobs we want to look at
+
+        :returns: list of job data dicts; interesting fields being
+            ``custom_data`` and ``body_tgt``
+
+        """
+        resp = self.gengo_api.getTranslationOrderJobs(id=str(order_id))
+
+        if resp['opstat'] != 'ok':
+            raise GengoAPIFailure(
+                'opstat: {0}, response: {1}'.format(resp['opstat'], resp))
+
+        job_ids = resp['response']['order']['jobs_approved']
+        if not job_ids:
+            return []
+
+        job_ids = ','.join(job_ids)
+        resp = self.gengo_api.getTranslationJobBatch(id=job_ids)
+
+        if resp['opstat'] != 'ok':
+            raise GengoAPIFailure(
+                'opstat: {0}, response: {1}'.format(resp['opstat'], resp))
+
+        return resp['response']['jobs']
