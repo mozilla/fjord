@@ -316,7 +316,7 @@ class GengoJob(ModelBase):
     created = models.DateTimeField(default=datetime.now())
 
     # When this job instance was completed
-    completed = models.DateTimeField(null=True)
+    completed = models.DateTimeField(blank=True, null=True)
 
     def __unicode__(self):
         return u'<GengoJob {0}>'.format(self.id)
@@ -391,7 +391,7 @@ class GengoOrder(ModelBase):
     created = models.DateTimeField(default=datetime.now())
 
     # When this order was completed
-    completed = models.DateTimeField(null=True)
+    completed = models.DateTimeField(blank=True, null=True)
 
     def __unicode__(self):
         return u'<GengoOrder {0}>'.format(self.id)
@@ -569,6 +569,7 @@ class GengoHumanTranslator(TranslationSystem):
             # GengoOrder with it.
             order = GengoOrder(order_id=resp['order_id'])
             order.save()
+            order.log('created', metadata={'response': resp})
 
             # Persist the order on all the jobs and change their
             # status.
@@ -610,10 +611,7 @@ class GengoHumanTranslator(TranslationSystem):
                 setattr(instance, job.dst_field, comp['body_tgt'])
                 instance.save()
 
-                job.status = STATUS_COMPLETE
-                job.save()
-
-                job.log('completed', {})
+                job.mark_complete()
 
             # Check to see if there are still outstanding jobs for
             # this order. If there aren't, close the order out.
