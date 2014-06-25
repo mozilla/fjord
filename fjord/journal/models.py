@@ -32,7 +32,7 @@ class RecordManager(models.Manager):
     def recent(self, app):
         return (self
                 .filter(app=app)
-                .filter(created__gte=datetime.now() - timedelta(days=14)))
+                .filter(created__gte=datetime.now() - timedelta(days=7)))
 
     def records(self, instance):
         return (
