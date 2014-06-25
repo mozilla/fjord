@@ -312,7 +312,11 @@ class GengoJob(ModelBase):
         choices=STATUS_CHOICES, default=STATUS_CREATED, max_length=12)
     order = models.ForeignKey('translations.GengoOrder', null=True)
 
+    # When this job instance was created
     created = models.DateTimeField(default=datetime.now())
+
+    # When this job instance was completed
+    completed = models.DateTimeField(null=True)
 
     def __unicode__(self):
         return u'<GengoJob {0}>'.format(self.id)
@@ -349,9 +353,17 @@ class GengoJob(ModelBase):
         )
 
     def assign_to_order(self, order):
+        """Assigns the job to an order which makes the job in progress"""
         self.order = order
         self.status = STATUS_IN_PROGRESS
         self.save()
+
+    def mark_complete(self):
+        """Marks a job as complete"""
+        self.status = STATUS_COMPLETE
+        self.completed = datetime.now()
+        self.save()
+        self.log('completed', {})
 
     def log(self, action, metadata):
         j_info(
@@ -374,9 +386,12 @@ class GengoOrder(ModelBase):
     status = models.CharField(
         choices=STATUS_CHOICES, default=STATUS_IN_PROGRESS, max_length=12)
 
-    # When the record was submitted to Gengo. This isn't necessarily
-    # when the record was created, so we explicitly populate it.
-    submitted = models.DateTimeField(null=True)
+    # When this instance was created which should also line up with
+    # the time the order was submitted to Gengo
+    created = models.DateTimeField(default=datetime.now())
+
+    # When this order was completed
+    completed = models.DateTimeField(null=True)
 
     def __unicode__(self):
         return u'<GengoOrder {0}>'.format(self.id)
@@ -386,6 +401,19 @@ class GengoOrder(ModelBase):
 
         if not self.pk:
             self.log('create GengoOrder', {})
+
+    def mark_complete(self):
+        """Marks an order as complete"""
+        self.status = STATUS_COMPLETE
+        self.completed = datetime.now()
+        self.save()
+        self.log('completed', {})
+
+    def completed_jobs(self):
+        return self.gengojob_set.filter(status=STATUS_COMPLETE)
+
+    def outstanding_jobs(self):
+        return self.gengojob_set.exclude(status=STATUS_COMPLETE)
 
     def log(self, action, metadata):
         j_info(
@@ -540,7 +568,6 @@ class GengoHumanTranslator(TranslationSystem):
             # We should have an order_id at this point, so we create a
             # GengoOrder with it.
             order = GengoOrder(order_id=resp['order_id'])
-            order.status = STATUS_IN_PROGRESS
             order.save()
 
             # Persist the order on all the jobs and change their
@@ -595,6 +622,4 @@ class GengoHumanTranslator(TranslationSystem):
                            .count())
 
             if outstanding == 0:
-                order.status = STATUS_COMPLETE
-                order.save()
-                order.log('completed', {})
+                order.mark_complete()
