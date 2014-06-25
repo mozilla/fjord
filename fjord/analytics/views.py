@@ -40,7 +40,13 @@ from fjord.translations.tasks import create_translation_tasks
 def spot_translate(request, responseid):
     # FIXME: This is gengo-machine specific for now.
     resp = get_object_or_404(Response, id=responseid)
-    create_translation_tasks(resp, system='gengo_machine')
+    system = request.POST.get('system', None)
+    if system:
+        create_translation_tasks(resp, system=system)
+
+    # FIXME: If there's no system specified, we should tell the user
+    # something. I'm going to defer fixing that for now since the user
+    # would have to be doing "sneaky" things to hit that situation.
 
     # FIXME: We should return a message to the user, so they know
     # it'll happen at some point. Plus we need to let the user know
