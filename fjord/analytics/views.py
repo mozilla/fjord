@@ -30,7 +30,7 @@ from fjord.base.util import (
 from fjord.feedback.models import Product, Response, ResponseMappingType
 from fjord.journal.models import Record
 from fjord.search.utils import es_error_statsd
-from fjord.translations.models import GengoJob
+from fjord.translations.models import GengoJob, get_translation_systems
 from fjord.translations.tasks import create_translation_tasks
 
 
@@ -41,7 +41,7 @@ def spot_translate(request, responseid):
     # FIXME: This is gengo-machine specific for now.
     resp = get_object_or_404(Response, id=responseid)
     system = request.POST.get('system', None)
-    if system:
+    if system and system in get_translation_systems():
         create_translation_tasks(resp, system=system)
 
     # FIXME: If there's no system specified, we should tell the user
