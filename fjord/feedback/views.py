@@ -7,9 +7,9 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.decorators.http import require_POST
 
+import rest_framework.generics
 from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
-from rest_framework import generics
 from statsd import statsd
 
 from fjord.base.browsers import UNKNOWN
@@ -456,5 +456,5 @@ def cyoa(request):
     })
 
 
-class PostFeedbackAPI(generics.CreateAPIView):
-    serializer_class = models.ResponseSerializer
+class PostFeedbackAPI(rest_framework.generics.CreateAPIView):
+    serializer_class = models.PostResponseSerializer
