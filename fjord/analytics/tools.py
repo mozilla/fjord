@@ -1,17 +1,8 @@
-import datetime
-import json
 from math import floor
 
 from django.template.defaultfilters import slugify
 
 from fjord.base.util import epoch_milliseconds
-
-
-class JSONDatetimeEncoder(json.JSONEncoder):
-    def default(self, value):
-        if hasattr(value, 'strftime'):
-            return value.isoformat()
-        return super(JSONDatetimeEncoder, self).default(value)
 
 
 def counts_to_options(counts, name, display=None, display_map=None,

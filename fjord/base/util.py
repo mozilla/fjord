@@ -1,9 +1,14 @@
-from functools import wraps
 import datetime
+import json
 import time
+from functools import wraps
 
 from django.contrib.auth.decorators import permission_required
-from django.http import HttpResponseRedirect
+from django.http import (
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseRedirect
+)
 from django.utils.dateparse import parse_date
 from django.utils.feedgenerator import Atom1Feed
 
@@ -11,6 +16,13 @@ from funfactory.urlresolvers import reverse
 from product_details import product_details
 from rest_framework.throttling import AnonRateThrottle
 from statsd import statsd
+
+
+class JSONDatetimeEncoder(json.JSONEncoder):
+    def default(self, value):
+        if hasattr(value, 'strftime'):
+            return value.isoformat()
+        return super(JSONDatetimeEncoder, self).default(value)
 
 
 def translate_country_name(current_language, country_code, country_name,
@@ -95,6 +107,27 @@ def smart_int(s, fallback=0):
         return int(float(s))
     except (ValueError, TypeError, OverflowError):
         return fallback
+
+
+def smart_timedelta(s, fallback=None):
+    """Convert s to a datetime.timedelta with a fallback for invalid input.
+
+    :arg s: The string to convert to a timedelta.
+    :arg fallback: Value to use in case of an error. Default: ``None``.
+
+    """
+    if isinstance(s, datetime.timedelta):
+        return s
+
+    # FIXME: Doing this manually for now for specific deltas. We can
+    # figure out how we want this to operate in the future.
+    if s == '1d':
+        return datetime.timedelta(days=1)
+    if s == '7d':
+        return datetime.timedelta(days=7)
+    if s == '14d':
+        return datetime.timedelta(days=14)
+    return fallback
 
 
 def smart_date(s, fallback=None):
@@ -214,6 +247,36 @@ def check_new_user(fun):
         return fun(request, *args, **kwargs)
 
     return _wrapped_view
+
+
+def cors_enabled(origin, methods=['GET']):
+    """A simple decorator to enable CORS."""
+    def decorator(f):
+        @wraps(f)
+        def decorated_func(request, *args, **kwargs):
+            if request.method == 'OPTIONS':
+                # preflight
+                if ('HTTP_ACCESS_CONTROL_REQUEST_METHOD' in request.META and
+                        'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' in request.META):
+
+                    response = HttpResponse()
+                    response['Access-Control-Allow-Methods'] = ", ".join(
+                        methods)
+
+                    # TODO: We might need to change this
+                    response['Access-Control-Allow-Headers'] = \
+                        request.META['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']
+                else:
+                    return HttpResponseBadRequest()
+            elif request.method in methods:
+                response = f(request, *args, **kwargs)
+            else:
+                return HttpResponseBadRequest()
+
+            response['Access-Control-Allow-Origin'] = origin
+            return response
+        return decorated_func
+    return decorator
 
 
 analyzer_required = permission_required(

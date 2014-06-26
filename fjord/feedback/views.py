@@ -9,11 +9,13 @@ from django.views.decorators.http import require_POST
 
 from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
-from rest_framework import generics
 from statsd import statsd
 
 from fjord.base.browsers import UNKNOWN
-from fjord.base.util import smart_str, translate_country_name
+from fjord.base.util import (
+    smart_str,
+    translate_country_name
+)
 from fjord.feedback import config
 from fjord.feedback import models
 from fjord.feedback.forms import ResponseForm
@@ -454,7 +456,3 @@ def cyoa(request):
     return render(request, template, {
         'products': products
     })
-
-
-class PostFeedbackAPI(generics.CreateAPIView):
-    serializer_class = models.ResponseSerializer

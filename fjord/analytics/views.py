@@ -15,7 +15,6 @@ from mobility.decorators import mobile_template
 from tower import ugettext as _
 
 from fjord.analytics.tools import (
-    JSONDatetimeEncoder,
     counts_to_options,
     zero_fill
 )
@@ -25,7 +24,8 @@ from fjord.base.util import (
     check_new_user,
     smart_int,
     smart_date,
-    Atom1FeedWithRelatedLinks
+    Atom1FeedWithRelatedLinks,
+    JSONDatetimeEncoder
 )
 from fjord.feedback.models import Product, Response, ResponseMappingType
 from fjord.journal.models import Record

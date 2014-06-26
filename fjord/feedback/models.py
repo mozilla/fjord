@@ -471,7 +471,7 @@ class NoNullsCharField(serializers.CharField):
         return super(NoNullsCharField, self).from_native(value)
 
 
-class ResponseSerializer(serializers.Serializer):
+class PostResponseSerializer(serializers.Serializer):
     """This handles incoming feedback
 
     This handles responses as well as the additional data for response
