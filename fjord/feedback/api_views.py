@@ -78,9 +78,12 @@ class PublicFeedbackAPI(rest_framework.views.APIView):
         # FIXME: Probably want to make this specifyable
         search = search.order_by('-created')
 
+        # Explicitly include only publicly visible fields
+        search = search.values_dict(models.ResponseMappingType.public_fields())
+
         # FIXME: We're omitting paging here for now. We might want to
         # add that at some point.
-        responses = search.values_dict()[:1000]
+        responses = search[:1000]
         return rest_framework.response.Response({
             'count': len(responses),
             'results': list(responses)

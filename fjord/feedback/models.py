@@ -321,6 +321,35 @@ class ResponseMappingType(FjordMappingType, Indexable):
         return Response
 
     @classmethod
+    def public_fields(cls):
+        """Fields that can be publicly-visible
+
+        .. Note::
+
+           Do NOT include fields that have PII in them.
+
+        """
+        return (
+            'id',
+            'happy',
+            'api',
+            'url_domain',
+            'has_email',
+            'description',
+            'description_bigrams',
+            'user_agent',
+            'product',
+            'version',
+            'platform',
+            'locale',
+            'source',
+            'campaign',
+            'organic',
+            'created'
+        )
+
+
+    @classmethod
     def get_mapping(cls):
         return {
             'id': integer_type(),

@@ -69,6 +69,22 @@ class PublicFeedbackAPITest(ElasticTestCase):
 
         # FIXME: Test date_start, date_end, delta, products/versions
 
+    def test_public_fields(self):
+        """The results should only contain publicly-visible fields"""
+        # Note: This test might fail when we add new fields to
+        # ES. What happens is that if a field doesn't have data when
+        # the document is indexed, then there won't be a key/val in
+        # the json results. Easy way to fix that is to make sure it
+        # has a value when creating the response.
+        response(api=True, save=True)
+        self.refresh()
+
+        resp = self.client.get(reverse('feedback-api'))
+        json_data = json.loads(resp.content)
+        eq_(json_data['count'], 1)
+        eq_(sorted(json_data['results'][0].keys()),
+            sorted(models.ResponseMappingType.public_fields()))
+
 
 class PostFeedbackAPITest(TestCase):
     def test_minimal(self):
