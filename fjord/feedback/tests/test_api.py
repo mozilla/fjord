@@ -6,9 +6,71 @@ from nose.tools import eq_
 
 from fjord.base.tests import TestCase, reverse
 from fjord.feedback import models
+from fjord.feedback.tests import response
+from fjord.search.tests import ElasticTestCase
 
 
-class TestFeedbackAPI(TestCase):
+class PublicFeedbackAPITest(ElasticTestCase):
+    def test_basic(self):
+        testdata = [
+            (True, 'en-US', 'Linux', 'Firefox', 'desc'),
+            (True, 'en-US', 'Mac OSX', 'Firefox for Android', 'desc'),
+            (False, 'de', 'Windows', 'Firefox', 'banana'),
+        ]
+
+        for happy, locale, platform, product, desc in testdata:
+            response(
+                happy=happy, locale=locale, platform=platform,
+                product=product, description=desc, save=True)
+        self.refresh()
+
+        resp = self.client.get(reverse('feedback-api'))
+        # FIXME: test headers
+        json_data = json.loads(resp.content)
+        eq_(json_data['count'], 3)
+        eq_(len(json_data['results']), 3)
+
+        resp = self.client.get(reverse('feedback-api'), {'happy': '1'})
+        json_data = json.loads(resp.content)
+        eq_(json_data['count'], 2)
+        eq_(len(json_data['results']), 2)
+
+        resp = self.client.get(reverse('feedback-api'), {'platforms': 'Linux'})
+        json_data = json.loads(resp.content)
+        eq_(json_data['count'], 1)
+        eq_(len(json_data['results']), 1)
+
+        resp = self.client.get(reverse('feedback-api'), {'products': 'Firefox'})
+        json_data = json.loads(resp.content)
+        eq_(json_data['count'], 2)
+        eq_(len(json_data['results']), 2)
+
+        resp = self.client.get(reverse('feedback-api'), {'locales': 'en-US'})
+        json_data = json.loads(resp.content)
+        eq_(json_data['count'], 2)
+        eq_(len(json_data['results']), 2)
+
+        resp = self.client.get(reverse('feedback-api'), {'locales': 'en-US,de'})
+        json_data = json.loads(resp.content)
+        eq_(json_data['count'], 3)
+        eq_(len(json_data['results']), 3)
+
+        resp = self.client.get(reverse('feedback-api'), {
+            'locales': 'de', 'happy': 1
+        })
+        json_data = json.loads(resp.content)
+        eq_(json_data['count'], 0)
+        eq_(len(json_data['results']), 0)
+
+        resp = self.client.get(reverse('feedback-api'), {'q': 'desc'})
+        json_data = json.loads(resp.content)
+        eq_(json_data['count'], 2)
+        eq_(len(json_data['results']), 2)
+
+        # FIXME: Test date_start, date_end, delta, products/versions
+
+
+class PostFeedbackAPITest(TestCase):
     def test_minimal(self):
         data = {
             'happy': True,
@@ -16,7 +78,7 @@ class TestFeedbackAPI(TestCase):
             'product': u'Firefox OS'
         }
 
-        r = self.client.post(reverse('api-post-feedback'), data)
+        r = self.client.post(reverse('feedback-api'), data)
         eq_(r.status_code, 201)
 
         feedback = models.Response.objects.latest(field_name='id')
@@ -61,7 +123,7 @@ class TestFeedbackAPI(TestCase):
         # resulting Response. In most cases, the field names line up
         # between PostResponseSerializer and Response with the
         # exception of 'email' which is stored in a different table.
-        r = self.client.post(reverse('api-post-feedback'), data)
+        r = self.client.post(reverse('feedback-api'), data)
         eq_(r.status_code, 201)
 
         feedback = models.Response.objects.latest(field_name='id')
@@ -84,7 +146,7 @@ class TestFeedbackAPI(TestCase):
             'email': 'foo@example.com'
         }
 
-        r = self.client.post(reverse('api-post-feedback'), data)
+        r = self.client.post(reverse('feedback-api'), data)
         eq_(r.status_code, 201)
 
         feedback = models.Response.objects.latest(field_name='id')
@@ -111,7 +173,7 @@ class TestFeedbackAPI(TestCase):
             'device': None
         }
 
-        r = self.client.post(reverse('api-post-feedback'),
+        r = self.client.post(reverse('feedback-api'),
                              json.dumps(data),
                              content_type='application/json')
         eq_(r.status_code, 400)
@@ -129,7 +191,7 @@ class TestFeedbackAPI(TestCase):
             'email': 'foo@example'
         }
 
-        r = self.client.post(reverse('api-post-feedback'), data)
+        r = self.client.post(reverse('feedback-api'), data)
         eq_(r.status_code, 400)
         assert 'email' in r.content
 
@@ -145,7 +207,7 @@ class TestFeedbackAPI(TestCase):
             'locale': 'en-US',
         }
 
-        r = self.client.post(reverse('api-post-feedback'), data)
+        r = self.client.post(reverse('feedback-api'), data)
         eq_(r.status_code, 201)
 
         feedback = models.Response.uncached.latest(field_name='id')
@@ -161,7 +223,7 @@ class TestFeedbackAPI(TestCase):
             'locale': 'en-US',
         }
 
-        r = self.client.post(reverse('api-post-feedback'), data)
+        r = self.client.post(reverse('feedback-api'), data)
         eq_(r.status_code, 201)
 
         feedback = models.Response.uncached.latest(field_name='id')
@@ -180,7 +242,7 @@ class TestFeedbackAPI(TestCase):
     #         'locale': 'en-US',
     #     }
     #
-    #     r = self.client.post(reverse('api-post-feedback'), data)
+    #     r = self.client.post(reverse('feedback-api'), data)
     #     eq_(r.status_code, 400)
     #     assert 'happy' in r.content
 
@@ -194,7 +256,7 @@ class TestFeedbackAPI(TestCase):
             'locale': 'en-US',
         }
 
-        r = self.client.post(reverse('api-post-feedback'), data)
+        r = self.client.post(reverse('feedback-api'), data)
         eq_(r.status_code, 400)
         assert 'description' in r.content
 
@@ -208,7 +270,7 @@ class TestFeedbackAPI(TestCase):
             'locale': 'en-US',
         }
 
-        r = self.client.post(reverse('api-post-feedback'), data)
+        r = self.client.post(reverse('feedback-api'), data)
         eq_(r.status_code, 400)
         assert 'product' in r.content
 
@@ -223,10 +285,12 @@ class TestFeedbackAPI(TestCase):
             'locale': 'en-US',
         }
 
-        r = self.client.post(reverse('api-post-feedback'), data)
+        r = self.client.post(reverse('feedback-api'), data)
         eq_(r.status_code, 400)
         assert 'product' in r.content
 
+
+class PostFeedbackAPIThrottleTest(TestCase):
     def test_throttle(self):
         # This test is a little goofy. Essentially we figure out what
         # the throttle trigger is, post that many times, then post
@@ -252,9 +316,9 @@ class TestFeedbackAPI(TestCase):
         # Now hit the api a fajillion times making sure things got
         # created
         for i in range(trigger):
-            r = self.client.post(reverse('api-post-feedback'), data)
+            r = self.client.post(reverse('feedback-api'), data)
             eq_(r.status_code, 201)
 
         # This one should trip the throttle trigger
-        r = self.client.post(reverse('api-post-feedback'), data)
+        r = self.client.post(reverse('feedback-api'), data)
         eq_(r.status_code, 429)

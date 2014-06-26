@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 
-from fjord.feedback import views
+from fjord.feedback import api_views
 
 
 urlpatterns = patterns(
@@ -34,5 +34,5 @@ urlpatterns = patterns(
     # Note: If we change the version number here, we also have to change it
     # in the ResponseSerializer.
     url(r'^api/v1/feedback/?$',
-        views.PostFeedbackAPI.as_view(), name='api-post-feedback'),
+        api_views.feedback_as_view(), name='feedback-api'),
 )

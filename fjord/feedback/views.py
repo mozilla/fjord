@@ -7,13 +7,15 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.decorators.http import require_POST
 
-import rest_framework.generics
 from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
 from statsd import statsd
 
 from fjord.base.browsers import UNKNOWN
-from fjord.base.util import smart_str, translate_country_name
+from fjord.base.util import (
+    smart_str,
+    translate_country_name
+)
 from fjord.feedback import config
 from fjord.feedback import models
 from fjord.feedback.forms import ResponseForm
@@ -454,7 +456,3 @@ def cyoa(request):
     return render(request, template, {
         'products': products
     })
-
-
-class PostFeedbackAPI(rest_framework.generics.CreateAPIView):
-    serializer_class = models.PostResponseSerializer
