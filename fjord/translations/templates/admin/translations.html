@@ -43,11 +43,12 @@
   </section>
 
   <section id="grp-changelist" class="">
-    <h1>Last 14 days of records</h1>
+    <h1>Last 7 days of records</h1>
     <div class="grp-module grp-changelist-results">
       <table id="result_list" class="grp-sortable">
         <thead>
           <tr>
+            <th scope="col" class="sortable"><div class="grp-text"><a href="?order=-created">created</a></div></th>
             <th scope="col" class="sortable"><div class="grp-text"><a href="#">id</a></div></th>
             <th scope="col" class="sortable"><div class="grp-text"><a href="?order=src">src</a></div></th>
             <th scope="col" class="sortable"><div class="grp-text"><a href="?order=type">type</a></div></th>
@@ -55,13 +56,13 @@
             <th scope="col" class="sortable"><div class="grp-text"><a href="?order=msg">msg</a></div></th>
             <th scope="col" class="sortable"><div class="grp-text"><a href="#">object id</a></div></th>
             <th scope="col" class="sortable"><div class="grp-text"><a href="#">object description</a></div></th>
-            <th scope="col" class="sortable"><div class="grp-text"><a href="?order=-created">created</a></div></th>
             <th scope="col" class="sortable"><div class="grp-text"><a href="?order=metadata">metadata</a></div></th>
           </tr>
         </thead>
         <tbody>
           {% for rec in records %}
             <tr class="grp-row grp-row-{% cycle 'odd' 'even' %} {% if rec.type == 'error' %}fail{% endif %}">
+              <td>{{ rec.created }}</td>
               <td>{{ rec.id }}</td>
               <td>{{ rec.src }}</td>
               <td>{{ rec.type }}</td>
@@ -69,7 +70,6 @@
               <td>{{ rec.msg }}</td>
               <td>{{ rec.content_object.id }}</td>
               <td>{{ rec.content_object.description|truncatechars:200 }}</td>
-              <td>{{ rec.created }}</td>
               <td>{{ rec.metadata }}</td>
             </tr>
           {% endfor %}

@@ -210,7 +210,7 @@ class Response(ModelBase):
         return [
             # key, system, src language, src field, dst language, dst field
             (instance_to_key(self), system, self.locale, 'description',
-             u'en-US', 'translated_description')
+             u'en', 'translated_description')
         ]
 
     @classmethod

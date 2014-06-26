@@ -12,6 +12,20 @@ from gengo import Gengo, GengoError
 # keep that until the next deployment.
 GENGO_LANGUAGE_CACHE = None
 
+# The comment we send to Gengo with the jobs to give some context for
+# the job.
+GENGO_COMMENT = """\
+This is a response from the Mozilla Input feedback system. It was
+submitted by an anonymous user in a non-English language. The feedback
+is used in aggregate to determine general user sentiment about Mozilla
+products and its features.
+
+This translation job was created by an automated system, so we're
+unable to respond to translator comments.
+
+If the response is nonsensical or junk text, then write "spam".
+"""
+
 
 class FjordGengoError(Exception):
     """Superclass for all Gengo translation errors"""
@@ -37,8 +51,16 @@ class GengoUnsupportedLanguage(FjordGengoError):
     """
 
 
+class GengoAPIFailure(FjordGengoError):
+    """Raised when the api kicks up an error"""
+
+
 class GengoMachineTranslationFailure(FjordGengoError):
     """Raised when machine translation didn't work"""
+
+
+class GengoHumanTranslationFailure(FjordGengoError):
+    """Raised when human translation didn't work"""
 
 
 def requires_keys(fun):
@@ -66,7 +88,8 @@ class FjordGengo(object):
         if settings.GENGO_PUBLIC_KEY and settings.GENGO_PRIVATE_KEY:
             gengo_api = Gengo(
                 public_key=settings.GENGO_PUBLIC_KEY,
-                private_key=settings.GENGO_PRIVATE_KEY
+                private_key=settings.GENGO_PRIVATE_KEY,
+                sandbox=getattr(settings, 'GENGO_USE_SANDBOX', True)
             )
         else:
             gengo_api = None
@@ -102,6 +125,23 @@ class FjordGengo(object):
             return GENGO_LANGUAGE_CACHE[0]
         else:
             return GENGO_LANGUAGE_CACHE[1]
+
+    @requires_keys
+    def get_job(self, job_id):
+        """Returns data for a specified job
+
+        :arg job_id: the job_id for the job we want data for
+
+        :returns: dict of job data
+
+        """
+        resp = self.gengo_api.getTranslationJob(id=str(job_id))
+
+        if resp['opstat'] != 'ok':
+            raise GengoAPIFailure(
+                'opstat: {0}, response: {1}'.format(resp['opstat'], resp))
+
+        return resp['response']['job']
 
     def guess_language(self, text):
         """Guesses the language of the text
@@ -140,8 +180,11 @@ class FjordGengo(object):
         raise GengoUnknownLanguage('request failure: {0}'.format(resp.content))
 
     @requires_keys
-    def get_machine_translation(self, id_, lc_src, lc_dst, text):
+    def machine_translate(self, id_, lc_src, lc_dst, text):
         """Performs a machine translation through Gengo
+
+        This method is synchronous--it creates the request, posts it,
+        waits for it to finish and then returns the translated text.
 
         :arg id_: instance id
         :arg lc_src: source language
@@ -150,11 +193,11 @@ class FjordGengo(object):
 
         :returns: text
 
-        :raises GengoUnsupportedLanguage: if the guesser guesses a language
-            that Gengo doesn't support
+        :raises GengoUnsupportedLanguage: if the guesser guesses a
+            language that Gengo doesn't support
 
-        :raises GengoMachineTranslationFailure: if calling machine translation
-            fails
+        :raises GengoMachineTranslationFailure: if calling machine
+            translation fails
 
         """
         data = {
@@ -166,14 +209,13 @@ class FjordGengo(object):
                     'lc_tgt': lc_dst,
                     'tier': 'machine',
                     'type': 'text',
-                    'slug': 'Input machine translation',
+                    'slug': 'Mozilla Input feedback response',
                 }
             }
         }
 
         try:
-            resp = self.gengo_api.postTranslationJobs(
-                jobs=data, as_group=0, allow_fork=0)
+            resp = self.gengo_api.postTranslationJobs(jobs=data)
         except GengoError as ge:
             # It's possible for the guesser to guess a language that's
             # in the list of supported languages, but for some reason
@@ -194,5 +236,82 @@ class FjordGengo(object):
 
             return job['body_tgt']
 
-        raise GengoMachineTranslationFailure(
-            'opstat: {0}'.format(resp['opstat']))
+        raise GengoAPIFailure(
+            'opstat: {0}, response: {1}'.format(resp['opstat'], resp))
+
+    @requires_keys
+    def human_translate_bulk(self, jobs):
+        """Performs human translation through Gengo on multiple jobs
+
+        This method is asynchronous--it creates the request, posts it,
+        and returns the order information.
+
+        :arg jobs: a list of dicts with ``id``, ``lc_src``, ``lc_dst``
+            ``text`` and (optional) ``unique_id`` keys
+
+        Response dict includes:
+
+        * job_count: number of jobs processed
+        * order_id: the order id
+        * group_id: I have no idea what this is
+        * credits_used: the number of credits used
+        * currency: the currency the credits are in
+
+        """
+        payload = {}
+        for job in jobs:
+            payload['job_{0}'.format(job['id'])] = {
+                'body_src': job['text'],
+                'lc_src': job['lc_src'],
+                'lc_tgt': job['lc_dst'],
+                'tier': 'standard',
+                'type': 'text',
+                'slug': 'Mozilla Input feedback response',
+                'force': 1,
+                'comment': GENGO_COMMENT,
+                'purpose': 'Online content',
+                'tone': 'informal',
+                'use_preferred': 0,
+                'auto_approve': 1,
+                'custom_data': job.get('unique_id', job['id'])
+            }
+
+        resp = self.gengo_api.postTranslationJobs(jobs=payload)
+
+        if resp['opstat'] != 'ok':
+            raise GengoAPIFailure(
+                'opstat: {0}, response: {1}'.format(resp['opstat'], resp))
+
+        return resp['response']
+
+    @requires_keys
+    def completed_jobs_for_order(self, order_id):
+        """Returns jobs for an order which are completed
+
+        Gengo uses the status "approved" for jobs that have been
+        translated and approved and are completed.
+
+        :arg order_id: the order_id for the jobs we want to look at
+
+        :returns: list of job data dicts; interesting fields being
+            ``custom_data`` and ``body_tgt``
+
+        """
+        resp = self.gengo_api.getTranslationOrderJobs(id=str(order_id))
+
+        if resp['opstat'] != 'ok':
+            raise GengoAPIFailure(
+                'opstat: {0}, response: {1}'.format(resp['opstat'], resp))
+
+        job_ids = resp['response']['order']['jobs_approved']
+        if not job_ids:
+            return []
+
+        job_ids = ','.join(job_ids)
+        resp = self.gengo_api.getTranslationJobBatch(id=job_ids)
+
+        if resp['opstat'] != 'ok':
+            raise GengoAPIFailure(
+                'opstat: {0}, response: {1}'.format(resp['opstat'], resp))
+
+        return resp['response']['jobs']

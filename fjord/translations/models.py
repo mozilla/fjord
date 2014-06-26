@@ -1,7 +1,9 @@
 from datetime import datetime
 
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
+from django.core.mail import mail_admins
 from django.db import models
 
 from dennis.translator import Translator
@@ -9,11 +11,13 @@ from statsd import statsd
 
 from .gengo_utils import (
     FjordGengo,
+    GengoAPIFailure,
     GengoMachineTranslationFailure,
     GengoUnknownLanguage,
     GengoUnsupportedLanguage,
 )
 from .utils import locale_equals_language
+from fjord.base.models import ModelBase
 from fjord.journal.models import Record
 from fjord.journal.utils import j_error, j_info
 
@@ -119,7 +123,7 @@ class TranslationSystem(object):
     def log_info(self, instance, action='translate', msg=u'', metadata=None):
         metadata = metadata or {}
 
-        record = j_info(
+        j_info(
             app='translations',
             src=self.name,
             action=action,
@@ -180,6 +184,14 @@ class DennisTranslator(TranslationSystem):
             instance.save()
             self.log_info(instance=instance, action='translate', msg='success')
 
+    def pull_translations(self):
+        # This is a no-op since translations happen synchronously.
+        pass
+
+    def push_translations(self):
+        # This is a no-op since translations happen synchronously.
+        pass
+
 
 # ---------------------------------------------------------
 # Gengo machine translator system AI 9000 of doom
@@ -191,39 +203,44 @@ class GengoMachineTranslator(TranslationSystem):
 
     def translate(self, instance, src_lang, src_field, dst_lang, dst_field):
         text = getattr(instance, src_field)
+        metadata = {
+            'locale': instance.locale,
+            'length': len(text),
+            'body': text[:50].encode('utf-8')
+        }
 
         gengo_api = FjordGengo()
         try:
             lc_src = gengo_api.guess_language(text)
             if not locale_equals_language(instance.locale, lc_src):
-                self.error(
+                self.log_error(
                     instance,
                     action='guess-language',
                     msg='locale "{0}" != guessed language "{1}"'.format(
                         instance.locale, lc_src),
-                    text=text)
+                    metadata=metadata)
 
-            translated = gengo_api.get_machine_translation(
-                instance.id, lc_src, 'en', text)
+            # If the source language is english, we just copy it over.
+            if locale_equals_language(dst_lang, lc_src):
+                setattr(instance, dst_field, text)
+                instance.save()
+                self.log_info(
+                    instance, action='translate',
+                    msg=u'lc_src == dst_lang, so we copy src to dst',
+                    metadata=metadata)
+                return
+
+            translated = gengo_api.machine_translate(
+                instance.id, lc_src, dst_lang, text)
 
             if translated:
                 setattr(instance, dst_field, translated)
                 instance.save()
-                metadata = {
-                    'locale': instance.locale,
-                    'length': len(text),
-                    'body': text[:50].encode('utf-8')
-                }
                 self.log_info(instance, action='translate', msg='success',
                               metadata=metadata)
                 statsd.incr('translation.gengo_machine.success')
 
             else:
-                metadata = {
-                    'locale': instance.locale,
-                    'length': len(text),
-                    'body': text[:50].encode('utf-8')
-                }
                 self.log_error(instance, action='translate',
                                msg='did not translate', metadata=metadata)
                 statsd.incr('translation.gengo_machine.failure')
@@ -232,11 +249,6 @@ class GengoMachineTranslator(TranslationSystem):
             # FIXME: This might be an indicator that this response is
             # spam. At some point p, we can write code to account for
             # that.
-            metadata = {
-                'locale': instance.locale,
-                'length': len(text),
-                'body': text[:50].encode('utf-8')
-            }
             self.log_error(instance, action='guess-language', msg=unicode(exc),
                            metadata=metadata)
             statsd.incr('translation.gengo_machine.unknown')
@@ -245,26 +257,24 @@ class GengoMachineTranslator(TranslationSystem):
             # FIXME: This is a similar boat to GengoUnknownLanguage
             # where for now, we're just going to ignore it because I'm
             # not sure what to do about it and I'd like more data.
-            metadata = {
-                'locale': instance.locale,
-                'length': len(text),
-                'body': text[:50].encode('utf-8')
-            }
             self.log_error(instance, action='translate', msg=unicode(exc),
                            metadata=metadata)
             statsd.incr('translation.gengo_machine.unsupported')
 
-        except GengoMachineTranslationFailure:
+        except (GengoAPIFailure, GengoMachineTranslationFailure):
             # FIXME: For now, if we have a machine translation
             # failure, we're just going to ignore it and move on.
-            metadata = {
-                'locale': instance.locale,
-                'length': len(text),
-                'body': text[:50].encode('utf-8')
-            }
             self.log_error(instance, action='translate', msg=unicode(exc),
                            metadata=metadata)
             statsd.incr('translation.gengo_machine.failure')
+
+    def pull_translations(self):
+        # This is a no-op since translations happen synchronously.
+        pass
+
+    def push_translations(self):
+        # This is a no-op since translations happen synchronously.
+        pass
 
 
 # ---------------------------------------------------------
@@ -282,7 +292,7 @@ STATUS_CHOICES = (
 )
 
 
-class GengoJob(models.Model):
+class GengoJob(ModelBase):
     """Represents a job for the Gengo human translation system"""
     # Generic foreign key to the instance this record is about
     content_type = models.ForeignKey(ContentType)
@@ -302,11 +312,58 @@ class GengoJob(models.Model):
         choices=STATUS_CHOICES, default=STATUS_CREATED, max_length=12)
     order = models.ForeignKey('translations.GengoOrder', null=True)
 
-    # When the Gengo job is submitted, we generate an "id" that ties
-    # it back to our system. This is that id.
-    custom_data = models.CharField(default=u'', blank=True, max_length=100)
-
+    # When this job instance was created
     created = models.DateTimeField(default=datetime.now())
+
+    # When this job instance was completed
+    completed = models.DateTimeField(blank=True, null=True)
+
+    def __unicode__(self):
+        return u'<GengoJob {0}>'.format(self.id)
+
+    def save(self, *args, **kwargs):
+        super(GengoJob, self).save(*args, **kwargs)
+
+        if not self.pk:
+            self.log('create GengoJob', {})
+
+    @classmethod
+    def unique_id_to_id(self, unique_id):
+        return int(unique_id.split(':')[-1])
+
+    @property
+    def unique_id(self):
+        """Returns a unique id for this job for this host
+
+        When we create a job with Gengo, we need to tie that job
+        uniquely back to a GengoJob row, but that could be created on
+        a variety of systems. This (attempts to) create a unique
+        identifier for a specific GengoJob in a specific environment
+        by (ab)using the SITE_URL.
+
+        FIXME: It's possible we don't need to do this because jobs are
+        tied to orders and order numbers are generated by Gengo and
+        should be unique.
+
+        """
+        return (
+            getattr(settings, 'SITE_URL', 'localhost') +
+            ':GengoJob:' +
+            str(self.pk)
+        )
+
+    def assign_to_order(self, order):
+        """Assigns the job to an order which makes the job in progress"""
+        self.order = order
+        self.status = STATUS_IN_PROGRESS
+        self.save()
+
+    def mark_complete(self):
+        """Marks a job as complete"""
+        self.status = STATUS_COMPLETE
+        self.completed = datetime.now()
+        self.save()
+        self.log('completed', {})
 
     def log(self, action, metadata):
         j_info(
@@ -314,29 +371,49 @@ class GengoJob(models.Model):
             src='gengo_human',
             action=action,
             msg='job event',
+            instance=self,
             metadata=metadata
         )
-
-    def __unicode__(self):
-        return u'<GengoJob {0}>'.format(self.id)
 
     @property
     def records(self):
         return Record.objects.records(self)
 
 
-class GengoOrder(models.Model):
+class GengoOrder(ModelBase):
     """Represents a Gengo translation order which contains multiple jobs"""
     order_id = models.CharField(max_length=100)
     status = models.CharField(
-        choices=STATUS_CHOICES, default=STATUS_CREATED, max_length=12)
+        choices=STATUS_CHOICES, default=STATUS_IN_PROGRESS, max_length=12)
 
-    # When the record was submitted to Gengo. This isn't necessarily
-    # when the record was created, so we explicitly populate it.
-    submitted = models.DateTimeField(null=True)
+    # When this instance was created which should also line up with
+    # the time the order was submitted to Gengo
+    created = models.DateTimeField(default=datetime.now())
+
+    # When this order was completed
+    completed = models.DateTimeField(blank=True, null=True)
 
     def __unicode__(self):
         return u'<GengoOrder {0}>'.format(self.id)
+
+    def save(self, *args, **kwargs):
+        super(GengoOrder, self).save(*args, **kwargs)
+
+        if not self.pk:
+            self.log('create GengoOrder', {})
+
+    def mark_complete(self):
+        """Marks an order as complete"""
+        self.status = STATUS_COMPLETE
+        self.completed = datetime.now()
+        self.save()
+        self.log('completed', {})
+
+    def completed_jobs(self):
+        return self.gengojob_set.filter(status=STATUS_COMPLETE)
+
+    def outstanding_jobs(self):
+        return self.gengojob_set.exclude(status=STATUS_COMPLETE)
 
     def log(self, action, metadata):
         j_info(
@@ -344,9 +421,203 @@ class GengoOrder(models.Model):
             src='gengo_human',
             action=action,
             msg='order event',
+            instance=self,
             metadata=metadata
         )
 
     @property
     def records(self):
         return Record.objects.records(self)
+
+
+class GengoHumanTranslator(TranslationSystem):
+    """Translates using Gengo human translation
+
+    Note: This costs real money!
+
+    """
+    name = 'gengo_human'
+
+    def translate(self, instance, src_lang, src_field, dst_lang, dst_field):
+        text = getattr(instance, src_field)
+        metadata = {
+            'locale': instance.locale,
+            'length': len(text),
+            'body': text[:50].encode('utf-8')
+        }
+
+        gengo_api = FjordGengo()
+
+        # Guess the language. If we can't guess the language, then we
+        # don't create a GengoJob.
+        try:
+            lc_src = gengo_api.guess_language(text)
+            if not locale_equals_language(instance.locale, lc_src):
+                self.log_error(
+                    instance,
+                    action='guess-language',
+                    msg='locale "{0}" != guessed language "{1}"'.format(
+                        instance.locale, lc_src),
+                    metadata=metadata)
+
+        except GengoUnknownLanguage as exc:
+            # FIXME: This might be an indicator that this response is
+            # spam. At some point p, we can write code to account for
+            # that.
+            self.log_error(instance, action='guess-language', msg=unicode(exc),
+                           metadata=metadata)
+            statsd.incr('translation.gengo_machine.unknown')
+            return
+
+        except GengoUnsupportedLanguage as exc:
+            # FIXME: This is a similar boat to GengoUnknownLanguage
+            # where for now, we're just going to ignore it because I'm
+            # not sure what to do about it and I'd like more data.
+            self.log_error(instance, action='translate', msg=unicode(exc),
+                           metadata=metadata)
+            statsd.incr('translation.gengo_machine.unsupported')
+            return
+
+        # If the source language is english, we just copy it over.
+        if locale_equals_language(dst_lang, lc_src):
+            setattr(instance, dst_field, text)
+            instance.save()
+            self.log_info(
+                instance, action='translate',
+                msg=u'lc_src == dst_lang, so we copy src to dst',
+                metadata=metadata)
+            return
+
+        job = GengoJob(
+            content_object=instance,
+            src_lang=lc_src,
+            src_field=src_field,
+            dst_lang=dst_lang,
+            dst_field=dst_field
+        )
+        job.save()
+
+    def balance_good_to_continue(self, balance, threshold):
+        """Checks whether balance is good to continue
+
+        If it's not, this sends some mail and returns False.
+
+        We check against a threshold that's high enough that we're
+        pretty sure the next job we create will not exceed the credits
+        in the account. Pretty sure if we exceed the credits in the
+        account, it'll return a non-ok opstat and that'll throw an
+        exception and everything will be ok data-consistency-wise.
+
+        """
+        if balance < threshold:
+            # FIXME: This should email a different group than admin,
+            # but I'm (ab)using the admin group for now because I know
+            # they're set up right.
+            mail_admins(
+                subject='Gengo account balance {0} < {1}'.format(
+                    balance, threshold),
+                message=(
+                    'Dagnabit! Send more money or the translations get it!\n\n'
+                    'Don\'t try no funny business, neither!\n\n'
+                    'Love,\n\n'
+                    'Gengo'
+                )
+            )
+            return False
+        return True
+
+    def push_translations(self):
+        gengo_api = FjordGengo()
+
+        balance = gengo_api.get_balance()
+        threshold = settings.GENGO_ACCOUNT_BALANCE_THRESHOLD
+
+        # statsd the balance so we can track it with graphite
+        statsd.gauge('translation.gengo.balance', balance)
+
+        if not self.balance_good_to_continue(balance, threshold):
+            # If we don't have enough balance, stop.
+            return
+
+        # Create language buckets for the jobs
+        jobs = GengoJob.objects.filter(status=STATUS_CREATED)
+        lang_buckets = {}
+        for job in jobs:
+            lang_buckets.setdefault(job.src_lang, []).append(job)
+
+        # For each bucket, assemble and order and post it.
+        for lang, jobs in lang_buckets.items():
+            batch = []
+            for job in jobs:
+                batch.append({
+                    'id': job.id,
+                    'lc_src': job.src_lang,
+                    'lc_dst': job.dst_lang,
+                    'text': getattr(job.content_object, job.src_field),
+                    'unique_id': job.unique_id
+                })
+
+            # This will kick up a GengoAPIFailure which has the
+            # complete response in the exception message. We want that
+            # to propagate that and end processing in cases where
+            # something bad happened because then we can learn more
+            # about the state things are in. Thus we don't catch
+            # exceptions here.
+            resp = gengo_api.human_translate_bulk(batch)
+
+            # We should have an order_id at this point, so we create a
+            # GengoOrder with it.
+            order = GengoOrder(order_id=resp['order_id'])
+            order.save()
+            order.log('created', metadata={'response': resp})
+
+            # Persist the order on all the jobs and change their
+            # status.
+            for job in jobs:
+                job.assign_to_order(order)
+
+            # Update the balance and see if we're below the threshold.
+            balance = balance - float(resp['credits_used'])
+
+            if not self.balance_good_to_continue(balance, threshold):
+                # If we don't have enough balance, stop.
+                return
+
+    def pull_translations(self):
+        gengo_api = FjordGengo()
+
+        # Get all the orders that are in progress
+        orders = GengoOrder.objects.filter(status=STATUS_IN_PROGRESS)
+        for order in orders:
+            # Get the list of all completed jobs
+            completed = gengo_api.completed_jobs_for_order(order.order_id)
+
+            # If there are no completed jobs, then we don't need to
+            # bother doing any additional processing for this order
+            if not completed:
+                continue
+
+            # For each complete job we haven't seen before, pull it
+            # from the db, save the translated text and update all the
+            # bookkeeping.
+            for comp in completed:
+                id_ = GengoJob.unique_id_to_id(comp['custom_data'])
+
+                job = GengoJob.objects.get(pk=id_)
+                if job.status == STATUS_COMPLETE:
+                    continue
+
+                instance = job.content_object
+                setattr(instance, job.dst_field, comp['body_tgt'])
+                instance.save()
+
+                job.mark_complete()
+
+            # Check to see if there are still outstanding jobs for
+            # this order. If there aren't, close the order out.
+            outstanding = (GengoJob.uncached
+                           .filter(order=order, status=STATUS_IN_PROGRESS)
+                           .count())
+
+            if outstanding == 0:
+                order.mark_complete()

@@ -33,26 +33,61 @@
 
   <section>
     <h1>Products</h1>
-    <h2>Automated Gengo machine translations</h2>
     <table>
       <thead>
-        <tr><th>Product name</th><th>Actions</th></tr>
+        <tr><th>Product name</th><th>translation system</th><th>Actions</th></tr>
       </thead>
       <tbody>
-        {% for prod in gengo_machiners %}
-          <tr><th>{{ prod.display_name }}</th><td><a href="{% url 'admin:feedback_product_change' prod.id %}">Change</a></td></tr>
+        {% for prod in products %}
+          <tr>
+            <th>{{ prod.display_name }}</th>
+            <td>{{ prod.translation_system }}</td>
+            <td><a href="{% url 'admin:feedback_product_change' prod.id %}">Change</a></td>
+          </tr>
         {% endfor %}
       </tbody>
     </table>
   </section>
-  <section>
-    <h1>Configuration</h1>
-    <table>
-      <tr><th>GENGO_PUBLIC_KEY</th><td>{{ settings.GENGO_PUBLIC_KEY }}</td></tr>
-      <tr><th>GENGO_PRIVATE_KEY</th><td>{{ settings.GENGO_PRIVATE_KEY }}</td></tr>
-    </table>
-  </section>
   {% if configured %}
+    <section>
+      <h1>Outstanding orders</h1>
+      <table>
+        <tr><th>id</th><th>order id</th><th>created</th><th>total</th><th>completed</th><th>outstanding</th></tr>
+        {% for order in outstanding %}
+          <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.order_id }}</td>
+            <td>{{ order.created }}</td>
+            <td>{{ order.total_jobs }}</td>
+            <td>{{ order.completed_jobs }}</td>
+            <td>{{ order.outstanding_jobs }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    </section>
+    <section>
+      <h1>Last seven days of orders</h1>
+      <table>
+        <tr>
+          <th>Label</th>
+          {% for day, created, completed in seven_days_of_orders %}
+            <th>{{ day }}</th>
+          {% endfor %}
+        </tr>
+        <tr>
+          <td>Created</td>
+          {% for day, created, completed in seven_days_of_orders %}
+            <td>{{ created }}</td>
+          {% endfor %}
+        </tr>
+        <tr>
+          <td>Completed</td>
+          {% for day, created, completed in seven_days_of_orders %}
+            <td>{{ completed }}</td>
+          {% endfor %}
+        </tr>
+      </table>
+    </section>
     <section>
       <h1>Supported languages</h1>
       <table>
@@ -73,4 +108,11 @@
       </table>
     </section>
   {% endif %}
+  <section>
+    <h1>Configuration</h1>
+    <table>
+      <tr><th>GENGO_PUBLIC_KEY</th><td>{{ settings.GENGO_PUBLIC_KEY }}</td></tr>
+      <tr><th>GENGO_PRIVATE_KEY</th><td>{{ settings.GENGO_PRIVATE_KEY }}</td></tr>
+    </table>
+  </section>
 {% endblock %}
