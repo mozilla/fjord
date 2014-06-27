@@ -10,3 +10,7 @@ HOME=/tmp
 # Note: This runs as root so it has access to the locale/ directory
 # to do an svn up.
 10 2 * * * root cd {{ source }} && (./bin/run_l10n_completion.sh {{ source }} {{ python }} > /dev/null)
+
+# Every hour, sync translations. This pulls and pushes to the various
+# translation systems.
+0 * * * * {{ user }} cd {{ source }} && {{ python }} manage.py translation_sync
