@@ -529,6 +529,11 @@ class GengoHumanTranslator(TranslationSystem):
     def push_translations(self):
         gengo_api = FjordGengo()
 
+        if not gengo_api.is_configured():
+            # If Gengo isn't configured, then we drop out here rather
+            # than raise a GengoConfig error.
+            return
+
         balance = gengo_api.get_balance()
         threshold = settings.GENGO_ACCOUNT_BALANCE_THRESHOLD
 
@@ -585,6 +590,11 @@ class GengoHumanTranslator(TranslationSystem):
 
     def pull_translations(self):
         gengo_api = FjordGengo()
+
+        if not gengo_api.is_configured():
+            # If Gengo isn't configured, then we drop out here rather
+            # than raise a GengoConfig error.
+            return
 
         # Get all the orders that are in progress
         orders = GengoOrder.objects.filter(status=STATUS_IN_PROGRESS)

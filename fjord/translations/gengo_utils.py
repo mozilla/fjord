@@ -96,6 +96,10 @@ class FjordGengo(object):
 
         self.gengo_api = gengo_api
 
+    def is_configured(self):
+        """Returns whether Gengo is configured for Gengo API requests"""
+        return not (self.gengo_api is None)
+
     @requires_keys
     def get_balance(self):
         """Returns the account balance as a float"""
