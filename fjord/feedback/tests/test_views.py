@@ -1,4 +1,5 @@
 from django.test.client import RequestFactory
+from django.test.utils import override_settings
 
 from nose.tools import eq_
 from mock import NonCallableMock
@@ -142,6 +143,7 @@ class TestFeedback(TestCase):
         resp = self.client.get(url)
         self.assertTemplateUsed(resp, 'feedback/generic_feedback_dev.html')
 
+    @override_settings(DEV_LANGUAGES=('en-US', 'es'))
     def test_urls_locale(self):
         """Test setting locale from the locale part of the url"""
         try:
