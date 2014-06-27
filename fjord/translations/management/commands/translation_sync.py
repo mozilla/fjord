@@ -7,14 +7,18 @@ class Command(BaseCommand):
     help = 'Syncs translations with all translation systems.'
 
     def handle(self, *args, **options):
+        verbose = (int(options.get('verbosity', 1)) >= 1)
         system_classes = get_translation_systems().values()
 
         for system_cls in system_classes:
             system = system_cls()
-            print '>>> {0} translation system'.format(system.name)
-            print 'Pulling...'
+            if verbose:
+                print '>>> {0} translation system'.format(system.name)
+                print 'Pulling...'
             system.pull_translations()
-            print 'Pushing...'
+            if verbose:
+                print 'Pushing...'
             system.push_translations()
 
-        print '>>> Done!'
+        if verbose:
+            print '>>> Done!'
