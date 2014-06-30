@@ -565,7 +565,7 @@ class CompletedJobsForOrderTestCase(BaseGengoTestCase):
                         u'body_src': u'Facebook no se puede enlazar con peru',
                         u'credits': u'0.35',
                         u'eta': -1,
-                        u'custom_data': u'localhost:GengoJob:7',
+                        u'custom_data': u'localhost||GengoJob||7',
                         u'tier': u'standard',
                         u'lc_tgt': u'en',
                         u'lc_src': u'es',
@@ -586,7 +586,7 @@ class CompletedJobsForOrderTestCase(BaseGengoTestCase):
             gengo_api = gengo_utils.FjordGengo()
             jobs = gengo_api.completed_jobs_for_order('263413')
             eq_([item['custom_data'] for item in jobs],
-                [u'localhost:GengoJob:7'])
+                [u'localhost||GengoJob||7'])
 
     def test_pull_translations(self):
         ght = GengoHumanTranslator()
@@ -641,7 +641,7 @@ class CompletedJobsForOrderTestCase(BaseGengoTestCase):
                         u'body_src': u'Not compatible with whatsap',
                         u'credits': u'0.35',
                         u'eta': -1,
-                        u'custom_data': u'localhost:GengoJob:{0}'.format(
+                        u'custom_data': u'localhost||GengoJob||{0}'.format(
                             gj.id),
                         u'tier': u'standard',
                         u'lc_tgt': u'en',
