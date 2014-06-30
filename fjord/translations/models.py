@@ -308,8 +308,8 @@ class GengoJob(ModelBase):
 
     @classmethod
     def unique_id_to_id(self, unique_id):
-        parts = unique_id.split(':')
-        return int(parts[2])
+        parts = unique_id.split('||')
+        return int(parts[-1])
 
     @property
     def unique_id(self):
@@ -326,11 +326,11 @@ class GengoJob(ModelBase):
         should be unique.
 
         """
-        return (
-            getattr(settings, 'SITE_URL', 'localhost') +
-            ':GengoJob:' +
+        return '||'.join([
+            getattr(settings, 'SITE_URL', 'localhost'),
+            'GengoJob',
             str(self.pk)
-        )
+        ])
 
     def assign_to_order(self, order):
         """Assigns the job to an order which makes the job in progress"""
