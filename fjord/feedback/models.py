@@ -165,10 +165,11 @@ class Response(ModelBase):
         Otherwise we generate a list of jobs to be done.
 
         """
-        # If the text is in English, we copy it over and we're
-        # done. We do this regardless of whether auto-translation is
-        # enabled or not for this product.
-        if self.locale == 'en-US':
+        # If the text is coming from an English-speaking locale, we
+        # assume it's also in English and just copy it over. We do
+        # this regardless of whether auto-translation is enabled or
+        # not for this product.
+        if self.locale.startswith('en'):
             self.translated_description = self.description
             self.save()
             return []

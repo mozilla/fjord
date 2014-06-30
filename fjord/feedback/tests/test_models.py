@@ -93,6 +93,22 @@ class TestGenerateTranslationJobs(TestCase):
         resp = Response.uncached.get(id=resp.id)
         eq_(resp.description, resp.translated_description)
 
+    def test_english_gb_no_translation(self):
+        """en-GB descriptions should get copied over"""
+        resp = response(
+            locale=u'en-GB',
+            description=u'hello',
+            translated_description=u'',
+            save=True
+        )
+
+        # No new jobs should be generated
+        eq_(len(resp.generate_translation_jobs()), 0)
+
+        # Re-fetch from the db and make sure the description was copied over
+        resp = Response.uncached.get(id=resp.id)
+        eq_(resp.description, resp.translated_description)
+
     def test_english_with_dennis(self):
         """English descriptions should get copied over"""
         resp = response(
