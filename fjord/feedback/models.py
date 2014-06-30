@@ -169,7 +169,7 @@ class Response(ModelBase):
         # assume it's also in English and just copy it over. We do
         # this regardless of whether auto-translation is enabled or
         # not for this product.
-        if self.locale.startswith('en'):
+        if self.locale and self.locale.startswith('en'):
             self.translated_description = self.description
             self.save()
             return []
