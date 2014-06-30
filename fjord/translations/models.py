@@ -86,6 +86,9 @@ class TranslationSystem(object):
     # Name of this translation system
     name = ''
 
+    # Whether or not this system uses push and pull translations
+    use_push_and_pull = False
+
     def translate(self, instance, src_lang, src_field, dst_lang, dst_field):
         """Implement this to translation fields on an instance
 
@@ -158,14 +161,6 @@ class FakeTranslator(TranslationSystem):
         instance.save()
         self.log_info(instance=instance, action='translate', msg='success')
 
-    def pull_translations(self):
-        # This is a no-op for testing purposes.
-        pass
-
-    def push_translations(self):
-        # This is a no-op for testing purposes.
-        pass
-
 
 # ---------------------------------------------------------
 # Dennis translation system
@@ -183,14 +178,6 @@ class DennisTranslator(TranslationSystem):
             setattr(instance, dst_field, translated)
             instance.save()
             self.log_info(instance=instance, action='translate', msg='success')
-
-    def pull_translations(self):
-        # This is a no-op since translations happen synchronously.
-        pass
-
-    def push_translations(self):
-        # This is a no-op since translations happen synchronously.
-        pass
 
 
 # ---------------------------------------------------------
@@ -268,14 +255,6 @@ class GengoMachineTranslator(TranslationSystem):
                            metadata=metadata)
             statsd.incr('translation.gengo_machine.failure')
 
-    def pull_translations(self):
-        # This is a no-op since translations happen synchronously.
-        pass
-
-    def push_translations(self):
-        # This is a no-op since translations happen synchronously.
-        pass
-
 
 # ---------------------------------------------------------
 # Gengo human translator system
@@ -329,7 +308,8 @@ class GengoJob(ModelBase):
 
     @classmethod
     def unique_id_to_id(self, unique_id):
-        return int(unique_id.split(':')[-1])
+        parts = unique_id.split(':')
+        return int(parts[2])
 
     @property
     def unique_id(self):
@@ -437,6 +417,7 @@ class GengoHumanTranslator(TranslationSystem):
 
     """
     name = 'gengo_human'
+    use_push_and_pull = True
 
     def translate(self, instance, src_lang, src_field, dst_lang, dst_field):
         text = getattr(instance, src_field)

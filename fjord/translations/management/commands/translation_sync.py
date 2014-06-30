@@ -11,7 +11,11 @@ class Command(BaseCommand):
         system_classes = get_translation_systems().values()
 
         for system_cls in system_classes:
+            if not system_cls.use_push_and_pull:
+                continue
+
             system = system_cls()
+
             if verbose:
                 print '>>> {0} translation system'.format(system.name)
                 print 'Pulling...'
