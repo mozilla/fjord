@@ -12,6 +12,9 @@ from gengo import Gengo, GengoError
 # keep that until the next deployment.
 GENGO_LANGUAGE_CACHE = None
 
+# Cache of supported language pairs.
+GENGO_LANGUAGE_PAIRS_CACHE = None
+
 # The comment we send to Gengo with the jobs to give some context for
 # the job.
 GENGO_COMMENT = """\
@@ -131,6 +134,27 @@ class FjordGengo(object):
             return GENGO_LANGUAGE_CACHE[1]
 
     @requires_keys
+    def get_language_pairs(self):
+        """Returns the list of supported language pairs
+
+        .. Note::
+
+           This is cached until the next deployment.
+
+        """
+        global GENGO_LANGUAGE_PAIRS_CACHE
+        if not GENGO_LANGUAGE_PAIRS_CACHE:
+            resp = self.gengo_api.getServiceLanguagePairs()
+            # NB: This looks specifically at the standard tier because
+            # that's what we're using. It ignores the other tiers.
+            pairs = [(item['lc_src'], item['lc_tgt'])
+                     for item in resp['response']
+                     if item['tier'] == u'standard']
+            GENGO_LANGUAGE_PAIRS_CACHE = pairs
+
+        return GENGO_LANGUAGE_PAIRS_CACHE
+
+    @requires_keys
     def get_job(self, job_id):
         """Returns data for a specified job
 
@@ -172,13 +196,6 @@ class FjordGengo(object):
             lang = resp_json['detected_lang_code']
             if lang == 'un':
                 raise GengoUnknownLanguage('unknown language')
-
-            if lang not in self.get_languages():
-                # If Gengo doesn't support the language, then we might
-                # as well throw the guess away because there's not
-                # much we can do with it.
-                raise GengoUnsupportedLanguage(
-                    'unsupported language (guesser): {0}'.format(lang))
             return lang
 
         raise GengoUnknownLanguage('request failure: {0}'.format(resp.content))
@@ -281,7 +298,6 @@ class FjordGengo(object):
             }
 
         resp = self.gengo_api.postTranslationJobs(jobs=payload)
-
         if resp['opstat'] != 'ok':
             raise GengoAPIFailure(
                 'opstat: {0}, response: {1}'.format(resp['opstat'], resp))

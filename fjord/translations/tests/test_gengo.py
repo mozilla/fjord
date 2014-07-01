@@ -34,6 +34,10 @@ class BaseGengoTestCase(TestCase):
              ]},
             (u'es', u'de', u'en')
         )
+        gengo_utils.GENGO_LANGUAGE_PAIRS_CACHE = [
+            (u'es', u'en'), (u'en', u'es-la'), (u'de', u'pl')
+        ]
+
         super(BaseGengoTestCase, self).setUp()
 
 
@@ -91,6 +95,15 @@ def guess_language(lang):
                     ],
                     u'detected_lang_name': u'SPANISH'
                 })
+            elif lang == 'el':
+                ret.update({
+                    u'detected_lang_code': u'el',
+                    u'details': [
+                        [u'GREEK', u'el', 62, 46.728971962616825],
+                        [u'ITALIAN', u'it', 38, 9.237875288683602]
+                    ],
+                    u'detected_lang_name': u'GREEK'
+                })
             elif lang == 'en':
                 ret.update({
                     u'detected_lang_code': u'en',
@@ -144,9 +157,6 @@ class GetLanguagesTestCase(BaseGengoTestCase):
         gengo_utils.GENGO_LANGUAGE_CACHE = None
 
         with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
-            # Note: We're mocking with "Muy lento" because it's
-            # short, but the Gengo language guesser actually can't
-            # figure out what language that is.
             instance = GengoMock.return_value
             instance.getServiceLanguages.return_value = response
 
@@ -160,6 +170,45 @@ class GetLanguagesTestCase(BaseGengoTestCase):
 
             # Test that the new list is cached.
             eq_(gengo_utils.GENGO_LANGUAGE_CACHE, (response, (u'es',)))
+
+
+@override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
+class GetLanguagePairsTestCase(BaseGengoTestCase):
+    def test_get_language_pairs(self):
+        resp = {
+            u'opstat': u'ok',
+            u'response': [
+                {u'tier': u'standard', u'lc_tgt': u'es-la', u'lc_src': u'en',
+                 u'unit_price': u'0.05', u'currency': u'USD'},
+                {u'tier': u'ultra', u'lc_tgt': u'ar', u'lc_src': u'en',
+                 u'unit_price': u'0.15', u'currency': u'USD'},
+                {u'tier': u'pro', u'lc_tgt': u'ar', u'lc_src': u'en',
+                 u'unit_price': u'0.10', u'currency': u'USD'},
+                {u'tier': u'ultra', u'lc_tgt': u'es', u'lc_src': u'en',
+                 u'unit_price': u'0.15', u'currency': u'USD'},
+                {u'tier': u'standard', u'lc_tgt': u'pl', u'lc_src': u'de',
+                 u'unit_price': u'0.05', u'currency': u'USD'}
+            ]
+        }
+
+        gengo_utils.GENGO_LANGUAGE_PAIRS_CACHE = None
+
+        with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
+            instance = GengoMock.return_value
+            instance.getServiceLanguagePairs.return_value = resp
+
+            # Make sure the cache is empty
+            eq_(gengo_utils.GENGO_LANGUAGE_PAIRS_CACHE, None)
+
+            # Test that we generate a list based on what we think the
+            # response is.
+            gengo_api = gengo_utils.FjordGengo()
+            eq_(gengo_api.get_language_pairs(),
+                [(u'en', u'es-la'), (u'de', u'pl')])
+
+            # Test that the new list is cached.
+            eq_(gengo_utils.GENGO_LANGUAGE_PAIRS_CACHE,
+                [(u'en', u'es-la'), (u'de', u'pl')])
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
@@ -335,6 +384,19 @@ class HumanTranslationTestCase(BaseGengoTestCase):
         translate(obj, 'gengo_human', 'es', 'desc', 'en', 'trans_desc')
         # If the guesser guesses English, then we just copy it over.
         eq_(obj.trans_desc, u'This is English.')
+
+    @guess_language('el')
+    def test_translate_gengo_human_unsupported_pair(self):
+        obj = SuperModel(
+            locale='el',
+            desc=u'This is really greek.'
+        )
+        obj.save()
+
+        eq_(obj.trans_desc, u'')
+        translate(obj, 'gengo_human', 'el', 'desc', 'en', 'trans_desc')
+        # el -> en is not a supported pair, so it shouldn't get translated.
+        eq_(obj.trans_desc, u'')
 
     @override_settings(
         ADMINS=(('Jimmy Discotheque', 'jimmy@example.com'),),
@@ -708,8 +770,9 @@ class LiveGengoTestCase(TestCase):
 
     """
     def setUp(self):
-        # Wipe out the GENGO_LANGUAGE_CACHE
+        # Wipe out the caches
         gengo_utils.GENGO_LANGUAGE_CACHE = None
+        gengo_utils.GENGO_LANGUAGE_PAIRS_CACHE = None
         super(LiveGengoTestCase, self).setUp()
 
     def test_get_language(self):

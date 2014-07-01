@@ -199,7 +199,12 @@ class GengoMachineTranslator(TranslationSystem):
         gengo_api = FjordGengo()
         try:
             lc_src = gengo_api.guess_language(text)
+            if lc_src not in gengo_api.get_languages():
+                raise GengoUnsupportedLanguage(
+                    'unsupported language: {0}'.format(lc_src))
+
             if not locale_equals_language(instance.locale, lc_src):
+                # Log this for metrics-purposes
                 self.log_error(
                     instance,
                     action='guess-language',
@@ -207,8 +212,8 @@ class GengoMachineTranslator(TranslationSystem):
                         instance.locale, lc_src),
                     metadata=metadata)
 
-            # If the source language is english, we just copy it over.
             if locale_equals_language(dst_lang, lc_src):
+                # If the source language is english, we just copy it over.
                 setattr(instance, dst_field, text)
                 instance.save()
                 self.log_info(
@@ -434,6 +439,7 @@ class GengoHumanTranslator(TranslationSystem):
         try:
             lc_src = gengo_api.guess_language(text)
             if not locale_equals_language(instance.locale, lc_src):
+                # Log this for metrics purposes
                 self.log_error(
                     instance,
                     action='guess-language',
@@ -466,6 +472,16 @@ class GengoHumanTranslator(TranslationSystem):
             self.log_info(
                 instance, action='translate',
                 msg=u'lc_src == dst_lang, so we copy src to dst',
+                metadata=metadata)
+            return
+
+        # If the src -> dst isn't a supported pair, log an issue for
+        # metrics purposes and move on.
+        if (lc_src, dst_lang) not in gengo_api.get_language_pairs():
+            self.log_error(
+                instance, action='translate',
+                msg=u'(lc_src {0}, dst_lang {1}) not supported'.format(
+                    lc_src, dst_lang),
                 metadata=metadata)
             return
 
