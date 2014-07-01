@@ -1,6 +1,7 @@
 import json
 
 from django.conf import settings
+from django.test.client import Client
 
 from nose.tools import eq_
 
@@ -87,6 +88,11 @@ class PublicFeedbackAPITest(ElasticTestCase):
 
 
 class PostFeedbackAPITest(TestCase):
+    def setUp(self):
+        super(PostFeedbackAPITest, self).setUp()
+        # Make sure the unit tests aren't papering over CSRF issues.
+        self.client = Client(enforce_csrf_checks = True)
+
     def test_minimal(self):
         data = {
             'happy': True,
