@@ -1,6 +1,5 @@
 import datetime
 import logging
-import socket
 import sys
 
 from django.conf import settings
@@ -123,19 +122,13 @@ def _live_index_handler(sender, **kwargs):
 
     instance = kwargs['instance']
 
-    try:
-        if kwargs['signal'] == post_save:
-            cls_path = to_class_path(instance.get_mapping_type())
-            index_item_task.delay(cls_path, instance.id)
+    if kwargs['signal'] == post_save:
+        cls_path = to_class_path(instance.get_mapping_type())
+        index_item_task.delay(cls_path, instance.id)
 
-        elif kwargs['signal'] == pre_delete:
-            cls_path = to_class_path(instance.get_mapping_type())
-            unindex_item_task.delay(cls_path, instance.id)
-    except socket.error:
-        # If we have a socket error here, it means we couldn't connect
-        # to amqp.  FIXME: Remove this at some point. But we have it
-        # here now for cron jobs.
-        pass
+    elif kwargs['signal'] == pre_delete:
+        cls_path = to_class_path(instance.get_mapping_type())
+        unindex_item_task(cls_path, instance.id)
 
 
 def register_live_index(model_cls):
