@@ -1,5 +1,7 @@
 from datetime import date
 
+from django.views.decorators.csrf import csrf_exempt
+
 import rest_framework.generics
 import rest_framework.views
 import rest_framework.response
@@ -99,6 +101,7 @@ def feedback_as_view():
     public_feedback_api_view = PublicFeedbackAPI.as_view()
     post_feedback_api_view = PostFeedbackAPI.as_view()
 
+    @csrf_exempt
     @cors_enabled('*', methods=['GET', 'POST'])
     def _feedback_api_router(request):
         if request.method == 'POST':
