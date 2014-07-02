@@ -8,42 +8,6 @@
 set -e
 set -x
 
-# Print out warning about next line which fails when there's a
-# virtualbox version mismatch.
-cat <<EOF
-
-************************************************************************
-
-If it hangs here (i.e. you wait for 15 seconds and nothing happens),
-you might have a mismatched version of the VirtualBox Guest
-Additions.
-
-Option 1:
-
-Shut down the box. Start it back up using the VB GUI. Choose "Insert
-Guest Additions CD" from the Devices menu. On the guest, mount
-/dev/cdrom /mnt && cd /mnt && ./VBoxLinuxAdditions.run. Shut the guest
-back down.
-
-Option 2:
-
-Alternately, per
-https://github.com/TryGhost/Ghost-Vagrant#updating-virtual-box-guest-additions,
-from the host, run...
-1) vagrant plugin install vagrant-vbguest
-2) vagrant up --no-provision
-3) vagrant ssh -c 'sudo apt-get -y -q purge virtualbox-guest-dkms
-   virtualbox-guest-utils virtualbox-guest-x11'
-4) vagrant halt
-5) vagrant up --provision
-
-Option 3 (Mac OSX and Linux only):
-
-Run bin/vagrant_fix_guest_additions.sh
-
-************************************************************************
-
-EOF
 cd ~vagrant/fjord
 
 # Update sources and package indexes:
