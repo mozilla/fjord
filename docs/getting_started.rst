@@ -49,6 +49,12 @@ Fjord repository this way::
    submodules. This will cause all those submodules to get cloned,
    too.
 
+   If you forget to do it, that's ok. just do::
+
+       git submodule update --init --recursive
+
+   and that'll recursively get all the vendor/ stuff.
+
 
 This creates a directory called ``fjord/``. We'll call that the "Fjord
 repository top-level directory".
@@ -86,11 +92,19 @@ After that, we have some minor setup to do::
 
 
 It will ask if you want to create a superuser. You totally do! Create
-a superuser that you'll use to log into Fjord. The username and
-password don't matter, but the email address does. You must choose an
-email address that is your Persona identity. If you don't have a
-Persona identity, you can create one at `the Persona site
-<https://persona.org/>`_.
+a superuser that you'll use to log into Fjord.
+
+The username and password don't matter, but the email address
+does. You must choose an email address that is your Persona
+identity. If you don't have a Persona identity, you can create one at
+`the Persona site <https://persona.org/>`_.
+
+.. Note::
+
+   You can create a superuser at any time by doing::
+
+       ./manage.py createsuperuser
+
 
 After you do that, you need to run migrations::
 
@@ -134,6 +148,25 @@ To launch the Django runserver, use the vagrant ssh shell and do::
 
 Then on your host computer, use your browser and go to
 ``http://127.0.0.1:8000``. You should see Fjord.
+
+
+Getting more sample data
+========================
+
+Sample data is tied to a specific moment in time. You'll need to run
+the generatedata command every time you need fresh data.
+
+The generatedata command only generates data and saves it to the
+db. After running generatedata, you'll need to add that data to the
+Elasticsearch index.
+
+    ./manage.py generatedata
+    ./manage.py esreindex
+
+
+.. Note::
+
+   You can call generadata as many times as you like.
 
 
 Virtual machine maintenance commands
@@ -283,3 +316,34 @@ Flushing the cache
 We use memcached for caching. to flush the cache, do::
 
     echo "flush_all" | nc localhost 11211
+
+
+Where to go from here?
+======================
+
+:ref:`conventions-chapter` covers project conventions for Python,
+JavaScript, git usage, etc.
+
+:ref:`workflow-chapter` covers the general workflow for taking a but,
+working on it and submitting your changes.
+
+:ref:`db-chapter` covers database-related things like updating your
+database with new migrations, creating migrations, etc.
+
+:ref:`es-chapter` covers Elasticsearch-related things like maintaining
+your Elasticsearch index, reindexing, getting status, deleting the
+index and debugging tools.
+
+:ref:`l10n-chapter` covers how we do localization in Fjord like links
+to the svn repository where .po files are stored, Verbatim links,
+getting localized strings, updating strings in Verbatim with new
+strings, testing strings with Dennis, linting strings, creating new
+locales, etc.
+
+:ref:`tests-chapter` covers testing in Fjord like running the tests,
+various arguments you can pass to the test runner to make debugging
+easier, running specific tests, writing tests, the smoketest system,
+JavaScript tests, etc.
+
+:ref:`vendor-chapter` covers maintaining ``vendor/`` and the Python
+library dependencies in there.
