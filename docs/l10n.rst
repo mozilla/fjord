@@ -30,7 +30,7 @@ Localizations are not stored in this repository, but are in Mozilla's SVN.
 
 To get the localizations, do::
 
-    $ svn checkout https://svn.mozilla.org/projects/l10n-misc/trunk/input/locale locale
+    svn checkout https://svn.mozilla.org/projects/l10n-misc/trunk/input/locale locale
 
 
 .. _l10n-update-strings:
@@ -43,23 +43,23 @@ First, ping Kadir (or whoever else) and tell him/her we're merging strings
 
 Then, update the svn repository::
 
-    $ cd locale
-    $ svn update
-    $ cd ..
+    cd locale
+    svn update
+    cd ..
 
 Then, extract the strings from the codebase::
 
-    $ ./manage.py extract
-    $ ./manage.py merge
+    ./manage.py extract
+    ./manage.py merge
 
 (Optional) To see changes in the project::
 
-    $ ./bin/compile-mo.sh locale/
+    ./bin/compile-mo.sh locale/
 
 Then, commit the new strings to svn::
 
-    $ cd locale
-    $ svn commit -m 'String update YYYY/MM/DD'
+    cd locale
+    svn commit -m 'String update YYYY/MM/DD'
 
 Then, tell him/her that the strings have been extracted. He/she will
 update Verbatim for all locales.

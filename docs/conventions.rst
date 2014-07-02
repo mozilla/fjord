@@ -1,6 +1,11 @@
-=====================================
-Conventions (git, l10n, Python, etc.)
-=====================================
+.. _conventions-chapter:
+
+=============================================
+Project Conventions (git, l10n, Python, etc.)
+=============================================
+
+.. contents::
+   :local:
 
 This document contains coding conventions, and things to watch out
 for, etc.
@@ -12,6 +17,9 @@ Coding conventions
 We follow most of the practices as detailed in the `Mozilla webdev
 bootcamp guide
 <http://mozweb.readthedocs.org/en/latest/coding.html>`_.
+
+FIXME - Codify those conventions here.
+
 
 Python
 ------
@@ -31,12 +39,6 @@ Use `jsdoc <http://usejsdoc.org/>`_ for JavaScript function documentation.
 
 Git conventions
 ===============
-
-Git workflow
-------------
-
-We use a rebase-based workflow.
-
 
 Git commit messages
 -------------------
@@ -61,8 +63,7 @@ advantage of.
 If the commit relates to a bug, the bug should show up in the summary
 line in brackets.
 
-There should be a blank line between the summary and the rest of the
-commit message. Lines shouldn't exceed 72 characters.
+Lines shouldn't exceed 72 characters.
 
 See `these guidelines
 <http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html>`_
@@ -85,8 +86,6 @@ Localization conventions
 
 Strings
 -------
-
-(Copied from Playdoh docs.)
 
 You can localize strings both in Python code as well as Jinja
 templates.
@@ -120,8 +119,6 @@ In Jinja we can use the following syntax for localized strings::
 
 Good Practices
 --------------
-
-(Copied from Playdoh docs.)
 
 Let’s say you have some template::
 
@@ -209,6 +206,6 @@ After that, cd into the project directory and do::
 
 After that runs, you can see what happened by doing::
 
-    $ ./manage.py runserver
+    $ ./manage.py runserver 0.0.0.0:8000
 
 and going to `<http://127.0.0.1:8000/xx/>`_.

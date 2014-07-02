@@ -9,30 +9,15 @@ the system continues to work. Further, they make it easier to verify
 correctness for behavioral details.
 
 
-Setting up the tests
-====================
-
-To set up the tests, follow the instructions in
-:ref:`setting-up-tests`.
-
-
 Running tests
 =============
 
 Running tests and arguments
 ---------------------------
 
-The tests have LiveServerTestCase tests that use Selenium to do ui
-testing now. Before you run the tests, you have to run these two
-commands::
-
-    $ ./manage.py collectstatic
-    $ ./manage.py compress_assets
-
-
 To run the test suite, do::
 
-    $ ./manage.py test
+    ./manage.py test
 
 
 However, that doesn't provide the most sensible defaults. Amongst
@@ -42,7 +27,7 @@ debugging output. Ew.
 
 I suggest you run it this way::
 
-    $ ./manage.py test -s --noinput --logging-clear-handlers
+    ./manage.py test -s --noinput --logging-clear-handlers
 
 
 The ``-s`` flag is important if you want to be able to drop into PDB
@@ -71,7 +56,7 @@ When the schema changes, you may need to drop the test database. You
 can also run the test suite with ``FORCE_DB`` once to cause Django to
 drop and recreate it::
 
-    $ FORCE_DB=1 ./manage.py test -s --noinput --logging-clear-handlers
+    FORCE_DB=1 ./manage.py test -s --noinput --logging-clear-handlers
 
 
 Running specific tests
@@ -80,11 +65,11 @@ Running specific tests
 You can run part of the test suite by specifying the directories of the
 code you want to run, like::
 
-    $ ./manage.py test fjord/feedback/tests
+    ./manage.py test fjord/feedback/tests
 
 You can specify specific tests::
 
-    # ./manage.py test fjord.feedback.tests.test_ui:TestFeedback.test_happy_url
+    ./manage.py test fjord.feedback.tests.test_ui:TestFeedback.test_happy_url
 
 See the output of ``./manage.py test --help`` for more arguments.
 
