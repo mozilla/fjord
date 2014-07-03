@@ -1,4 +1,5 @@
 import json
+from datetime import date, timedelta
 
 from django.conf import settings
 from django.test.client import Client
@@ -41,7 +42,8 @@ class PublicFeedbackAPITest(ElasticTestCase):
         eq_(json_data['count'], 1)
         eq_(len(json_data['results']), 1)
 
-        resp = self.client.get(reverse('feedback-api'), {'products': 'Firefox'})
+        resp = self.client.get(reverse('feedback-api'),
+                               {'products': 'Firefox'})
         json_data = json.loads(resp.content)
         eq_(json_data['count'], 2)
         eq_(len(json_data['results']), 2)
@@ -51,7 +53,8 @@ class PublicFeedbackAPITest(ElasticTestCase):
         eq_(json_data['count'], 2)
         eq_(len(json_data['results']), 2)
 
-        resp = self.client.get(reverse('feedback-api'), {'locales': 'en-US,de'})
+        resp = self.client.get(reverse('feedback-api'),
+                               {'locales': 'en-US,de'})
         json_data = json.loads(resp.content)
         eq_(json_data['count'], 3)
         eq_(len(json_data['results']), 3)
@@ -68,7 +71,89 @@ class PublicFeedbackAPITest(ElasticTestCase):
         eq_(json_data['count'], 2)
         eq_(len(json_data['results']), 2)
 
-        # FIXME: Test date_start, date_end, delta, products/versions
+        # FIXME: Test products/versions
+
+    def create_test_data(self):
+        """Create and send test data"""
+        testdata = [
+            ('2014-07-01', True, 'en-US', 'Firefox'),
+            ('2014-07-02', True, 'en-US', 'Firefox for Android'),
+            ('2014-07-03', False, 'de', 'Firefox'),
+            ('2014-07-04', False, 'de', 'Firefox for Android'),
+        ]
+        for date_start, happy, platform, product in testdata:
+            response(
+                happy=happy, platform=platform,
+                product=product, created=date_start, save=True)
+        self.refresh()
+
+    def _test(self, getoptions, expectedresponse):
+        """Helper method for tests"""
+        self.create_test_data()
+        resp = self.client.get(reverse('feedback-api'), getoptions)
+        json_data = json.loads(resp.content)
+        results = json_data['results']
+        eq_(len(json_data['results']), len(expectedresponse))
+        for result, expected in zip(results, expectedresponse):
+            eq_(result['created'], expected)
+
+    def test_date_start(self):
+        """date_start returns responses from that day forward"""
+        self._test(
+            {'date_start': '2014-07-02'},
+            ['2014-07-04T00:00:00', '2014-07-03T00:00:00',
+             '2014-07-02T00:00:00'])
+
+    def test_date_end(self):
+        """date_end returns responses from before that day"""
+        self._test(
+            {'date_end': '2014-07-03'},
+            ['2014-07-03T00:00:00', '2014-07-02T00:00:00',
+                '2014-07-01T00:00:00'])
+
+    def test_date_delta_with_date_end(self):
+        """Test date_delta filtering when date_end exists"""
+        self._test(
+            {'date_delta': '1d', 'date_end': '2014-07-03'},
+            ['2014-07-03T00:00:00', '2014-07-02T00:00:00'])
+
+    def test_date_delta_with_date_start(self):
+        """Test date_delta filtering when date_start exists"""
+        self._test(
+            {'date_delta': '1d', 'date_start': '2014-07-02'},
+            ['2014-07-03T00:00:00', '2014-07-02T00:00:00'])
+
+    def test_date_delta_with_date_end_and_date_start(self):
+        """When all three date fields are specified ignore date_start"""
+        self._test(
+            {'date_delta': '1d', 'date_end': '2014-07-03',
+            'date_start': '2014-07-02'},
+            ['2014-07-03T00:00:00', '2014-07-02T00:00:00'])
+
+    def test_date_delta_with_no_constraints(self):
+        """Test date_delta filtering without date_end or date_start"""
+        timeformatsuffix = 'T00:00:00'
+        today = (str(date.today()) + timeformatsuffix)
+        yesterday = (str(date.today() + timedelta(days=-1)) + timeformatsuffix)
+        beforeyesterday = (str(date.today() + timedelta(days=-2)) +
+                           timeformatsuffix)
+        testdata = [
+            (True, 'de', 'Firefox for Android', beforeyesterday),
+            (True, 'en-US', 'Firefox', yesterday),
+            (True, 'en-US', 'Firefox for Android', today)
+        ]
+        for happy, platform, product, date_start in testdata:
+            response(
+                happy=happy, platform=platform,
+                product=product, created=date_start, save=True)
+        self.refresh()
+        self._test({'date_delta': '1d'}, [today, yesterday])
+
+    def test_both_date_end_and_date_start_with_no_date_delta(self):
+        self._test(
+            {'date_start': '2014-07-02', 'date_end': '2014-07-03'},
+            ['2014-07-03T00:00:00', '2014-07-02T00:00:00']
+        )
 
     def test_public_fields(self):
         """The results should only contain publicly-visible fields"""
@@ -91,7 +176,7 @@ class PostFeedbackAPITest(TestCase):
     def setUp(self):
         super(PostFeedbackAPITest, self).setUp()
         # Make sure the unit tests aren't papering over CSRF issues.
-        self.client = Client(enforce_csrf_checks = True)
+        self.client = Client(enforce_csrf_checks=True)
 
     def test_minimal(self):
         data = {
