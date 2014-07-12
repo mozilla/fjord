@@ -33,6 +33,8 @@ class JSONObjectField(models.TextField):
     description = _lazy(u'JSON Object')
 
     def to_python(self, value):
+        # FIXME: This isn't called when accessing the field value.
+        # So it must be something else.
         return json.loads(value)
 
     def value_to_string(self, obj):

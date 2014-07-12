@@ -184,6 +184,7 @@ INSTALLED_APPS = get_apps(
         'fjord.analytics',
         'fjord.base',
         'fjord.feedback',
+        'fjord.heartbeat',
         'fjord.journal',
         'fjord.search',
         'fjord.translations',
