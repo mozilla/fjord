@@ -9,7 +9,7 @@ from django.http import (
     HttpResponseBadRequest,
     HttpResponseRedirect
 )
-from django.utils.dateparse import parse_date
+from django.utils.dateparse import parse_date, parse_datetime
 from django.utils.feedgenerator import Atom1Feed
 
 from funfactory.urlresolvers import reverse

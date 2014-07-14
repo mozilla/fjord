@@ -1,0 +1,62 @@
+{% extends "admin/base_site.html" %}
+{% block content_title %}
+  <h1>Translations - Maintenance - Backfill</h1>
+{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style type="text/css">
+    section {
+      clear: both;
+      margin: 1em 0em 1em 0em;
+    }
+    div#content div {
+      margin-bottom: .5em;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <section>
+    <p class="errornote">
+      Be very careful how you fill out this form. It can create lots
+      of translation jobs. If you make a mistake, you might need an
+      account on the translation system in question and then have to
+      remove them by hand.
+    </p>
+  </section>
+
+  <section>
+    <form action="{{ request.path }}" method=POST>
+      {% csrf_token %}
+      <table>
+        <tr>
+          <th>Date start (yyyy-mm-dd)</th>
+          <td>
+            <input type="text" name="date_start" value="{{ date_start }}">
+          </td>
+        </tr>
+        <tr>
+          <th>Date end (yyyy-mm-dd)</th>
+          <td>
+            <input type="text" name="date_end" value="{{ date_end }}">
+          </td>
+        </tr>
+        <tr>
+          <th>Model</th>
+          <td>
+            <select name="model">
+              {% for cls in model_classes %}
+                <option value="{{ cls }}">{{ cls }}</option>
+              {% endfor %}
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td><input type="Submit"></td>
+        </tr>
+      </table>
+    </form>
+  </section>
+{% endblock %}
