@@ -153,9 +153,15 @@ def translations_management_backfill_view(request):
     date_end = smart_date(request.POST.get('date_end'))
     model = smart_str(request.POST.get('model'))
 
-    if request.method == 'POST':
+    if request.method == 'POST' and date_start and date_end and model:
         # NB: We just let the errors propagate because this is an
         # admin page. That way we get a traceback and all that detail.
+
+        # We add one day to date_end so that it picks up the entire day of
+        # date_end.
+        #
+        # FIXME: We should do this in a less goofy way.
+        date_end = date_end + timedelta(days=1)
 
         model_cls = import_by_path(model)
 
