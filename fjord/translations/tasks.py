@@ -39,7 +39,7 @@ def create_translation_tasks(instance, system=None):
     """Generate translation tasks for a given translateable instance"""
     jobs = instance.generate_translation_jobs(system=system)
     if not jobs:
-        return
+        return []
 
     for key, system, src_lang, src_field, dst_lang, dst_field in jobs:
         if not getattr(instance, src_field).strip():
@@ -48,6 +48,8 @@ def create_translation_tasks(instance, system=None):
 
         translate_task.delay(key, system, src_lang, src_field,
                              dst_lang, dst_field)
+
+    return jobs
 
 
 def translate_handler(sender, instance=None, created=False, **kwargs):
@@ -66,6 +68,10 @@ def translate_handler(sender, instance=None, created=False, **kwargs):
     return create_translation_tasks(instance)
 
 
+# Set of models registered for translation.
+REGISTERED_MODELS = set()
+
+
 def register_auto_translation(model_cls):
     """Decorator that Registers model class for automatic translation
 
@@ -81,6 +87,7 @@ def register_auto_translation(model_cls):
     that we can save the data back to the instance later.
 
     """
-    uid = str(model_cls) + 'translation'
+    uid = '-'.join([model_cls.__module__, model_cls.__name__, 'translation'])
     post_save.connect(translate_handler, model_cls, dispatch_uid=uid)
+    REGISTERED_MODELS.add(model_cls)
     return model_cls

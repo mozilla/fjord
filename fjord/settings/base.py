@@ -173,6 +173,7 @@ INSTALLED_APPS = get_apps(
         'fjord.grappellioverride',
         'grappelli',
         'django.contrib.admin',
+        'django.contrib.messages',
         'django_extensions',
         'django_nose',
         'djcelery',
