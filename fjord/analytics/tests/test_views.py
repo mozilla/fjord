@@ -12,7 +12,7 @@ from django.http import QueryDict
 
 from fjord.analytics import views
 from fjord.base.tests import LocalizingClient, reverse, user, profile
-from fjord.feedback.tests import response
+from fjord.feedback.tests import response, product
 from fjord.search.tests import ElasticTestCase
 
 
@@ -59,6 +59,19 @@ class TestDashboardView(ElasticTestCase):
         # Make sure that each opinion is shown and that the count is correct.
         eq_(pq('.block.count strong').text(), '7')
         eq_(len(pq('li.opinion')), 7)
+
+    def test_hidden_products_dont_show_up(self):
+        # Create a hidden product and one response for it
+        prod = product(display_name=u'HiddenProduct', db_name='HiddenProduct',
+                       on_dashboard=False, save=True)
+        response(product=prod.db_name, save=True)
+        self.refresh()
+
+        url = reverse('dashboard')
+        resp = self.client.get(url)
+        eq_(resp.status_code, 200)
+
+        assert 'HiddenProduct' not in resp.content
 
     def test_dashboard_atom_links(self):
         """Test dashboard atom links are correct"""
@@ -380,6 +393,27 @@ class TestResponseview(ElasticTestCase):
         eq_(200, r.status_code)
         self.assertTemplateUsed(r, 'analytics/mobile/response.html')
         assert str(resp.description) in r.content
+
+    def test_hidden_products(self):
+        # First, test with a non-authenticated user
+        prod = product(display_name='HiddenProduct', on_dashboard=False,
+                       save=True)
+        resp = response(product=prod.db_name, save=True)
+        self.refresh()
+
+        r = self.client.get(reverse('response_view', args=(resp.id,)))
+        eq_(403, r.status_code)
+
+        # Second, test with an authenticated user
+        # Create an analyzer and log her in
+        jane = user(email='jane@example.com', save=True)
+        profile(user=jane, save=True)
+        jane.groups.add(Group.objects.get(name='analyzers'))
+
+        self.client_login_user(jane)
+
+        r = self.client.get(reverse('response_view', args=(resp.id,)))
+        eq_(200, r.status_code)
 
     def test_response_view_analyzer(self):
         """Test secret section only shows up for analyzers"""

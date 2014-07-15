@@ -4,6 +4,7 @@ from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
 
+from caching.base import CachingManager
 from elasticutils.contrib.django import Indexable, MLT
 from product_details import product_details
 from rest_framework import serializers
@@ -28,6 +29,12 @@ from fjord.translations.tasks import register_auto_translation
 # do this in code rather than in the db since it makes it easier to
 # tweak the value.
 TRUNCATE_LENGTH = 10000
+
+
+class ProductManager(CachingManager):
+    def public(self):
+        """Returns publicly visible products"""
+        return self.filter(on_dashboard=True)
 
 
 class Product(ModelBase):
@@ -60,6 +67,8 @@ class Product(ModelBase):
         blank=True,
         max_length=20,
     )
+
+    objects = ProductManager()
 
     @classmethod
     def from_slug(cls, slug):

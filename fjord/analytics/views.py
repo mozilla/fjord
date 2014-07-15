@@ -6,7 +6,11 @@ from datetime import date, timedelta
 
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import (
+    HttpResponse,
+    HttpResponseForbidden,
+    HttpResponseRedirect
+)
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 
@@ -60,6 +64,14 @@ def spot_translate(request, responseid):
 @mobile_template('analytics/{mobile/}response.html')
 def response_view(request, responseid, template):
     response = get_object_or_404(Response, id=responseid)
+
+    if (not Product.objects.get(db_name=response.product).on_dashboard and
+        not (request.user.is_authenticated()
+             and request.user.has_perm('analytics.can_view_dashboard'))):
+        # If this is a response for a hidden product and the user
+        # isn't in the analytics group, then they can't see it.
+        return HttpResponseForbidden()
+
     mlt = None
     records = None
 
@@ -210,7 +222,13 @@ def dashboard(request):
     if search_locale is not None:
         f &= F(locale=unknown_to_empty(search_locale))
         current_search['locale'] = search_locale
-    if search_product is not None:
+
+    visible_products = [
+        prod.encode('utf-8')
+        for prod in Product.objects.public().values_list('db_name', flat=True)
+    ]
+
+    if search_product == u'' or search_product in visible_products:
         f &= F(product=unknown_to_empty(search_product))
         current_search['product'] = search_product
 
@@ -219,6 +237,8 @@ def dashboard(request):
             # product.
             f &= F(version=unknown_to_empty(search_version))
             current_search['version'] = search_version
+    else:
+        f &= F(product__in=visible_products)
 
     if search_date_start is None and search_date_end is None:
         selected = '7d'
