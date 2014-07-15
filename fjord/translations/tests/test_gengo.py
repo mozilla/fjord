@@ -221,7 +221,6 @@ class GetBalanceTestCase(BaseGengoTestCase):
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
 class MachineTranslateTestCase(BaseGengoTestCase):
-    @guess_language('es')
     def test_machine_translate(self):
         with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
             # Note: We're mocking with "Muy lento" because it's
@@ -256,6 +255,17 @@ class MachineTranslateTestCase(BaseGengoTestCase):
             text = u'Muy lento'
             eq_(gengo_api.machine_translate(1010, 'es', 'en', text),
                 u'Very slow')
+
+    def test_machine_translate_unsupported_lc_src(self):
+        with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
+            gengo_api = gengo_utils.FjordGengo()
+            self.assertRaises(
+                gengo_utils.GengoUnsupportedLanguage,
+                gengo_api.machine_translate,
+                1010, 'zh-tw', 'en', 'whatevs'
+            )
+
+            eq_(GengoMock.return_value.postTranslationJobs.mock_calls, [])
 
     @guess_language('es')
     def test_translate_gengo_machine(self):

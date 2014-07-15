@@ -15,6 +15,12 @@ GENGO_LANGUAGE_CACHE = None
 # Cache of supported language pairs.
 GENGO_LANGUAGE_PAIRS_CACHE = None
 
+# List of unsupported source languages. Theoretically, these don't
+# change often and there's no way to discover them via the Gengo API
+# that I can see, so we're going to manually curate them. If this
+# turns out to be problematic, we can change how we do things then.
+GENGO_MACHINE_UNSUPPORTED = ['zh-cn', 'zh-tw']
+
 # The comment we send to Gengo with the jobs to give some context for
 # the job.
 GENGO_COMMENT = """\
@@ -221,6 +227,11 @@ class FjordGengo(object):
             translation fails
 
         """
+        if lc_src in GENGO_MACHINE_UNSUPPORTED:
+            raise GengoUnsupportedLanguage(
+                'unsupported language (translater; hc)): {0} -> {1}'.format(
+                    lc_src, lc_dst))
+
         data = {
             'jobs': {
                 'job_1': {
