@@ -89,6 +89,14 @@
       </table>
     </section>
     <section>
+      <h1>Unsupported machine languages</h1>
+      <table>
+        {% for lang in machine_unsupported %}
+          <tr><td>{{ lang }}</td></tr>
+        {% endfor %}
+      </table>
+    </section>
+    <section>
       <h1>Supported languages</h1>
       <table>
         <tr><th>Gengo language code (lc)</th><th>Gengo language</th><th>related prod locale</th></tr>
