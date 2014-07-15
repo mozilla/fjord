@@ -228,7 +228,10 @@ def dashboard(request):
         for prod in Product.objects.public().values_list('db_name', flat=True)
     ]
 
-    if search_product == u'' or search_product in visible_products:
+    # This covers the "unknown" product which is also visible.
+    visible_products.append('')
+
+    if search_product in visible_products:
         f &= F(product=unknown_to_empty(search_product))
         current_search['product'] = search_product
 
