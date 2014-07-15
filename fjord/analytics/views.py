@@ -4,6 +4,7 @@
 import json
 from datetime import date, timedelta
 
+from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -41,16 +42,16 @@ def spot_translate(request, responseid):
     # FIXME: This is gengo-machine specific for now.
     resp = get_object_or_404(Response, id=responseid)
     system = request.POST.get('system', None)
+    total_jobs = 0
     if system and system in get_translation_systems():
-        create_translation_tasks(resp, system=system)
+        total_jobs += len(create_translation_tasks(resp, system=system))
 
     # FIXME: If there's no system specified, we should tell the user
     # something. I'm going to defer fixing that for now since the user
     # would have to be doing "sneaky" things to hit that situation.
 
-    # FIXME: We should return a message to the user, so they know
-    # it'll happen at some point. Plus we need to let the user know
-    # when it's failed.
+    messages.success(request, '%s %s translation jobs added' % (
+        total_jobs, system))
     return HttpResponseRedirect(
         reverse('response_view', args=(responseid,)))
 

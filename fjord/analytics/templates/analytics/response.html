@@ -10,6 +10,15 @@
 </div>
 
 <div class="col wide">
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+        {{ message.tags }}: {{ message }}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
 {% block content_middle %}
   <div class="block feedback">
     <h2>{{ _('Response id: {id}')|f(id=response.id) }}</h2>
