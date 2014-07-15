@@ -456,6 +456,7 @@ CELERYD_TASK_SOFT_TIME_LIMIT = 60 * 10
 
 # Configuration for API views.
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (),
     'DEFAULT_THROTTLE_CLASSES': (
         'fjord.base.util.MeasuredAnonRateThrottle',
     ),
