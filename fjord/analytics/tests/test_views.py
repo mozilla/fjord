@@ -394,8 +394,7 @@ class TestResponseview(ElasticTestCase):
         self.assertTemplateUsed(r, 'analytics/mobile/response.html')
         assert str(resp.description) in r.content
 
-    def test_hidden_products(self):
-        # First, test with a non-authenticated user
+    def test_hidden_products_with_unauthed_user(self):
         prod = product(display_name='HiddenProduct', on_dashboard=False,
                        save=True)
         resp = response(product=prod.db_name, save=True)
@@ -404,8 +403,24 @@ class TestResponseview(ElasticTestCase):
         r = self.client.get(reverse('response_view', args=(resp.id,)))
         eq_(403, r.status_code)
 
-        # Second, test with an authenticated user
-        # Create an analyzer and log her in
+    def test_hidden_products_with_authed_user(self):
+        prod = product(display_name='HiddenProduct', on_dashboard=False,
+                       save=True)
+        resp = response(product=prod.db_name, save=True)
+        self.refresh()
+
+        jane = user(email='jane@example.com', save=True)
+        profile(user=jane, save=True)
+
+        r = self.client.get(reverse('response_view', args=(resp.id,)))
+        eq_(403, r.status_code)
+
+    def test_hidden_products_with_analyzer_user(self):
+        prod = product(display_name='HiddenProduct', on_dashboard=False,
+                       save=True)
+        resp = response(product=prod.db_name, save=True)
+        self.refresh()
+
         jane = user(email='jane@example.com', save=True)
         profile(user=jane, save=True)
         jane.groups.add(Group.objects.get(name='analyzers'))

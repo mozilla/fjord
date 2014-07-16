@@ -65,12 +65,19 @@ def spot_translate(request, responseid):
 def response_view(request, responseid, template):
     response = get_object_or_404(Response, id=responseid)
 
-    if (not Product.objects.get(db_name=response.product).on_dashboard and
-        not (request.user.is_authenticated()
-             and request.user.has_perm('analytics.can_view_dashboard'))):
-        # If this is a response for a hidden product and the user
-        # isn't in the analytics group, then they can't see it.
-        return HttpResponseForbidden()
+    try:
+        prod = Product.objects.get(db_name=response.product)
+
+        if (not prod.on_dashboard
+            and not (request.user.is_authenticated()
+                     or request.user.has_perm('analytics.can_view_dashboard'))):
+
+            # If this is a response for a hidden product and the user
+            # isn't in the analytics group, then they can't see it.
+            return HttpResponseForbidden()
+
+    except Product.DoesNotExist:
+        pass
 
     mlt = None
     records = None
