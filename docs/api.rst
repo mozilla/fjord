@@ -191,3 +191,91 @@ HTTP 400
 HTTP 429
     There has been too many feedback postings from this IP address and
     the throttle trigger was hit. Try again later.
+
+
+Posting heartbeat feedback: /api/v1/hb/
+=======================================
+
+:URL:            ``/api/v1/hb/``
+:Method:         HTTP POST
+:Payload format: JSON--make sure to have ``Content-type: application/json``
+                 header
+
+
+Required fields
+---------------
+
+**locale**
+    String. The locale of the user interface that the user is using
+
+    Examples: ``"en-US"``, ``"fr"``, ``"de"``
+
+**platform**
+    String. The name of the operating system/platform the product
+    is running on.
+
+    Examples: ``"OS X"``, ``"Windows 8"``, ``"Firefox OS"``,
+    ``"Android"``, ``"Linux"``
+
+**product**
+    String. The name of the product the user is giving feedback on.
+
+    Examples: ``"Firefox for Android"``, ``"Firefox OS"``
+
+    .. Note::
+
+       This must be a valid product in the system. Before you start
+       posting to Input, please talk to the User Advocacy folks or an
+       Input admin to have your product added.
+
+**channel**
+    String. The channel of the product the user is giving feedback on.
+
+    Examples: ``"stable"``, ``"beta"``
+
+**version**
+    String. The version of the product the user is giving feedback
+    on as a string.
+
+    Examples: ``"22b2"``, ``"1.1"``
+
+
+    String. The operating system the user is using
+
+**poll**
+    String. The slug of the poll this heartbeat response is for.
+
+    Examples: ``"is-firefox-fast"``
+
+    .. Note::
+
+       The poll must be created on the Input system you're testing
+       against and enabled. Otherwise you'll get errors.
+
+       Before you start posting to Input, please talk to the User
+       Advocacy folks or an Input admin to have your product added.
+
+**answer**
+    String. The answer value.
+
+    Examples: ``"true"``, ``"false"``, ``"4"``
+
+
+Minimal example with curl
+-------------------------
+
+::
+
+    curl -v -XPOST $URL \
+        -H 'Accept: application/json; indent=4' \
+        -H 'Content-type: application/json' \
+        -d '
+    {
+        "locale": "en-US",
+        "platform": "Linux",
+        "product": "Firefox",
+        "version": "30.0",
+        "channel": "stable",
+        "poll": "ou812",
+        "answer": "42"
+    }'
