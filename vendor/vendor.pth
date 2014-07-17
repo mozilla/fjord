@@ -55,6 +55,7 @@ src/django-sha2
 src/django-statsd
 src/elasticutils
 src/elasticsearch-py
+src/factory_boy
 src/funfactory
 src/gengo-python
 src/jingo

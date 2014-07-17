@@ -103,3 +103,6 @@
 [submodule "vendor/src/gengo-python"]
 	path = vendor/src/gengo-python
 	url = https://github.com/gengo/gengo-python.git
+[submodule "vendor/src/factory_boy"]
+	path = vendor/src/factory_boy
+	url = https://github.com/rbarrois/factory_boy.git
