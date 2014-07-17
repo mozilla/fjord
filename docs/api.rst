@@ -4,6 +4,9 @@
  API
 =====
 
+.. contents::
+   :local:
+
 Fjord has an API.
 
 
@@ -29,8 +32,8 @@ that our production server does. The url for the our stage server is::
 Please make sure to use the right domain!
 
 
-Posting feedback
-================
+Posting product feedback: /api/v1/feedback/
+===========================================
 
 :URL:            ``/api/v1/feedback/``
 :Method:         HTTP POST
@@ -38,126 +41,123 @@ Posting feedback
                  header
 
 
-**Required fields**
+Required fields
+---------------
 
-    **happy**
-        Boolean. All feedback is either happy or sad. This denotes
-        whether this feedback is happy (True) or sad (False).
+**happy**
+    Boolean. All feedback is either happy or sad. This denotes
+    whether this feedback is happy (True) or sad (False).
 
-        Valid values: ``true``, ``false``
+    Valid values: ``true``, ``false``
 
-    **description**
-        String. This is the feedback text.
+**description**
+    String. This is the feedback text.
 
-        Example: ``"OMG! I love Firefox!"``
+    Example: ``"OMG! I love Firefox!"``
 
-    **product**
-        String. The name of the product the user is giving feedback on.
+**product**
+    String. The name of the product the user is giving feedback on.
 
-        Examples: ``"Firefox for Android"``, ``"Firefox OS"``
+    Examples: ``"Firefox for Android"``, ``"Firefox OS"``
 
-        Current valid choices are:
+    .. Note::
 
-        * `''` (empty string)
-        * `'Firefox OS'`
-        * `'Firefox for Android'`
-        * `'Firefox'`
-        * `'Firefox Metro'`
+       This must be a valid product in the system. Before you start
+       posting to Input, please talk to the User Advocacy folks or an
+       Input admin to have your product added.
 
-        Those changes are case-sensitive and must appear exactly like
-        that.
 
-        Note: This list may be old. If you think it's old, please ask
-        someone from the User Advocacy group or an Input developer to
-        verify.
+Optional fields
+---------------
 
-**Optional fields**
+**channel**
+    String. The channel of the product the user is giving feedback on.
 
-    **channel**
-        String. The channel of the product the user is giving feedback on.
+    Examples: ``"stable"``, ``"beta"``
 
-        Examples: ``"stable"``, ``"beta"``
+**version**
+    String. The version of the product the user is giving feedback
+    on as a string.
 
-    **version**
-        String. The version of the product the user is giving feedback
-        on as a string.
+    Examples: ``"22b2"``, ``"1.1"``
 
-        Examples: ``"22b2"``, ``"1.1"``
+**platform**
+    String. The name of the operating system/platform the product
+    is running on.
 
-    **platform**
-        String. The name of the operating system/platform the product
-        is running on.
+    Examples: ``"OS X"``, ``"Windows 8"``, ``"Firefox OS"``,
+    ``"Android"``, ``"Linux"``
 
-        Examples: ``"OS X"``, ``"Windows 8"``, ``"Firefox OS"``,
-        ``"Android"``, ``"Linux"``
+**locale**
+    String. The locale the user is using.
 
-    **locale**
-        String. The locale the user is using.
+    Examples: ``"en-US"``, ``"fr"``, ``"de"``
 
-        Examples: ``"en-US"``, ``"fr"``, ``"de"``
+**country**
+    String. The country of origin for the device.
 
-    **country**
-        String. The country of origin for the device.
+    Examples: ``"Peru"``, ``"Mexico"``
 
-        Examples: ``"Peru"``, ``"Mexico"``
+    .. Note::
 
-        .. Note::
+       This is probably only relevant to Firefox OS phones.
 
-           This is probably only relevant to Firefox OS phones.
+**manufacturer**
+    String. The manufacturer of the device the product is running
+    on.
 
-    **manufacturer**
-        String. The manufacturer of the device the product is running
-        on.
+    Examples: ``"Geeksphone"``, ``"Samsung"``
 
-        Examples: ``"Geeksphone"``, ``"Samsung"``
+**device**
+    String. The model name of the device the product is running
+    on.
 
-    **device**
-        String. The model name of the device the product is running
-        on.
+    Examples: ``"Peak"``, ``"Galaxy Tab 10.1"``
 
-        Examples: ``"Peak"``, ``"Galaxy Tab 10.1"``
+**url**
+    String. If the feedback relates to a specific webpage, then
+    the url is the url of the webpage it refers to.
 
-    **url**
-        String. If the feedback relates to a specific webpage, then
-        the url is the url of the webpage it refers to.
+    Examples: ``"https://facebook.com/"``, ``"https://google.com/"``
 
-        Examples: ``"https://facebook.com/"``, ``"https://google.com/"``
+**email**
+    String. The email address of the user. This allows us to
+    contact the user at some later point to respond to the user's
+    feedback or ask for more information.
 
-    **email**
-        String. The email address of the user. This allows us to
-        contact the user at some later point to respond to the user's
-        feedback or ask for more information.
+    Example: ``"joe@example.com"``
 
-        Example: ``"joe@example.com"``
+**user_agent**
+    String. The user agent of the client if applicable. For example
+    if the user is using a Firefox OS device, this would be
+    the user agent of the browser used to send feedback.
 
-    **user_agent**
-        String. The user agent of the client if applicable. For example
-        if the user is using a Firefox OS device, this would be
-        the user agent of the browser used to send feedback.
+    Example: ``'Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0'``
 
-        Example: ``'Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0'``
+**source**
+    String. If this response was initiated by a blog post, wiki page,
+    search, newsletter, tweet or something like that, this is the source
+    that initiated the response. It has the same semantics as the 
+    utm_source querystring parameter:
 
-    **source**
-        String. If this response was initiated by a blog post, wiki page,
-        search, newsletter, tweet or something like that, this is the source
-        that initiated the response. It has the same semantics as the 
-        utm_source querystring parameter:
+    https://support.google.com/analytics/answer/1033867
 
-        https://support.google.com/analytics/answer/1033867
+    Example: ``'Hacks blog'``
 
-        Example: ``'wiki'``
+**campaign**
+    String. If this response was initiated by a marketing campaign,
+    this is the name of the campaign. It has the same semantics as
+    the utm_campaign querystring parameter:
 
-    **campaign**
-        String. If this response was initiated by a marketing campaign,
-        this is the name of the campaign. It has the same semantics as
-        the utm_campaign querystring parameter:
-
-        https://support.google.com/analytics/answer/1033867
+    https://support.google.com/analytics/answer/1033867
       
-        Example: ``'show-the-love'``
+    Example: ``'show the firefox love post'``
 
 
-Minimal example::
+Minimal example with curl
+-------------------------
+
+::
 
     $ curl -v -XPOST 'https://input.allizom.org/api/v1/feedback' \
         -H 'Accept: application/json; indent=4' \
@@ -171,7 +171,7 @@ Minimal example::
 
 
 Responses
-=========
+---------
 
 After posting feedback, you'll get one of several responses:
 
