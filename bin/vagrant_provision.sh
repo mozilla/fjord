@@ -13,6 +13,10 @@ cd ~vagrant/fjord
 # Update sources and package indexes:
 apt-get update
 
+#configure locales:
+export LC_ALL="en_US.UTF-8"
+locale-gen en_US.UTF-8
+
 # Install node and npm:
 apt-get install -y -q npm
 # Homogenize binary name with production RHEL:
