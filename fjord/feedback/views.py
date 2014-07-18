@@ -7,11 +7,11 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.decorators.http import require_POST
 
-from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
 from statsd import statsd
 
 from fjord.base.browsers import UNKNOWN
+from fjord.base.urlresolvers import reverse
 from fjord.base.util import (
     smart_str,
     translate_country_name

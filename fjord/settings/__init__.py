@@ -1,11 +1,11 @@
 import sys
 
 # This is imported as the DJANGO_SETTINGS_MODULE. It imports local.py
-# which imports base.py which imports funfactory.settings_base.
+# which imports base.py.
 #
 # Thus:
 #
-# 1. base.py overrides funfactory.settings_base
+# 1. base.py has the defaults
 # 2. local.py overrides everything
 # 3. if we're running tests, tests override local
 
