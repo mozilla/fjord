@@ -2,7 +2,7 @@ from nose.tools import eq_
 
 from fjord.base.tests import TestCase
 from fjord.feedback.models import ResponseMappingType
-from fjord.feedback.tests import response
+from fjord.feedback.tests import ResponseFactory
 from fjord.search.index import chunked
 from fjord.search.tests import ElasticTestCase
 
@@ -28,7 +28,7 @@ class TestLiveIndexing(ElasticTestCase):
         S = ResponseMappingType.search
         count_pre = S().count()
 
-        s = response(happy=True, description='Test live indexing.', save=True)
+        s = ResponseFactory(happy=True, description='Test live indexing.')
         self.refresh()
         eq_(count_pre + 1, S().count())
 

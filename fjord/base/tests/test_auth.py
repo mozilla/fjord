@@ -3,7 +3,7 @@ from django.test.client import RequestFactory
 from nose.tools import eq_
 
 from fjord.base.browserid import FjordVerify
-from fjord.base.tests import BaseTestCase, profile, reverse, user
+from fjord.base.tests import BaseTestCase, ProfileFactory, reverse, UserFactory
 
 
 class TestAuth(BaseTestCase):
@@ -11,7 +11,7 @@ class TestAuth(BaseTestCase):
         """Tests that new users get redirected to new_user page"""
         # Create a user that has no profile--this is the sign that the
         # user is new!
-        new_user = user(save=True)
+        new_user = UserFactory(profile=None)
         self.client_login_user(new_user)
 
         # Now do some ridiculous setup so we can call login_success()
@@ -34,10 +34,7 @@ class TestAuth(BaseTestCase):
 
     def test_existing_user(self):
         """Tests that existing users get redirected to right place"""
-        # Create a user that has no profile--this is the sign that the
-        # user is new!
-        new_user = user(save=True)
-        profile(user=new_user, save=True)
+        new_user = ProfileFactory().user
         self.client_login_user(new_user)
 
         # Now do some ridiculous setup so we can call login_success()

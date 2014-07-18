@@ -2,10 +2,10 @@ import time
 
 from django.conf import settings
 
+import factory
 from elasticsearch.exceptions import NotFoundError
-from nose import SkipTest
 
-from fjord.base.tests import BaseTestCase, with_save
+from fjord.base.tests import BaseTestCase
 from fjord.search.index import get_index, get_es
 from fjord.search.models import Record
 
@@ -75,12 +75,9 @@ class ElasticTestCase(BaseTestCase):
             pass
 
 
-@with_save
-def record(**kwargs):
-    """Model maker for fjord.search.models.Record."""
-    defaults = {
-        'batch_id': 'ou812',
-        'name': 'Frank'
-        }
-    defaults.update(kwargs)
-    return Record(**defaults)
+class RecordFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Record
+
+    batch_id = 'ou812'
+    name = 'Frank'

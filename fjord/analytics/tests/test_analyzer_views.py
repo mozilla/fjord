@@ -6,8 +6,8 @@ from pyquery import PyQuery
 
 from django.contrib.auth.models import Group
 
-from fjord.base.tests import LocalizingClient, profile, reverse, user
-from fjord.feedback.tests import response, responseemail
+from fjord.base.tests import LocalizingClient, ProfileFactory, reverse
+from fjord.feedback.tests import ResponseFactory, ResponseEmailFactory
 from fjord.search.tests import ElasticTestCase
 
 
@@ -29,11 +29,11 @@ class TestAnalyticsDashboardView(ElasticTestCase):
         eq_(403, resp.status_code)
 
         # Verify analyzers can see analytics dashboard link
-        jane = user(email='jane@example.com', save=True)
-        profile(user=jane, save=True)
+        jane = ProfileFactory(user__email='jane@example.com').user
         jane.groups.add(Group.objects.get(name='analyzers'))
 
         self.client_login_user(jane)
+
         resp = self.client.get(reverse('dashboard'))
         eq_(200, resp.status_code)
         assert 'adashboard' in resp.content
@@ -63,14 +63,13 @@ class TestOccurrencesView(ElasticTestCase):
             (False, 'es', 'apple banana'),
         ]
         for happy, locale, description in items:
-            response(
-                happy=happy, locale=locale, description=description, save=True)
+            ResponseFactory(happy=happy, locale=locale,
+                            description=description)
 
         self.refresh()
 
         # Create analyzer and log analyzer in
-        jane = user(email='jane@example.com', save=True)
-        profile(user=jane, save=True)
+        jane = ProfileFactory(user__email='jane@example.com').user
         jane.groups.add(Group.objects.get(name='analyzers'))
 
         self.client_login_user(jane)
@@ -139,14 +138,13 @@ class TestSearchView(ElasticTestCase):
         ]
         for happy, platform, locale, description, created in items:
             # We don't need to keep this around, just need to create it.
-            response(happy=happy, platform=platform, locale=locale,
-                     description=description, created=created, save=True)
+            ResponseFactory(happy=happy, platform=platform, locale=locale,
+                            description=description, created=created)
 
         self.refresh()
 
         # Create analyzer and log analyzer in
-        jane = user(email='jane@example.com', save=True)
-        profile(user=jane, save=True)
+        jane = ProfileFactory(user__email='jane@example.com').user
         jane.groups.add(Group.objects.get(name='analyzers'))
 
         self.client_login_user(jane)
@@ -219,10 +217,12 @@ class TestSearchView(ElasticTestCase):
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 0)
 
-        resp = response(
-            happy=True, product=u'Firefox', description=u'ou812',
-            created=datetime.now(), save=True)
-        responseemail(opinion=resp, save=True)
+        ResponseEmailFactory(
+            opinion__happy=True,
+            opinion__product=u'Firefox',
+            opinion__description=u'ou812',
+            opinion__created=datetime.now())
+
         # Have to reindex everything because unlike in a request
         # context, what happens here is we index the Response, but
         # without the ResponseEmail.
@@ -241,10 +241,12 @@ class TestSearchView(ElasticTestCase):
         eq_(len(pq('li.opinion')), 1)
 
     def test_country(self):
-        resp = response(
-            happy=True, product=u'Firefox OS', description=u'ou812',
-            country=u'ES', created=datetime.now(), save=True)
-        responseemail(opinion=resp, save=True)
+        ResponseEmailFactory(
+            opinion__happy=True,
+            opinion__product=u'Firefox OS',
+            opinion__description=u'ou812',
+            opinion__country=u'ES',
+            opinion__created=datetime.now())
         # Have to reindex everything because unlike in a request
         # context, what happens here is we index the Response, but
         # without the ResponseEmail.

@@ -5,7 +5,7 @@ from nose.tools import eq_
 from pyquery import PyQuery
 
 from fjord.base import views
-from fjord.base.tests import LocalizingClient, TestCase, profile, reverse, user
+from fjord.base.tests import LocalizingClient, TestCase, ProfileFactory, reverse
 from fjord.base.views import IntentionalException
 from fjord.search.tests import ElasticTestCase
 
@@ -103,8 +103,7 @@ class TestRobots(TestCase):
 class TestNewUserView(ElasticTestCase):
     def setUp(self):
         super(TestNewUserView, self).setUp()
-        jane = user(email='jane@example.com', save=True)
-        profile(user=jane, save=True)
+        jane = ProfileFactory(user__email='jane@example.com').user
         jane.groups.add(Group.objects.get(name='analyzers'))
         self.jane = jane
 

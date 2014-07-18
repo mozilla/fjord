@@ -69,8 +69,8 @@ def response_view(request, responseid, template):
         prod = Product.objects.get(db_name=response.product)
 
         if (not prod.on_dashboard
-            and not (request.user.is_authenticated()
-                     or request.user.has_perm('analytics.can_view_dashboard'))):
+            and (not request.user.is_authenticated()
+                 or not request.user.has_perm('analytics.can_view_dashboard'))):
 
             # If this is a response for a hidden product and the user
             # isn't in the analytics group, then they can't see it.

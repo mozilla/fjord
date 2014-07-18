@@ -1,62 +1,52 @@
+import factory
+
 from fjord.base import browsers
-from fjord.base.tests import with_save
 from fjord.feedback.models import Product, Response, ResponseEmail
 
 
 USER_AGENT = 'Mozilla/5.0 (X11; Linux i686; rv:17.0) Gecko/17.0 Firefox/17.0'
 
 
-@with_save
-def product(**kwargs):
-    defaults = {
-        'enabled': True,
-        'notes': u'',
-        'display_name': u'Firefox',
-        'slug': u'firefox',
-        'on_dashboard': True,
-    }
-    defaults.update(kwargs)
-    if 'db_name' not in defaults:
-        defaults['db_name'] = defaults['display_name']
-    return Product(**defaults)
+class ProductFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Product
+
+    display_name = u'Firefox'
+    db_name = factory.LazyAttribute(lambda a: a.display_name)
+    notes = u''
+    slug = u'firefox'
+
+    enabled = True
+    on_dashboard = True
 
 
-@with_save
-def response(**kwargs):
-    """Model maker for feedback.models.Response."""
-    ua = kwargs.pop('ua', USER_AGENT)
-    parsed = browsers.parse_ua(ua)
-    defaults = {
-        'prodchan': 'firefox.desktop.stable',
+class ResponseFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = Response
 
-        'happy': True,
-        'url': u'',
-        'description': u'So awesome!',
+    happy = True,
+    url = u''
+    description = u'So awesome!'
 
-        'user_agent': ua,
-        'browser': parsed.browser,
-        'browser_version': parsed.browser_version,
-        'platform': parsed.platform,
+    user_agent = USER_AGENT
+    browser = factory.LazyAttribute(
+        lambda a: browsers.parse_ua(a.user_agent).browser)
+    browser_version = factory.LazyAttribute(
+        lambda a: browsers.parse_ua(a.user_agent).browser_version)
+    platform = factory.LazyAttribute(
+        lambda a: browsers.parse_ua(a.user_agent).platform)
 
-        'product': Response.infer_product(parsed.platform),
-        'channel': u'stable',
-        'version': parsed.browser_version,
-        'locale': u'en-US',
-    }
-
-    defaults.update(kwargs)
-    return Response(**defaults)
+    product = factory.LazyAttribute(
+        lambda a: Response.infer_product(browsers.parse_ua(a.user_agent).platform))
+    channel = u'stable'
+    version = factory.LazyAttribute(
+        lambda a: browsers.parse_ua(a.user_agent).browser_version)
+    locale = u'en-US'
 
 
-@with_save
-def responseemail(**kwargs):
-    defaults = {
-        'email': 'joe@example.com'
-    }
+class ResponseEmailFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = ResponseEmail
 
-    defaults.update(kwargs)
-    if 'opinion' not in kwargs:
-        resp = response(save=True)
-        defaults['opinion'] = resp
-
-    return ResponseEmail(**defaults)
+    opinion = factory.SubFactory(ResponseFactory)
+    email = 'joe@example.com'

@@ -6,7 +6,7 @@ from django.conf import settings
 from eadred.helpers import sentence_generator
 
 from fjord.feedback.models import Response
-from fjord.feedback.tests import response
+from fjord.feedback.tests import ResponseFactory
 
 
 HAPPY_FEEDBACK = (
@@ -105,15 +105,14 @@ def create_basic_sampledata():
     for i in range(100):
         product = products.next()
         now = now - random.randint(500, 2000)
-        response(
+        ResponseFactory(
             happy=True,
             description=happy_feedback.next(),
             product=product[0],
             version=product[1],
             platform=platforms.next(),
             locale=locales.next(),
-            created=datetime.datetime.fromtimestamp(now),
-            save=True
+            created=datetime.datetime.fromtimestamp(now)
         )
 
     now = time.time()
@@ -122,7 +121,7 @@ def create_basic_sampledata():
     for i in range(100):
         product = products.next()
         now = now - random.randint(500, 2000)
-        response(
+        ResponseFactory(
             happy=False,
             description=sad_feedback.next(),
             product=product[0],
@@ -130,8 +129,7 @@ def create_basic_sampledata():
             platform=platforms.next(),
             locale=locales.next(),
             url=urls.next(),
-            created=datetime.datetime.fromtimestamp(now),
-            save=True
+            created=datetime.datetime.fromtimestamp(now)
         )
 
 
@@ -164,15 +162,16 @@ def create_additional_sampledata(samplesize):
 
         product = products.next()
         objs.append(
-            response(
+            ResponseFactory.build(
                 happy=happy,
                 description=description,
                 product=product[0],
                 version=product[1],
                 url=url,
-                ua=user_agents.next(),
+                user_agent=user_agents.next(),
                 locale=locales.next(),
-                created=datetime.datetime.fromtimestamp(now))
+                created=datetime.datetime.fromtimestamp(now)
+            )
         )
 
         # Bulk-save the objects to the db 500 at a time and

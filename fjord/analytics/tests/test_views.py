@@ -1,6 +1,5 @@
 import json
 import logging
-import textwrap
 from datetime import date, datetime, timedelta
 
 from elasticsearch.exceptions import ConnectionError
@@ -11,8 +10,8 @@ from django.contrib.auth.models import Group
 from django.http import QueryDict
 
 from fjord.analytics import views
-from fjord.base.tests import LocalizingClient, reverse, user, profile
-from fjord.feedback.tests import response, product
+from fjord.base.tests import LocalizingClient, ProfileFactory, reverse
+from fjord.feedback.tests import ResponseFactory, ProductFactory
 from fjord.search.tests import ElasticTestCase
 
 
@@ -44,8 +43,8 @@ class TestDashboardView(ElasticTestCase):
         ]
         for happy, platform, locale, description, created in items:
             # We don't need to keep this around, just need to create it.
-            response(happy=happy, platform=platform, locale=locale,
-                     description=description, created=created, save=True)
+            ResponseFactory(happy=happy, platform=platform, locale=locale,
+                     description=description, created=created)
 
         self.refresh()
 
@@ -62,9 +61,10 @@ class TestDashboardView(ElasticTestCase):
 
     def test_hidden_products_dont_show_up(self):
         # Create a hidden product and one response for it
-        prod = product(display_name=u'HiddenProduct', db_name='HiddenProduct',
-                       on_dashboard=False, save=True)
-        response(product=prod.db_name, save=True)
+        prod = ProductFactory(
+            display_name=u'HiddenProduct', db_name='HiddenProduct',
+            on_dashboard=False)
+        ResponseFactory(product=prod.db_name)
         self.refresh()
 
         url = reverse('dashboard')
@@ -104,7 +104,7 @@ class TestDashboardView(ElasticTestCase):
         # the truncation length) plus a string that's easy to assert
         # non-existence of.
         desc = ('0' * 500) + 'OMGou812'
-        response(description=desc, save=True)
+        ResponseFactory(description=desc)
         self.refresh()
 
         url = reverse('dashboard')
@@ -364,7 +364,7 @@ class TestResponseview(ElasticTestCase):
 
     def test_response_view(self):
         """Test dashboard link goes to response view"""
-        resp = response(happy=True, description=u'the best!', save=True)
+        resp = ResponseFactory(happy=True, description=u'the best!')
 
         self.refresh()
 
@@ -384,7 +384,7 @@ class TestResponseview(ElasticTestCase):
 
     def test_response_view_mobile(self):
         """Test response mobile view doesn't die"""
-        resp = response(happy=True, description=u'the best!', save=True)
+        resp = ResponseFactory(happy=True, description=u'the best!')
 
         self.refresh()
 
@@ -395,34 +395,30 @@ class TestResponseview(ElasticTestCase):
         assert str(resp.description) in r.content
 
     def test_hidden_products_with_unauthed_user(self):
-        prod = product(display_name='HiddenProduct', on_dashboard=False,
-                       save=True)
-        resp = response(product=prod.db_name, save=True)
+        prod = ProductFactory(display_name='HiddenProduct', on_dashboard=False)
+        resp = ResponseFactory(product=prod.db_name)
         self.refresh()
 
         r = self.client.get(reverse('response_view', args=(resp.id,)))
         eq_(403, r.status_code)
 
     def test_hidden_products_with_authed_user(self):
-        prod = product(display_name='HiddenProduct', on_dashboard=False,
-                       save=True)
-        resp = response(product=prod.db_name, save=True)
+        prod = ProductFactory(display_name='HiddenProduct', on_dashboard=False)
+        resp = ResponseFactory(product=prod.db_name)
         self.refresh()
 
-        jane = user(email='jane@example.com', save=True)
-        profile(user=jane, save=True)
+        jane = ProfileFactory(user__email='jane@example.com').user
+        self.client_login_user(jane)
 
         r = self.client.get(reverse('response_view', args=(resp.id,)))
         eq_(403, r.status_code)
 
     def test_hidden_products_with_analyzer_user(self):
-        prod = product(display_name='HiddenProduct', on_dashboard=False,
-                       save=True)
-        resp = response(product=prod.db_name, save=True)
+        prod = ProductFactory(display_name='HiddenProduct', on_dashboard=False)
+        resp = ResponseFactory(product=prod.db_name)
         self.refresh()
 
-        jane = user(email='jane@example.com', save=True)
-        profile(user=jane, save=True)
+        jane = ProfileFactory(user__email='jane@example.com').user
         jane.groups.add(Group.objects.get(name='analyzers'))
 
         self.client_login_user(jane)
@@ -432,8 +428,7 @@ class TestResponseview(ElasticTestCase):
 
     def test_response_view_analyzer(self):
         """Test secret section only shows up for analyzers"""
-        resp = response(happy=True, description=u'the bestest best!',
-                        save=True)
+        resp = ResponseFactory(happy=True, description=u'the bestest best!')
 
         self.refresh()
         r = self.client.get(reverse('response_view', args=(resp.id,)))
@@ -447,9 +442,7 @@ class TestResponseview(ElasticTestCase):
         secretarea = pq('dl.secret')
         eq_(len(secretarea), 0)
 
-        # Create an analyzer and log her in
-        jane = user(email='jane@example.com', save=True)
-        profile(user=jane, save=True)
+        jane = ProfileFactory(user__email='jane@example.com').user
         jane.groups.add(Group.objects.get(name='analyzers'))
 
         self.client_login_user(jane)

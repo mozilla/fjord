@@ -7,7 +7,7 @@ from mock import NonCallableMock
 from fjord.base.browsers import parse_ua
 from fjord.base.tests import TestCase, LocalizingClient, reverse
 from fjord.feedback import models
-from fjord.feedback.tests import product
+from fjord.feedback.tests import ProductFactory
 from fjord.feedback.views import _get_prodchan
 
 
@@ -37,8 +37,8 @@ class TestPicker(TestCase):
         self.assertTemplateUsed(resp, 'feedback/picker.html')
 
     def test_picker_with_products(self):
-        product(display_name=u'ProductFoo', slug=u'productfoo', save=True)
-        product(display_name=u'ProductBar', slug=u'productbar', save=True)
+        ProductFactory(display_name=u'ProductFoo', slug=u'productfoo')
+        ProductFactory(display_name=u'ProductBar', slug=u'productbar')
 
         from django.core.cache import cache
         cache.clear()
@@ -401,7 +401,7 @@ class TestFeedback(TestCase):
     def test_url_cleaning(self):
         """Clean urls before saving"""
         url = reverse('feedback')
-        resp = self.client.post(url, {
+        self.client.post(url, {
             'url': u'http://mozilla.org:8000/path/?foo=bar#bar',
             'happy': 0,
             'description': u'foo'

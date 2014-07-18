@@ -15,6 +15,7 @@ from django.test.utils import override_settings
 
 from django_browserid.tests import mock_browserid
 
+import factory
 # reverse is here for convenience so other test modules import it from
 # here rather than importing it from funfactory
 from funfactory.urlresolvers import reverse  # noqa
@@ -127,50 +128,72 @@ class MobileTestCase(TestCase):
         self.client.cookies[settings.MOBILE_COOKIE] = 'on'
 
 
-def with_save(func):
-    """Decorate a model maker to add a `save` kwarg.
+# def with_save(func):
+#     """Decorate a model maker to add a `save` kwarg.
 
-    If save=True, the model maker will save the object before returning it.
+#     If save=True, the model maker will save the object before returning it.
 
-    """
-    @wraps(func)
-    def saving_func(*args, **kwargs):
-        save = kwargs.pop('save', False)
-        ret = func(*args, **kwargs)
-        if save:
-            ret.save()
-        return ret
+#     """
+#     @wraps(func)
+#     def saving_func(*args, **kwargs):
+#         save = kwargs.pop('save', False)
+#         ret = func(*args, **kwargs)
+#         if save:
+#             ret.save()
+#         return ret
 
-    return saving_func
-
-
-@with_save
-def user(**kwargs):
-    """Return a user with all necessary defaults filled in.
-
-    Default password is 'testpass' unless you say otherwise in a kwarg.
-
-    """
-    defaults = {}
-    if 'username' not in kwargs:
-        defaults['username'] = ''.join(random.choice(letters)
-                                       for x in xrange(15))
-    if 'email' not in kwargs:
-        defaults['email'] = ''.join(
-            random.choice(letters) for x in xrange(10)) + '@example.com'
-    defaults.update(kwargs)
-    user = User(**defaults)
-    user.set_password(kwargs.get('password', 'testpass'))
-    return user
+#     return saving_func
 
 
-@with_save
-def profile(**kwargs):
-    """Returns a Profile"""
-    defaults = {}
-    if 'user' not in kwargs:
-        defaults['user'] = user(save=True)
+# @with_save
+# def user(**kwargs):
+#     """Return a user with all necessary defaults filled in.
 
-    defaults.update(kwargs)
+#     Default password is 'testpass' unless you say otherwise in a kwarg.
 
-    return Profile(**defaults)
+#     """
+#     defaults = {}
+#     if 'username' not in kwargs:
+#         defaults['username'] = ''.join(random.choice(letters)
+#                                        for x in xrange(15))
+#     if 'email' not in kwargs:
+#         defaults['email'] = ''.join(
+#             random.choice(letters) for x in xrange(10)) + '@example.com'
+#     defaults.update(kwargs)
+#     user = User(**defaults)
+#     user.set_password(kwargs.get('password', 'testpass'))
+#     return user
+
+
+# @with_save
+# def profile(**kwargs):
+#     """Returns a Profile"""
+#     defaults = {}
+#     if 'user' not in kwargs:
+#         defaults['user'] = user(save=True)
+
+#     defaults.update(kwargs)
+
+#     return Profile(**defaults)
+
+
+class ProfileFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Profile
+
+    # We pass in profile=None to prevent UserFactory from creating
+    # another profile (this disables the RelatedFactory)
+    user = factory.SubFactory('fjord.base.tests.UserFactory', profile=None)
+
+
+class UserFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = User
+
+    username = factory.Sequence(lambda n: 'user_%d' % n)
+    email = factory.Sequence(lambda n: 'joe%d@example.com' % n)
+
+    # We pass in 'user' to link the generated Profile to our
+    # just-generated User This will call
+    # ProfileFactory(user=our_new_user), thus skipping the SubFactory.
+    profile = factory.RelatedFactory(ProfileFactory, 'user')

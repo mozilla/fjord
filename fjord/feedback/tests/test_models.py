@@ -2,7 +2,7 @@ from nose.tools import eq_
 
 from fjord.base.tests import TestCase
 from fjord.feedback.models import Product, Response
-from fjord.feedback.tests import response
+from fjord.feedback.tests import ResponseFactory
 from fjord.feedback.utils import compute_grams
 from fjord.search.tests import ElasticTestCase
 
@@ -10,24 +10,23 @@ from fjord.search.tests import ElasticTestCase
 class TestResponseModel(TestCase):
     def test_description_truncate_on_save(self):
         # Extra 10 characters get lopped off on save.
-        resp = response(description=('a' * 10010), save=True)
+        resp = ResponseFactory(description=('a' * 10010))
         eq_(resp.description, 'a' * 10000)
 
     def test_description_strip_on_save(self):
         # Nix leading and trailing whitespace.
-        resp = response(description=u'   \n\tou812\t\n   ', save=True)
+        resp = ResponseFactory(description=u'   \n\tou812\t\n   ')
         eq_(resp.description, u'ou812')
 
     def test_url_domain(self):
         # Test a "normal domain"
-        resp = response(url=u'http://foo.example.com.br/blah')
+        resp = ResponseFactory(url=u'http://foo.example.com.br/blah')
         eq_(resp.url_domain, u'example.com.br')
         assert isinstance(resp.url_domain, unicode)
 
         # Test a unicode domain
-        resp = response(
-            url=u'http://\u30c9\u30e9\u30af\u30a810.jp/dq10_skillpoint.html',
-            save=True)
+        resp = ResponseFactory(
+            url=u'http://\u30c9\u30e9\u30af\u30a810.jp/dq10_skillpoint.html')
         eq_(resp.url_domain, u'\u30c9\u30e9\u30af\u30a810.jp')
         assert isinstance(resp.url_domain, unicode)
 
@@ -51,11 +50,10 @@ class TestAutoTranslation(TestCase):
         prod.translation_system = u'dennis'
         prod.save()
 
-        resp = response(
+        resp = ResponseFactory(
             locale=u'es',
             product=u'firefox',
-            description=u'hola',
-            save=True
+            description=u'hola'
         )
 
         # Fetch it from the db again
@@ -79,11 +77,10 @@ class TestGenerateTranslationJobs(TestCase):
 
     def test_english_no_translation(self):
         """English descriptions should get copied over"""
-        resp = response(
+        resp = ResponseFactory(
             locale=u'en-US',
             description=u'hello',
-            translated_description=u'',
-            save=True
+            translated_description=u''
         )
 
         # No new jobs should be generated
@@ -95,11 +92,10 @@ class TestGenerateTranslationJobs(TestCase):
 
     def test_english_gb_no_translation(self):
         """en-GB descriptions should get copied over"""
-        resp = response(
+        resp = ResponseFactory(
             locale=u'en-GB',
             description=u'hello',
-            translated_description=u'',
-            save=True
+            translated_description=u''
         )
 
         # No new jobs should be generated
@@ -111,12 +107,11 @@ class TestGenerateTranslationJobs(TestCase):
 
     def test_english_with_dennis(self):
         """English descriptions should get copied over"""
-        resp = response(
+        resp = ResponseFactory(
             locale=u'en-US',
             product=u'firefox',
             description=u'hello',
-            translated_description=u'',
-            save=True
+            translated_description=u''
         )
 
         # Set the product up for translation *after* creating the response
@@ -135,12 +130,11 @@ class TestGenerateTranslationJobs(TestCase):
 
     def test_spanish_no_translation(self):
         """Spanish should not get translated"""
-        resp = response(
+        resp = ResponseFactory(
             locale=u'es',
             product=u'firefox',
             description=u'hola',
-            translated_description=u'',
-            save=True
+            translated_description=u''
         )
 
         # No jobs should be translated
@@ -151,12 +145,11 @@ class TestGenerateTranslationJobs(TestCase):
 
     def test_spanish_with_dennis(self):
         """Spanish should get translated"""
-        resp = response(
+        resp = ResponseFactory(
             locale=u'es',
             product=u'firefox',
             description=u'hola',
-            translated_description=u'',
-            save=True
+            translated_description=u''
         )
 
         # Set the product up for translation *after* creating the response
@@ -177,20 +170,18 @@ class TestGenerateTranslationJobs(TestCase):
 
     def test_spanish_with_dennis_and_existing_translations(self):
         """Response should pick up existing translation"""
-        existing_resp = response(
+        existing_resp = ResponseFactory(
             locale=u'es',
             product=u'firefox',
             description=u'hola',
-            translated_description=u'DUDE!',
-            save=True
+            translated_description=u'DUDE!'
         )
 
-        resp = response(
+        resp = ResponseFactory(
             locale=u'es',
             product=u'firefox',
             description=u'hola',
-            translated_description=u'',
-            save=True
+            translated_description=u''
         )
 
         # Set the product up for translation *after* creating the response

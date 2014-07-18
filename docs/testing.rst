@@ -92,9 +92,9 @@ runner as long as the look like a test.
   ``LocalizingClient`` instead of the default client for the
   ``TestCase`` class.
 
-* We use modelmakers instead of fixtures. For example,
-  ``fjord.feedback.tests.response`` is the modelmaker for
-  ``fjord.feedback.models.Response``.
+* We use FactoryBoy to generate model instances instead of using fixtures.
+  ``fjord.feedback.tests.ResponseFactory`` generates
+  ``fjord.feedback.models.Response`` instances.
 
 * To add a smoketest, see the ``README.rst`` file in the ``smoketests/``
   directory.

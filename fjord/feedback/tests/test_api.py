@@ -8,7 +8,7 @@ from nose.tools import eq_
 
 from fjord.base.tests import TestCase, reverse
 from fjord.feedback import models
-from fjord.feedback.tests import response
+from fjord.feedback.tests import ResponseFactory
 from fjord.search.tests import ElasticTestCase
 
 
@@ -21,9 +21,9 @@ class PublicFeedbackAPITest(ElasticTestCase):
         ]
 
         for happy, locale, platform, product, desc in testdata:
-            response(
+            ResponseFactory(
                 happy=happy, locale=locale, platform=platform,
-                product=product, description=desc, save=True)
+                product=product, description=desc)
         self.refresh()
 
         resp = self.client.get(reverse('feedback-api'))
@@ -82,9 +82,9 @@ class PublicFeedbackAPITest(ElasticTestCase):
             ('2014-07-04', False, 'de', 'Firefox for Android'),
         ]
         for date_start, happy, platform, product in testdata:
-            response(
-                happy=happy, platform=platform,
-                product=product, created=date_start, save=True)
+            ResponseFactory(
+                happy=happy, platform=platform, product=product,
+                created=date_start)
         self.refresh()
 
     def _test(self, getoptions, expectedresponse):
@@ -143,9 +143,9 @@ class PublicFeedbackAPITest(ElasticTestCase):
             (True, 'en-US', 'Firefox for Android', today)
         ]
         for happy, platform, product, date_start in testdata:
-            response(
-                happy=happy, platform=platform,
-                product=product, created=date_start, save=True)
+            ResponseFactory(
+                happy=happy, platform=platform, product=product,
+                created=date_start)
         self.refresh()
         self._test({'date_delta': '1d'}, [today, yesterday])
 
@@ -162,7 +162,7 @@ class PublicFeedbackAPITest(ElasticTestCase):
         # the document is indexed, then there won't be a key/val in
         # the json results. Easy way to fix that is to make sure it
         # has a value when creating the response.
-        response(api=True, save=True)
+        ResponseFactory(api=True)
         self.refresh()
 
         resp = self.client.get(reverse('feedback-api'))
