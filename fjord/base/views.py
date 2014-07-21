@@ -10,10 +10,10 @@ from django.views.decorators.cache import never_cache
 
 from celery.messaging import establish_connection
 from elasticsearch.exceptions import ConnectionError, NotFoundError
-from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
 
 from fjord.base.models import Profile
+from fjord.base.urlresolvers import reverse
 from fjord.search.index import get_index, get_index_stats
 
 

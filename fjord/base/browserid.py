@@ -3,9 +3,9 @@ import urlparse
 from django.http import HttpResponseRedirect
 
 from django_browserid.views import Verify
-from funfactory.urlresolvers import reverse
 
 from fjord.base.models import Profile
+from fjord.base.urlresolvers import reverse
 
 
 class FjordVerify(Verify):

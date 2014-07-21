@@ -17,9 +17,9 @@ from django_browserid.tests import mock_browserid
 
 import factory
 # reverse is here for convenience so other test modules import it from
-# here rather than importing it from funfactory
-from funfactory.urlresolvers import reverse  # noqa
-from funfactory.urlresolvers import split_path
+# here rather than importing it from urlresolvers
+from fjord.base.urlresolvers import reverse  # noqa
+from fjord.base.urlresolvers import split_path
 
 from fjord.base.models import Profile
 

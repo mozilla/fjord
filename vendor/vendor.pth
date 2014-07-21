@@ -4,7 +4,6 @@ packages/South
 packages/amqp
 packages/anyjson
 packages/carrot
-packages/cef
 packages/certifi
 packages/chardet
 packages/cssselect
@@ -56,7 +55,6 @@ src/django-statsd
 src/elasticutils
 src/elasticsearch-py
 src/factory_boy
-src/funfactory
 src/gengo-python
 src/jingo
 src/jingo-minify

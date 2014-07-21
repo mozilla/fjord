@@ -12,10 +12,11 @@ from django.http import (
 from django.utils.dateparse import parse_date, parse_datetime
 from django.utils.feedgenerator import Atom1Feed
 
-from funfactory.urlresolvers import reverse
 from product_details import product_details
 from rest_framework.throttling import AnonRateThrottle
 from statsd import statsd
+
+from fjord.base.urlresolvers import reverse
 
 
 class JSONDatetimeEncoder(json.JSONEncoder):

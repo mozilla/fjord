@@ -15,7 +15,6 @@ from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 
 from elasticutils.contrib.django import F, es_required_or_50x
-from funfactory.urlresolvers import reverse
 from mobility.decorators import mobile_template
 from tower import ugettext as _
 
@@ -24,6 +23,7 @@ from fjord.analytics.tools import (
     zero_fill
 )
 from fjord.base.helpers import locale_name
+from fjord.base.urlresolvers import reverse
 from fjord.base.util import (
     analyzer_required,
     check_new_user,

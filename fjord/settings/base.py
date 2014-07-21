@@ -3,17 +3,74 @@
 # settings_local.py
 
 import logging
+import os
+import socket
 
-from funfactory.settings_base import *
+from django.utils.functional import lazy
 
 
-# Name of the top-level module where you put all your apps.  If you
-# did not install Playdoh with the funfactory installer script you may
-# need to edit this value. See the docs about installing from a clone.
+ROOT = os.path.abspath(
+    os.path.join(
+        os.path.dirname(__file__),
+        '..',
+        '..'
+    ))
+
+
+def path(*dirs):
+    return os.path.join(ROOT, *dirs)
+
+
+# Name of the top-level module where you put all your apps.
 PROJECT_MODULE = 'fjord'
 
 # Defines the views served for root URLs.
 ROOT_URLCONF = '%s.urls' % PROJECT_MODULE
+
+ADMINS = ()
+MANAGERS = ADMINS
+
+DATABASES = {}  # See settings_local.
+
+SLAVE_DATABASES = []
+
+DATABASE_ROUTERS = ('multidb.PinningMasterSlaveRouter',)
+
+# Site ID is used by Django's Sites framework.
+SITE_ID = 1
+
+## Internationalization.
+
+# Local time zone for this installation. Choices can be found here:
+# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+# although not all choices may be available on all operating systems.
+# On Unix systems, a value of None will cause Django to use the same
+# timezone as the operating system.
+# If running in a Windows environment this must be set to the same as your
+# system time zone.
+TIME_ZONE = 'America/Los_Angeles'
+
+# If you set this to False, Django will make some optimizations so as not
+# to load the internationalization machinery.
+USE_I18N = True
+
+# If you set this to False, Django will not format dates, numbers and
+# calendars according to the current locale
+USE_L10N = True
+
+# Gettext text domain
+TEXT_DOMAIN = 'messages'
+STANDALONE_DOMAINS = [TEXT_DOMAIN, 'javascript']
+TOWER_KEYWORDS = {'_lazy': None}
+TOWER_ADD_HEADERS = True
+
+# Language code for this installation. All choices can be found here:
+# http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGE_CODE = 'en-US'
+
+# Tells the product_details module where to find our local JSON files.
+# This ultimately controls how LANGUAGES are constructed.
+PROD_DETAILS_DIR = path('lib/product_details_json')
 
 # This is the list of languages that are active for non-DEV
 # environments. Add languages here to allow users to see the site in
@@ -156,63 +213,136 @@ PROD_LANGUAGES = [
 
 DEV_LANGUAGES = PROD_LANGUAGES
 
-INSTALLED_APPS = get_apps(
-    exclude=(
-        'compressor',
-    ),
-    append=(
-        # south has to come early, otherwise tests fail.
-        'south',
+def lazy_lang_url_map():
+    from django.conf import settings
+    langs = settings.DEV_LANGUAGES if settings.DEV else settings.PROD_LANGUAGES
+    return dict([(i.lower(), i) for i in langs])
 
-        'django_browserid',
-        'adminplus',
+LANGUAGE_URL_MAP = lazy(lazy_lang_url_map, dict)()
 
-        # This has to come before Grappelli since it contains the
-        # admin/index.html template that overrides the Grappelli one
-        # and provides the adminplus stuff.
-        'fjord.grappellioverride',
-        'grappelli',
-        'django.contrib.admin',
-        'django.contrib.messages',
-        'django_extensions',
-        'django_nose',
-        'djcelery',
-        'eadred',
-        'jingo_minify',
-        'dennis.django_dennis',
+# Override Django's built-in with our native names
+def lazy_langs():
+    from django.conf import settings
+    from product_details import product_details
+    langs = DEV_LANGUAGES if settings.DEV else settings.PROD_LANGUAGES
+    return dict([(lang.lower(), product_details.languages[lang]['native'])
+                 for lang in langs if lang in product_details.languages])
 
-        'fjord.analytics',
-        'fjord.base',
-        'fjord.feedback',
-        'fjord.heartbeat',
-        'fjord.journal',
-        'fjord.search',
-        'fjord.translations',
-    ))
+LANGUAGES = lazy(lazy_langs, dict)()
 
-MIDDLEWARE_CLASSES = get_middleware(
-    exclude=(
-        # We do mobile detection ourselves.
-        'mobility.middleware.DetectMobileMiddleware',
-        'mobility.middleware.XMobileMiddleware',
-    ),
-    append=(
-        'fjord.base.middleware.UserAgentMiddleware',
-        'fjord.base.middleware.MobileQueryStringMiddleware',
-        'fjord.base.middleware.MobileMiddleware',
-        'django_statsd.middleware.GraphiteMiddleware',
-        'django_statsd.middleware.GraphiteRequestTimingMiddleware',
-    ))
+INSTALLED_APPS = (
+    # Local apps
+    'tower',  # for ./manage.py extract (L10n)
+    'cronjobs',  # for ./manage.py cron * cmd line tasks
+    'django_browserid',
+
+    # Django contrib apps
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.staticfiles',
+
+    # Third-party apps, patches, fixes
+    'commonware.response.cookies',
+    'djcelery',
+    'django_nose',
+    'session_csrf',
+
+    # L10n
+    'product_details',
+
+    # south has to come early, otherwise tests fail.
+    'south',
+
+    'adminplus',
+
+    # This has to come before Grappelli since it contains the
+    # admin/index.html template that overrides the Grappelli one
+    # and provides the adminplus stuff.
+    'fjord.grappellioverride',
+    'grappelli',
+    'django.contrib.admin',
+    'django.contrib.messages',
+    'django_extensions',
+    'django_nose',
+    'djcelery',
+    'eadred',
+    'jingo_minify',
+    'dennis.django_dennis',
+
+    'fjord.analytics',
+    'fjord.base',
+    'fjord.feedback',
+    'fjord.heartbeat',
+    'fjord.journal',
+    'fjord.search',
+    'fjord.translations',
+)
+
+MIDDLEWARE_CLASSES = (
+    'fjord.base.middleware.LocaleURLMiddleware',
+
+    'multidb.middleware.PinningRouterMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'session_csrf.CsrfMiddleware',  # Must be after auth middleware.
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'commonware.middleware.FrameOptionsHeader',
+
+    'fjord.base.middleware.UserAgentMiddleware',
+    'fjord.base.middleware.MobileQueryStringMiddleware',
+    'fjord.base.middleware.MobileMiddleware',
+    'django_statsd.middleware.GraphiteMiddleware',
+    'django_statsd.middleware.GraphiteRequestTimingMiddleware',
+)
 
 LOCALE_PATHS = (
     os.path.join(ROOT, PROJECT_MODULE, 'locale'),
 )
 
-SUPPORTED_NONLOCALES += (
+SUPPORTED_NONLOCALES = [
+    'admin',
+    'api',
+    'browserid',
+    'media',
     'robots.txt',
     'services',
-    'api',
-)
+    'static',
+]
+
+## Media and templates.
+
+# Absolute path to the directory that holds media.
+# Example: "/home/media/media.lawrence.com/"
+MEDIA_ROOT = path('media')
+
+# URL that handles the media served from MEDIA_ROOT. Make sure to use a
+# trailing slash if there is a path component (optional in other cases).
+# Examples: "http://media.lawrence.com", "http://example.com/media/"
+MEDIA_URL = '/media/'
+
+# Absolute path to the directory static files should be collected to.
+# Don't put anything in this directory yourself; store your static files
+# in apps' "static/" subdirectories and in STATICFILES_DIRS.
+# Example: "/home/media/media.lawrence.com/static/"
+STATIC_ROOT = path('static')
+
+# URL prefix for static files.
+# Example: "http://media.lawrence.com/static/"
+STATIC_URL = '/static/'
+
+def JINJA_CONFIG():
+    config = {
+        'extensions': [
+            'tower.template.i18n',
+            'jinja2.ext.do',
+            'jinja2.ext.with_',
+            'jinja2.ext.loopcontrols'
+        ],
+        'finalize': lambda x: x if x is not None else ''
+    }
+    return config
 
 # Because Jinja2 is the default template loader, add any non-Jinja
 # templated apps here:
@@ -363,10 +493,36 @@ JINGO_MINIFY_USE_STATIC = True
 LESS_BIN = 'lessc'
 JAVA_BIN = 'java'
 
+# Sessions
+#
+# By default, be at least somewhat secure with our session cookies.
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = True
+
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'django_browserid.auth.BrowserIDBackend',
 ]
+
+## Auth
+# The first hasher in this list will be used for new passwords.
+# Any other hasher in the list can be used for existing passwords.
+# Playdoh ships with Bcrypt+HMAC by default because it's the most secure.
+# To use bcrypt, fill in a secret HMAC key in your local settings.
+BASE_PASSWORD_HASHERS = (
+    'django_sha2.hashers.BcryptHMACCombinedPasswordVerifier',
+    'django_sha2.hashers.SHA512PasswordHasher',
+    'django_sha2.hashers.SHA256PasswordHasher',
+    'django.contrib.auth.hashers.SHA1PasswordHasher',
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+    'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher',
+)
+HMAC_KEYS = {  # for bcrypt only
+    #'2012-06-06': 'cheesecake',
+}
+
+from django_sha2 import get_password_hashers
+PASSWORD_HASHERS = get_password_hashers(BASE_PASSWORD_HASHERS, HMAC_KEYS)
 
 BROWSERID_VERIFY_CLASS = 'fjord.base.browserid.FjordVerify'
 BROWSERID_AUDIENCES = ['http://127.0.0.1:8000', 'http://localhost:8000']
@@ -374,11 +530,28 @@ LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL_FAILURE = '/login-failure'
 
-TEMPLATE_CONTEXT_PROCESSORS = get_template_context_processors(
-    exclude=(),
-    append=(
-        'django_browserid.context_processors.browserid',
-    ))
+# List of callables that know how to import templates from various sources.
+TEMPLATE_LOADERS = (
+    'jingo.Loader',
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.media',
+    'django.core.context_processors.request',
+    'session_csrf.context_processor',
+    'django.contrib.messages.context_processors.messages',
+    'fjord.base.context_processors.i18n',
+    'fjord.base.context_processors.globals',
+    'django_browserid.context_processors.browserid',
+)
+
+TEMPLATE_DIRS = (
+    path('templates'),
+)
 
 # Should robots.txt deny everything or disallow a calculated list of
 # URLs we don't want to be crawled?  Default is false, disallow
@@ -394,27 +567,17 @@ CSRF_FAILURE_VIEW = 'fjord.base.views.csrf_failure'
 
 # Tells the extract script what files to look for L10n in and what
 # function handles the extraction. The Tower library expects this.
-DOMAIN_METHODS['messages'] = [
-    ('%s/**.py' % PROJECT_MODULE,
-        'tower.management.commands.extract.extract_tower_python'),
-    ('%s/**/templates/**.html' % PROJECT_MODULE,
-        'tower.management.commands.extract.extract_tower_template'),
-    ('templates/**.html',
-        'tower.management.commands.extract.extract_tower_template'),
-]
+DOMAIN_METHODS = {
+    'messages': [
+        ('%s/**.py' % PROJECT_MODULE,
+         'tower.management.commands.extract.extract_tower_python'),
+        ('%s/**/templates/**.html' % PROJECT_MODULE,
+         'tower.management.commands.extract.extract_tower_template'),
+        ('templates/**.html',
+         'tower.management.commands.extract.extract_tower_template'),
+    ]
+}
 
-# # Use this if you have localizable HTML files:
-# DOMAIN_METHODS['lhtml'] = [
-#    ('**/templates/**.lhtml',
-#        'tower.management.commands.extract.extract_tower_template'),
-# ]
-
-# # Use this if you have localizable JS files:
-# DOMAIN_METHODS['javascript'] = [
-#    # Make sure that this won't pull in strings from external
-#    # libraries you may use.
-#    ('media/js/**.js', 'javascript'),
-# ]
 
 # When set to True, this will cause a message to be displayed on all
 # pages that this is not production.
@@ -426,10 +589,11 @@ GENGO_PRIVATE_KEY = None
 GENGO_USE_SANDBOX = True
 GENGO_ACCOUNT_BALANCE_THRESHOLD = 100.0
 
-# STATICFILES_FINDERS = (
-#     'django.contrib.staticfiles.finders.FileSystemFinder',
-#     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-# )
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder'
+)
 
 # ElasticSearch settings.
 
@@ -451,6 +615,17 @@ ES_LIVE_INDEX = True
 
 ES_TIMEOUT = 10
 
+## Celery
+
+# True says to simulate background tasks without actually using celeryd.
+# Good for local development in case celeryd is not running.
+CELERY_ALWAYS_EAGER = True
+
+BROKER_CONNECTION_TIMEOUT = 0.1
+CELERY_RESULT_BACKEND = 'amqp'
+CELERY_IGNORE_RESULT = True
+CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
+
 # Time in seconds before celery.exceptions.SoftTimeLimitExceeded is raised.
 # The task can catch that and recover but should exit ASAP.
 CELERYD_TASK_SOFT_TIME_LIMIT = 60 * 10
@@ -471,6 +646,21 @@ REST_FRAMEWORK = {
 
 # Grappelli settings
 GRAPPELLI_ADMIN_TITLE = 'Input admin and diabolical dashboard'
+
+# For absolute urls
+try:
+    DOMAIN = socket.gethostname()
+except socket.error:
+    DOMAIN = 'localhost'
+PROTOCOL = "http://"
+PORT = 80
+
+## Logging
+LOG_LEVEL = logging.INFO
+HAS_SYSLOG = True
+SYSLOG_TAG = "http_app_playdoh"  # Change this after you fork.
+LOGGING_CONFIG = None
+LOGGING = {}
 
 try:
     len(LOGGING)
