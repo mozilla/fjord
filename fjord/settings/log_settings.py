@@ -5,7 +5,6 @@ import socket
 from django.conf import settings
 
 import commonware.log
-import cef
 import dictconfig
 
 
@@ -39,10 +38,6 @@ cfg = {
                                                         settings.SYSLOG_TAG,
                                                         base_fmt),
         },
-        'cef': {
-            '()': cef.SysLogFormatter,
-            'datefmt': '%H:%M:%s',
-        },
     },
     'handlers': {
         'console': {
@@ -58,15 +53,6 @@ cfg = {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler',
         },
-        'cef_syslog': {
-            '()': logging.handlers.SysLogHandler,
-            'facility': logging.handlers.SysLogHandler.LOG_LOCAL4,
-            'formatter': 'cef',
-        },
-        'cef_console': {
-            '()': logging.StreamHandler,
-            'formatter': 'cef',
-        },
         'null': {
             '()': NullHandler,
         }
@@ -77,9 +63,6 @@ cfg = {
             'level': 'ERROR',
             'propagate': False,
         },
-        'cef': {
-            'handlers': ['cef_syslog' if use_syslog else 'cef_console'],
-        }
     },
     'root': {},
 }

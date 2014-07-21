@@ -4,7 +4,6 @@ packages/South
 packages/amqp
 packages/anyjson
 packages/carrot
-packages/cef
 packages/certifi
 packages/chardet
 packages/cssselect
