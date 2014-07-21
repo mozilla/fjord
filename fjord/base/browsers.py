@@ -152,11 +152,12 @@ def parse_ua(ua):
                     platform_version = fxos_version
                     break
 
-    # Make sure browser_version is at least x.y.z for non-Firefox OS
+    # Make sure browser_version is at least x.y for non-Firefox OS
     # browsers.
-    if browser != 'Firefox OS' and browser_version != UNKNOWN:
-        while browser_version.count('.') < 2:
-            browser_version += '.0'
+    if (browser != 'Firefox OS'
+            and browser_version != UNKNOWN
+            and browser_version.count('.') < 1):
+        browser_version += '.0'
 
     return Browser(browser, browser_version, platform, platform_version,
                    mobile)

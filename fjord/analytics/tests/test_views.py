@@ -91,13 +91,13 @@ class TestDashboardView(ElasticTestCase):
 
         r = self.client.get(
             reverse('dashboard'),
-            {'product': 'Firefox', 'version': '20.0.0'})
+            {'product': 'Firefox', 'version': '20.0'})
         eq_(200, r.status_code)
         pq = PyQuery(r.content)
         pq = pq('link[type="application/atom+xml"]')
         qs = QueryDict(pq[0].attrib['href'].split('?')[1])
         eq_(qs['product'], u'Firefox')
-        eq_(qs['version'], u'20.0.0')
+        eq_(qs['version'], u'20.0')
 
     def test_truncated_description_on_dashboard(self):
         # Create a description that's 500 characters long (which is
@@ -145,13 +145,13 @@ class TestDashboardView(ElasticTestCase):
 
         # Product version
         r = self.client.get(
-            url, {'product': 'Firefox', 'version': '17.0.0'})
+            url, {'product': 'Firefox', 'version': '17.0'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 7)
 
         # Product version
         r = self.client.get(
-            url, {'product': 'Firefox', 'version': '18.0.0'})
+            url, {'product': 'Firefox', 'version': '18.0'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 0)
 
@@ -182,13 +182,13 @@ class TestDashboardView(ElasticTestCase):
         # Filter on product and version--both filters affect the
         # results
         r = self.client.get(
-            url, {'product': 'Firefox', 'version': '18.0.0'})
+            url, {'product': 'Firefox', 'version': '18.0'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 0)
 
         # Filter on version--filter has no effect on results
         r = self.client.get(
-            url, {'version': '18.0.0'})
+            url, {'version': '18.0'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 7)
 

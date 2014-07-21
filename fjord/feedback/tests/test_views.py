@@ -558,7 +558,7 @@ class TestFeedback(TestCase):
         # Note: This comes from the user agent from the LocalizingClient
         eq_(u'Firefox for Android', feedback.product)
         eq_(u'stable', feedback.channel)
-        eq_(u'24.0.0', feedback.version)
+        eq_(u'24.0', feedback.version)
 
     def test_deprecated_firefox_for_android_sad_is_sad(self):
         data = {
@@ -584,7 +584,7 @@ class TestFeedback(TestCase):
         # Note: This comes from the user agent from the LocalizingClient
         eq_(u'Firefox for Android', feedback.product)
         eq_(u'stable', feedback.channel)
-        eq_(u'24.0.0', feedback.version)
+        eq_(u'24.0', feedback.version)
 
     def test_deprecated_firefox_for_android_ideas_are_sad(self):
         """We treat "sad" and "ideas" as sad feedback now."""
@@ -611,7 +611,7 @@ class TestFeedback(TestCase):
         # Note: This comes from the user agent from the LocalizingClient
         eq_(u'Firefox for Android', feedback.product)
         eq_(u'stable', feedback.channel)
-        eq_(u'24.0.0', feedback.version)
+        eq_(u'24.0', feedback.version)
 
     def test_deprecated_firefox_for_android_minimal(self):
         """Test the minimal post data from FfA works."""
@@ -636,7 +636,7 @@ class TestFeedback(TestCase):
         # Note: This comes from the user agent from the LocalizingClient
         eq_(u'Firefox for Android', feedback.product)
         eq_(u'stable', feedback.channel)
-        eq_(u'24.0.0', feedback.version)
+        eq_(u'24.0', feedback.version)
 
     def test_deprecated_firefox_for_android_phony_ua(self):
         """Test that phony user agents works. bug 855671."""

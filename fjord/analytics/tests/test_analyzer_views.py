@@ -97,7 +97,7 @@ class TestOccurrencesView(ElasticTestCase):
         # Minimal required for results
         resp = self.client.get(url, {
             'product': 'Firefox',
-            'first_version': '17.0.0'}
+            'first_version': '17.0'}
         )
         eq_(200, resp.status_code)
         assert 'This field is required' not in resp.content
@@ -190,13 +190,13 @@ class TestSearchView(ElasticTestCase):
 
         # Product version
         r = self.client.get(
-            self.url, {'product': 'Firefox', 'version': '17.0.0'})
+            self.url, {'product': 'Firefox', 'version': '17.0'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 7)
 
         # Product version
         r = self.client.get(
-            self.url, {'product': 'Firefox', 'version': '18.0.0'})
+            self.url, {'product': 'Firefox', 'version': '18.0'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 0)
 
@@ -277,13 +277,13 @@ class TestSearchView(ElasticTestCase):
         # Filter on product and version--both filters affect the
         # results
         r = self.client.get(
-            self.url, {'product': 'Firefox', 'version': '18.0.0'})
+            self.url, {'product': 'Firefox', 'version': '18.0'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 0)
 
         # Filter on version--filter has no effect on results
         r = self.client.get(
-            self.url, {'version': '18.0.0'})
+            self.url, {'version': '18.0'})
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 7)
 

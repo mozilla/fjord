@@ -18,7 +18,7 @@
    {
        "user_agent": "Mozilla/5.0 (OS X; Intel Mac OS X 10.6; rv:9.0) Gecko/20100101 Firefox/9.0",
        "browser": "Firefox",
-       "browser_version": "9.0.0",
+       "browser_version": "9.0",
        "platform": "OS X",
        "platform_version": "10.6",
        "mobile": false
@@ -58,7 +58,7 @@
    {
        "user_agent": "Mozilla/5.0 (Windows NT 6.1; rv:12.0) Gecko/20120403211507 Firefox/12.0",
        "browser": "Firefox",
-       "browser_version": "12.0.0",
+       "browser_version": "12.0",
        "platform": "Windows",
        "platform_version": "7",
        "mobile": false
@@ -66,7 +66,7 @@
    {
        "user_agent": "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0",
        "browser": "Firefox",
-       "browser_version": "24.0.0",
+       "browser_version": "24.0",
        "platform": "Windows",
        "platform_version": "8.1",
        "mobile": false
@@ -74,7 +74,7 @@
    {
        "user_agent": "Mozilla/5.0 (X11; FreeBSD amd64; rv:5.0) Gecko/20100101 Firefox/5.0",
        "browser": "Firefox",
-       "browser_version": "5.0.0",
+       "browser_version": "5.0",
        "platform": "FreeBSD",
        "platform_version": "",
        "mobile": false
@@ -106,7 +106,7 @@
    {
        "user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:5.0) Gecko/20100101 Firefox/5.0 Iceweasel/5.0",
        "browser": "Iceweasel",
-       "browser_version": "5.0.0",
+       "browser_version": "5.0",
        "platform": "Linux",
        "platform_version": "",
        "mobile": false
@@ -146,7 +146,7 @@
    {
       "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:20.0) Gecko/20130208 Firefox/20.0",
       "browser": "Firefox",
-      "browser_version": "20.0.0",
+      "browser_version": "20.0",
       "platform": "OS X",
       "platform_version": "10.7",
       "mobile": false
@@ -154,7 +154,7 @@
     {
       "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:18.0) Gecko/20100101 Firefox/18.0",
       "browser": "Firefox",
-      "browser_version": "18.0.0",
+      "browser_version": "18.0",
       "platform": "OS X",
       "platform_version": "10.8",
       "mobile": false
