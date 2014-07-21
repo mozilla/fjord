@@ -3,11 +3,14 @@ from django.conf.urls import patterns, include
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.http import HttpResponse
 
-# This must come before importing admin
+# Note: This must come before importing admin because it patches the
+# admin.
 from fjord.base.monkeypatches import patch
 patch()
 
 from django.contrib import admin
+
+admin.autodiscover()
 
 urlpatterns = patterns('',
 

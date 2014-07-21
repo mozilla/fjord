@@ -23,8 +23,8 @@ def patch():
     from session_csrf import anonymous_csrf
     from adminplus import AdminSitePlus
 
+    # Patch the admin
     admin.site = AdminSitePlus()
-    admin.autodiscover()
     admin.site.login = login_required(anonymous_csrf(admin.site.login))
 
     # Monkey-patch django forms to avoid having to use Jinja2's |safe
