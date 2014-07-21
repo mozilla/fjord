@@ -29,6 +29,7 @@ ROOT_URLCONF = '%s.urls' % PROJECT_MODULE
 
 ADMINS = ()
 MANAGERS = ADMINS
+DEV = False
 
 DATABASES = {}  # See settings_local.
 
