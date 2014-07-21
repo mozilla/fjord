@@ -4,7 +4,6 @@ import os
 # Edit this if necessary or override the variable in your environment.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fjord.settings')
 
-# For local development in a virtualenv
 from fjord import manage
 
 manage.setup_environ(__file__)
