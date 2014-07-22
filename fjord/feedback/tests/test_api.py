@@ -13,18 +13,21 @@ from fjord.search.tests import ElasticTestCase
 
 
 class PublicFeedbackAPITest(ElasticTestCase):
-    def test_basic(self):
+    def create_basic_data(self):
         testdata = [
-            (True, 'en-US', 'Linux', 'Firefox', 'desc'),
-            (True, 'en-US', 'Mac OSX', 'Firefox for Android', 'desc'),
-            (False, 'de', 'Windows', 'Firefox', 'banana'),
+            (True, 'en-US', 'Linux', 'Firefox', '30.0', 'desc'),
+            (True, 'en-US', 'Mac OSX', 'Firefox for Android', '31.0', 'desc'),
+            (False, 'de', 'Windows', 'Firefox', '29.0', 'banana'),
         ]
 
-        for happy, locale, platform, product, desc in testdata:
+        for happy, locale, platform, product, version, desc in testdata:
             ResponseFactory(
                 happy=happy, locale=locale, platform=platform,
-                product=product, description=desc)
+                product=product, version=version, description=desc)
         self.refresh()
+
+    def test_basic_root(self):
+        self.create_basic_data()
 
         resp = self.client.get(reverse('feedback-api'))
         # FIXME: test headers
@@ -32,10 +35,16 @@ class PublicFeedbackAPITest(ElasticTestCase):
         eq_(json_data['count'], 3)
         eq_(len(json_data['results']), 3)
 
+    def test_happy(self):
+        self.create_basic_data()
+
         resp = self.client.get(reverse('feedback-api'), {'happy': '1'})
         json_data = json.loads(resp.content)
         eq_(json_data['count'], 2)
         eq_(len(json_data['results']), 2)
+
+    def test_platforms(self):
+        self.create_basic_data()
 
         resp = self.client.get(reverse('feedback-api'), {'platforms': 'Linux'})
         json_data = json.loads(resp.content)
@@ -43,10 +52,42 @@ class PublicFeedbackAPITest(ElasticTestCase):
         eq_(len(json_data['results']), 1)
 
         resp = self.client.get(reverse('feedback-api'),
+                               {'platforms': 'Linux,Windows'})
+        json_data = json.loads(resp.content)
+        eq_(json_data['count'], 2)
+        eq_(len(json_data['results']), 2)
+
+    def test_products_and_versions(self):
+        self.create_basic_data()
+
+        resp = self.client.get(reverse('feedback-api'),
                                {'products': 'Firefox'})
         json_data = json.loads(resp.content)
         eq_(json_data['count'], 2)
         eq_(len(json_data['results']), 2)
+
+        resp = self.client.get(reverse('feedback-api'),
+                               {'products': 'Firefox,Firefox for Android'})
+        json_data = json.loads(resp.content)
+        eq_(json_data['count'], 3)
+        eq_(len(json_data['results']), 3)
+
+        # version without product gets ignored
+        resp = self.client.get(reverse('feedback-api'),
+                               {'versions': '30.0'})
+        json_data = json.loads(resp.content)
+        eq_(json_data['count'], 3)
+        eq_(len(json_data['results']), 3)
+
+        resp = self.client.get(reverse('feedback-api'),
+                               {'products': 'Firefox',
+                                'versions': '30.0'})
+        json_data = json.loads(resp.content)
+        eq_(json_data['count'], 1)
+        eq_(len(json_data['results']), 1)
+
+    def test_locales(self):
+        self.create_basic_data()
 
         resp = self.client.get(reverse('feedback-api'), {'locales': 'en-US'})
         json_data = json.loads(resp.content)
@@ -59,6 +100,10 @@ class PublicFeedbackAPITest(ElasticTestCase):
         eq_(json_data['count'], 3)
         eq_(len(json_data['results']), 3)
 
+    def test_multi_filter(self):
+        self.create_basic_data()
+
+        # Locale and happy
         resp = self.client.get(reverse('feedback-api'), {
             'locales': 'de', 'happy': 1
         })
@@ -66,14 +111,15 @@ class PublicFeedbackAPITest(ElasticTestCase):
         eq_(json_data['count'], 0)
         eq_(len(json_data['results']), 0)
 
+    def test_query(self):
+        self.create_basic_data()
+
         resp = self.client.get(reverse('feedback-api'), {'q': 'desc'})
         json_data = json.loads(resp.content)
         eq_(json_data['count'], 2)
         eq_(len(json_data['results']), 2)
 
-        # FIXME: Test products/versions
-
-    def create_test_data(self):
+    def create_date_data(self):
         """Create and send test data"""
         testdata = [
             ('2014-07-01', True, 'en-US', 'Firefox'),
@@ -87,9 +133,9 @@ class PublicFeedbackAPITest(ElasticTestCase):
                 created=date_start)
         self.refresh()
 
-    def _test(self, getoptions, expectedresponse):
+    def _test_date(self, getoptions, expectedresponse):
         """Helper method for tests"""
-        self.create_test_data()
+        self.create_date_data()
         resp = self.client.get(reverse('feedback-api'), getoptions)
         json_data = json.loads(resp.content)
         results = json_data['results']
@@ -99,33 +145,33 @@ class PublicFeedbackAPITest(ElasticTestCase):
 
     def test_date_start(self):
         """date_start returns responses from that day forward"""
-        self._test(
+        self._test_date(
             {'date_start': '2014-07-02'},
             ['2014-07-04T00:00:00', '2014-07-03T00:00:00',
              '2014-07-02T00:00:00'])
 
     def test_date_end(self):
         """date_end returns responses from before that day"""
-        self._test(
+        self._test_date(
             {'date_end': '2014-07-03'},
             ['2014-07-03T00:00:00', '2014-07-02T00:00:00',
                 '2014-07-01T00:00:00'])
 
     def test_date_delta_with_date_end(self):
         """Test date_delta filtering when date_end exists"""
-        self._test(
+        self._test_date(
             {'date_delta': '1d', 'date_end': '2014-07-03'},
             ['2014-07-03T00:00:00', '2014-07-02T00:00:00'])
 
     def test_date_delta_with_date_start(self):
         """Test date_delta filtering when date_start exists"""
-        self._test(
+        self._test_date(
             {'date_delta': '1d', 'date_start': '2014-07-02'},
             ['2014-07-03T00:00:00', '2014-07-02T00:00:00'])
 
     def test_date_delta_with_date_end_and_date_start(self):
         """When all three date fields are specified ignore date_start"""
-        self._test(
+        self._test_date(
             {'date_delta': '1d', 'date_end': '2014-07-03',
             'date_start': '2014-07-02'},
             ['2014-07-03T00:00:00', '2014-07-02T00:00:00'])
@@ -147,10 +193,10 @@ class PublicFeedbackAPITest(ElasticTestCase):
                 happy=happy, platform=platform, product=product,
                 created=date_start)
         self.refresh()
-        self._test({'date_delta': '1d'}, [today, yesterday])
+        self._test_date({'date_delta': '1d'}, [today, yesterday])
 
     def test_both_date_end_and_date_start_with_no_date_delta(self):
-        self._test(
+        self._test_date(
             {'date_start': '2014-07-02', 'date_end': '2014-07-03'},
             ['2014-07-03T00:00:00', '2014-07-02T00:00:00']
         )
