@@ -70,6 +70,10 @@ apt-get install -y -q memcached
 # Create local settings file if it doesn't exist
 [ -f fjord/settings/local.py ] || cp fjord/settings/local.py-dist fjord/settings/local.py
 
+# Remove unused packages, most of them are related to X server
+# and we don't use X server at all.
+apt-get autoremove -y -q
+
 # FIXME: Change the motd file so that it has a link to Fjord docs,
 # tells the user where the code is and lists common commands.
 
