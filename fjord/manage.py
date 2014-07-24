@@ -31,16 +31,32 @@ def setup_environ(manage_file):
     # python setup.py install|develop
     sys.path.append(ROOT)
 
-    # Global (upstream) vendor library
-    site.addsitedir(path('vendor'))
+    # Check for ~/.virtualenvs/fjordvagrant/. If that exists, use that.
+    # Otherwise use vendor/.
+    possible_venv = os.path.expanduser('~/.virtualenvs/fjordvagrant/')
+    if os.path.exists(possible_venv):
+        venv = os.path.join(
+            possible_venv,
+            'lib',
+            'python2.6' if sys.version.startswith('2.6') else 'python2.7',
+            'site-packages')
 
-    # Move the new items to the front of sys.path. (via virtualenv)
-    new_sys_path = []
-    for item in list(sys.path):
-        if item not in prev_sys_path:
-            new_sys_path.append(item)
-            sys.path.remove(item)
-    sys.path[:0] = new_sys_path
+        if os.path.exists(venv):
+            print 'Using {0}'.format(venv)
+            sys.path.insert(0, venv)
+        else:
+            raise Exception('{0} does not exist.'.format(venv))
+    else:
+        print 'Using vendor'
+        site.addsitedir(path('vendor'))
+
+        # Move the new items to the front of sys.path. (via virtualenv)
+        new_sys_path = []
+        for item in list(sys.path):
+            if item not in prev_sys_path:
+                new_sys_path.append(item)
+                sys.path.remove(item)
+        sys.path[:0] = new_sys_path
 
     from django.core.management import execute_manager  # noqa
 

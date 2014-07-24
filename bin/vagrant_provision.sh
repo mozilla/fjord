@@ -27,7 +27,7 @@ npm install -g less
 
 # Install Python development-related things:
 apt-get install -y -q libapache2-mod-wsgi python-pip libpython-dev
-pip install virtualenv virtualenvwrapper nose Sphinx
+pip install virtualenv nose Sphinx
 
 # Install git:
 apt-get install -y -q git
@@ -49,11 +49,19 @@ mysql -uroot -ppassword -hlocalhost \
 mysql -uroot -ppassword -hlocalhost \
     -e "GRANT ALL ON test_fjord.* TO 'fjord'@'localhost' IDENTIFIED BY 'password'"
 
-# Install compiled dependencies
+VENV=/home/vagrant/.virtualenvs/fjordvagrant
+
+# Build virtual environment and activate it
+sudo -u vagrant virtualenv $VENV
+
+# Install Fjord requirements
+sudo -u vagrant $VENV/bin/python ./peep install -r requirements/requirements.txt
+
+# Install compiled requirements
 # Note: Need to do this before launching Elasticsearch because of
 # memory issues
 apt-get install -y -q libxml2 libxml2-dev libxslt1.1 libxslt1-dev
-pip install -r requirements/compiled.txt
+sudo -u vagrant $VENV/bin/python ./peep install -r requirements/compiled.txt
 
 # Install Elasticsearch 0.90.10
 curl http://packages.elasticsearch.org/GPG-KEY-elasticsearch | apt-key add -
