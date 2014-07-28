@@ -90,6 +90,8 @@ def _handle_feedback_post(request, locale=None, product=None,
     form = ResponseForm(request.POST)
     form.is_valid()
 
+    get_data = request.GET.copy()
+
     data = form.cleaned_data
     description = data.get('description', u'').strip()
     if not description:
@@ -106,11 +108,11 @@ def _handle_feedback_post(request, locale=None, product=None,
         product = models.Product.get_product_map()[product]
 
     # src, then source, then utm_source
-    source = request.GET.get('src', u'')
+    source = get_data.pop('src', [u''])[0]
     if not source:
-        source = request.GET.get('utm_source', u'')
+        source = get_data.pop('utm_source', [u''])[0]
 
-    campaign = request.GET.get('utm_campaign', u'')
+    campaign = get_data.pop('utm_campaign', [u''])[0]
 
     # If the product came in on the url, then we only want to populate
     # the platfrom from the user agent data iff the product specified
@@ -183,6 +185,27 @@ def _handle_feedback_post(request, locale=None, product=None,
     if data.get('email_ok') and data.get('email'):
         e = models.ResponseEmail(email=data['email'], opinion=opinion)
         e.save()
+
+    if get_data:
+        # There was extra context in the query string, so we grab that
+        # with some restrictions and save it separately.
+        slop = {}
+
+        # We capture at most the first 20 key/val pairs
+        get_data_items = sorted(get_data.items())[:20]
+
+        for key, val in get_data_items:
+            # Keys can be at most 20 characters long.
+            key = key[:20]
+            if len(val) == 1:
+                val = val[0]
+
+            # Values can be at most 20 characters long.
+            val = val[:100]
+            slop[key.encode('utf-8')] = val.encode('utf-8')
+
+        context = models.ResponseContext(data=slop, opinion=opinion)
+        context.save()
 
     if data['happy']:
         statsd.incr('feedback.happy')

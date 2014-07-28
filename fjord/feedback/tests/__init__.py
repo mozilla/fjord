@@ -1,7 +1,12 @@
 import factory
 
 from fjord.base import browsers
-from fjord.feedback.models import Product, Response, ResponseEmail
+from fjord.feedback.models import (
+    Product,
+    Response,
+    ResponseContext,
+    ResponseEmail
+)
 
 
 USER_AGENT = 'Mozilla/5.0 (X11; Linux i686; rv:17.0) Gecko/17.0 Firefox/17.0'
@@ -50,3 +55,11 @@ class ResponseEmailFactory(factory.DjangoModelFactory):
 
     opinion = factory.SubFactory(ResponseFactory)
     email = 'joe@example.com'
+
+
+class ResponseContextFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = ResponseContext
+
+    opinion = factory.SubFactory(ResponseFactory)
+    data = '{}'

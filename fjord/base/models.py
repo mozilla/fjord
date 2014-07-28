@@ -32,14 +32,25 @@ class JSONObjectField(models.TextField):
     empty_strings_allowed = False
     description = _lazy(u'JSON Object')
 
+    def pre_init(self, value, obj):
+        if obj._state.adding:
+            if isinstance(value, basestring):
+                return json.loads(value)
+        return value
+
     def to_python(self, value):
         # FIXME: This isn't called when accessing the field value.
         # So it must be something else.
         return json.loads(value)
 
+    def get_db_prep_value(self, value, connection, prepared=False):
+        if self.null and value is None:
+            return None
+        return json.dumps(value, sort_keys=True) if value else '{}'
+
     def value_to_string(self, obj):
         val = self._get_val_from_obj(obj)
-        return json.dumps(val, sort_keys=True) if val else '{}'
+        return self.get_db_prep_value(val)
 
 
 from south.modelsinspector import add_introspection_rules

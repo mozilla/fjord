@@ -1,3 +1,5 @@
+import json
+
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
@@ -83,6 +85,12 @@ class TestFeedback(TestCase):
         eq_(u'Firefox', feedback.product)
         eq_(u'stable', feedback.channel)
         eq_(u'14.0.1', feedback.version)
+
+        # Make sure it doesn't create an email record
+        eq_(models.ResponseEmail.objects.count(), 0)
+
+        # Make sure it doesn't create a context record
+        eq_(models.ResponseContext.objects.count(), 0)
 
     def test_valid_sad(self):
         """Submitting a valid sad form creates an item in the DB.
@@ -530,6 +538,67 @@ class TestFeedback(TestCase):
 
         feedback = models.Response.objects.latest(field_name='id')
         eq_(feedback.campaign, u'20140220_email')
+
+    def test_save_context_basic(self):
+        """We capture any querystring vars as context"""
+        url = reverse('feedback')
+
+        r = self.client.post(url + '?foo=bar', {
+            'happy': 0,
+            'description': u"I like the colors.",
+        })
+
+        self.assertRedirects(r, reverse('thanks'))
+
+        context = models.ResponseContext.objects.latest(field_name='id')
+        eq_(context.data, u'{"foo": "bar"}')
+
+    def test_save_context_long_key(self):
+        """Long keys are truncated"""
+        url = reverse('feedback')
+
+        r = self.client.post(url + '?foo12345678901234567890=bar', {
+            'happy': 0,
+            'description': u"I like the colors.",
+        })
+
+        self.assertRedirects(r, reverse('thanks'))
+
+        context = models.ResponseContext.objects.latest(field_name='id')
+        eq_(context.data, u'{"foo12345678901234567": "bar"}')
+
+    def test_save_context_long_val(self):
+        """Long values are truncated"""
+        url = reverse('feedback')
+
+        r = self.client.post(url + '?foo=' + ('a' * 100) + 'b', {
+            'happy': 0,
+            'description': u"I like the colors.",
+        })
+
+        self.assertRedirects(r, reverse('thanks'))
+
+        context = models.ResponseContext.objects.latest(field_name='id')
+        eq_(context.data, u'{"foo": "' + ('a' * 100) + '"}')
+
+    def test_save_context_maximum_pairs(self):
+        """Only save 20 pairs"""
+        url = reverse('feedback')
+
+        qs = '&'.join(['foo%02d=%s' % (i, i) for i in range(25)])
+
+        r = self.client.post(url + '?' + qs, {
+            'happy': 0,
+            'description': u"I like the colors.",
+        })
+
+        self.assertRedirects(r, reverse('thanks'))
+
+        context = models.ResponseContext.objects.latest(field_name='id')
+        data = sorted(json.loads(context.data).items())
+        eq_(len(data), 20)
+        eq_(data[0], (u'foo00', '0'))
+        eq_(data[-1], (u'foo19', '19'))
 
     def test_deprecated_firefox_for_android_feedback_works(self):
         """Verify firefox for android can post feedback"""

@@ -12,7 +12,7 @@ from statsd import statsd
 from tower import ugettext_lazy as _lazy
 
 from fjord.base.domain import get_domain
-from fjord.base.models import ModelBase
+from fjord.base.models import ModelBase, JSONObjectField
 from fjord.base.util import smart_truncate, instance_to_key
 from fjord.feedback.config import CODE_TO_COUNTRY, ANALYSIS_STOPWORDS
 from fjord.feedback.utils import compute_grams
@@ -497,7 +497,17 @@ class ResponseEmail(ModelBase):
     email = models.EmailField()
 
     def __unicode__(self):
-        return self.id
+        return unicode(self.id)
+
+
+class ResponseContext(ModelBase):
+    """Holds context data we were sent as a JSON blob."""
+
+    opinion = models.ForeignKey(Response)
+    data = JSONObjectField(default=u'{}')
+
+    def __unicode__(self):
+        return unicode(self.id)
 
 
 class NoNullsCharField(serializers.CharField):
