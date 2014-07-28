@@ -82,6 +82,9 @@ apt-get install -y -q memcached
 # and we don't use X server at all.
 apt-get autoremove -y -q
 
+# Activate the virtual environment in .bashrc
+echo ". $VENV/bin/activate" >> /home/vagrant/.bashrc
+
 # FIXME: Change the motd file so that it has a link to Fjord docs,
 # tells the user where the code is and lists common commands.
 

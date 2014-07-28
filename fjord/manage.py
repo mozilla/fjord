@@ -95,23 +95,14 @@ def setup_environ(manage_file):
     # python setup.py install|develop
     sys.path.append(ROOT)
 
-    # Check for ~/.virtualenvs/fjordvagrant/. If that exists, use that.
-    # Otherwise use vendor/.
-    possible_venv = os.path.expanduser('~/.virtualenvs/fjordvagrant/')
-    if os.path.exists(possible_venv):
-        venv = os.path.join(
-            possible_venv,
-            'lib',
-            'python2.6' if sys.version.startswith('2.6') else 'python2.7',
-            'site-packages')
+    # FIXME: This is vendor/-specific. When we ditch vendor/ we can
+    # ditch this.
 
-        if os.path.exists(venv):
-            print 'Using {0}'.format(venv)
-            sys.path.insert(0, venv)
-        else:
-            raise Exception('{0} does not exist.'.format(venv))
-    else:
-        print 'Using vendor'
+    # Check for ~/.virtualenvs/fjordvagrant/. If that doesn't exist, then
+    # launch all the vendor/ stuff.
+    possible_venv = os.path.expanduser('~/.virtualenvs/fjordvagrant/')
+    if not os.path.exists(possible_venv):
+        os.environ['USING_VENDOR'] = '1'
         site.addsitedir(path('vendor'))
 
         # Move the new items to the front of sys.path. (via virtualenv)
