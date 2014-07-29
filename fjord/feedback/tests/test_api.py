@@ -318,6 +318,87 @@ class PostFeedbackAPITest(TestCase):
         email = models.ResponseEmail.objects.latest(field_name='id')
         eq_(email.email, data['email'])
 
+    def test_with_context(self):
+        data = {
+            'happy': True,
+            'description': u'Great!',
+            'product': u'Firefox OS',
+            'channel': u'stable',
+            'version': u'1.1',
+            'platform': u'Firefox OS',
+            'locale': 'en-US',
+            'email': 'foo@example.com',
+            'slopmenow': 'bar'
+        }
+
+        r = self.client.post(reverse('feedback-api'), data)
+        eq_(r.status_code, 201)
+
+        context = models.ResponseContext.objects.latest(field_name='id')
+        eq_(context.data, u'{"slopmenow": "bar"}')
+
+    def test_with_context_truncate_key(self):
+        data = {
+            'happy': True,
+            'description': u'Great!',
+            'product': u'Firefox OS',
+            'channel': u'stable',
+            'version': u'1.1',
+            'platform': u'Firefox OS',
+            'locale': 'en-US',
+            'email': 'foo@example.com',
+            'foo012345678901234567890': 'bar'
+        }
+
+        r = self.client.post(reverse('feedback-api'), data)
+        eq_(r.status_code, 201)
+
+        context = models.ResponseContext.objects.latest(field_name='id')
+        eq_(context.data, u'{"foo01234567890123456": "bar"}')
+
+    def test_with_context_truncate_value(self):
+        data = {
+            'happy': True,
+            'description': u'Great!',
+            'product': u'Firefox OS',
+            'channel': u'stable',
+            'version': u'1.1',
+            'platform': u'Firefox OS',
+            'locale': 'en-US',
+            'email': 'foo@example.com',
+            'foo': ('a' * 100) + 'b'
+        }
+
+        r = self.client.post(reverse('feedback-api'), data)
+        eq_(r.status_code, 201)
+
+        context = models.ResponseContext.objects.latest(field_name='id')
+        eq_(context.data, u'{"foo": "' + ('a' * 100) + '"}')
+
+    def test_with_context_20_pairs(self):
+        data = {
+            'happy': True,
+            'description': u'Great!',
+            'product': u'Firefox OS',
+            'channel': u'stable',
+            'version': u'1.1',
+            'platform': u'Firefox OS',
+            'locale': 'en-US',
+            'email': 'foo@example.com',
+        }
+
+        for i in range(25):
+            data['foo%02d' % i] = str(i)
+
+        r = self.client.post(reverse('feedback-api'), data)
+        eq_(r.status_code, 201)
+
+        context = models.ResponseContext.objects.latest(field_name='id')
+        data = sorted(json.loads(context.data).items())
+        eq_(len(data), 20)
+        eq_(data[0], ('foo00', '0'))
+        eq_(data[-1], ('foo19', '19'))
+
     def test_null_device_returns_400(self):
         data = {
             'happy': True,

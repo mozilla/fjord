@@ -604,6 +604,24 @@ class PostResponseSerializer(serializers.Serializer):
         # Response model instance.
         opinion.email = attrs.get('email', '').strip()
 
+        slop = {}
+        data_items = sorted(self.context['request'].DATA.items())
+        for key, val in data_items:
+            if key in attrs:
+                continue
+            # Restrict key to 20 characters
+            key = key[:20]
+
+            # Restrict value to 100 characters
+            val = val[:100]
+            slop[key] = val
+
+            # Only collect 20 pairs max
+            if len(slop) >= 20:
+                break
+
+        opinion.slop = slop
+
         return opinion
 
     def save_object(self, obj, **kwargs):
@@ -615,5 +633,12 @@ class PostResponseSerializer(serializers.Serializer):
                 opinion=obj
             )
             opinion_email.save(**kwargs)
+
+        if obj.slop:
+            context = ResponseContext(
+                data=obj.slop,
+                opinion=obj
+            )
+            context.save(**kwargs)
 
         return obj
