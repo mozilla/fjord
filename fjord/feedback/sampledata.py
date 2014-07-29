@@ -99,38 +99,43 @@ def create_basic_sampledata():
     locales = sentence_generator(settings.DEV_LANGUAGES)
     urls = sentence_generator(URLS)
 
-    now = time.time()
-
     # Create 100 happy responses.
+    now = time.time()
+    objs = []
     for i in range(100):
         product = products.next()
         now = now - random.randint(500, 2000)
-        ResponseFactory(
-            happy=True,
-            description=happy_feedback.next(),
-            product=product[0],
-            version=product[1],
-            platform=platforms.next(),
-            locale=locales.next(),
-            created=datetime.datetime.fromtimestamp(now)
+        objs.append(
+            ResponseFactory.build(
+                happy=True,
+                description=happy_feedback.next(),
+                product=product[0],
+                version=product[1],
+                platform=platforms.next(),
+                locale=locales.next(),
+                created=datetime.datetime.fromtimestamp(now)
+            )
         )
-
-    now = time.time()
 
     # Create 100 sad responses.
+    now = time.time()
     for i in range(100):
         product = products.next()
         now = now - random.randint(500, 2000)
-        ResponseFactory(
-            happy=False,
-            description=sad_feedback.next(),
-            product=product[0],
-            version=product[1],
-            platform=platforms.next(),
-            locale=locales.next(),
-            url=urls.next(),
-            created=datetime.datetime.fromtimestamp(now)
+        objs.append(
+            ResponseFactory.build(
+                happy=False,
+                description=sad_feedback.next(),
+                product=product[0],
+                version=product[1],
+                platform=platforms.next(),
+                locale=locales.next(),
+                url=urls.next(),
+                created=datetime.datetime.fromtimestamp(now)
+            )
         )
+
+    Response.objects.bulk_create(objs)
 
 
 def create_additional_sampledata(samplesize):
@@ -202,7 +207,7 @@ def generate_sampledata(options):
 
     if samplesize not in (None, True):
         create_additional_sampledata(samplesize)
-        print 'Done!  Please reindex to pick up db changes.'
-        return
+    else:
+        create_basic_sampledata()
 
-    create_basic_sampledata()
+    print 'Done!  Please reindex to pick up db changes.'
