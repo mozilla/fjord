@@ -3,6 +3,9 @@ import logging
 import os
 import site
 import sys
+from itertools import chain
+
+from pip.req import parse_requirements
 
 
 current_settings = None
@@ -15,6 +18,67 @@ def path(*a):
     if ROOT is None:
         _not_setup()
     return os.path.join(ROOT, *a)
+
+
+def check_dependencies():
+    """Check installed requirements vs. specified requirements
+
+    This prints out a list of dependencies where the version installed
+    is not the same as the one specified in the requirements files.
+
+    It also exits immediately. At some point we might want to change
+    it from doing that, but not today.
+
+    If you want to skip this check, set SKIP_CHECK=1 in your
+    environment.
+
+    .. Note::
+
+       This only works for packaged requirements. It does not work for
+       requirements downloaded in a tarball from github. Those
+       requirements get put in the "unsatisfyable" requirements list
+       and this will tell you how many there are.
+
+       Generally we should minimize those requirements as much as
+       possible.
+
+    """
+    req_path = path('requirements')
+    req_files = [os.path.join(req_path, fn) for fn in os.listdir(req_path)]
+
+    reqs = list(chain(*(parse_requirements(path)
+                        for path in req_files)))
+
+    unsatisfied_reqs = []
+    unsatisfyable_reqs = []
+    for req in reqs:
+        if req.url and 'github.com' in req.url:
+            unsatisfyable_reqs.append(req)
+            continue
+
+        req.check_if_exists()
+
+        if not req.satisfied_by:
+            unsatisfied_reqs.append(req)
+
+    if unsatisfyable_reqs:
+        print 'There are %d requirements that cannot be checked.' % (
+            len(unsatisfyable_reqs))
+
+    if unsatisfied_reqs:
+        print 'The following requirements are not satsifed:'
+        print ''
+
+        for req in unsatisfied_reqs:
+            print 'UNSATISFIED:', req.req
+
+        print ''
+        print 'Update your virtual environment by doing:'
+        print ''
+        print '    ./peep install -r requirements/requirements.txt'
+        print ''
+        print 'or run with SKIP_CHECK=1 .'
+        sys.exit(1)
 
 
 def setup_environ(manage_file):
@@ -31,16 +95,23 @@ def setup_environ(manage_file):
     # python setup.py install|develop
     sys.path.append(ROOT)
 
-    # Global (upstream) vendor library
-    site.addsitedir(path('vendor'))
+    # FIXME: This is vendor/-specific. When we ditch vendor/ we can
+    # ditch this.
 
-    # Move the new items to the front of sys.path. (via virtualenv)
-    new_sys_path = []
-    for item in list(sys.path):
-        if item not in prev_sys_path:
-            new_sys_path.append(item)
-            sys.path.remove(item)
-    sys.path[:0] = new_sys_path
+    # Check for ~/.virtualenvs/fjordvagrant/. If that doesn't exist, then
+    # launch all the vendor/ stuff.
+    possible_venv = os.path.expanduser('~/.virtualenvs/fjordvagrant/')
+    if not os.path.exists(possible_venv):
+        os.environ['USING_VENDOR'] = '1'
+        site.addsitedir(path('vendor'))
+
+        # Move the new items to the front of sys.path. (via virtualenv)
+        new_sys_path = []
+        for item in list(sys.path):
+            if item not in prev_sys_path:
+                new_sys_path.append(item)
+                sys.path.remove(item)
+        sys.path[:0] = new_sys_path
 
     from django.core.management import execute_manager  # noqa
 

@@ -1,7 +1,11 @@
+# sha256: H6pJd-mFBzHot_ih1YuGJzk6N0RUN4jsQ3-0XgbP5AE
 MySQL-python==1.2.3c1
+
+# sha256: IvlnXkLcZAxEadT30hC67LXmlYI6-VTIE9UckwI1Z10
 Jinja2==2.5.5
 
-# for bcrypt passwords
+# sha256: rxL5lFTolenkMMdXI8O5QZwLzNDqd4A2YtaprFb2Qls
 py-bcrypt==0.3
 
+# sha256: CRLV6D2egvLG7hJny1zvsP_82eILGbvB5S4mYu8w4GQ
 lxml==2.3.5
