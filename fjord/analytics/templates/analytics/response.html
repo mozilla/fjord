@@ -31,6 +31,10 @@
           <span class="sprite sad">{{ _('Sad') }}</span>
         {% endif %}
         <dl class="inline">
+          <dt>{{ _('Category') }}</dt>
+          <dd>
+            {{ response.category or _('None') }}
+          </dd>
           <dt>{{ _('Description') }}</dt>
           <dd>
             <p>{{ response.description|nl2br }}</p>
@@ -121,7 +125,7 @@
 
         {% if user.is_authenticated() and user.has_perm('analytics.can_view_dashboard') %}
           <dl class="inline secret">
-            <dt>{{ _('URL') }}</dt>
+            <dt>{{ _('Full URL') }}</dt>
             <dd>
               {{ response.url or 'None' }}
             </dd>
@@ -141,18 +145,10 @@
             <dd>
               {{ response.user_agent|unknown }}
             </dd>
-            <dt>{{ _('Email address') }}</dt>
+            <dt>{{ _('Email') }}</dt>
             <dd>
               {% if response.responseemail_set.count() > 0 %}
                 {{ response.responseemail_set.all()[0].email }}
-              {% else %}
-                &mdash;
-              {% endif %}
-            </dd>
-            <dt>{{ _('Context') }}</dt>
-            <dd>
-              {% if response.responsecontext_set.count() > 0 %}
-                {{ response.responsecontext_set.all()[0].data }}
               {% else %}
                 &mdash;
               {% endif %}
@@ -173,6 +169,14 @@
                 {% endfor %}
               {% else %}
                 --
+              {% endif %}
+            </dd>
+            <dt>{{ _('Context') }}</dt>
+            <dd>
+              {% if response.responsecontext_set.count() > 0 %}
+                {{ response.responsecontext_set.all()[0].data }}
+              {% else %}
+                &mdash;
               {% endif %}
             </dd>
             {% if user.is_superuser %}

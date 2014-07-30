@@ -120,6 +120,9 @@ class Response(ModelBase):
     # Translation into English of the description
     translated_description = models.TextField(blank=True)
 
+    category = models.CharField(max_length=50, blank=True, null=True,
+                                default=u'')
+
     # Data inferred from urls or explicitly stated by the thing saving
     # the data (webform, client of the api, etc)
     product = models.CharField(max_length=30, blank=True)
@@ -245,6 +248,7 @@ class Response(ModelBase):
             'sentiment',
             'description',
             'translated_description',
+            'category',
             'product',
             'channel',
             'version',
@@ -349,6 +353,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'url_domain',
             'has_email',
             'description',
+            'category',
             'description_bigrams',
             'user_agent',
             'product',
@@ -373,6 +378,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'url_domain': keyword_type(),
             'has_email': boolean_type(),
             'description': text_type(),
+            'category': text_type(),
             'description_bigrams': keyword_type(),
             'description_terms': terms_type(),
             'user_agent': keyword_type(),
@@ -407,6 +413,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'url_domain': obj.url_domain,
             'has_email': bool(obj.user_email),
             'description': obj.description,
+            'category': obj.category,
             'description_terms': obj.description,
             'user_agent': obj.user_agent,
             'product': obj.product,
@@ -534,6 +541,8 @@ class PostResponseSerializer(serializers.Serializer):
     url = serializers.URLField(required=False, default=u'')
     description = serializers.CharField(required=True)
 
+    category = serializers.CharField(max_length=50, required=False, default=u'')
+
     # product, channel, version, locale, platform
     product = NoNullsCharField(max_length=20, required=True)
     channel = NoNullsCharField(max_length=30, required=False, default=u'')
@@ -584,6 +593,7 @@ class PostResponseSerializer(serializers.Serializer):
             happy=attrs['happy'],
             url=attrs['url'].strip(),
             description=attrs['description'].strip(),
+            category=attrs['category'].strip(),
             product=attrs['product'].strip(),
             channel=attrs['channel'].strip(),
             version=attrs['version'].strip(),

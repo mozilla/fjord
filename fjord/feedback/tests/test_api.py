@@ -249,6 +249,7 @@ class PostFeedbackAPITest(TestCase):
         data = {
             'happy': True,
             'description': u'Great!',
+            'category': u'ui',
             'product': u'Firefox OS',
             'channel': u'stable',
             'version': u'1.1',
