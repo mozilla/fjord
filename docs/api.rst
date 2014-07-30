@@ -114,6 +114,12 @@ Optional fields
 
     Examples: ``"Peak"``, ``"Galaxy Tab 10.1"``
 
+**category**
+    String. The category classification for this feedback
+    response.
+
+    Examples: ``"ui"``, ``"performance"``, ``"bookmarks"``
+
 **url**
     String. If the feedback relates to a specific webpage, then
     the url is the url of the webpage it refers to.
@@ -152,6 +158,36 @@ Optional fields
     https://support.google.com/analytics/answer/1033867
       
     Example: ``'show the firefox love post'``
+
+
+Extra context
+-------------
+
+You can provide additional context in the form of key/value pairs by
+adding additional data to the JSON object.
+
+Any fields that aren't part of the required or optional fields list
+will get thrown into a JSON object and dumped in the feedback response
+context.
+
+For example, if the product were the Firefox devtools and you want
+feedback responses to include the theme (dark or light) that the user
+was using, you could add this to the JSON object::
+
+    {
+        "happy": true,
+        "description": "devtools are the best!",
+        "product": "Devtools",
+        "theme": "dark"
+    }
+
+That last key will get added to the feedback response context.
+
+.. Note::
+
+   It's important you don't add ids or data that allows you to
+   correlate feedback responses to things in other data sets. That
+   violates our privacy policy.
 
 
 Minimal example with curl
