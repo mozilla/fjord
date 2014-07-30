@@ -10,19 +10,18 @@ from pages.base import Page
 
 
 class Header(Page):
-
     _feedback_link_locator = (By.CSS_SELECTOR, 'a.dashboard')
     _main_heading_link_locator = (By.CSS_SELECTOR, 'h1 > a')
 
     def click_feedback_link(self):
         self.selenium.find_element(*self._feedback_link_locator).click()
-        from pages.desktop.feedback import FeedbackPage
-        return FeedbackPage(self.testsetup)
+        from pages.desktop.dashboard import DashboardPage
+        return DashboardPage(self.testsetup)
 
     def click_main_heading_link(self):
         self.selenium.find_element(*self._main_heading_link_locator).click()
-        from pages.desktop.feedback import FeedbackPage
-        return FeedbackPage(self.testsetup)
+        from pages.desktop.dashboard import DashboardPage
+        return DashboardPage(self.testsetup)
 
     @property
     def is_feedback_link_visible(self):

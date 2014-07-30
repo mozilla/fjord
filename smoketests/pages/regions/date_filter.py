@@ -60,7 +60,7 @@ class DateFilter(Page):
     @property
     def is_custom_date_filter_visible(self):
         """Returns True if the custom date filter form is visible."""
-        return self.is_element_visible(self._custom_dates_locator)
+        return self.is_element_visible_no_wait(self._custom_dates_locator)
 
     @property
     def is_datepicker_visible(self):
@@ -71,16 +71,16 @@ class DateFilter(Page):
     @property
     def is_custom_start_date_visible(self):
         """Returns True if the custom start date input form is visible."""
-        return self.is_element_visible(self._custom_start_date_locator)
+        return self.is_element_visible_no_wait(self._custom_start_date_locator)
 
     @property
     def is_custom_end_date_visible(self):
         """Returns True if the custom end date input form is visible."""
-        return self.is_element_visible(self._custom_end_date_locator)
+        return self.is_element_visible_no_wait(self._custom_end_date_locator)
 
     @property
     def is_datepicker_next_month_button_disabled(self):
-        return self.is_element_visible(self._datepicker_next_month_disabled_locator)
+        return self.is_element_visible_no_wait(self._datepicker_next_month_disabled_locator)
 
     def wait_for_datepicker_to_open(self):
         WebDriverWait(self.selenium, self.timeout).until(lambda s: self.is_datepicker_visible)
@@ -201,8 +201,8 @@ class DateFilter(Page):
 
     @property
     def is_date_filter_applied(self):
-        from pages.base import BasePage
-        base = BasePage(self.testsetup)
+        from pages.base import Page
+        base = Page(self.testsetup)
         return base.date_start_from_url and base.date_end_from_url or False
 
     @property

@@ -5,15 +5,12 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
-from pages.base import BasePage
-from pages.desktop.thanks import ThanksPage
+from pages.base import Page
+from pages.generic_feedback_thanks import ThanksPage
 
 
-class GenericFeedbackFormPage(BasePage):
-
+class GenericFeedbackFormPage(Page):
     _page_title = 'Submit Your Feedback :: Firefox Input'
 
     _intro_card_locator = (By.ID, 'intro')
@@ -46,10 +43,6 @@ class GenericFeedbackFormPage(BasePage):
 
     def click_support_page(self):
         self.selenium.find_element(*self._support_page_locator).click()
-
-    def wait_for(self, locator):
-        # FIXME: self.timeout
-        WebDriverWait(self.selenium, 5).until(EC.visibility_of_element_located(locator))
 
     def click_happy_feedback(self):
         self.selenium.find_element(*self._happy_button_locator).click()

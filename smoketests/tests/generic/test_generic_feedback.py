@@ -7,12 +7,11 @@ import time
 import pytest
 from unittestzero import Assert
 
-from pages.desktop.generic_feedback_form import GenericFeedbackFormPage
-from pages.desktop.feedback import FeedbackPage
+from pages.dashboard import DashboardPage
+from pages.generic_feedback_form import GenericFeedbackFormPage
 
 
 class TestFeedback(object):
-
     def test_submit_happy_feedback(self, mozwebqa):
         timestamp = str(time.time())
         desc = 'input-tests testing happy feedback ' + timestamp
@@ -39,8 +38,8 @@ class TestFeedback(object):
         Assert.true(thanks_pg.is_the_current_page)
 
         # 6. verify
-        dashboard_pg = FeedbackPage(mozwebqa)
-        dashboard_pg.go_to_feedback_page()
+        dashboard_pg = DashboardPage(mozwebqa)
+        dashboard_pg.go_to_dashboard_page()
         dashboard_pg.search_for(desc)
         resp = dashboard_pg.messages[0]
         Assert.equal(resp.type.strip(), 'Happy')
@@ -74,8 +73,8 @@ class TestFeedback(object):
         Assert.true(thanks_pg.is_the_current_page)
 
         # 6. verify
-        dashboard_pg = FeedbackPage(mozwebqa)
-        dashboard_pg.go_to_feedback_page()
+        dashboard_pg = DashboardPage(mozwebqa)
+        dashboard_pg.go_to_dashboard_page()
         dashboard_pg.search_for(desc)
         resp = dashboard_pg.messages[0]
         Assert.equal(resp.type.strip(), 'Sad')
@@ -123,8 +122,8 @@ class TestFeedback(object):
         thanks_pg = feedback_pg.submit(expect_success=True)
         Assert.true(thanks_pg.is_the_current_page)
 
-        dashboard_pg = FeedbackPage(mozwebqa)
-        dashboard_pg.go_to_feedback_page()
+        dashboard_pg = DashboardPage(mozwebqa)
+        dashboard_pg.go_to_dashboard_page()
         dashboard_pg.search_for(desc)
         resp = dashboard_pg.messages[0]
         Assert.equal(resp.body.strip(), desc.strip())
@@ -143,8 +142,8 @@ class TestFeedback(object):
         # Check the dashboard again and make sure the most recent
         # response has the same created time as the first time. If it
         # does, then
-        dashboard_pg = FeedbackPage(mozwebqa)
-        dashboard_pg.go_to_feedback_page()
+        dashboard_pg = DashboardPage(mozwebqa)
+        dashboard_pg.go_to_dashboard_page()
         dashboard_pg.search_for(desc)
         resp = dashboard_pg.messages[0]
         Assert.equal(resp.body.strip(), desc.strip())
@@ -175,8 +174,8 @@ class TestFeedback(object):
         Assert.true(thanks_pg.is_the_current_page)
 
         # 5. verify
-        dashboard_pg = FeedbackPage(mozwebqa)
-        dashboard_pg.go_to_feedback_page()
+        dashboard_pg = DashboardPage(mozwebqa)
+        dashboard_pg.go_to_dashboard_page()
         dashboard_pg.search_for(desc)
         resp = dashboard_pg.messages[0]
         Assert.equal(resp.type.strip(), 'Happy')

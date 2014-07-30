@@ -5,11 +5,10 @@
 import pytest
 from unittestzero import Assert
 
-from pages.desktop.feedback import FeedbackPage
+from pages.dashboard import DashboardPage
 
 
 class TestPlatformFilter(object):
-
     @pytest.mark.nondestructive
     def test_feedback_can_be_filtered_by_platform(self, mozwebqa):
         """Tests platform filtering in dashboard
@@ -20,18 +19,18 @@ class TestPlatformFilter(object):
         4. Verify that the platform for all messages on the first page of results is correct
 
         """
-        feedback_pg = FeedbackPage(mozwebqa)
+        dashboard_pg = DashboardPage(mozwebqa)
 
-        feedback_pg.go_to_feedback_page()
-        total_messages = feedback_pg.total_message_count
+        dashboard_pg.go_to_dashboard_page()
+        total_messages = dashboard_pg.total_message_count
 
-        platforms = feedback_pg.platform_filter.platforms
+        platforms = dashboard_pg.platform_filter.platforms
         platform_names = [platform.name for platform in platforms]
 
         Assert.greater(len(platforms), 0)
 
         for name in platform_names[:2]:
-            platform = feedback_pg.platform_filter.platform(name)
+            platform = dashboard_pg.platform_filter.platform(name)
 
             platform_name = platform.name
             platform_code = platform.code
@@ -39,14 +38,14 @@ class TestPlatformFilter(object):
             platform_count = platform.message_count
             Assert.greater(total_messages, platform_count)
 
-            feedback_pg.platform_filter.select_platform(platform_code)
+            dashboard_pg.platform_filter.select_platform(platform_code)
 
-            Assert.greater(total_messages, feedback_pg.total_message_count)
-            Assert.equal(len(feedback_pg.platform_filter.platforms), 1)
-            Assert.equal(feedback_pg.platform_filter.selected_platform.name, platform_name)
-            Assert.equal(feedback_pg.platform_from_url, platform_code)
+            Assert.greater(total_messages, dashboard_pg.total_message_count)
+            Assert.equal(len(dashboard_pg.platform_filter.platforms), 1)
+            Assert.equal(dashboard_pg.platform_filter.selected_platform.name, platform_name)
+            Assert.equal(dashboard_pg.platform_from_url, platform_code)
 
-            for message in feedback_pg.messages:
+            for message in dashboard_pg.messages:
                 Assert.equal(message.platform, platform_name)
 
-            feedback_pg.platform_filter.unselect_platform(platform_code)
+            dashboard_pg.platform_filter.unselect_platform(platform_code)

@@ -5,29 +5,29 @@
 import pytest
 from unittestzero import Assert
 
-from pages.desktop.feedback import FeedbackPage
+from pages.dashboard import DashboardPage
 
 
 class TestSearch(object):
 
     @pytest.mark.nondestructive
     def test_that_empty_search_of_feedback_returns_some_data(self, mozwebqa):
-        feedback_pg = FeedbackPage(mozwebqa)
+        dashboard_pg = DashboardPage(mozwebqa)
 
-        feedback_pg.go_to_feedback_page()
-        feedback_pg.search_for('')
-        Assert.greater(len(feedback_pg.messages), 0)
+        dashboard_pg.go_to_dashboard_page()
+        dashboard_pg.search_for('')
+        Assert.greater(len(dashboard_pg.messages), 0)
 
     @pytest.mark.nondestructive
     def test_that_we_can_search_feedback_with_unicode(self, mozwebqa):
-        feedback_pg = FeedbackPage(mozwebqa)
+        dashboard_pg = DashboardPage(mozwebqa)
 
-        feedback_pg.go_to_feedback_page()
-        feedback_pg.search_for(u"p\xe1gina")
+        dashboard_pg.go_to_dashboard_page()
+        dashboard_pg.search_for(u"p\xe1gina")
         # There's no way to guarantee that the search we did finds
         # responses on the page. So we check for one of two possible
         # scenarios: existences of responses or a message count of 0.
         Assert.true(
-            feedback_pg.no_messages
-            or (len(feedback_pg.messages) > 0)
+            dashboard_pg.no_messages
+            or (len(dashboard_pg.messages) > 0)
         )
