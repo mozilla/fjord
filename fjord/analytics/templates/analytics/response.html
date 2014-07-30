@@ -149,6 +149,14 @@
                 &mdash;
               {% endif %}
             </dd>
+            <dt>{{ _('Context') }}</dt>
+            <dd>
+              {% if response.responsecontext_set.count() > 0 %}
+                {{ response.responsecontext_set.all()[0].data }}
+              {% else %}
+                &mdash;
+              {% endif %}
+            </dd>
             <dt>{{ _('API version')  }}</dt>
             <dd>
               {{ response.api or '--' }}
