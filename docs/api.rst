@@ -185,6 +185,13 @@ That last key will get added to the feedback response context.
 
 .. Note::
 
+   Obviously, don't use a key that's already the name of a
+   field. Also, since this is not future proof, you might want to
+   prepend a unique string to any keys you add.
+
+
+.. Note::
+
    It's important you don't add ids or data that allows you to
    correlate feedback responses to things in other data sets. That
    violates our privacy policy.
