@@ -5,8 +5,6 @@ import site
 import sys
 from itertools import chain
 
-from pip.req import parse_requirements
-
 
 current_settings = None
 execute_manager = None
@@ -43,6 +41,9 @@ def check_dependencies():
        possible.
 
     """
+    # Import this here because not all environments have pip.
+    from pip.req import parse_requirements
+
     req_path = path('requirements')
     req_files = [os.path.join(req_path, fn) for fn in os.listdir(req_path)]
 
