@@ -13,13 +13,15 @@ from statsd import statsd
 from fjord.base.browsers import UNKNOWN
 from fjord.base.urlresolvers import reverse
 from fjord.base.util import (
+    actual_ip_plus_context,
+    ratelimit,
     smart_str,
     translate_country_name
 )
 from fjord.feedback import config
 from fjord.feedback import models
 from fjord.feedback.forms import ResponseForm
-from fjord.feedback.utils import actual_ip_plus_desc, clean_url, ratelimit
+from fjord.feedback.utils import clean_url
 
 
 def happy_redirect(request):
@@ -64,8 +66,11 @@ def requires_firefox(func):
     return _requires_firefox
 
 
-@ratelimit(rulename='doublesubmit_1pm', keyfun=actual_ip_plus_desc, rate='1/m')
-@ratelimit(rulename='100ph', rate='100/h')
+@ratelimit(rulename='doublesubmit_1pm',
+           keyfun=actual_ip_plus_context(
+               lambda req: req.POST.get('description', u'no description')),
+           rate='1/10m')
+@ratelimit(rulename='50ph', rate='50/h')
 def _handle_feedback_post(request, locale=None, product=None,
                           version=None, channel=None):
     """Saves feedback post to db accounting for throttling

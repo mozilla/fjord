@@ -1,7 +1,9 @@
 import datetime
 import json
+import re
 import time
 from functools import wraps
+from hashlib import md5
 
 from django.contrib.auth.decorators import permission_required
 from django.http import (
@@ -9,11 +11,13 @@ from django.http import (
     HttpResponseBadRequest,
     HttpResponseRedirect
 )
-from django.utils.dateparse import parse_date, parse_datetime
+from django.utils.dateparse import parse_date
+from django.utils.encoding import force_str
 from django.utils.feedgenerator import Atom1Feed
 
 from product_details import product_details
-from rest_framework.throttling import AnonRateThrottle
+from ratelimit.helpers import is_ratelimited
+from rest_framework.throttling import SimpleRateThrottle
 from statsd import statsd
 
 from fjord.base.urlresolvers import reverse
@@ -225,10 +229,142 @@ class Atom1FeedWithRelatedLinks(Atom1Feed):
                 attrs={'href': item['link_related'], 'rel': 'related'})
 
 
-class MeasuredAnonRateThrottle(AnonRateThrottle):
-    """On throttle failure, does a statsd call"""
+def actual_ip(req):
+    """Returns the actual ip address
+
+    Our dev, stage and prod servers are behind a reverse proxy, so the ip
+    address in REMOTE_ADDR is the reverse proxy server and not the client
+    ip address. The actual client ip address is in HTTP_X_CLUSTER_CLIENT_IP.
+
+    In our local development and test environments, the client ip address
+    is in REMOTE_ADDR.
+
+    """
+    return req.META.get('HTTP_X_CLUSTER_CLIENT_IP', req.META['REMOTE_ADDR'])
+
+
+def actual_ip_plus_context(contextfun):
+    """Returns a key function that adds md5 hashed context to the key"""
+    def _actual_ip_plus_context(req, *args, **kwargs):
+        # Force whatever comes out of contextfun to be bytes.
+        context = force_str(contextfun(req))
+
+        # md5 hash that.
+        hasher = md5()
+        hasher.update(context)
+        context = hasher.hexdigest()
+
+        # Then return the ip address plus a : plus the desc md5 hash.
+        return actual_ip(req) + ':' + context
+    return _actual_ip_plus_context
+
+
+def ratelimit(rulename, keyfun=actual_ip, rate='5/m'):
+    """Rate-limiting decorator that keeps metrics via statsd
+
+    This is just like the django-ratelimit ratelimit decorator, but is
+    stacking-friendly, performs some statsd fancypants and also has
+    Fjord-friendly defaults.
+
+    :arg rulename: rulename for statsd logging---must be a string
+        with letters only! look for this in statsd under
+        "throttled." + rulename.
+    :arg keyfun: (optional) function to generate a key for this
+        throttling. defaults to actual_ip.
+    :arg rate: (optional) rate to throttle at. defaults to 5/m.
+
+    """
+    def decorator(fn):
+        @wraps(fn)
+        def _wrapped(request, *args, **kwargs):
+            already_limited = getattr(request, 'limited', False)
+            ratelimited = is_ratelimited(
+                request=request, increment=True, ip=False, method=['POST'],
+                field=None, rate=rate, keys=keyfun)
+
+            if not already_limited and ratelimited:
+                statsd.incr('throttled.' + rulename)
+
+            return fn(request, *args, **kwargs)
+        return _wrapped
+    return decorator
+
+
+RATE_RE = re.compile(r'^(\d+)/(\d*)([smhd])$')
+
+class RatelimitThrottle(SimpleRateThrottle):
+    """This wraps the django-ratelimit ratelimiter in a DRF class
+
+    Django Rest Framework has its own throttling system. That's great,
+    but we're already using django-ratelimit. So this wraps
+    django-ratelimit throttling in the Django Rest Framework structure
+    so I can have a unified throttling backend for regular and API
+    views.
+
+    .. Note::
+
+       Return an instance of this in the `get_throttles` method. Don't
+       use this with `throttled_classes` property because it requires
+       other parameters to instantiate.
+
+       e.g.::
+
+           class MyThrottle(AnonRateThrottle):
+               def get_throttles(self):
+                   return [
+                       RatelimitThrottle(
+                           rulename='double_submit',
+                           rate='1/10m'
+                       )
+                   ]
+
+    """
+    def __init__(self, rulename, keyfun=None, rate='5/m', methods=('POST',)):
+        self.rulename = rulename
+        self.rate = rate
+        self.num_requests, self.duration = self.parse_rate(rate)
+        self.keyfun = keyfun or actual_ip
+        self.methods = methods
+
+    def get_cache_key(self, request, view):
+        return self.keyfun(request)
+
+    def parse_rate(self, rate):
+        """Handles num/(multi * period) like 1/10m"""
+        num, multiplier, period = RATE_RE.match(rate).groups()
+
+        num = int(num)
+        multiplier = int(multiplier or 1)
+        period = {'s': 1, 'm': 60, 'h': 3600, 'd': 86400}[period]
+        return (num, (multiplier * period))
+
+    def allow_request(self, request, view):
+        already_limited = getattr(request, 'limited', False)
+        ratelimited = is_ratelimited(
+            request=request, increment=True, ip=False, method=self.methods,
+            field=None, rate=self.rate, keys=self.keyfun)
+
+        if not already_limited and ratelimited:
+            statsd.incr('throttled.' + self.rulename)
+
+        if ratelimited:
+            # Failed rate-limiting, so this request is not allowed.
+            return self.throttle_failure()
+
+        # Did not trigger rate-limiting, so this request is allowed.
+        return self.throttle_success()
+
+    def throttle_success(self):
+        return True
+
     def throttle_failure(self):
-        statsd.incr('api.throttle.failure')
+        """Called when a request has failed due to throttling"""
+        return False
+
+    def wait(self):
+        # We don't want to calculate the actual wait time, so we cheat
+        # here and just return the duration.
+        return self.duration
 
 
 def check_new_user(fun):

@@ -9,7 +9,9 @@ import rest_framework.response
 from elasticutils.contrib.django import F
 
 from fjord.base.util import (
+    actual_ip_plus_context,
     cors_enabled,
+    RatelimitThrottle,
     smart_date,
     smart_timedelta
 )
@@ -91,9 +93,32 @@ class PublicFeedbackAPI(rest_framework.views.APIView):
             'results': list(responses)
         })
 
+    def get_throttles(self):
+        """Returns throttle class instances"""
+        return [
+            RatelimitThrottle(
+                rulename='api_get_100ph',
+                rate='100/h',
+                methods=('GET',))
+        ]
 
 class PostFeedbackAPI(rest_framework.generics.CreateAPIView):
     serializer_class = models.PostResponseSerializer
+
+    def get_throttles(self):
+        """Returns throttle class instances"""
+        def _get_desc(req):
+            return req.DATA.get('description', u'no description')
+
+        return [
+            RatelimitThrottle(
+                rulename='api_post_50ph',
+                rate='50/h'),
+            RatelimitThrottle(
+                rulename='api_post_doublesubmit_1p10m',
+                rate='1/10m',
+                keyfun=actual_ip_plus_context(_get_desc))
+        ]
 
 
 def feedback_as_view():

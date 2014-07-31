@@ -1,82 +1,13 @@
-from functools import wraps
 from hashlib import md5
 import re
 import urlparse
 
 from elasticsearch.exceptions import ElasticsearchException
-from ratelimit.helpers import is_ratelimited
-from statsd import statsd
 
 from django.utils.encoding import force_str
 
 from fjord.feedback import config
 from fjord.search.index import es_analyze
-
-
-def actual_ip(req):
-    """Returns the actual ip address
-
-    Our dev, stage and prod servers are behind a reverse proxy, so the ip
-    address in REMOTE_ADDR is the reverse proxy server and not the client
-    ip address. The actual client ip address is in HTTP_X_CLUSTER_CLIENT_IP.
-
-    In our local development and test environments, the client ip address
-    is in REMOTE_ADDR.
-
-    """
-    return req.META.get('HTTP_X_CLUSTER_CLIENT_IP', req.META['REMOTE_ADDR'])
-
-
-def actual_ip_plus_desc(req):
-    """Returns actual ip address plus first 30 characters of desc
-
-    This key is formulated to reduce double-submits.
-
-    """
-    # This pulls out the description and make sure it's bytes.
-    desc = force_str(req.POST.get('description', u'no description'))
-
-    # md5 hash that.
-    hasher = md5()
-    hasher.update(desc)
-    desc = hasher.hexdigest()
-
-    # Then return the ip address plus a : plus the desc md5 hash.
-    return actual_ip(req) + ':' + desc
-
-
-def ratelimit(rulename, keyfun=None, rate='5/m'):
-    """Rate-limiting decorator that keeps metrics via statsd
-
-    This is just like the django-ratelimit ratelimit decorator, but is
-    stacking-friendly, performs some statsd fancypants and also has
-    Fjord-friendly defaults.
-
-    :arg rulename: rulename for statsd logging---must be a string
-        with letters only! look for this in statsd under
-        "throttled." + rulename.
-    :arg keyfun: (optional) function to generate a key for this
-        throttling. defaults to actual_ip.
-    :arg rate: (optional) rate to throttle at. defaults to 5/m.
-
-    """
-    if keyfun is None:
-        keyfun = actual_ip
-
-    def decorator(fn):
-        @wraps(fn)
-        def _wrapped(request, *args, **kwargs):
-            already_limited = getattr(request, 'limited', False)
-            ratelimited = is_ratelimited(
-                request=request, increment=True, ip=False, method=['POST'],
-                field=None, rate=rate, keys=keyfun)
-
-            if not already_limited and ratelimited:
-                statsd.incr('throttled.' + rulename)
-
-            return fn(request, *args, **kwargs)
-        return _wrapped
-    return decorator
 
 
 TOKEN_SPLIT_RE = re.compile(r'[\s\.\,\/\\\?\;\:\"\*\&\^\%\$\#\@\!]+')
