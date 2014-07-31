@@ -784,7 +784,7 @@ class TestWebFormThrottling(TestCase):
                 'description': u'{0} Firefox rocks! {0}'.format(i),
                 'url': u'http://mozilla.org/'
             })
-        eq_(models.Response.objects.count(), 100)
+        eq_(models.Response.objects.count(), 50)
 
         # The 101st should be throttled, so there should only be 100
         # responses in the db.
@@ -793,7 +793,7 @@ class TestWebFormThrottling(TestCase):
             'description': u'Firefox rocks!',
             'url': u'http://mozilla.org/'
         })
-        eq_(models.Response.objects.count(), 100)
+        eq_(models.Response.objects.count(), 50)
 
         # Make sure we still went to the Thanks page.
         self.assertRedirects(r, reverse('thanks'))

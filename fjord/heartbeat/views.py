@@ -1,6 +1,7 @@
 import rest_framework.views
 import rest_framework.response
-from fjord.base.util import smart_str
+
+from fjord.base.util import RatelimitThrottle, smart_str
 
 from .models import Answer, Poll
 
@@ -60,3 +61,14 @@ class HeartbeatAPI(rest_framework.views.APIView):
         return rest_framework.response.Response(
             status=201,
             data={'msg': 'success!'})
+
+    def get_throttles(self):
+        """Returns throttle class instances"""
+        def _get_desc(req):
+            return req.DATA.get('description', u'no description')
+
+        return [
+            RatelimitThrottle(
+                rulename='api_hb_post_50ph',
+                rate='50/h'),
+        ]

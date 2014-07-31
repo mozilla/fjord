@@ -1,4 +1,5 @@
 import json
+import time
 from datetime import date, timedelta
 
 from django.conf import settings
@@ -451,7 +452,7 @@ class PostFeedbackAPITest(TestCase):
         # Test with a product, but no channel
         data = {
             'happy': True,
-            'description': u'Great!',
+            'description': u'Great! Hazzah!',
             'product': u'Firefox OS',
             'version': u'1.1',
             'platform': u'Firefox OS',
@@ -527,17 +528,38 @@ class PostFeedbackAPITest(TestCase):
 
 class PostFeedbackAPIThrottleTest(TestCase):
     def test_throttle(self):
-        # This test is a little goofy. Essentially we figure out what
-        # the throttle trigger is, post that many times, then post
-        # once more to see if it gets throttled. So if the trigger is
-        # 100, then we post 101 times which seems kind of excessive
-        # in a test.
+        # We allow 50 posts per hour.
+        throttle_trigger = 50
 
-        # Get the trigger so that we can post that many times + 1
-        # to test throttling
-        trigger = settings.REST_FRAMEWORK['DEFAULT_THROTTLE_RATES']['anon']
-        trigger = int(trigger.split('/')[0])
+        # Descriptions have to be unique otherwise we hit the
+        # double-submit throttling. So we do this fancy thing here.
+        def data_generator():
+            while True:
+                yield {
+                    'happy': True,
+                    'description': u'Great! ' + str(time.time()),
+                    'product': u'Firefox OS',
+                    'channel': u'stable',
+                    'version': u'1.1',
+                    'platform': u'Firefox OS',
+                    'locale': 'en-US',
+                }
 
+        data = data_generator()
+
+        # Now hit the api a fajillion times making sure things got
+        # created
+        for i in range(throttle_trigger):
+            r = self.client.post(reverse('feedback-api'), data.next())
+            eq_(r.status_code, 201)
+
+        # This one should trip the throttle trigger
+        r = self.client.post(reverse('feedback-api'), data.next())
+        eq_(r.status_code, 429)
+
+    def test_double_submit_throttle(self):
+        # We disallow two submits in a row of the same description
+        # from the same ip address.
         data = {
             'happy': True,
             'description': u'Great!',
@@ -548,12 +570,10 @@ class PostFeedbackAPIThrottleTest(TestCase):
             'locale': 'en-US',
         }
 
-        # Now hit the api a fajillion times making sure things got
-        # created
-        for i in range(trigger):
-            r = self.client.post(reverse('feedback-api'), data)
-            eq_(r.status_code, 201)
+        # First time is fine
+        r = self.client.post(reverse('feedback-api'), data)
+        eq_(r.status_code, 201)
 
-        # This one should trip the throttle trigger
+        # Second time and back off!
         r = self.client.post(reverse('feedback-api'), data)
         eq_(r.status_code, 429)
