@@ -4,9 +4,9 @@ import os
 # Edit this if necessary or override the variable in your environment.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fjord.settings')
 
-from fjord import manage
+from fjord import manage_utils
 
-manage.setup_environ(__file__)
+manage_utils.setup_environ(__file__)
 
 from fjord.base import monkeypatches
 monkeypatches.patch()
@@ -17,8 +17,8 @@ USING_VENDOR = os.environ.get('USING_VENDOR', '0')
 
 
 if USING_VENDOR == '0' and SKIP_CHECK != '1':
-    manage.check_dependencies()
+    manage_utils.check_dependencies()
 
 
 if __name__ == "__main__":
-    manage.main()
+    manage_utils.main()
