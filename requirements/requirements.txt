@@ -26,10 +26,6 @@ https://github.com/jbalogh/jingo/archive/5e985a5c16e343a30482cc526127a856b1cb45e
 # sha256: OTZ4mjjiLzXDRK7mbZ5hzOSR7v62NYpUYS_FYNKBoPo
 https://github.com/mozilla/elasticutils/archive/641ccade9cfba1415809077fad674b41b436d174.tar.gz#egg=elasticutils
 
-# dennis: tags/v0.4.2^0
-# sha256: P7EjNhkJmOMckhvTr4jIQS23fDqqCjXMSpKkasIQGjc
-https://github.com/willkg/dennis/archive/fb87f585e8f65ae29f86e849710265040e35b689.tar.gz#egg=dennis
-
 # django-grappelli: tags/2.4.10^0
 # sha256: Aff-Wq92Uwupotohk5IJAGe-WqzSlxTxLJgW-zjaAWA
 https://github.com/sehmaschine/django-grappelli/archive/7ac34941117da730865967a74e714da4a180eddb.tar.gz#egg=django-grappelli
@@ -137,6 +133,9 @@ https://github.com/celery/django-celery/archive/b11b358cbc0d7b3ca15575d27332d4ae
 # tower: remotes/origin/HEAD
 # sha256: qm0q7z3NpXlebil6MCUbfIAahKy4h2MwiBjXscUjCdA
 https://github.com/clouserw/tower/archive/ade9804345eb49dd1b626fd276cd9572fd15d1b3.tar.gz#egg=tower
+
+# sha256: 9hjzf43QSX_1qFP77j5HH34aQXmghyoWGTNdKZXztBI
+dennis==0.4.3
 
 # sha256: HDW0rCBs7y0kgWyJ-Jzyid09OM98RJuz-re_bUPwGx8
 ordereddict==1.1
