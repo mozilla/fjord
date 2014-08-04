@@ -23,21 +23,13 @@ log = logging.getLogger('i.search')
 CHUNK_SIZE = 10000
 
 
-def handle_reset(request):
-    """Mark outstanding Records as failed.
-
-    Why? You'd want to reset the system if it gets itself wedged
-    thinking there are outstanding tasks, but there aren't. This
-    lets you fix that.
-
-    """
+def reset_records():
     for rec in Record.outstanding():
         rec.mark_fail('Cancelled.')
-    return HttpResponseRedirect(request.path)
 
 
-def handle_reindex(request):
-    """Caculate chunks and kick off indexing tasks."""
+def reindex():
+    """Calculates and creates indexing chunks"""
     index = get_index()
 
     batch_id = create_batch_id()
@@ -49,11 +41,6 @@ def handle_reindex(request):
         chunks.extend(
             (cls, chunk) for chunk in chunked(indexable, CHUNK_SIZE))
 
-    # The previous lines do a lot of work and take some time to
-    # execute.  So we wait until here to wipe and rebuild the
-    # index. That reduces the time that there is no index by a little.
-    recreate_index()
-
     for cls, id_list in chunks:
         chunk_name = '%s %d -> %d' % (cls.get_mapping_type_name(),
                                       id_list[0], id_list[-1])
@@ -62,6 +49,27 @@ def handle_reindex(request):
         index_chunk_task.delay(index, batch_id, rec.id,
                                (to_class_path(cls), id_list))
 
+
+def handle_reset(request):
+    """Mark outstanding Records as failed.
+
+    Why? You'd want to reset the system if it gets itself wedged
+    thinking there are outstanding tasks, but there aren't. This
+    lets you fix that.
+
+    """
+    reset_records()
+    return HttpResponseRedirect(request.path)
+
+
+def handle_recreate_reindex(request):
+    recreate_index()
+    reindex()
+    return HttpResponseRedirect(request.path)
+
+
+def handle_reindex(request):
+    reindex()
     return HttpResponseRedirect(request.path)
 
 
@@ -72,19 +80,19 @@ def search_admin_view(request):
     es_deets = None
     indexes = []
 
-    reset_requested = 'reset' in request.POST
-    if reset_requested:
-        try:
+    try:
+        if 'reset' in request.POST:
             return handle_reset(request)
-        except Exception as exc:
-            error_messages.append(u'Error: %s' % exc.message)
 
-    reindex_requested = 'reindex' in request.POST
-    if reindex_requested:
-        try:
+        if 'reindex' in request.POST:
             return handle_reindex(request)
-        except Exception as exc:
-            error_messages.append(u'Error: %s' % exc.message)
+
+        if 'recreate_reindex' in request.POST:
+            return handle_recreate_reindex(request)
+
+    except Exception as exc:
+        error_messages.append(u'Error: %s' % exc.message)
+
 
     try:
         # This gets index stats, but also tells us whether ES is in
@@ -110,7 +118,7 @@ def search_admin_view(request):
                               'button below. (ElasticHttpNotFoundError)')
 
     outstanding_records = Record.outstanding()
-    recent_records = Record.objects.order_by('-creation_time')[:20]
+    recent_records = Record.objects.order_by('-creation_time')[:100]
 
     return render(request, 'admin/search_admin_view.html', {
             'title': 'Search',
