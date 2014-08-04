@@ -259,7 +259,7 @@ def actual_ip_plus_context(contextfun):
     return _actual_ip_plus_context
 
 
-def ratelimit(rulename, keyfun=None, rate='5/m'):
+def ratelimit(rulename, keyfun=actual_ip, rate='5/m'):
     """Rate-limiting decorator that keeps metrics via statsd
 
     This is just like the django-ratelimit ratelimit decorator, but is
@@ -274,9 +274,6 @@ def ratelimit(rulename, keyfun=None, rate='5/m'):
     :arg rate: (optional) rate to throttle at. defaults to 5/m.
 
     """
-    if keyfun is None:
-        keyfun = actual_ip
-
     def decorator(fn):
         @wraps(fn)
         def _wrapped(request, *args, **kwargs):
