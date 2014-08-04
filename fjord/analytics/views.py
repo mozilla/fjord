@@ -14,6 +14,7 @@ from django.http import (
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 
+from elasticsearch import ElasticsearchException
 from elasticutils.contrib.django import F, es_required_or_50x
 from mobility.decorators import mobile_template
 from tower import ugettext as _
@@ -81,11 +82,17 @@ def response_view(request, responseid, template):
 
     mlt = None
     records = None
+    errors = []
 
     if (request.user.is_authenticated()
         and request.user.has_perm('analytics.can_view_dashboard')):
 
-        mlt = ResponseMappingType.morelikethis(response)
+        try:
+            # Convert it to a list to force it to execute right now.
+            mlt = list(ResponseMappingType.morelikethis(response))
+        except ElasticsearchException as exc:
+            errors.append('Failed to do morelikethis: %s' % exc)
+
         records = [
             (u'Response records', Record.objects.records(response)),
         ]
@@ -101,6 +108,7 @@ def response_view(request, responseid, template):
     # We don't pass the response directly to the template and instead
     # do some data tweaks here to make it more palatable for viewing.
     return render(request, template, {
+        'errors': errors,
         'response': response,
         'mlt': mlt,
         'records': records,

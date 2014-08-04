@@ -30,7 +30,22 @@
         {% else %}
           <span class="sprite sad">{{ _('Sad') }}</span>
         {% endif %}
+        {% if errors %}
+          <ul>
+          </ul>
+        {% endif %}
         <dl class="inline">
+          <dt>Errors</dt>
+          {% if errors %}
+            <dd>
+              <p>
+                These errors were kicked up when retrieving this data:
+              </p>
+              {% for error in errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </dd>
+          {% endif %}
           <dt>{{ _('Category') }}</dt>
           <dd>
             {{ response.category or _('None') }}
