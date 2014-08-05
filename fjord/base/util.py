@@ -17,7 +17,7 @@ from django.utils.feedgenerator import Atom1Feed
 
 from product_details import product_details
 from ratelimit.helpers import is_ratelimited
-from rest_framework.throttling import AnonRateThrottle, SimpleRateThrottle
+from rest_framework.throttling import SimpleRateThrottle
 from statsd import statsd
 
 from fjord.base.urlresolvers import reverse
@@ -347,13 +347,18 @@ class RatelimitThrottle(SimpleRateThrottle):
         if not already_limited and ratelimited:
             statsd.incr('throttled.' + self.rulename)
 
+        if ratelimited:
+            # Failed rate-limiting, so this request is not allowed.
             return self.throttle_failure()
+
+        # Did not trigger rate-limiting, so this request is allowed.
         return self.throttle_success()
 
     def throttle_success(self):
         return True
 
     def throttle_failure(self):
+        """Called when a request has failed due to throttling"""
         return False
 
     def wait(self):
