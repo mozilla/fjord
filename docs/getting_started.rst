@@ -35,26 +35,12 @@ Download Fjord
 If you have a GitHub account, you should fork the Fjord repository and
 then clone your fork::
 
-    git clone --recursive https://github.com/<USERNAME>/fjord.git
+    git clone https://github.com/<USERNAME>/fjord.git
 
 If you do not have a GitHub account, that's ok! Clone the official
 Fjord repository this way::
 
-    git clone --recursive https://github.com/mozilla/fjord.git
-
-
-.. Note::
-
-   The ``--recursive`` option is important since Fjord uses git
-   submodules. This will cause all those submodules to get cloned,
-   too.
-
-   If you forget to do it, that's ok. just do::
-
-       git submodule update --init --recursive
-
-   and that'll recursively get all the vendor/ stuff.
-
+    git clone https://github.com/mozilla/fjord.git
 
 This creates a directory called ``fjord/``. We'll call that the "Fjord
 repository top-level directory".
