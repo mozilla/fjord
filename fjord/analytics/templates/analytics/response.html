@@ -30,13 +30,9 @@
         {% else %}
           <span class="sprite sad">{{ _('Sad') }}</span>
         {% endif %}
-        {% if errors %}
-          <ul>
-          </ul>
-        {% endif %}
         <dl class="inline">
-          <dt>Errors</dt>
           {% if errors %}
+            <dt>Errors</dt>
             <dd>
               <p>
                 These errors were kicked up when retrieving this data:
