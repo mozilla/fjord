@@ -66,7 +66,7 @@ def requires_firefox(func):
     return _requires_firefox
 
 
-@ratelimit(rulename='doublesubmit_1pm',
+@ratelimit(rulename='doublesubmit_1p10m',
            keyfun=actual_ip_plus_context(
                lambda req: req.POST.get('description', u'no description')),
            rate='1/10m')
