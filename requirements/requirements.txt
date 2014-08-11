@@ -220,3 +220,6 @@ anyjson==0.3.3
 
 # sha256: xyzOcAUT2_Imn5aV-nlALvSwhg0pJaXMRmayFkfeu2o
 chardet==2.2.1
+
+# sha256: 10erSV9JDXxVts9yHGpBn-OoNK2uOfyLelW8rf6v8mk
+django-waffle==0.10

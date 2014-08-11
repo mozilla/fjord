@@ -62,3 +62,4 @@ src/kombu
 src/nuggets
 src/pystatsd
 src/tower
+src/django-waffle

@@ -103,3 +103,6 @@
 [submodule "vendor/src/factory_boy"]
 	path = vendor/src/factory_boy
 	url = https://github.com/rbarrois/factory_boy.git
+[submodule "vendor/src/django-waffle"]
+	path = vendor/src/django-waffle
+	url = https://github.com/jsocol/django-waffle.git

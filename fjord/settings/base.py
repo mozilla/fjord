@@ -248,6 +248,7 @@ INSTALLED_APPS = (
     'djcelery',
     'django_nose',
     'session_csrf',
+    'waffle',
 
     # L10n
     'product_details',
@@ -287,13 +288,18 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'session_csrf.CsrfMiddleware',  # Must be after auth middleware.
+
+    # Must be after auth middleware.
+    'session_csrf.CsrfMiddleware',
+
     'django.contrib.messages.middleware.MessageMiddleware',
     'commonware.middleware.FrameOptionsHeader',
+    'waffle.middleware.WaffleMiddleware',
 
     'fjord.base.middleware.UserAgentMiddleware',
     'fjord.base.middleware.MobileQueryStringMiddleware',
     'fjord.base.middleware.MobileMiddleware',
+
     'django_statsd.middleware.GraphiteMiddleware',
     'django_statsd.middleware.GraphiteRequestTimingMiddleware',
 )
