@@ -339,16 +339,13 @@ class RatelimitThrottle(SimpleRateThrottle):
         return (num, (multiplier * period))
 
     def allow_request(self, request, view):
-        already_limited = getattr(request, 'limited', False)
         ratelimited = is_ratelimited(
             request=request, increment=True, ip=False, method=self.methods,
             field=None, rate=self.rate, keys=self.keyfun)
 
-        if not already_limited and ratelimited:
-            statsd.incr('throttled.' + self.rulename)
-
         if ratelimited:
             # Failed rate-limiting, so this request is not allowed.
+            statsd.incr('throttled.' + self.rulename)
             return self.throttle_failure()
 
         # Did not trigger rate-limiting, so this request is allowed.
