@@ -36,6 +36,8 @@ from fjord.base.util import (
     smart_date)
 from fjord.feedback.helpers import country_name
 from fjord.feedback.models import Product, Response, ResponseMappingType
+from fjord.heartbeat.models import Answer as HBAnswer
+from fjord.heartbeat.models import Poll as HBPoll
 from fjord.search.utils import es_error_statsd
 
 
@@ -587,6 +589,20 @@ def analytics_search(request):
         'next_page': page + 1 if end < search_count else None,
         'current_search': current_search,
         'selected': selected,
+    })
+
+
+@check_new_user
+@analyzer_required
+def analytics_hb(request):
+    """Shows HB data"""
+    template = 'analytics/analyzer/hb.html'
+    hb_polls = HBPoll.objects.filter(enabled=True)
+    hb_data = HBAnswer.objects.order_by('-created')[:100]
+
+    return render(request, template, {
+        'hb_polls': hb_polls,
+        'hb_data': hb_data
     })
 
 
