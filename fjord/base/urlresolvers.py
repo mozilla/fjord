@@ -91,7 +91,8 @@ class Prefixer(object):
         return settings.LANGUAGE_CODE
 
     def get_best_language(self, accept_lang):
-        """Given an Accept-Language header, return the best-matching language."""
+        """Given an Accept-Language header, return the best-matching language.
+        """
         LUM = settings.LANGUAGE_URL_MAP
         langs = dict(LUM)
         langs.update((k.split('-')[0], v) for k, v in LUM.items() if

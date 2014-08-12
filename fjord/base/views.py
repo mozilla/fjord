@@ -3,7 +3,12 @@ import socket
 from functools import wraps
 
 from django.conf import settings
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
+from django.http import (
+    Http404,
+    HttpResponse,
+    HttpResponseForbidden,
+    HttpResponseRedirect
+)
 from django.shortcuts import render
 from django.utils.http import is_safe_url
 from django.views.decorators.cache import never_cache
@@ -55,7 +60,10 @@ def login_failure(request, template=None):
 
 @mobile_template('{mobile/}csrf_failure.html')
 def csrf_failure(request, reason='', template=None):
-    return HttpResponseForbidden(render(request, template), content_type='text/html')
+    return HttpResponseForbidden(
+        render(request, template),
+        content_type='text/html'
+    )
 
 
 @mobile_template('{mobile/}about.html')
@@ -91,8 +99,9 @@ def dev_or_authorized(func):
     """Show view for admin and developer instances, else 404"""
     @wraps(func)
     def _dev_or_authorized(request, *args, **kwargs):
-        if (request.user.is_superuser or settings.SHOW_STAGE_NOTICE
-            or settings.DEBUG):
+        if (request.user.is_superuser
+                or settings.SHOW_STAGE_NOTICE
+                or settings.DEBUG):
 
             return func(request, *args, **kwargs)
 

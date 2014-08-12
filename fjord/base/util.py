@@ -203,7 +203,7 @@ class FakeLogger(object):
     def _out(self, level, msg, *args):
         msg = msg % args
         self.stdout.write('%s %-8s: %s\n' % (
-                time.strftime('%H:%M:%S'), level, msg))
+            time.strftime('%H:%M:%S'), level, msg))
 
     def info(self, msg, *args):
         self._out('INFO', msg, *args)
@@ -291,6 +291,7 @@ def ratelimit(rulename, keyfun=actual_ip, rate='5/m'):
 
 
 RATE_RE = re.compile(r'^(\d+)/(\d*)([smhd])$')
+
 
 class RatelimitThrottle(SimpleRateThrottle):
     """This wraps the django-ratelimit ratelimiter in a DRF class

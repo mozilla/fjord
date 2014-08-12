@@ -1,7 +1,9 @@
 from django.conf.urls import patterns, url
 
 
-urlpatterns = patterns('fjord.base.views',
+urlpatterns = patterns(
+    'fjord.base.views',
+
     url(r'^login-failure$', 'login_failure', name='login-failure'),
 
     url(r'^services/monitor$', 'monitor_view', name='services-monitor'),

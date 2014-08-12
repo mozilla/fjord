@@ -16,9 +16,9 @@ def settings_view(request):
                        for key in sorted(settings.keys())]
 
     return render(request, 'admin/settings_view.html', {
-            'settings': sorted_settings,
-            'title': 'App Settings'
-            })
+        'settings': sorted_settings,
+        'title': 'App Settings'
+    })
 
 
 admin.site.register_view('settings', settings_view,
@@ -36,9 +36,9 @@ def celery_settings_view(request):
         for key in sorted(settings)]
 
     return render(request, 'admin/settings_view.html', {
-            'settings': sorted_settings,
-            'title': 'Celery Settings'
-            })
+        'settings': sorted_settings,
+        'title': 'Celery Settings'
+    })
 
 
 admin.site.register_view('celery', celery_settings_view,
