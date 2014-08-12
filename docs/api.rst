@@ -249,21 +249,23 @@ Required fields
 ---------------
 
 **locale**
-    String. The locale of the user interface that the user is using
+    String. Max length: 8. The locale of the user interface that the
+    user is using
 
-    Examples: ``"en-US"``, ``"fr"``, ``"de"``
+    Examples:``"en-US"``, ``"fr"``, ``"de"``
 
 **platform**
-    String. The name of the operating system/platform the product
-    is running on.
+    String. Max length: 30. The name of the operating system/platform
+    the product is running on.
 
     Examples: ``"OS X"``, ``"Windows 8"``, ``"Firefox OS"``,
     ``"Android"``, ``"Linux"``
 
 **product**
-    String. The name of the product the user is giving feedback on.
+    String. Max length: 30. The name of the product the user is giving
+    feedback on.
 
-    Examples: ``"Firefox for Android"``, ``"Firefox OS"``
+    Examples:``"Firefox for Android"``, ``"Firefox OS"``
 
     .. Note::
 
@@ -272,23 +274,25 @@ Required fields
        Input admin to have your product added.
 
 **channel**
-    String. The channel of the product the user is giving feedback on.
+    String. Max length: 30. The channel of the product the user is
+    giving feedback on.
 
-    Examples: ``"stable"``, ``"beta"``
+    Examples:``"stable"``, ``"beta"``
 
 **version**
-    String. The version of the product the user is giving feedback
-    on as a string.
+    String. Max length: 30. The version of the product the user is
+    giving feedback on as a string.
 
-    Examples: ``"22b2"``, ``"1.1"``
+    Examples:``"22b2"``, ``"1.1"``
 
 
     String. The operating system the user is using
 
 **poll**
-    String. The slug of the poll this heartbeat response is for.
+    String. Max length: 50. Alpha-numeric characters and ``-`` only. The
+    slug of the poll this heartbeat response is for.
 
-    Examples: ``"is-firefox-fast"``
+    Examples:``"is-firefox-fast"``
 
     .. Note::
 
@@ -299,13 +303,20 @@ Required fields
        Advocacy folks or an Input admin to have your product added.
 
 **answer**
-    String. The answer value.
+    String. Max length: 10. The answer value.
 
     Examples: ``"true"``, ``"false"``, ``"4"``
 
 
-Minimal example with curl
--------------------------
+Extra data
+    Any additional fields you provide in the POST data will get
+    glommed into a JSON object and stuck in the db.
+
+
+Curl examples
+-------------
+
+Minimal example:
 
 ::
 
@@ -322,3 +333,29 @@ Minimal example with curl
         "poll": "ou812",
         "answer": "42"
     }'
+
+
+Here's an example providing "extra" data:
+
+::
+
+    curl -v -XPOST $URL \
+        -H 'Accept: application/json; indent=4' \
+        -H 'Content-type: application/json' \
+        -d '
+    {
+        "locale": "en-US",
+        "platform": "Linux",
+        "product": "Firefox",
+        "version": "30.0",
+        "channel": "stable",
+        "poll": "ou812",
+        "answer": "42",
+        "favoritepie": "cherry",
+        "favoriteUAperson": "tyler"
+    }'
+
+The extra fields are plucked out and put in a JSON object and stored
+in the db like this::
+
+    {"favoritepie": "cherry", "favoriteUAperson": "tyler"}
