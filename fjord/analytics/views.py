@@ -70,8 +70,9 @@ def response_view(request, responseid, template):
         prod = Product.objects.get(db_name=response.product)
 
         if (not prod.on_dashboard
-            and (not request.user.is_authenticated()
-                 or not request.user.has_perm('analytics.can_view_dashboard'))):
+                and (not request.user.is_authenticated()
+                     or not request.user.has_perm(
+                         'analytics.can_view_dashboard'))):
 
             # If this is a response for a hidden product and the user
             # isn't in the analytics group, then they can't see it.
@@ -85,7 +86,7 @@ def response_view(request, responseid, template):
     errors = []
 
     if (request.user.is_authenticated()
-        and request.user.has_perm('analytics.can_view_dashboard')):
+            and request.user.has_perm('analytics.can_view_dashboard')):
 
         try:
             # Convert it to a list to force it to execute right now.
@@ -176,8 +177,10 @@ def generate_atom_feed(request, search):
 
 
 def generate_dashboard_url(request, output_format='atom',
-                                viewname='dashboard'):
-    """For a given request, generates the dashboard url for the given format"""
+                           viewname='dashboard'):
+    """For a given request, generates the dashboard url for the given format
+
+    """
     qd = request.GET.copy()
 
     # Remove anything from the querystring that isn't good for a feed:
@@ -464,11 +467,13 @@ def generate_totals_histogram(search_date_start, search_date_end,
         },
     ).facet_counts()
 
-    totals_data = dict((p['time'], p['count']) for p in totals_histogram['total'])
+    totals_data = dict((p['time'], p['count'])
+                       for p in totals_histogram['total'])
     zero_fill(search_date_start, search_date_end, [totals_data])
     totals_data = sorted(totals_data.items())
 
-    happy_data = dict((p['time'], p['count']) for p in totals_histogram['happy'])
+    happy_data = dict((p['time'], p['count'])
+                      for p in totals_histogram['happy'])
     zero_fill(search_date_start, search_date_end, [happy_data])
     happy_data = sorted(happy_data.items())
 
@@ -484,16 +489,23 @@ def generate_totals_histogram(search_date_start, search_date_end,
         # Figure out yesterday and today as a percent to one
         # significant digit.
         if happy_data[i-1][1] and totals_data[i-1][1]:
-            yesterday = int(happy_data[i-1][1] * 1.0 / totals_data[i-1][1] * 1000) / 10.0
+            yesterday = (
+                int(happy_data[i-1][1] * 1.0
+                    / totals_data[i-1][1] * 1000)
+                / 10.0
+            )
 
         if happy_data[i][1] and totals_data[i][1]:
-            today = int(happy_data[i][1] * 1.0 / totals_data[i][1] * 1000) / 10.0
+            today = (
+                int(happy_data[i][1] * 1.0
+                    / totals_data[i][1] * 1000)
+                / 10.0
+            )
 
         if (today - yesterday) >= 0:
             up_deltas.append((happy_data[i][0], today - yesterday))
         else:
             down_deltas.append((happy_data[i][0], today - yesterday))
-
 
     # Nix the first total because it's not in our date range
     totals_data = totals_data[1:]
@@ -503,7 +515,8 @@ def generate_totals_histogram(search_date_start, search_date_end,
             'name': 'zero',
             'data': [(totals_data[0][0], 0), (totals_data[-1][0], 0)],
             'yaxis': 2,
-            'lines': {'show': True, 'fill': False, 'lineWidth': 1, 'shadowSize': 0},
+            'lines': {'show': True, 'fill': False, 'lineWidth': 1,
+                      'shadowSize': 0},
             'color': '#dddddd',
         },
         {
@@ -520,7 +533,7 @@ def generate_totals_histogram(search_date_start, search_date_end,
             'label': _('Percent change in sentiment upwards'),
             'data': up_deltas,
             'yaxis': 2,
-            'bars': {'show': True, 'lineWidth': 3,},
+            'bars': {'show': True, 'lineWidth': 3},
             'points': {'show': True},
             'color': '#55E744',
         },
@@ -578,7 +591,9 @@ def product_dashboard_firefox(request, prod):
     search = search.filter(base_f)
 
     # Figure out the list of platforms and versions for this range.
-    plats_and_vers = search.facet('platform', 'version', size=50).facet_counts()
+    plats_and_vers = (search
+                      .facet('platform', 'version', size=50)
+                      .facet_counts())
 
     # Figure out the "by platform" histogram
     platforms = [part['term'] for part in plats_and_vers['platform']]
@@ -595,7 +610,8 @@ def product_dashboard_firefox(request, prod):
     for key in platform_counts.keys():
         data = dict((p['time'], p['count']) for p in platform_counts[key])
 
-        if sum([p['count'] for p in platform_counts[key]]) < (totals_sum * 0.02):
+        sum_counts = sum([p['count'] for p in platform_counts[key]])
+        if sum_counts < (totals_sum * 0.02):
             # Skip platforms where the number of responses is less than
             # 2% of the total.
             continue
@@ -624,7 +640,8 @@ def product_dashboard_firefox(request, prod):
     for key in version_counts.keys():
         data = dict((p['time'], p['count']) for p in version_counts[key])
 
-        if sum([p['count'] for p in version_counts[key]]) < (totals_sum * 0.02):
+        sum_counts = sum([p['count'] for p in version_counts[key]])
+        if sum_counts < (totals_sum * 0.02):
             # Skip versions where the number of responses is less than
             # 2% of the total.
             continue
@@ -684,6 +701,7 @@ def product_dashboard_generic(request, prod):
 PRODUCT_TO_DASHBOARD = {
     'firefox': product_dashboard_firefox
 }
+
 
 @check_new_user
 @es_required_or_50x(error_template='analytics/es_down.html')

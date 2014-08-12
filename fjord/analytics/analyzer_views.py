@@ -105,7 +105,7 @@ def analytics_occurrences(request):
                 first_params['q'] = cleaned['first_search_term']
 
             if ('date_start' not in first_params
-                and 'date_end' not in first_params):
+                    and 'date_end' not in first_params):
 
                 # FIXME - If there's no start date, then we want
                 # "everything" so we use a hard-coded 2013-01-01 date
@@ -130,12 +130,12 @@ def analytics_occurrences(request):
                 first_facet_bi, key=lambda item: -item['count'])
 
             if (cleaned['second_version']
-                or cleaned['second_search_term']
-                or cleaned['second_start_date']):
+                    or cleaned['second_search_term']
+                    or cleaned['second_start_date']):
 
                 second_resp_s = (ResponseMappingType.search()
-                                .filter(product=cleaned['product'])
-                                .filter(locale__startswith='en'))
+                                 .filter(product=cleaned['product'])
+                                 .filter(locale__startswith='en'))
 
                 second_params['product'] = cleaned['product']
 
@@ -157,7 +157,7 @@ def analytics_occurrences(request):
                     second_params['q'] = cleaned['second_search_term']
 
                 if ('date_start' not in second_params
-                    and 'date_end' not in second_params):
+                        and 'date_end' not in second_params):
 
                     # FIXME - If there's no start date, then we want
                     # "everything" so we use a hard-coded 2013-01-01 date
@@ -472,8 +472,8 @@ def analytics_search(request):
         'organic': {},
     }
     facets = search.facet(*(counts.keys()),
-        filtered=bool(search._process_filters(f.filters)),
-        size=25)
+                          filtered=bool(search._process_filters(f.filters)),
+                          size=25)
 
     for param, terms in facets.facet_counts().items():
         for term in terms:
@@ -632,14 +632,15 @@ def analytics_hourly_histogram(request):
             'facet_filter': search._process_filters(filters.filters)
         }).facet_counts()
 
-    hourly_data = dict((p['time'], p['count']) for p in hourly_histogram['hourly'])
+    hourly_data = dict((p['time'], p['count'])
+                       for p in hourly_histogram['hourly'])
 
     hour = 60 * 60 * 1000.0
     zero_fill(date_start, date_end, [hourly_data], spacing=hour)
 
-    # FIXME: This is goofy. After zero_fill, we end up with a bunch of trailing
-    # zeros for reasons I don't really understand, so instead of fixing that, I'm
-    # just going to remove them here.
+    # FIXME: This is goofy. After zero_fill, we end up with a bunch of
+    # trailing zeros for reasons I don't really understand, so instead
+    # of fixing that, I'm just going to remove them here.
     hourly_data = sorted(hourly_data.items())
     while hourly_data and hourly_data[-1][1] == 0:
         hourly_data.pop(-1)
