@@ -6,7 +6,7 @@ from fjord.base.models import ModelBase, JSONObjectField
 class Poll(ModelBase):
     """Defines a Heartbeat poll"""
     slug = models.SlugField(unique=True)
-    description= models.TextField(default=u'', blank=True)
+    description = models.TextField(default=u'', blank=True)
     status = models.CharField(max_length=1000, blank=True, default=u'')
     enabled = models.BooleanField(default=False)
 
