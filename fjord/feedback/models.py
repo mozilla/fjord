@@ -366,7 +366,6 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'created'
         )
 
-
     @classmethod
     def get_mapping(cls):
         return {
@@ -491,10 +490,15 @@ class ResponseMappingType(FjordMappingType, Indexable):
         else:
             min_term_freq = 1
 
-        return MLT(id_=resp.id, s = s, mlt_fields=['description'],
-                   index=cls.get_index(), doctype=cls.get_mapping_type_name(),
-                   stop_words=list(ANALYSIS_STOPWORDS),
-                   min_term_freq=min_term_freq)
+        return MLT(
+            id_=resp.id,
+            s=s,
+            mlt_fields=['description'],
+            index=cls.get_index(),
+            doctype=cls.get_mapping_type_name(),
+            stop_words=list(ANALYSIS_STOPWORDS),
+            min_term_freq=min_term_freq
+        )
 
 
 class ResponseEmail(ModelBase):
@@ -541,7 +545,8 @@ class PostResponseSerializer(serializers.Serializer):
     url = serializers.URLField(required=False, default=u'')
     description = serializers.CharField(required=True)
 
-    category = serializers.CharField(max_length=50, required=False, default=u'')
+    category = serializers.CharField(max_length=50, required=False,
+                                     default=u'')
 
     # product, channel, version, locale, platform
     product = NoNullsCharField(max_length=20, required=True)

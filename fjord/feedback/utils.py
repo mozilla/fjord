@@ -1,13 +1,7 @@
-from hashlib import md5
 import re
 import urlparse
 
-from elasticsearch.exceptions import ElasticsearchException
-
-from django.utils.encoding import force_str
-
 from fjord.feedback import config
-from fjord.search.index import es_analyze
 
 
 TOKEN_SPLIT_RE = re.compile(r'[\s\.\,\/\\\?\;\:\"\*\&\^\%\$\#\@\!]+')

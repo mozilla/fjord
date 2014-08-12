@@ -1,7 +1,5 @@
 from django import forms
 
-from tower import ugettext as _
-
 
 class URLInput(forms.TextInput):
     """Text field with HTML5 URL Input type."""
@@ -27,6 +25,6 @@ class ResponseForm(forms.Form):
     # These are hidden fields on the form which we have here so we can
     # abuse the fields for data validation.
     manufacturer = forms.CharField(required=False, widget=forms.HiddenInput(
-            attrs={'class': 'manufacturer'}))
+        attrs={'class': 'manufacturer'}))
     device = forms.CharField(required=False, widget=forms.HiddenInput(
-            attrs={'class': 'device'}))
+        attrs={'class': 'device'}))

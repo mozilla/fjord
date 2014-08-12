@@ -102,6 +102,7 @@ class PublicFeedbackAPI(rest_framework.views.APIView):
                 methods=('GET',))
         ]
 
+
 class PostFeedbackAPI(rest_framework.generics.CreateAPIView):
     serializer_class = models.PostResponseSerializer
 

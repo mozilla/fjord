@@ -338,7 +338,7 @@ PRODUCT_OVERRIDE = {
 @csrf_exempt
 @never_cache
 def feedback_router_dev(request, product=None, version=None, channel=None,
-                    *args, **kwargs):
+                        *args, **kwargs):
     """DEV ONLY FEEDBACK ROUTER"""
     view = None
 
@@ -392,7 +392,7 @@ def feedback_router_dev(request, product=None, version=None, channel=None,
         })
 
     view = view or generic_feedback_dev
-        
+
     return view(request, request.locale, product, version, channel,
                 *args, **kwargs)
 
@@ -442,7 +442,6 @@ def feedback_router(request, product=None, version=None, channel=None,
         statsd.incr('feedback.oldandroid')
 
         return android_about_feedback(request, request.locale)
-
 
     # FIXME - validate these better
     version = smart_str(version)
