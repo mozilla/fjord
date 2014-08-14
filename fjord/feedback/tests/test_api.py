@@ -209,7 +209,7 @@ class PublicFeedbackAPITest(ElasticTestCase):
         # the document is indexed, then there won't be a key/val in
         # the json results. Easy way to fix that is to make sure it
         # has a value when creating the response.
-        ResponseFactory(api=True)
+        ResponseFactory(description=u'best browser ever', api=True)
         self.refresh()
 
         resp = self.client.get(reverse('feedback-api'))
