@@ -90,7 +90,8 @@ def response_view(request, responseid, template):
 
         try:
             # Convert it to a list to force it to execute right now.
-            mlt = list(ResponseMappingType.morelikethis(response))
+            mlt = ResponseMappingType.reshape(
+                ResponseMappingType.morelikethis(response))
         except ElasticsearchException as exc:
             errors.append('Failed to do morelikethis: %s' % exc)
 

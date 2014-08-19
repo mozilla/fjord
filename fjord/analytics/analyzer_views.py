@@ -224,6 +224,8 @@ def analytics_duplicates(request):
                               'user_agent', 'id')
                  .order_by('created').everything())
 
+    responses = ResponseMappingType.reshape(responses)
+
     total_count = len(responses)
 
     response_dupes = {}
