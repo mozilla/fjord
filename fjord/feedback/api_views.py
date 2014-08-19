@@ -87,7 +87,7 @@ class PublicFeedbackAPI(rest_framework.views.APIView):
 
         # FIXME: We're omitting paging here for now. We might want to
         # add that at some point.
-        responses = search[:1000]
+        responses = models.ResponseMappingType.reshape(search[:1000])
         return rest_framework.response.Response({
             'count': len(responses),
             'results': list(responses)

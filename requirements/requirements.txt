@@ -22,10 +22,6 @@ https://github.com/gengo/gengo-python/archive/8388e35e6ef1ae946a39268763e741d826
 # sha256: Orqipd_IL9e7ZWjQsG0DDHclCBmuCITl4Iv0kQAlnxE
 https://github.com/jbalogh/jingo/archive/5e985a5c16e343a30482cc526127a856b1cb45ed.tar.gz#egg=jingo
 
-# elasticutils: remotes/origin/HEAD
-# sha256: OTZ4mjjiLzXDRK7mbZ5hzOSR7v62NYpUYS_FYNKBoPo
-https://github.com/mozilla/elasticutils/archive/641ccade9cfba1415809077fad674b41b436d174.tar.gz#egg=elasticutils
-
 # django-grappelli: tags/2.4.10^0
 # sha256: Aff-Wq92Uwupotohk5IJAGe-WqzSlxTxLJgW-zjaAWA
 https://github.com/sehmaschine/django-grappelli/archive/7ac34941117da730865967a74e714da4a180eddb.tar.gz#egg=django-grappelli
@@ -81,10 +77,6 @@ https://github.com/fwenzel/django-sha2/archive/3ba2b4771056fb722bc9fe52cf26918a3
 # pystatsd: tags/v2.0.0~18
 # sha256: UJkVHAutOP-GXiwrbxdunGn7QjoJElkPZvznPaFl4AA
 https://github.com/jsocol/pystatsd/archive/cad663f13cb059d46fac784330d87ceafc519ba7.tar.gz#egg=pystatsd
-
-# elasticsearch-py: tags/0.4.5
-# sha256: h2WPuVFSAUU-R2QKcYG5P4myRade5QdbG6xz1jb-S4o
-https://github.com/elasticsearch/elasticsearch-py/archive/f8cee704479c5a73af27b31ff4de78a45050638f.tar.gz#egg=elasticsearch-py
 
 # django-extensions: tags/1.3.3
 # sha256: oEiCqdyUMgocSPT2W6xNnQj_MoJgNTkCQK1JnBPLfsc
@@ -223,3 +215,9 @@ chardet==2.2.1
 
 # sha256: 10erSV9JDXxVts9yHGpBn-OoNK2uOfyLelW8rf6v8mk
 django-waffle==0.10
+
+# sha256: XtqEnhjUd9UuYmC5AQTwDXm65JHoAo7_pMEY-iFObqo
+elasticutils==0.10
+
+# sha256: Y_uAldsYamwLussgySl75CXfqd5MMws1NGD2NYIHxqo
+elasticsearch==0.4.5

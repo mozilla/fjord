@@ -276,7 +276,8 @@ def _analytics_search_export(request, opinions_s):
 
     # We convert what we get back from ES to what's in the db so we
     # can get all the information.
-    opinions = Response.objects.filter(id__in=[mem[0] for mem in opinions_s])
+    opinions = Response.objects.filter(
+        id__in=[mem[0][0] for mem in opinions_s])
 
     writer = csv.writer(response)
 
@@ -445,7 +446,8 @@ def analytics_search(request):
     end = start + page_count
 
     search_count = search.count()
-    opinion_page_ids = [mem[0] for mem in search.values_list('id')[start:end]]
+    search_results = search.values_list('id')[start:end]
+    opinion_page_ids = [mem[0][0] for mem in search_results]
 
     # We convert what we get back from ES to what's in the db so we
     # can get all the information.

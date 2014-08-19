@@ -367,6 +367,17 @@ class ResponseMappingType(FjordMappingType, Indexable):
         )
 
     @classmethod
+    def reshape(cls, results):
+        """Reshapes the results so lists are lists and everything is not"""
+        def delist(item):
+            return val if key == 'description_bigrams' else val[0]
+
+        return [
+            dict([(key, delist(val)) for key, val in result.items()])
+            for result in results
+        ]
+
+    @classmethod
     def get_mapping(cls):
         return {
             'id': integer_type(),
