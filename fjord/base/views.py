@@ -66,8 +66,8 @@ def csrf_failure(request, reason='', template=None):
     )
 
 
-@mobile_template('{mobile/}about.html')
-def about_view(request, template=None):
+def about_view(request):
+    template = 'about.html'
     return render(request, template)
 
 
