@@ -6,7 +6,78 @@
   <div class="col"></div>
   <div class="col wide">
     <div class="block">
-      {% include "includes/about_text.html" %}
+      <h2>{{ _('Hello!') }}</h2>
+      <p>
+        {% trans %}
+          Firefox Input is Mozilla's primary feedback mechanism for
+          products. It is set up to be a method of one-way
+          communication about your experiences in using our products, the
+          Internet you view it through, and what Mozilla can do to
+          make that experience better. The system is available over a
+          wide-variety of submission mechanisms and product builds.
+        {% endtrans %}
+      </p>
+      <p>
+        {% trans url='https://input.mozilla.org/feedback' %}
+          To submit feedback for a Mozilla product, please go to
+          <a href="{{ url }}">the feedback submission page</a>!
+        {% endtrans %}
+      </p>
+
+      <h2>{{ _('Privacy Policy') }}</h2>
+      <p>
+        {% trans url='https://www.mozilla.org/privacy/websites/' %}
+          We adhere to the <a href="{{ url }}">Mozilla Privacy Policy</a>.
+        {% endtrans %}
+      </p>
+
+      <h2>{{ _('Legal Disclaimers and Limitations') }}</h2>
+      <p>
+        {% trans url='https://www.mozilla.org/about/legal/' %}
+          We are covered by the <a href="{{ url }}">Mozilla legal
+          disclaimers and limitations</a> document.
+        {% endtrans %}
+      </p>
+
+      <h2>{{ _('Data Retention Policy') }}</h2>
+      <p>
+        {% trans %}
+          We have a data retention policy that covers data stored on
+          this site:
+        {% endtrans %}
+      </p>
+      <ol>
+        <li>
+          {% trans %}
+            We keep feedback data forever, but only the last 6 months
+            of data is available on the public dashboard.
+          {% endtrans %}
+        </li>
+        <li>
+          {% trans %}
+            We keep email addresses associated with feedback data for
+            6 months and then delete them.
+          {% endtrans %}
+        </li>
+      </ol>
+
+      <h2>{{ _('Open Data') }}</h2>
+      <p>
+        {% trans %}
+          We'd love to experiment more with this data, but we're only a
+          few people. So, we need requests from you on questions you'd
+          like to see answered! If you would like to experiment with our
+          data, please contact us!
+        {% endtrans %}
+      </p>
+
+      <h2>{{ _('Source Code') }}</h2>
+      <p>
+        {% trans url='https://github.com/mozilla/fjord' %}
+          The code for the Firefox Input site can be
+          <a href="{{ url }}">found on GitHub</a>!
+        {% endtrans %}
+      </p>
     </div>
   </div>
 {% endblock %}

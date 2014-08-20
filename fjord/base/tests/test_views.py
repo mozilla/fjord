@@ -18,10 +18,6 @@ class TestAbout(TestCase):
         eq_(200, r.status_code)
         self.assertTemplateUsed(r, 'about.html')
 
-        r = self.client.get(reverse('about-view'), {'mobile': 1})
-        eq_(200, r.status_code)
-        self.assertTemplateUsed(r, 'mobile/about.html')
-
 
 class TestLoginFailure(TestCase):
     def test_login_failure_view(self):
