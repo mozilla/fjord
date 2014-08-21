@@ -14,3 +14,6 @@ HOME=/tmp
 # Every hour, sync translations. This pulls and pushes to the various
 # translation systems.
 0 * * * * {{ user }} cd {{ source }} && {{ python }} manage.py translation_sync -v 0 --traceback
+
+# On Sundays at 3:10am
+10 3 * * 0 {{ user }} cd {{ source }} && {{ python }} manage.py purge_data -v 3 --traceback

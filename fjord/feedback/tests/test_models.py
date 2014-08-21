@@ -1,8 +1,21 @@
+import datetime
+
 from nose.tools import eq_
 
 from fjord.base.tests import TestCase
-from fjord.feedback.models import Product, Response
-from fjord.feedback.tests import ResponseFactory
+from fjord.feedback.models import (
+    Product,
+    Response,
+    ResponseEmail,
+    ResponseContext,
+    ResponseMappingType,
+    purge_data
+)
+from fjord.feedback.tests import (
+    ResponseFactory,
+    ResponseEmailFactory,
+    ResponseContextFactory
+)
 from fjord.feedback.utils import compute_grams
 from fjord.search.tests import ElasticTestCase
 
@@ -196,7 +209,7 @@ class TestGenerateTranslationJobs(TestCase):
         eq_(resp.translated_description, existing_resp.translated_description)
 
 
-class TestComputeGrams(ElasticTestCase):
+class TestComputeGrams(TestCase):
     def test_empty(self):
         eq_(compute_grams(u''), [])
 
@@ -234,3 +247,54 @@ class TestComputeGrams(ElasticTestCase):
         # Nix duplicate bigrams
         eq_(sorted(compute_grams(u'youtube crash youtube flash')),
             ['crash youtube', 'flash youtube'])
+
+
+class TestParseData(ElasticTestCase):
+    def test_purge(self):
+        now = datetime.datetime.now()
+        cutoff = now - datetime.timedelta(days=5)
+
+        # Create 10 ResponseEmail objs--one for each day for the last
+        # 10 days.
+        for i in range(10):
+            ResponseEmailFactory(
+                opinion__created=(now - datetime.timedelta(days=i))
+            )
+            ResponseContextFactory(
+                opinion__created=(now - datetime.timedelta(days=i))
+            )
+
+        # Since creating the objects and indexing them happens very
+        # quickly in tests, we hit a race condition and the has_email
+        # column ends up being false. So instead we just drop the
+        # index and rebuild it.
+        self.setup_indexes()
+
+        # Make sure everything is in the db
+        eq_(Response.objects.count(), 20)
+        eq_(ResponseEmail.objects.count(), 10)
+        eq_(ResponseContext.objects.count(), 10)
+
+        # Make sure everything is in the index
+        resp_s = ResponseMappingType.search()
+        eq_(resp_s.count(), 20)
+        eq_(resp_s.filter(has_email=True).count(), 10)
+
+        # Now purge everything older than 5 days and make sure things
+        # got removed that should have gotten removed
+        cutoff = now - datetime.timedelta(days=5)
+        purge_data(cutoff=cutoff)
+
+        self.refresh()
+
+        eq_(Response.objects.count(), 20)
+        eq_(ResponseEmail.objects.count(), 5)
+        eq_(ResponseEmail.objects.filter(opinion__created__gte=cutoff).count(), 5)
+        eq_(ResponseContext.objects.count(), 5)
+        eq_(ResponseContext.objects.filter(opinion__created__gte=cutoff).count(), 5)
+
+        # Everything should still be in the index, but the number of
+        # things with has_email=True should go down
+        resp_s = ResponseMappingType.search()
+        eq_(resp_s.count(), 20)
+        eq_(resp_s.filter(has_email=True).count(), 5)
