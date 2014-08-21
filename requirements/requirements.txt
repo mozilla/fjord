@@ -106,10 +106,6 @@ https://github.com/mozilla/django-session-csrf/archive/f00ad913c62e139d36078e8a7
 # sha256: 1puIiyzkiFYjCAemvTakxuIrbY3PRtTmvXOaY__Xy8I
 https://github.com/jsocol/django-ratelimit/archive/e7ec3ded4ffe86afdcd39bc2ee6650ee738c9e10.tar.gz#egg=django-ratelimit
 
-# django: tags/1.5.8^0
-# sha256: TKIS3_GwT7FeWS0nGWSIW6y93gHFhk5QLIB9fhPcJ8I
-https://github.com/django/django/archive/4e922f608424b36e83ff54a106392476e9e24c3e.tar.gz#egg=django
-
 # nuggets: master~7
 # sha256: eeq_z415NQPBF3j59fmy6JGjtnpDgVQxwwvFKxnDQx0
 https://github.com/mozilla/nuggets/archive/ce506882b6943ea45ea4f98290fc4ef23e09a083.tar.gz#egg=nuggets
@@ -125,6 +121,9 @@ https://github.com/celery/django-celery/archive/b11b358cbc0d7b3ca15575d27332d4ae
 # tower: remotes/origin/HEAD
 # sha256: qm0q7z3NpXlebil6MCUbfIAahKy4h2MwiBjXscUjCdA
 https://github.com/clouserw/tower/archive/ade9804345eb49dd1b626fd276cd9572fd15d1b3.tar.gz#egg=tower
+
+# sha256: R85QXFBGw4gXgovuJTtyVocvhsQ0DbGvaYy4VI26oNI
+Django==1.5.9
 
 # sha256: 9hjzf43QSX_1qFP77j5HH34aQXmghyoWGTNdKZXztBI
 dennis==0.4.3
