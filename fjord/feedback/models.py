@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
@@ -17,9 +17,16 @@ from fjord.base.util import smart_truncate, instance_to_key
 from fjord.feedback.config import CODE_TO_COUNTRY, ANALYSIS_STOPWORDS
 from fjord.feedback.utils import compute_grams
 from fjord.search.index import (
-    register_mapping_type, FjordMappingType,
-    boolean_type, date_type, integer_type, keyword_type, terms_type,
-    text_type)
+    register_mapping_type,
+    FjordMappingType,
+    boolean_type,
+    date_type,
+    integer_type,
+    keyword_type,
+    terms_type,
+    text_type,
+    index_chunk
+)
 from fjord.search.tasks import register_live_index
 from fjord.translations.models import get_translation_system_choices
 from fjord.translations.tasks import register_auto_translation
@@ -668,3 +675,35 @@ class PostResponseSerializer(serializers.Serializer):
             context.save(**kwargs)
 
         return obj
+
+
+def purge_data(cutoff=None, verbose=False):
+    """Implements data purging per our data retention policy"""
+    responses_to_update = set()
+
+    if cutoff == None:
+        # Default to wiping out 180 days ago which is roughly 6 months.
+        cutoff = datetime.now() - timedelta(days=180)
+
+    # First, ResponseEmail.
+    objs = ResponseEmail.objects.filter(opinion__created__lte=cutoff)
+    responses_to_update.update(objs.values_list('opinion_id', flat=True))
+    count = objs.count()
+    objs.delete()
+
+    if verbose:
+        print 'Purged %d feedback_responseemail records' % count
+
+    # Second, ResponseContext.
+    objs = ResponseContext.objects.filter(opinion__created__lte=cutoff)
+    responses_to_update.update(objs.values_list('opinion_id', flat=True))
+    count = objs.count()
+    objs.delete()
+
+    if verbose:
+        print 'Purged %d feedback_responsecontext records' % count
+
+    if responses_to_update:
+        if verbose:
+            print '%d responses to re-index' % len(responses_to_update)
+        index_chunk(ResponseMappingType, list(responses_to_update))
