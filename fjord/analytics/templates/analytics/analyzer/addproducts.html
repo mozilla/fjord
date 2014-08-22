@@ -1,41 +1,50 @@
-{% extends "analytics/dashboard_base.html" %}
-{% block content %}
-<div class="col wide">
+{% extends "analytics/analyzer/dashboard.html" %}
+{% block content_middle %}
   <div class="block">
-  <h2>Analytics: Products</h2>
-  <table class="summarytable">
-  <tr>
-    <th>id</th>
-    <th>enabled?</th>
-    <th>on dashboard?</th>
-    <th>display name</th>
-    <th>db name</th>
-    <th>slug</th>
-    <th>automatic translations?</th>
-    <th>feedback product url</th>
-    <th>notes</th>
-  </tr>
-  {% for prod in products %}
-    <tr>
-    <td>{{ prod.id }}</td>
-    <td>{{ prod.enabled }}</td>
-    <td>{{ prod.on_dashboard }}</td>
-    <td>{{ prod.display_name }}</td>
-    <td>{{ prod.db_name }}</td>
-    <td>{{ prod.slug }}</td>
-    <td>{{ prod.translation_system }}</td>
-    {# FIXME - URL is hard-coded so it doesn't include the locale. Need better way to do this. #}
-    <td><a href="https://input.mozilla.org/feedback/{{ prod.slug }}">https://input.mozilla.org/feedback/{{ prod.slug }}</a></td>
-    <td>{{ prod.notes }}</td>
-    </tr>
-  {% endfor %}
-  </table>
-    <br>
+    <h2>Analytics: Products</h2>
+    <table class="summarytable">
+      <tr>
+        <th>id</th>
+        <th>enabled?</th>
+        <th>on dashboard?</th>
+        <th>display name</th>
+        <th>db name</th>
+        <th>slug</th>
+        <th>automatic translations?</th>
+        <th>feedback product url</th>
+        <th>notes</th>
+      </tr>
+      {% for prod in products %}
+        <tr>
+          <td>
+            <a href="{{ url('addproducts') }}?pk={{ prod.id }}">Edit</a>
+            {{ prod.id }}
+          </td>
+          <td>{{ prod.enabled }}</td>
+          <td>{{ prod.on_dashboard }}</td>
+          <td>{{ prod.display_name }}</td>
+          <td>{{ prod.db_name }}</td>
+          <td>{{ prod.slug }}</td>
+          <td>{{ prod.translation_system }}</td>
+          {# FIXME - URL is hard-coded so it doesn't include the locale. Need better way to do this. #}
+          <td><a href="https://input.mozilla.org/feedback/{{ prod.slug }}">https://input.mozilla.org/feedback/{{ prod.slug }}</a></td>
+          <td>{{ prod.notes }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+    <p>
+      Click on "Edit" above to edit an existing product or fill out
+      the fields below to create a new product.
+    </p>
+    <p class="warning">
+      Note: If you go to update an existing product and you change the
+      db_name, it will create a new product. You can't change the
+      db_name for an existing product since it'll orphan responses.
+    </p>
     <form action='' method='POST'>
       {{ csrf() }}
-      {{ form }}
+      {{ form.as_p() }}
       <input type="submit">
     </form>
   </div>
-</div>
 {% endblock %}

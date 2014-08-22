@@ -21,7 +21,7 @@ import csv
 from elasticutils.contrib.django import F, es_required_or_50x
 
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.utils.encoding import force_bytes
 from django.views.generic.edit import FormView
 from django.utils.decorators import method_decorator
@@ -674,10 +674,21 @@ class ProductsUpdateView(FormView):
     def dispatch(self, *args, **kwargs):
         return super(ProductsUpdateView, self).dispatch(*args, **kwargs)
 
+    def get(self, request, *args, **kwargs):
+        if 'pk' in request.GET:
+            self.object = get_object_or_404(Product, pk=request.GET['pk'])
+        return super(ProductsUpdateView, self).get(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super(ProductsUpdateView, self).get_context_data(**kwargs)
         context['products'] = Product.uncached.all()
         return context
+
+    def get_form_kwargs(self):
+        kwargs = super(ProductsUpdateView, self).get_form_kwargs()
+        if hasattr(self, 'object'):
+            kwargs['instance'] = self.object
+        return kwargs
 
     def form_valid(self, form):
         try:
@@ -688,7 +699,7 @@ class ProductsUpdateView(FormView):
             instance.notes = form.data.get('notes') or instance.notes
             instance.enabled = form.data.get('enabled') or False
             instance.on_dashboard = form.data.get('on_dashboard') or False
-            instance.save()
+            self.object = instance.save()
         except Product.DoesNotExist:
-            form.save()
+            self.object = form.save()
         return super(ProductsUpdateView, self).form_valid(form)
