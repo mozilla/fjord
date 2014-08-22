@@ -55,6 +55,13 @@ Required fields
 
     Example: ``"OMG! I love Firefox!"``
 
+    .. Note::
+
+       The form this field is on should have some informational text
+       stating that data in this field will be publicly available and
+       that the user should not include personally identifyable
+       information.
+
 **product**
     String. The name of the product the user is giving feedback on.
 
@@ -132,6 +139,11 @@ Optional fields
     feedback or ask for more information.
 
     Example: ``"joe@example.com"``
+
+    .. Note::
+
+       The form this field is in should state that email addresses
+       will not be publicly available.
 
 **user_agent**
     String. The user agent of the client if applicable. For example
