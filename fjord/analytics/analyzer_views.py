@@ -23,8 +23,10 @@ from elasticutils.contrib.django import F, es_required_or_50x
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils.encoding import force_bytes
+from django.views.generic.edit import FormView
+from django.utils.decorators import method_decorator
 
-from fjord.analytics.forms import OccurrencesComparisonForm
+from fjord.analytics.forms import OccurrencesComparisonForm, ProductsUpdateForm
 from fjord.analytics.tools import (
     counts_to_options,
     zero_fill)
@@ -659,3 +661,34 @@ def analytics_hourly_histogram(request):
         'start_date': date_start,
         'end_date': date_end
     })
+
+
+class ProductsUpdateView(FormView):
+    """An administrator view for showing, adding, and updating the products."""
+    template_name = 'analytics/analyzer/addproducts.html'
+    form_class = ProductsUpdateForm
+    success_url = 'products'
+
+    @method_decorator(check_new_user)
+    @method_decorator(analyzer_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ProductsUpdateView, self).dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductsUpdateView, self).get_context_data(**kwargs)
+        context['products'] = Product.uncached.all()
+        return context
+
+    def form_valid(self, form):
+        try:
+            instance = Product.objects.get(db_name=form.data.get('db_name'))
+            instance.slug = form.data.get('slug') or instance.slug
+            instance.display_name = (form.data.get('display_name') or
+                                     instance.display_name)
+            instance.notes = form.data.get('notes') or instance.notes
+            instance.enabled = form.data.get('enabled') or False
+            instance.on_dashboard = form.data.get('on_dashboard') or False
+            instance.save()
+        except Product.DoesNotExist:
+            form.save()
+        return super(ProductsUpdateView, self).form_valid(form)

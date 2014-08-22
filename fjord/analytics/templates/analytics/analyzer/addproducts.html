@@ -1,0 +1,41 @@
+{% extends "analytics/dashboard_base.html" %}
+{% block content %}
+<div class="col wide">
+  <div class="block">
+  <h2>Analytics: Products</h2>
+  <table class="summarytable">
+  <tr>
+    <th>id</th>
+    <th>enabled?</th>
+    <th>on dashboard?</th>
+    <th>display name</th>
+    <th>db name</th>
+    <th>slug</th>
+    <th>automatic translations?</th>
+    <th>feedback product url</th>
+    <th>notes</th>
+  </tr>
+  {% for prod in products %}
+    <tr>
+    <td>{{ prod.id }}</td>
+    <td>{{ prod.enabled }}</td>
+    <td>{{ prod.on_dashboard }}</td>
+    <td>{{ prod.display_name }}</td>
+    <td>{{ prod.db_name }}</td>
+    <td>{{ prod.slug }}</td>
+    <td>{{ prod.translation_system }}</td>
+    {# FIXME - URL is hard-coded so it doesn't include the locale. Need better way to do this. #}
+    <td><a href="https://input.mozilla.org/feedback/{{ prod.slug }}">https://input.mozilla.org/feedback/{{ prod.slug }}</a></td>
+    <td>{{ prod.notes }}</td>
+    </tr>
+  {% endfor %}
+  </table>
+    <br>
+    <form action='' method='POST'>
+      {{ csrf() }}
+      {{ form }}
+      <input type="submit">
+    </form>
+  </div>
+</div>
+{% endblock %}
