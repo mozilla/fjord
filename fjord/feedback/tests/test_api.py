@@ -1,6 +1,6 @@
 import json
 import time
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
 from django.conf import settings
 from django.test.client import Client
@@ -201,6 +201,26 @@ class PublicFeedbackAPITest(ElasticTestCase):
             {'date_start': '2014-07-02', 'date_end': '2014-07-03'},
             ['2014-07-03T00:00:00', '2014-07-02T00:00:00']
         )
+
+    def test_old_responses(self):
+        # Make sure we can't see responses from > 180 days ago
+        cutoff = datetime.today() - timedelta(days=180)
+        ResponseFactory(description='Young enough--Party!',
+                        created=cutoff + timedelta(days=1))
+        ResponseFactory(description='Too old--Get off my lawn!',
+                        created=cutoff - timedelta(days=1))
+        self.refresh()
+
+        resp = self.client.get(reverse('feedback-api'), {
+            'date_start': (cutoff - timedelta(days=1)).strftime('%Y-%m-%d'),
+            'date_end': (cutoff + timedelta(days=1)).strftime('%Y-%m-%d')
+        })
+        json_data = json.loads(resp.content)
+        results = json_data['results']
+        eq_(len(results), 1)
+
+        assert 'Young enough--Party!' in resp.content
+        assert 'Too old--Get off my lawn!' not in resp.content
 
     def test_public_fields(self):
         """The results should only contain publicly-visible fields"""

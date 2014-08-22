@@ -270,6 +270,12 @@ def dashboard(request):
     if search_date_start is None:
         search_date_start = search_date_end - timedelta(days=7)
 
+    # Restrict the frontpage dashboard to only show the last 6 months
+    # of data
+    six_months_ago = date.today() - timedelta(days=180)
+    search_date_start = max(six_months_ago, search_date_start)
+    search_date_end = max(search_date_start, search_date_end)
+
     current_search['date_end'] = search_date_end.strftime('%Y-%m-%d')
     f &= F(created__lte=search_date_end)
 

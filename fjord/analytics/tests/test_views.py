@@ -73,6 +73,22 @@ class TestDashboardView(ElasticTestCase):
 
         assert 'HiddenProduct' not in resp.content
 
+    def test_cant_see_old_responses(self):
+        # Make sure we can't see responses from > 180 days ago
+        cutoff = datetime.today() - timedelta(days=180)
+        ResponseFactory(description='Young enough--Party!',
+                        created=cutoff + timedelta(days=1))
+        ResponseFactory(description='Too old--Get off my lawn!',
+                        created=cutoff - timedelta(days=1))
+        self.refresh()
+
+        url = reverse('dashboard')
+        resp = self.client.get(url, {
+            'date_start': cutoff.strftime('%Y-%m-%d')}
+        )
+        assert 'Young enough--Party!' in resp.content
+        assert 'Too old--Get off my lawn!' not in resp.content
+
     def test_dashboard_atom_links(self):
         """Test dashboard atom links are correct"""
         r = self.client.get(reverse('dashboard'))
