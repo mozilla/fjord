@@ -30,9 +30,9 @@ https://github.com/sehmaschine/django-grappelli/archive/7ac34941117da730865967a7
 # sha256: r9QC3Jp7_juBcqjKkKb3yQ_8J6o6cUfaTtromZjJuWY
 https://github.com/jsocol/django-adminplus/archive/09fa38724e8e05afc78f912da0ed78ef892da910.tar.gz#egg=django-adminplus
 
-# django-statsd: master~11
-# sha256: _npuGP2ilngXqnL_8fRw_CTUCgfPbj9IfYr-tSv_6Io
-https://github.com/andymckay/django-statsd/archive/7af5cbf9efa5a98589ea4ae8d99a54ce47679e91.tar.gz#egg=django-statsd
+# django-statsd: tags/0.3.8.5
+# sha256: LTn7BrZL1DKwIiETzYeOHlosfAnsk7K7V3zw4Kq_GNk
+https://github.com/andymckay/django-statsd/archive/bb601976056d0f922c5a613d2a9786b81d179b06.tar.gz#egg=django-statsd
 
 # django-mozilla-product-details: master
 # sha256: LXr-aGWpW7mD4dM2MNJrcqfhBmi5zJM97KBPPorG2ko
@@ -74,9 +74,9 @@ https://github.com/rbarrois/factory_boy/archive/87f8cc0cc0d2f48f489c81b8c93e8ab6
 # sha256: TBUJueJfjaBHp4GeUtY0o_IaGHk4DOUf0ZbJZ4YXPPM
 https://github.com/fwenzel/django-sha2/archive/3ba2b4771056fb722bc9fe52cf26918a3f0388bb.tar.gz#egg=django-sha2
 
-# pystatsd: tags/v2.0.0~18
-# sha256: UJkVHAutOP-GXiwrbxdunGn7QjoJElkPZvznPaFl4AA
-https://github.com/jsocol/pystatsd/archive/cad663f13cb059d46fac784330d87ceafc519ba7.tar.gz#egg=pystatsd
+# pystatsd: tags/v2.0.3
+# sha256: ozq2VrtflIfyjLk4v8huZPbbX8jDRf8cirZxZfP6eNI
+https://github.com/jsocol/pystatsd/archive/da0005cb30fac365c7bc3a9ab9a4824e1a9c3a49.tar.gz#egg=pystatsd
 
 # django-extensions: tags/1.3.3
 # sha256: oEiCqdyUMgocSPT2W6xNnQj_MoJgNTkCQK1JnBPLfsc
