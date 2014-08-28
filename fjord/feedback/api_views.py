@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from django.views.decorators.csrf import csrf_exempt
 
@@ -68,9 +68,13 @@ class PublicFeedbackAPI(rest_framework.views.APIView):
                 date_end = date.today()
                 date_start = date_end - delta
 
+        # We restrict public API access to the last 6 months.
+        six_months_ago = date.today() - timedelta(days=180)
         if date_start:
+            date_start = max(six_months_ago, date_start)
             f &= F(created__gte=date_start)
         if date_end:
+            date_end = max(six_months_ago, date_end)
             f &= F(created__lte=date_end)
 
         search = search.filter(f)
