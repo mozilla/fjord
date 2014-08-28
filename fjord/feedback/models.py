@@ -575,8 +575,8 @@ class PostResponseSerializer(serializers.Serializer):
     country = NoNullsCharField(max_length=4, required=False, default=u'')
 
     # device information
-    manufacturer = NoNullsCharField(required=False, default=u'')
-    device = NoNullsCharField(required=False, default=u'')
+    manufacturer = NoNullsCharField(max_length=255, required=False, default=u'')
+    device = NoNullsCharField(max_length=255, required=False, default=u'')
 
     # user's email address
     email = serializers.EmailField(required=False)

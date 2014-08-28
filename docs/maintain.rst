@@ -30,7 +30,7 @@ Onboarding a new developer
    :wiki page: https://wiki.mozilla.org/Firefox/Input
 
 8. Set up your development environment by reading through and doing all
-   the things in the :ref:`hacking-howto-chapter`
+   the things in the :ref:`getting-started-chapter`
 
 9. If you haven't read through the `Webdev Bootcamp
    <http://mozweb.readthedocs.org/en/latest/>`_, now is a good time

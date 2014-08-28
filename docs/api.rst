@@ -51,7 +51,8 @@ Required fields
     Valid values: ``true``, ``false``
 
 **description**
-    String. This is the feedback text.
+    String. Max length: None (but 10,000 characters is probably a good cutoff).
+    This is the feedback text.
 
     Example: ``"OMG! I love Firefox!"``
 
@@ -62,10 +63,16 @@ Required fields
        that the user should not include personally identifyable
        information.
 
-**product**
-    String. The name of the product the user is giving feedback on.
+       Example informational text::
 
-    Examples: ``"Firefox for Android"``, ``"Firefox OS"``
+           The content of your feedback will be public, so please be sure
+           not to include any personal information.
+
+**product**
+    String. Max length: 20. The name of the product the user is giving
+    feedback on.
+
+    Examples:``"Firefox for Android"``, ``"Firefox OS"``
 
     .. Note::
 
@@ -78,58 +85,59 @@ Optional fields
 ---------------
 
 **channel**
-    String. The channel of the product the user is giving feedback on.
+    String. Max length: 30. The channel of the product the user is
+    giving feedback on.
 
     Examples: ``"stable"``, ``"beta"``
 
 **version**
-    String. The version of the product the user is giving feedback
-    on as a string.
+    String. Max length: 30. The version of the product the user is
+    giving feedback on as a string.
 
     Examples: ``"22b2"``, ``"1.1"``
 
 **platform**
-    String. The name of the operating system/platform the product
-    is running on.
+    String. Max length: 30. The name of the operating system/platform
+    the product is running on.
 
     Examples: ``"OS X"``, ``"Windows 8"``, ``"Firefox OS"``,
     ``"Android"``, ``"Linux"``
 
 **locale**
-    String. The locale the user is using.
+    String. Max length: 8. The locale the user is using.
 
     Examples: ``"en-US"``, ``"fr"``, ``"de"``
 
 **country**
-    String. The country of origin for the device.
+    String. Max length: 30. The country of origin for the device.
 
     Examples: ``"Peru"``, ``"Mexico"``
 
     .. Note::
 
-       This is probably only relevant to Firefox OS phones.
+       This is only relevant to Firefox OS phones.
 
 **manufacturer**
-    String. The manufacturer of the device the product is running
-    on.
+    String. Max length: 255. The manufacturer of the device the
+    product is running on.
 
     Examples: ``"Geeksphone"``, ``"Samsung"``
 
 **device**
-    String. The model name of the device the product is running
-    on.
+    String. Max length: 255. The model name of the device the product
+    is running on.
 
     Examples: ``"Peak"``, ``"Galaxy Tab 10.1"``
 
 **category**
-    String. The category classification for this feedback
-    response.
+    String. Max length: 50. The category classification for this
+    feedback response.
 
     Examples: ``"ui"``, ``"performance"``, ``"bookmarks"``
 
 **url**
-    String. If the feedback relates to a specific webpage, then
-    the url is the url of the webpage it refers to.
+    String. Max length: 200. If the feedback relates to a specific
+    webpage, then the url is the url of the webpage it refers to.
 
     Examples: ``"https://facebook.com/"``, ``"https://google.com/"``
 
@@ -145,30 +153,35 @@ Optional fields
        The form this field is in should state that email addresses
        will not be publicly available.
 
+       Example informational text::
+
+           While your feedback will be publicly visible, email addresses
+           are kept private. We understand your privacy is important.
+
 **user_agent**
-    String. The user agent of the client if applicable. For example
-    if the user is using a Firefox OS device, this would be
-    the user agent of the browser used to send feedback.
+    String. Max length: 255. The user agent of the client if
+    applicable. For example if the user is using a Firefox OS device,
+    this would be the user agent of the browser used to send feedback.
 
     Example: ``'Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0'``
 
 **source**
-    String. If this response was initiated by a blog post, wiki page,
-    search, newsletter, tweet or something like that, this is the source
-    that initiated the response. It has the same semantics as the 
-    utm_source querystring parameter:
+    String. Max length: 100. If this response was initiated by a blog
+    post, wiki page, search, newsletter, tweet or something like that,
+    this is the source that initiated the response. It has the same
+    semantics as the utm_source querystring parameter:
 
     https://support.google.com/analytics/answer/1033867
 
     Example: ``'Hacks blog'``
 
 **campaign**
-    String. If this response was initiated by a marketing campaign,
-    this is the name of the campaign. It has the same semantics as
-    the utm_campaign querystring parameter:
+    String. Max length: 100. If this response was initiated by a
+    marketing campaign, this is the name of the campaign. It has the
+    same semantics as the utm_campaign querystring parameter:
 
     https://support.google.com/analytics/answer/1033867
-      
+
     Example: ``'show the firefox love post'``
 
 
@@ -192,6 +205,7 @@ was using, you could add this to the JSON object::
         "product": "Devtools",
         "theme": "dark"
     }
+
 
 That last key will get added to the feedback response context.
 
