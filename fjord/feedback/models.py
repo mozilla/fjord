@@ -12,8 +12,8 @@ from statsd import statsd
 from tower import ugettext_lazy as _lazy
 
 from fjord.base.domain import get_domain
-from fjord.base.models import ModelBase, JSONObjectField
-from fjord.base.util import smart_truncate, instance_to_key
+from fjord.base.models import ModelBase, JSONObjectField, EnhancedURLField
+from fjord.base.util import smart_truncate, instance_to_key, is_url
 from fjord.feedback.config import CODE_TO_COUNTRY, ANALYSIS_STOPWORDS
 from fjord.feedback.utils import compute_grams
 from fjord.search.index import (
@@ -121,7 +121,7 @@ class Response(ModelBase):
 
     # Data coming from the user
     happy = models.BooleanField(default=True)
-    url = models.URLField(blank=True)
+    url = EnhancedURLField(blank=True)
     description = models.TextField(blank=True)
 
     # Translation into English of the description
@@ -560,7 +560,7 @@ class PostResponseSerializer(serializers.Serializer):
 
     """
     happy = serializers.BooleanField(required=True)
-    url = serializers.URLField(max_length=200, required=False, default=u'')
+    url = serializers.CharField(max_length=200, required=False, default=u'')
     description = serializers.CharField(required=True)
 
     category = serializers.CharField(max_length=50, required=False,
@@ -588,6 +588,15 @@ class PostResponseSerializer(serializers.Serializer):
     # source and campaign
     source = NoNullsCharField(max_length=100, required=False, default=u'')
     campaign = NoNullsCharField(max_length=100, required=False, default=u'')
+
+    def validate_url(self, attrs, source):
+        value = attrs[source]
+        if value:
+            if not is_url(value):
+                raise serializers.ValidationError(
+                    '{0} is not a valid url'.format(value))
+
+        return attrs
 
     def validate_product(self, attrs, source):
         """Validates the product against Product model"""

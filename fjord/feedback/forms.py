@@ -1,5 +1,7 @@
 from django import forms
 
+from fjord.base.forms import EnhancedURLField
+
 
 class URLInput(forms.TextInput):
     """Text field with HTML5 URL Input type."""
@@ -11,7 +13,7 @@ class ResponseForm(forms.Form):
 
     # NB: The class 'url' is hard-coded in the Testpilot extension to
     # accommodate pre-filling the field client-side.
-    url = forms.URLField(required=False, widget=forms.TextInput(
+    url = EnhancedURLField(required=False, widget=forms.TextInput(
         attrs={'placeholder': 'http://', 'class': 'url'}))
 
     description = forms.CharField(widget=forms.Textarea(), required=True)

@@ -1,5 +1,6 @@
 import json
 
+from django.core.cache import cache
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
@@ -42,7 +43,6 @@ class TestPicker(TestCase):
         ProductFactory(display_name=u'ProductFoo', slug=u'productfoo')
         ProductFactory(display_name=u'ProductBar', slug=u'productbar')
 
-        from django.core.cache import cache
         cache.clear()
 
         resp = self.client.get(reverse('feedback_dev'))
@@ -405,6 +405,32 @@ class TestFeedback(TestCase):
 
         self.assertRedirects(r, reverse('thanks'))
         eq_(models.Response.objects.count(), 1)
+
+    def test_valid_urls(self):
+        """Test valid url field values"""
+        test_data = [
+            # input, expected
+            ('example.com', 'http://example.com/'),
+            ('http://example.com', 'http://example.com/'),
+            ('https://example.com', 'https://example.com/'),
+            ('ftp://example.com', ''),  # We currently redact ftp urls
+            ('about:config', 'about:config'),
+            ('chrome://foo', 'chrome://foo')
+        ]
+
+        url = reverse('feedback')
+        for item, expected in test_data:
+            cache.clear()
+
+            r = self.client.post(url, {
+                'url': item,
+                'happy': 0,
+                'description': u'foo' + item
+            })
+
+            self.assertRedirects(r, reverse('thanks'))
+            latest = models.Response.uncached.latest('pk')
+            eq_(latest.url, expected)
 
     def test_url_cleaning(self):
         """Clean urls before saving"""
