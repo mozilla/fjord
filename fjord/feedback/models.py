@@ -560,7 +560,7 @@ class PostResponseSerializer(serializers.Serializer):
 
     """
     happy = serializers.BooleanField(required=True)
-    url = serializers.URLField(required=False, default=u'')
+    url = serializers.URLField(max_length=200, required=False, default=u'')
     description = serializers.CharField(required=True)
 
     category = serializers.CharField(max_length=50, required=False,
@@ -575,7 +575,8 @@ class PostResponseSerializer(serializers.Serializer):
     country = NoNullsCharField(max_length=4, required=False, default=u'')
 
     # device information
-    manufacturer = NoNullsCharField(max_length=255, required=False, default=u'')
+    manufacturer = NoNullsCharField(max_length=255, required=False,
+                                    default=u'')
     device = NoNullsCharField(max_length=255, required=False, default=u'')
 
     # user's email address
