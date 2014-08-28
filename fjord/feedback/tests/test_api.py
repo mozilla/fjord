@@ -2,7 +2,7 @@ import json
 import time
 from datetime import date, datetime, timedelta
 
-from django.conf import settings
+from django.core.cache import cache
 from django.test.client import Client
 
 from nose.tools import eq_
@@ -544,6 +544,39 @@ class PostFeedbackAPITest(TestCase):
         r = self.client.post(reverse('feedback-api'), data)
         eq_(r.status_code, 400)
         assert 'product' in r.content
+
+    def test_url_max_length(self):
+        url_base = 'http://example.com/'
+
+        # Up to 199 characters is fine.
+        data = {
+            'happy': True,
+            'channel': u'stable',
+            'version': u'1.1',
+            'description': u'Great! 199',
+            'product': u'Firefox OS',
+            'platform': u'Firefox OS',
+            'url': url_base + ('a' * (199 - len(url_base))) + 'b',
+            'locale': 'en-US',
+        }
+
+        r = self.client.post(reverse('feedback-api'), data)
+        eq_(r.status_code, 201)
+
+        # 200th character is not fine.
+        data = {
+            'happy': True,
+            'channel': u'stable',
+            'version': u'1.1',
+            'description': u'Great! 200',
+            'product': u'Firefox OS',
+            'platform': u'Firefox OS',
+            'url': url_base + ('a' * (200 - len(url_base))) + 'b',
+            'locale': 'en-US',
+        }
+
+        r = self.client.post(reverse('feedback-api'), data)
+        eq_(r.status_code, 400)
 
 
 class PostFeedbackAPIThrottleTest(TestCase):
