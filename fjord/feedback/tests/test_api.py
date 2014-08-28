@@ -578,6 +578,40 @@ class PostFeedbackAPITest(TestCase):
         r = self.client.post(reverse('feedback-api'), data)
         eq_(r.status_code, 400)
 
+    def test_valid_urls(self):
+        test_data = [
+            'example.com',
+            'example.com:80',
+            'example.com:80/foo',
+            'http://example.com',
+            'http://example.com/foo',
+            'http://example.com:80',
+            'http://example.com:80/foo',
+            'https://example.com',
+            'https://example.com/foo',
+            'https://example.com:80',
+            'https://example.com:80/foo',
+            'ftp://example.com',
+            'about:mozilla',
+            'chrome://foo'
+        ]
+        for url in test_data:
+            data = {
+                'happy': True,
+                'channel': u'stable',
+                'version': u'1.1',
+                'description': u'Great!',
+                'product': u'Firefox OS',
+                'platform': u'Firefox OS',
+                'url': url,
+                'locale': 'en-US',
+            }
+
+            r = self.client.post(reverse('feedback-api'), data)
+            eq_(r.status_code, 201, msg=('%s != 201 (%s)' % (r.status_code, url)))
+
+            cache.clear()
+
 
 class PostFeedbackAPIThrottleTest(TestCase):
     def test_throttle(self):

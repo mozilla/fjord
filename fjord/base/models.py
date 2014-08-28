@@ -6,6 +6,9 @@ from django.db import models
 import caching.base
 from tower import ugettext_lazy as _lazy
 
+from fjord.base import forms
+from fjord.base.validators import EnhancedURLValidator
+
 
 class ModelBase(caching.base.CachingMixin, models.Model):
     """Common base model for all models: Implements caching."""
@@ -19,6 +22,27 @@ class ModelBase(caching.base.CachingMixin, models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+
+class EnhancedURLField(models.CharField):
+    """URLField that also supports about: and chrome:// urls"""
+    description = 'Enhanced URL'
+
+    def __init__(self, verbose_name=None, name=None, **kwargs):
+        kwargs['max_length'] = kwargs.get('max_length', 200)
+        models.CharField.__init__(self, verbose_name, name, **kwargs)
+        self.validators.append(EnhancedURLValidator())
+
+    def formfield(self, **kwargs):
+        defaults = {
+            'form_class': forms.EnhancedURLField,
+        }
+        defaults.update(kwargs)
+        return super(EnhancedURLField, self).formfield(**defaults)
+
+
+from south.modelsinspector import add_introspection_rules
+add_introspection_rules([], ["^fjord\.base\.models\.EnhancedURLField"])
 
 
 class JSONObjectField(models.TextField):

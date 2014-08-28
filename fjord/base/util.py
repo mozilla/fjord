@@ -6,13 +6,14 @@ from functools import wraps
 from hashlib import md5
 
 from django.contrib.auth.decorators import permission_required
+from django.core import validators
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
     HttpResponseRedirect
 )
 from django.utils.dateparse import parse_date
-from django.utils.encoding import force_str
+from django.utils.encoding import force_str, force_text
 from django.utils.feedgenerator import Atom1Feed
 
 from product_details import product_details
@@ -28,6 +29,43 @@ class JSONDatetimeEncoder(json.JSONEncoder):
         if hasattr(value, 'strftime'):
             return value.isoformat()
         return super(JSONDatetimeEncoder, self).default(value)
+
+
+def is_url(url):
+    """Takes a string and returns whether or not it's a url
+
+    Recognizes about: and chrome:// urls, everything Django's
+    URLValidator recognizes and protocol-less urls.
+
+    >>> is_url(u'example.com')
+    True
+    >>> is_url(u'about:')
+    True
+    >>> is_url(u'foo')
+    False
+
+    """
+    url = force_text(url)
+
+    # Check what Django's URLValidator thinks about it. That covers
+    # the http/https/ftp cases including localhost, ipv4, ipv6 and
+    # optional ports.
+    if validators.URLValidator.regex.search(url):
+        return True
+
+    # Check if it's an about: url.
+    if url.startswith('about:'):
+        return True
+
+    # Check if it's a chrome:// url.
+    if url.startswith('chrome://'):
+        return True
+
+    # Check if it's a protocol-less url by prepending http:// to it.
+    if validators.URLValidator.regex.search('http://' + url):
+        return True
+
+    return False
 
 
 def translate_country_name(current_language, country_code, country_name,
