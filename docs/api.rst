@@ -7,11 +7,152 @@
 .. contents::
    :local:
 
-Fjord has an API.
+Fjord has several POST APIs and one GET API for data.
+
+
+Getting product feedback: GET /api/v1/feedback/
+===============================================
+
+:URL:            ``/api/v1/feedback/``
+:Method:         HTTP GET
+:Payload format: There is no payload--everything is done in the querystring
+
+
+Doing a GET without any querystring arguments will return the most
+recent 1000 publicly visible responses.
+
+.. Warning::
+
+   This API endpoint is throttled. If you hit it too often, you'll get
+   throttled. You just need to wait a bit for the throttle to expire.
+
+
+.. Note::
+
+   This API endpoint is still in flux. The documentation is
+   rudimentary at best. Amongst other things, it's difficult to
+   discover valid values for things.
+
+   If you're using this API endpoint and have issues, please
+   `open a bug
+   <https://bugzilla.mozilla.org/enter_bug.cgi?product=Input&rep_platform=all&op_sys=all&component=General>`_.
+
+
+Filters
+-------
+
+**q**
+    String. Text query.
+
+    Example::
+
+        ?q=crash
+
+**happy**
+    Boolean. ``0`` or ``1``. Restricts results to either happy feedback or
+    sad feedback.
+
+    Example::
+
+        ?happy=0
+
+**platforms**
+    Strings. Comma separated list of platforms. For valid platforms, see
+    `<https://input.mozilla.org/>`_.
+
+    Examples::
+
+        ?platforms=linux
+        ?platforms=linux,os x
+
+**locales**
+    Strings. Comma separated list of locales. For valid locales, see
+    `<https://input.mozilla.org/>`_.
+
+    Examples::
+
+        ?locales=en-US
+        ?locales=en-US,es,es-BR
+
+**products**
+    Strings. Comma separated list of products. For valid products, see
+    `<https://input.mozilla.org/>`_.
+
+    Examples::
+
+        ?products=Firefox
+        ?products=Firefox OS,Firefox
+
+**versions**
+    Strings. Comma separated list of versions for a specific product. For
+    valid versions, see `<https://input.mozilla.org/>`_.
+
+    You must specify a product in order to specify versions.
+
+    Examples::
+
+        ?products=Firefox&versions=31.0
+        ?products=Firefox&versions=31.0,32.0
+
+**date_start**
+    Date in YYYY-MM-DD format. Specifies the start for the date range you're
+    querying for.
+
+    Example::
+
+        ?date_start=2014-08-12
+
+**date_end**
+    Date in YYYY-MM-DD format. Specifies the end for the date range you're
+    querying for.
+
+    Defaults to today.
+
+    Example::
+
+        ?date_end=2014-08-12
+
+**date_delta**
+    ``1d``, ``7d``, ``14d``. The number of days from ``date_start`` or
+    ``date_end``.
+
+    Example::
+
+        # Shows the last 7 days ending today
+        ?date_delta=7d
+
+        # Shows 14 days ending 2014-08-12
+        ?date_end=2014-08-12&date_delta=14d
+
+        # Shows 14 days starting 2014-08-12
+        ?date_start=2014-08-12&date_delta=14d
+
+
+Examples
+--------
+
+Show all the happy responses for Firefox for the last 7 days for the
+English locale::
+
+    ?happy=1&products=Firefox&locales=en-US&date_delta=7d
+
+Show sad responses for Windows platforms for the last day::
+
+    ?happy=0&platforms=Windows 7,Windows XP, Windows 8.1,Windows 8,Windows Vista,Windows NT&date_delta=1d
+
+
+
+Posting product feedback: POST /api/v1/feedback/
+================================================
+
+:URL:            ``/api/v1/feedback/``
+:Method:         HTTP POST
+:Payload format: JSON---make sure to have ``Content-type: application/json``
+                 header
 
 
 Testing clients using the API
-=============================
+-----------------------------
 
 .. Warning::
 
@@ -29,16 +170,7 @@ that our production server does. The url for the our stage server is::
                   ^^^^^^^
 
 
-Please make sure to use the right domain!
-
-
-Posting product feedback: /api/v1/feedback/
-===========================================
-
-:URL:            ``/api/v1/feedback/``
-:Method:         HTTP POST
-:Payload format: JSON---make sure to have ``Content-type: application/json``
-                 header
+Please make sure to use the correct domain!
 
 
 Required fields
@@ -269,6 +401,28 @@ Posting heartbeat feedback: /api/v1/hb/
 :Method:         HTTP POST
 :Payload format: JSON--make sure to have ``Content-type: application/json``
                  header
+
+
+Testing clients using the API
+-----------------------------
+
+.. Warning::
+
+   **DO NOT TEST YOUR CLIENT AGAINST OUR PRODUCTION SERVER. IT WILL
+   MAKE CHENG, MATT, TYLER AND I CROSS.**
+
+
+Seriously. Please don't test your client against our production
+server.
+
+Test your client against our stage server which runs the same code
+that our production server does. The url for the our stage server is::
+
+    https://input.allizom.org/
+                  ^^^^^^^
+
+
+Please make sure to use the correct domain!
 
 
 Required fields
