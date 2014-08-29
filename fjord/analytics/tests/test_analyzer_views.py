@@ -313,31 +313,31 @@ class TestSearchView(ElasticTestCase):
 
         # Unspecified start => (-infin, end]
         r = self.client.get(self.url, {
-                'date_end': end,
-            })
+            'date_end': end,
+        })
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 5)
 
         # Unspecified end => [start, +infin)
         r = self.client.get(self.url, {
-                'date_start': start
-            })
+            'date_start': start
+        })
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 6)
 
         # Both start and end => [start, end]
         r = self.client.get(self.url, {
-                'date_start': start,
-                'date_end': end,
-            })
+            'date_start': start,
+            'date_end': end,
+        })
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 4)
 
     def test_date_start_valueerror(self):
         # https://bugzilla.mozilla.org/show_bug.cgi?id=898584
         r = self.client.get(self.url, {
-                'date_start': '0001-01-01',
-            })
+            'date_start': '0001-01-01',
+        })
         eq_(r.status_code, 200)
 
     def test_invalid_search(self):
@@ -356,9 +356,9 @@ class TestSearchView(ElasticTestCase):
         # A broken date range search shouldn't affect anything
         # Why this? Because this is the thing the fuzzer found.
         r = self.client.get(self.url, {
-                'date_end': '/etc/shadow\x00',
-                'date_start': '/etc/passwd\x00'
-                })
+            'date_end': '/etc/shadow\x00',
+            'date_start': '/etc/passwd\x00'
+        })
         eq_(r.status_code, 200)
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 7)

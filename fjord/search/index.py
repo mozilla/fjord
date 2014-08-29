@@ -383,12 +383,13 @@ def es_reindex_cmd(percent=100, mapping_types=None):
                 per_1000 = (time.time() - cls_start_time) / (i / 1000.0)
                 this_1000 = time.time() - chunk_start_time
 
-                log.info('   %s/%s %s... (%s/1000 avg, %s ETA)',
-                         i,
-                         total,
-                         format_time(this_1000),
-                         format_time(per_1000),
-                         format_time(time_to_go)
+                log.info(
+                    '   %s/%s %s... (%s/1000 avg, %s ETA)',
+                    i,
+                    total,
+                    format_time(this_1000),
+                    format_time(per_1000),
+                    format_time(time_to_go)
                 )
 
             delta_time = time.time() - cls_start_time

@@ -5,7 +5,12 @@ from nose.tools import eq_
 from pyquery import PyQuery
 
 from fjord.base import views
-from fjord.base.tests import LocalizingClient, TestCase, ProfileFactory, reverse
+from fjord.base.tests import (
+    LocalizingClient,
+    TestCase,
+    ProfileFactory,
+    reverse
+)
 from fjord.base.views import IntentionalException
 from fjord.search.tests import ElasticTestCase
 
@@ -67,7 +72,7 @@ class MonitorViewTest(ElasticTestCase):
                           if 'ERROR' in line]
 
                 eq_(resp.status_code, 200, '%s != %s (%s)' % (
-                        resp.status_code, 200, repr(errors)))
+                    resp.status_code, 200, repr(errors)))
 
         finally:
             views.test_memcached = test_memcached

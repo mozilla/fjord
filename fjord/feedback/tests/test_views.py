@@ -455,7 +455,7 @@ class TestFeedback(TestCase):
         self.assertTemplateUsed(r, 'feedback/generic_feedback.html')
 
     def test_email_collection(self):
-        """If the user enters an email and checks the box, collect the email."""
+        """If the user enters an email and checks the box, collect email."""
         url = reverse('feedback')
 
         r = self.client.post(url, {
@@ -468,7 +468,7 @@ class TestFeedback(TestCase):
         eq_(r.status_code, 302)
 
     def test_email_privacy(self):
-        """If an email is entered, but the box is not checked, don't collect."""
+        """If an email is entered, but box is not checked, don't collect."""
         email_count = models.ResponseEmail.objects.count()
 
         url = reverse('feedback')

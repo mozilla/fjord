@@ -48,7 +48,7 @@ def index_chunk_task(index, batch_id, rec_id, chunk):
     except Exception:
         if rec is not None:
             rec.mark_fail(u'Errored out %s %s' % (
-                    sys.exc_type, sys.exc_value))
+                sys.exc_type, sys.exc_value))
         raise
 
     finally:
@@ -116,8 +116,9 @@ def unindex_item_task(cls_path, item_id, **kwargs):
 
 
 def _live_index_handler(sender, **kwargs):
-    if (not settings.ES_LIVE_INDEX or
-        'signal' not in kwargs or 'instance' not in kwargs):
+    if (not settings.ES_LIVE_INDEX
+            or 'signal' not in kwargs
+            or 'instance' not in kwargs):
         return
 
     instance = kwargs['instance']

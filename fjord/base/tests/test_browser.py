@@ -22,7 +22,7 @@ class TestUserAgentDetection(object):
 
         msg = ('UA Detection failed. UA="{0}", parsed="{1}" '
                'expected="{2}"'.format(
-                case['user_agent'], parsed, expected))
+                   case['user_agent'], parsed, expected))
         assert parsed == expected, msg
 
     def test_parse_ua(self):

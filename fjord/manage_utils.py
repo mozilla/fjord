@@ -149,7 +149,7 @@ def validate_settings(settings):
 
 def _not_setup():
     raise EnvironmentError(
-            'setup_environ() has not been called for this process')
+        'setup_environ() has not been called for this process')
 
 
 def main(argv=None):

@@ -44,7 +44,7 @@ class TestDashboardView(ElasticTestCase):
         for happy, platform, locale, description, created in items:
             # We don't need to keep this around, just need to create it.
             ResponseFactory(happy=happy, platform=platform, locale=locale,
-                     description=description, created=created)
+                            description=description, created=created)
 
         self.refresh()
 
@@ -250,7 +250,8 @@ class TestDashboardView(ElasticTestCase):
     # re-added.
     # def test_search_format_atom_has_related_links(self):
     #     """Atom output works"""
-    #     response(description='relatedlinks', url='http://example.com', save=True)
+    #     response(description='relatedlinks', url='http://example.com',
+    #              save=True)
     #     self.refresh()
 
     #     url = reverse('dashboard')
@@ -273,23 +274,23 @@ class TestDashboardView(ElasticTestCase):
 
         # Unspecified start => (-infin, end]
         r = self.client.get(url, {
-                'date_end': end,
-            })
+            'date_end': end,
+        })
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 5)
 
         # Unspecified end => [start, +infin)
         r = self.client.get(url, {
-                'date_start': start
-            })
+            'date_start': start
+        })
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 6)
 
         # Both start and end => [start, end]
         r = self.client.get(url, {
-                'date_start': start,
-                'date_end': end,
-            })
+            'date_start': start,
+            'date_end': end,
+        })
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 4)
 
@@ -297,8 +298,8 @@ class TestDashboardView(ElasticTestCase):
         # https://bugzilla.mozilla.org/show_bug.cgi?id=898584
         url = reverse('dashboard')
         r = self.client.get(url, {
-                'date_start': '0001-01-01',
-            })
+            'date_start': '0001-01-01',
+        })
         eq_(r.status_code, 200)
 
     def test_invalid_search(self):
@@ -316,9 +317,9 @@ class TestDashboardView(ElasticTestCase):
         # A broken date range search shouldn't affect anything
         # Why this? Because this is the thing the fuzzer found.
         r = self.client.get(url, {
-                'date_end': '/etc/shadow\x00',
-                'date_start': '/etc/passwd\x00'
-                })
+            'date_end': '/etc/shadow\x00',
+            'date_start': '/etc/passwd\x00'
+        })
         eq_(r.status_code, 200)
         pq = PyQuery(r.content)
         eq_(len(pq('li.opinion')), 7)
@@ -337,9 +338,9 @@ class TestDashboardView(ElasticTestCase):
         end = (date.today() - timedelta(days=3))
 
         r = self.client.get(url, {
-                'date_start': start.strftime('%Y-%m-%d'),
-                'date_end': end.strftime('%Y-%m-%d'),
-            })
+            'date_start': start.strftime('%Y-%m-%d'),
+            'date_end': end.strftime('%Y-%m-%d'),
+        })
         # The histogram data is of the form [d, v], where d is a number of
         # milliseconds since the epoch, and v is the value at that time stamp.
         dates = [d[0] for d in r.context['histogram'][0]['data']]

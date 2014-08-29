@@ -53,7 +53,7 @@ class TestCountsHelper(TestCase):
 
     def test_map_func(self):
         options = counts_to_options(self.counts, 'fruit',
-            value_map=lambda s: s.upper())
+                                    value_map=lambda s: s.upper())
         # Note that options get sorted by count.
         eq_(options['options'][0]['value'], 'BANANAS')
         eq_(options['options'][1]['value'], 'ORANGES')

@@ -289,9 +289,13 @@ class TestParseData(ElasticTestCase):
 
         eq_(Response.objects.count(), 20)
         eq_(ResponseEmail.objects.count(), 5)
-        eq_(ResponseEmail.objects.filter(opinion__created__gte=cutoff).count(), 5)
+        eq_(ResponseEmail.objects.filter(
+            opinion__created__gte=cutoff).count(),
+            5)
         eq_(ResponseContext.objects.count(), 5)
-        eq_(ResponseContext.objects.filter(opinion__created__gte=cutoff).count(), 5)
+        eq_(ResponseContext.objects.filter(
+            opinion__created__gte=cutoff).count(),
+            5)
 
         # Everything should still be in the index, but the number of
         # things with has_email=True should go down

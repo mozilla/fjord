@@ -174,7 +174,7 @@ class PublicFeedbackAPITest(ElasticTestCase):
         """When all three date fields are specified ignore date_start"""
         self._test_date(
             {'date_delta': '1d', 'date_end': '2014-07-03',
-            'date_start': '2014-07-02'},
+             'date_start': '2014-07-02'},
             ['2014-07-03T00:00:00', '2014-07-02T00:00:00'])
 
     def test_date_delta_with_no_constraints(self):
@@ -608,7 +608,8 @@ class PostFeedbackAPITest(TestCase):
             }
 
             r = self.client.post(reverse('feedback-api'), data)
-            eq_(r.status_code, 201, msg=('%s != 201 (%s)' % (r.status_code, url)))
+            eq_(r.status_code, 201,
+                msg=('%s != 201 (%s)' % (r.status_code, url)))
 
             cache.clear()
 

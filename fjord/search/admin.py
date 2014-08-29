@@ -93,7 +93,6 @@ def search_admin_view(request):
     except Exception as exc:
         error_messages.append(u'Error: %s' % exc.message)
 
-
     try:
         # This gets index stats, but also tells us whether ES is in
         # a bad state.
@@ -121,16 +120,16 @@ def search_admin_view(request):
     recent_records = Record.objects.order_by('-creation_time')[:100]
 
     return render(request, 'admin/search_admin_view.html', {
-            'title': 'Search',
-            'es_deets': es_deets,
-            'mapping_type_stats': stats,
-            'indexes': indexes,
-            'index': get_index(),
-            'error_messages': error_messages,
-            'recent_records': recent_records,
-            'outstanding_records': outstanding_records,
-            'now': datetime.now(),
-            })
+        'title': 'Search',
+        'es_deets': es_deets,
+        'mapping_type_stats': stats,
+        'indexes': indexes,
+        'index': get_index(),
+        'error_messages': error_messages,
+        'recent_records': recent_records,
+        'outstanding_records': outstanding_records,
+        'now': datetime.now(),
+    })
 
 
 admin.site.register_view('search-admin-view', search_admin_view,

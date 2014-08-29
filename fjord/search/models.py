@@ -61,7 +61,7 @@ class Record(models.Model):
     def outstanding(cls):
         """Return queryset of outstanding records."""
         return cls.objects.filter(status__in=[
-                cls.STATUS_NEW, cls.STATUS_IN_PROGRESS])
+            cls.STATUS_NEW, cls.STATUS_IN_PROGRESS])
 
     def __unicode__(self):
         return '%s:%s%s' % (self.batch_id, self.name, self.status)

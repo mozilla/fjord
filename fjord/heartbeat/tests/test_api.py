@@ -1,12 +1,10 @@
 import json
 
-from django.test.client import Client
-
 from nose.tools import eq_
 
 from fjord.base.tests import TestCase, reverse
-from fjord.heartbeat.models import Answer, Poll
-from fjord.heartbeat.tests import AnswerFactory, PollFactory
+from fjord.heartbeat.models import Answer
+from fjord.heartbeat.tests import PollFactory
 
 
 class HeartbeatPostAPITest(TestCase):

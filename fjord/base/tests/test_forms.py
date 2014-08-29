@@ -19,14 +19,15 @@ class EnhancedURLFieldTests(TestCase):
             ('http://example.com/', 'http://example.com'),
             ('http://example.com./', 'http://example.com.'),
             ('http://www.example.com/', 'http://www.example.com'),
-            ('http://www.example.com:8000/test', 'http://www.example.com:8000/test'),
+            ('http://www.example.com:8000/test',
+             'http://www.example.com:8000/test'),
             ('http://valid-with-hyphens.com/', 'valid-with-hyphens.com'),
             ('http://subdomain.domain.com/', 'subdomain.domain.com'),
             ('http://200.8.9.10/', 'http://200.8.9.10'),
             ('http://200.8.9.10:8000/test', 'http://200.8.9.10:8000/test'),
             ('http://valid-----hyphens.com/', 'http://valid-----hyphens.com'),
-            ('http://www.example.com/s/http://code.djangoproject.com/ticket/13804',
-             'www.example.com/s/http://code.djangoproject.com/ticket/13804'),
+            ('http://www.example.com/s/http://code.djangoproject.com/tkt/13',
+             'www.example.com/s/http://code.djangoproject.com/tkt/13'),
         ]
 
         f = EnhancedURLField()

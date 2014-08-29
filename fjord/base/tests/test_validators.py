@@ -2,8 +2,6 @@ from unittest import TestCase
 
 from django.core.exceptions import ValidationError
 
-from nose.tools import eq_
-
 from fjord.base.validators import EnhancedURLValidator
 
 

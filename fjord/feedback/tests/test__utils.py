@@ -23,8 +23,8 @@ class Testclean_url(TestCase):
 
 
 class TestComputeGrams(TestCase):
-    # FIXME - Beef this up so that we have more comprehensive tests of the various
-    # tokenizing edge cases.
+    # FIXME - Beef this up so that we have more comprehensive tests of
+    # the various tokenizing edge cases.
 
     def test_basic(self):
         test_data = [
@@ -54,8 +54,8 @@ class TestComputeGrams(TestCase):
             ('Being partially sighted, I found the features with Windows XP '
              'and IE8 extremely usefu;. I need everything in Arial black bold '
              'text.',
-             [u'extremely usefu', u'features sighted', u'windows xp', u'ie8 xp',
-              u'black bold', u'partially sighted', u'need usefu',
+             [u'extremely usefu', u'features sighted', u'windows xp',
+              u'ie8 xp', u'black bold', u'partially sighted', u'need usefu',
               u'features windows', u'arial need', u'arial black', u'bold text',
               u'extremely ie8']),
         ]
