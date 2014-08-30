@@ -14,19 +14,30 @@ for, etc.
 Coding conventions
 ==================
 
-We follow most of the practices as detailed in the `Mozilla webdev
-bootcamp guide
-<http://mozweb.readthedocs.org/en/latest/coding.html>`_.
+Git pre-commit hook
+-------------------
 
-FIXME - Codify those conventions here.
+We have a Git pre-commit hook that makes it easier to make sure you're
+checking in linted code. To set it up, run::
+
+    $ ./bin/hooks/flake8_lint.pre-commit
+
+That'll set up the pre-commit hook. After that, every time you commit
+something in Git, it'll run the hook first and if everything is fine
+continue with the commit. If things are not fine, it'll notify you and
+stop.
 
 
-Python
-------
+Python conventions
+------------------
+
+Follow `PEP-8 <http://python.org/dev/peps/pep-0008/>`_ for code and
+`PEP-257 <http://python.org/dev/peps/pep-0257/>`_ for docstrings.
 
 If you don't have an editor that checks PEP-8 issues and runs pyflakes
-for you, it's worth setting it up. Use `flake8
-<https://flake8.readthedocs.org/en/latest/>`_ because it's awesome.
+for you, it's worth setting it up.
+
+Use the linting script in ``bin/flake8_lint.sh``.
 
 
 JavaScript
@@ -68,17 +79,6 @@ Lines shouldn't exceed 72 characters.
 See `these guidelines
 <http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html>`_
 for some more explanation.
-
-
-Git resources and tools
------------------------
-
-See `Webdev bootcamp guide
-<http://mozweb.readthedocs.org/en/latest/git.html#git-and-github>`_
-for:
-
-* helpful resources for learning git
-* helpful tools
 
 
 Localization conventions
@@ -155,9 +155,9 @@ Here’s an alternative::
     <h1>_('Hello')</h1>
 
     <p>
-    {% trans about_url='http://about.me/lionel.richie' %}
-      Is it <a href="{{ about_url }}">me</a> you're looking for?
-    {% endtrans %}
+      {% trans about_url='http://about.me/lionel.richie' %}
+        Is it <a href="{{ about_url }}">me</a> you're looking for?
+      {% endtrans %}
     </p>
 
 or if you have multiple paragraphs::
@@ -165,12 +165,12 @@ or if you have multiple paragraphs::
     <h1>_('Hello')</h1>
 
     {% trans about_url='http://about.me/lionel.richie' %}
-    <p>
-      Is it <a href="{{ about_url }}">me</a> you're looking for?
-    </p>
-    <p>
-      I can see it in your eyes.
-    </p>
+      <p>
+        Is it <a href="{{ about_url }}">me</a> you're looking for?
+      </p>
+      <p>
+        I can see it in your eyes.
+      </p>
     {% endtrans %}
 
 Here are the advantages:
