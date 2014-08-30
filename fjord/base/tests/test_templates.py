@@ -22,13 +22,13 @@ class MobileQueryStringOverrideTest(ElasticTestCase):
         # Doing a request and specifying the mobile querystring
         # parameter should persist that value in the MOBILE cookie.
         resp = self.client.get('/', {
-                'mobile': 1
-                })
+            'mobile': 1
+        })
         assert MOBILE_COOKIE in resp.cookies
         eq_(resp.cookies[MOBILE_COOKIE].value, 'yes')
 
         resp = self.client.get('/', {
-                'mobile': 0
-                })
+            'mobile': 0
+        })
         assert MOBILE_COOKIE in resp.cookies
         eq_(resp.cookies[MOBILE_COOKIE].value, 'no')

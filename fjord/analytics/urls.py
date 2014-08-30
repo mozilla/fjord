@@ -1,11 +1,5 @@
 from django.conf.urls import patterns, url
-from django.contrib.auth.decorators import login_required
 
-
-from fjord.base.util import (
-    analyzer_required,
-    check_new_user,
-)
 from fjord.analytics.analyzer_views import ProductsUpdateView
 
 

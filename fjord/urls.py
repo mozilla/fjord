@@ -12,7 +12,8 @@ from django.contrib import admin
 
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
 
     (r'', include('fjord.analytics.urls')),
     (r'', include('fjord.base.urls')),
@@ -20,10 +21,11 @@ urlpatterns = patterns('',
     (r'', include('fjord.heartbeat.urls')),
 
     # Generate a robots.txt
-    (r'^robots\.txt$',
+    (
+        r'^robots\.txt$',
         lambda r: HttpResponse(
-            ("User-agent: *\n%s: /" % 'Allow' if settings.ENGAGE_ROBOTS
-             else 'Disallow'),
+            ("User-agent: *\n%s: /" % (
+                'Allow' if settings.ENGAGE_ROBOTS else 'Disallow')),
             mimetype="text/plain"
         )
     ),

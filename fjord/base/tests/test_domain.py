@@ -20,7 +20,7 @@ class TestGetDomain(TestCase):
             (u'https://foo.example.com.br/', u'example.com.br'),
             (u'http://blog.goo.ne.jp/shinsburger', u'goo.ne.jp'),
 
-            # FIXME - This fails in the tests. See if this works when we 
+            # FIXME - This fails in the tests. See if this works when we
             # change the code to get the most recent tld list from Mozilla.
             # (u'http://500px.com\u6253\u4e0d\u5f00/',
             #  u'500px.com\u6253\u4e0d\u5f00'),

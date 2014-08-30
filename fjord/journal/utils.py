@@ -12,6 +12,7 @@ def j_info(app, src, action, msg, instance=None, metadata=None):
         instance=instance,
         metadata=metadata)
 
+
 def j_error(app, src, action, msg, instance=None, metadata=None):
     """Generate an ERROR record in the journal."""
     return Record.objects.log(

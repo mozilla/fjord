@@ -91,13 +91,13 @@ class SmartBoolTest(TestCase):
         truths = ['Yes', 'y', u'TRUE', '1', u'1']
         for x in truths:
             b = smart_bool(x, 'fallback')
-            assert b == True, self.msg_template % (x, True, b)
+            assert b is True, self.msg_template % (x, True, b)
 
     def test_falsey(self):
         falses = ['No', 'n', u'FALSE', '0', u'0']
         for x in falses:
             b = smart_bool(x, 'fallback')
-            assert b == False, self.msg_template % (x, False, b)
+            assert b is False, self.msg_template % (x, False, b)
 
     def test_fallback(self):
         garbages = [None, 'apple', u'']
@@ -120,7 +120,7 @@ class FakeModel(object):
         _foo_cache[pk] = self
 
     def __repr__(self):
-       return '<FakeModel:{0}>'.format(self.pk)
+        return '<FakeModel:{0}>'.format(self.pk)
 
     objects = FakeModelManager()
 

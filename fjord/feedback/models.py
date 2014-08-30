@@ -691,7 +691,7 @@ def purge_data(cutoff=None, verbose=False):
     """Implements data purging per our data retention policy"""
     responses_to_update = set()
 
-    if cutoff == None:
+    if cutoff is None:
         # Default to wiping out 180 days ago which is roughly 6 months.
         cutoff = datetime.now() - timedelta(days=180)
 

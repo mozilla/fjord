@@ -1,8 +1,6 @@
 import inspect
 import os
-import random
 from functools import wraps
-from string import letters
 
 from nose import SkipTest
 
@@ -54,7 +52,7 @@ def skip_if(test_func, msg=''):
             # methods that start with 'test'.
             for attr in cls_or_func.__dict__.keys():
                 if (attr.startswith('test')
-                    and callable(getattr(cls_or_func, attr))):
+                        and callable(getattr(cls_or_func, attr))):
 
                     setattr(cls_or_func, attr,
                             skipping_fun(getattr(cls_or_func, attr)))
@@ -82,8 +80,11 @@ class LocalizingClient(Client):
 
     """
     def __init__(self, user_agent=None, *args, **kwargs):
-        self.user_agent = user_agent or ('Mozilla/5.0 (X11; Linux x86_64; '
-            'rv:14.0) Gecko/20100101 Firefox/14.0.1')
+        self.user_agent = (
+            user_agent
+            or ('Mozilla/5.0 (X11; Linux x86_64; rv:14.0) '
+                'Gecko/20100101 Firefox/14.0.1')
+        )
         super(LocalizingClient, self).__init__(*args, **kwargs)
 
     def request(self, **request):
