@@ -238,6 +238,24 @@ class PublicFeedbackAPITest(ElasticTestCase):
         eq_(sorted(json_data['results'][0].keys()),
             sorted(models.ResponseMappingType.public_fields()))
 
+    def test_max(self):
+        for i in range(10):
+            ResponseFactory(description=u'best browser ever %d' % i)
+        self.refresh()
+
+        resp = self.client.get(reverse('feedback-api'))
+        json_data = json.loads(resp.content)
+        eq_(json_data['count'], 10)
+
+        resp = self.client.get(reverse('feedback-api'), {'max': '5'})
+        json_data = json.loads(resp.content)
+        eq_(json_data['count'], 5)
+
+        # FIXME: For now, nonsense values get ignored.
+        resp = self.client.get(reverse('feedback-api'), {'max': 'foo'})
+        json_data = json.loads(resp.content)
+        eq_(json_data['count'], 10)
+
 
 class PostFeedbackAPITest(TestCase):
     def setUp(self):
