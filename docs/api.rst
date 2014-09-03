@@ -19,7 +19,7 @@ Getting product feedback: GET /api/v1/feedback/
 
 
 Doing a GET without any querystring arguments will return the most
-recent 1000 publicly visible responses.
+recent 1,000 publicly visible responses for all products.
 
 .. Warning::
 
@@ -126,6 +126,19 @@ Filters
 
         # Shows 14 days starting 2014-08-12
         ?date_start=2014-08-12&date_delta=14d
+
+**max**
+
+    Integer. Defaults to 1,000. Maximum is 10,000. Minimum is 1. The maximum
+    number of responses you want to get back.
+
+    Example::
+
+        # Retrieve at most 500 responses
+        ?max=500
+
+        # Retrieve at most 10000 responses
+        ?max=10000
 
 
 Examples

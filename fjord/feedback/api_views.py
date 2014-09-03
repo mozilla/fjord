@@ -13,6 +13,7 @@ from fjord.base.util import (
     cors_enabled,
     RatelimitThrottle,
     smart_date,
+    smart_int,
     smart_timedelta
 )
 from fjord.feedback import models
@@ -20,7 +21,7 @@ from fjord.feedback import models
 
 class PublicFeedbackAPI(rest_framework.views.APIView):
     def get(self, request):
-        """Returns JSON feed of first 1000 results
+        """Returns JSON feed of first 10000 results
 
         This feels like a duplication of the front-page dashboard search
         logic, but it's separate which allows us to handle multiple
@@ -89,9 +90,11 @@ class PublicFeedbackAPI(rest_framework.views.APIView):
         # Explicitly include only publicly visible fields
         search = search.values_dict(models.ResponseMappingType.public_fields())
 
-        # FIXME: We're omitting paging here for now. We might want to
-        # add that at some point.
-        responses = models.ResponseMappingType.reshape(search[:1000])
+        maximum = smart_int(request.GET.get('max', None))
+        maximum = maximum or 1000
+        maximum = min(max(1, maximum), 10000)
+
+        responses = models.ResponseMappingType.reshape(search[:maximum])
         return rest_framework.response.Response({
             'count': len(responses),
             'results': list(responses)
