@@ -472,3 +472,57 @@ table.hb td {
 table.hb td {
   border: 1px solid #ddd;
 }
+
+.pager {
+  padding-top: 1em;
+  padding-bottom: 1em;
+
+  span.current {
+    // FIXME: This is gooftastic, but I don't want to spend time right now
+    // fixing this.
+    margin-left: 10em;
+  }
+}
+
+table.flagged {
+  width: 100%;
+
+  th, td {
+    padding: 6px;
+  }
+
+  td {
+    border: 1px solid #ddd;
+  }
+  td.flagged-id {
+    width: 8em;
+  }
+  td.flagged-description {
+    word-wrap: break-word;
+    word-break: normal;
+    white-space: normal;
+  }
+  td.flagged-created {
+    width: 10em;
+  }
+  td.flagged-flags {
+    width: 12em;
+
+    .spam {
+      background: #e8e;
+    }
+    .spam-wrong {
+      color: #e8e;
+      background: white;
+      border: 1px solid #e8e;
+    }
+    .abuse {
+      background: #f22;
+    }
+    .abuse-wrong {
+      color: #f22;
+      background: white;
+      border: 1px solid #f22;
+    }
+  }
+}

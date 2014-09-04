@@ -35,7 +35,9 @@ from fjord.base.util import (
     analyzer_required,
     check_new_user,
     smart_int,
-    smart_date)
+    smart_date,
+    smart_str
+)
 from fjord.feedback.helpers import country_name
 from fjord.feedback.models import Product, Response, ResponseMappingType
 from fjord.heartbeat.models import Answer as HBAnswer
@@ -703,3 +705,70 @@ class ProductsUpdateView(FormView):
         except Product.DoesNotExist:
             self.object = form.save()
         return super(ProductsUpdateView, self).form_valid(form)
+
+
+@check_new_user
+@analyzer_required
+def analytics_flagged(request):
+    """View showing responses with flags
+
+    NOTE: This is not permanent and might go away depending on how the
+    spicedham prototype works.
+
+    """
+    template = 'analytics/analyzer/flags.html'
+
+    # FIXME: Importing this here so all the changes are localized to
+    # this function.  If we decide to go forward with this, we should
+    # unlocalize it.
+
+    from django.contrib import messages
+    from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+    from django.http import HttpResponseRedirect
+
+    from fjord.flags.models import Flag
+
+    if request.method == 'POST':
+        flag_action = request.POST.get('flag')
+        if flag_action:
+            # We do some shenanigans here to make sure we're fetching
+            # and operating on a flag_set that's not
+            # cached. django-cache-machine doesn't invalidate m2m
+            # queries correctly. :(
+            resp = get_object_or_404(
+                Response, pk=smart_int(request.POST['id']))
+            flag = get_object_or_404(Flag, name=flag_action)
+
+            resp_flags = dict([(f.name, f)
+                               for f in resp.flag_set.no_cache().all()])
+            if flag.name in resp_flags:
+                del resp_flags[flag.name]
+                messages.success(request, 'removed %s flag from %d' % (
+                    flag_action, resp.id))
+            else:
+                resp_flags[flag.name] = flag
+                messages.success(request, 'added %s flag from %d' % (
+                    flag_action, resp.id))
+
+            resp.flag_set.clear()
+            resp.flag_set.add(*resp_flags.values())
+            return HttpResponseRedirect(request.get_full_path())
+
+    resp_filter = smart_str(request.GET.get('filter'))
+    response_list = Response.uncached.filter(locale=u'en-US')
+    if resp_filter:
+        response_list = response_list.filter(flag__name=resp_filter)
+
+    paginator = Paginator(response_list, 50)
+
+    page = request.GET.get('page')
+    try:
+        responses = paginator.page(page)
+    except PageNotAnInteger:
+        responses = paginator.page(1)
+    except EmptyPage:
+        responses = paginator.page(paginator.num_pages)
+
+    return render(request, template, {
+        'responses': responses
+    })
