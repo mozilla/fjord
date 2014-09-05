@@ -26,7 +26,6 @@ packages/six
 packages/tldextract
 packages/translate-toolkit
 packages/urllib3
-packages/spicedham
 src/billiard
 src/bleach
 src/celery
