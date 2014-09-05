@@ -129,7 +129,7 @@ def _live_index_handler(sender, **kwargs):
 
     elif kwargs['signal'] == pre_delete:
         cls_path = to_class_path(instance.get_mapping_type())
-        unindex_item_task(cls_path, instance.id)
+        unindex_item_task.delay(cls_path, instance.id)
 
 
 def register_live_index(model_cls):
