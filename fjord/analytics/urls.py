@@ -9,7 +9,7 @@ urlpatterns = patterns(
     # This covers / and /dashboard
     url(r'^(?:dashboard/?)?$', 'dashboard', name='dashboard'),
 
-    # This covers / and /dashboard
+    # This covers product dashboards
     url(r'^dashboard/(?P<productslug>[^/]+)/?$',
         'product_dashboard_router', name='product_dashboard'),
 
@@ -17,7 +17,7 @@ urlpatterns = patterns(
     url(r'^dashboard/response/(?P<responseid>\d+)/?$',
         'response_view', name='response_view'),
 
-    # Show a specific response
+    # Translate a specific response
     url(r'^dashboard/translate/(?P<responseid>\d+)/?$',
         'spot_translate', name='spot_translate'),
 
@@ -44,4 +44,6 @@ urlpatterns += patterns(
         name='analytics_duplicates'),
     url(r'^analytics/hb/?$', 'analytics_hb',
         name='analytics_hb'),
+    url(r'^analytics/flagged/?$', 'analytics_flagged',
+        name='analytics_flagged'),
 )
