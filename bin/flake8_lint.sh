@@ -22,6 +22,7 @@ FLAKE8_SETTINGS="--max-line-length=79"
 FLAKE8_IGNORE=(
     '*migrations*'
     'fjord/settings*'
+    'vendor/*'
 )
 
 # Files to lint is either the list of arguments to this script, or the
@@ -39,7 +40,6 @@ FLAKE8_IGNORE=$(IFS=,; echo "${FLAKE8_IGNORE[*]}")
 
 # If there are files to run through flake8, do it.
 if [[ -n ${FLAKE8_FILES[*]} ]]; then
-  echo $FLAKE8_IGNORE
   flake8 $FLAKE8_SETTINGS --exclude="$FLAKE8_IGNORE" ${FLAKE8_FILES[*]}
   FLAKE_RETURN=$?
 else
