@@ -57,7 +57,7 @@ submodule is as easy as::
     $ git checkout <REFSPEC>
     $ cd ../..
     $ git add vendor/src/<LIBRARY-DIR>
-    $ git ci -m "[bug xyz] Update <LIBRARY>"
+    $ git commit -m "[bug xyz] Update <LIBRARY>"
 
 Easy peasy!
 
@@ -78,7 +78,7 @@ Run::
     <Add the new library's dir to vendor.pth>
 
     $ git add vendor/vendor.pth
-    $ git ci -m "[bug xyz] Add <LIBRARY>"
+    $ git commit -m "[bug xyz] Add <LIBRARY>"
 
 
 Updating a library with pip
@@ -104,7 +104,7 @@ Finally, add the new library to git::
 
     $ cd vendor
     $ git add packages
-    $ git ci -m "Adding version <VERSION> of <LIBRARY>"
+    $ git commit -m "Adding version <VERSION> of <LIBRARY>"
 
 
 .. Warning::
@@ -127,7 +127,7 @@ Adding a new library with pip is easy using pip::
 
     <Add the new library's path>
 
-    $ git ci -m "Adding <LIBRARY>"
+    $ git commit -m "Adding <LIBRARY>"
 
 Make sure you add any dependencies from the new library, as well.
 
