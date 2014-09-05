@@ -26,6 +26,7 @@ packages/six
 packages/tldextract
 packages/translate-toolkit
 packages/urllib3
+packages/spicedham
 src/billiard
 src/bleach
 src/celery
@@ -63,3 +64,4 @@ src/nuggets
 src/pystatsd
 src/tower
 src/django-waffle
+src/spicedham
