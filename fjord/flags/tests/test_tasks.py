@@ -16,24 +16,25 @@ class TestClassifyTask(TestCase):
         with patch('fjord.flags.tasks.classify') as classify_mock:
             classify_mock.return_value = True
 
-            # This creates the response and saves it which should kick off
-            # the classifier and classify it as spam and abuse.
+            # This creates the response and saves it which kicks off
+            # the classifier task. It should be classified as abuse.
             resp1 = ResponseFactory(locale=u'en-US', description=u'ou812')
 
-            eq_(classify_mock.call_count, 2)
+            eq_(classify_mock.call_count, 1)
             eq_(sorted([f.name for f in resp1.flag_set.all()]),
-                ['abuse', 'spam'])
+                ['abuse'])
 
     def test_classify_false_task(self):
         """flags shouldn't be created if classifier returns False"""
         with patch('fjord.flags.tasks.classify') as classify_mock:
             classify_mock.return_value = False
 
-            # This creates the response and saves it which should kick off
-            # the classifier and classify it as spam and abuse.
+            # This creates the response and saves it which kicks off
+            # the classifier task. It should not be classified as
+            # abuse.
             resp1 = ResponseFactory(locale=u'en-US', description=u'ou812')
 
-            eq_(classify_mock.call_count, 2)
+            eq_(classify_mock.call_count, 1)
             eq_([f.name for f in resp1.flag_set.all()], [])
 
     def test_ignore_non_english(self):

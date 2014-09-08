@@ -11,10 +11,10 @@ class TestFlagModel(TestCase):
     def test_flag(self):
         # Create a flag and a response, add the flag to the response
         # in a way we're probably going to use these things.
-        FlagFactory(name='test-spam')
+        FlagFactory(name='test-abuse')
         resp = ResponseFactory()
 
-        resp.flag_set.add(Flag.objects.get(name='test-spam'))
+        resp.flag_set.add(Flag.objects.get(name='test-abuse'))
 
         eq_(resp.flag_set.count(), 1)
-        eq_(Flag.objects.get(name='test-spam').responses.count(), 1)
+        eq_(Flag.objects.get(name='test-abuse').responses.count(), 1)

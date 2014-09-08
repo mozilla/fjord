@@ -7,15 +7,12 @@ from django.db import models
 class Migration(DataMigration):
 
     def forwards(self, orm):
-        "Write your forwards methods here."
-        # Note: Remember to use orm['appname.ModelName'] rather than "from appname.models..."
-        for name in ['spam', 'abuse', 'spam-wrong', 'abuse-wrong']:
+        for name in ['abuse', 'abuse-wrong']:
             flag = orm.Flag.objects.create(name=name)
             flag.save()
 
     def backwards(self, orm):
-        "Write your backwards methods here."
-        for name in ['spam', 'abuse', 'spam-wrong', 'abuse-wrong']:
+        for name in ['abuse', 'abuse-wrong']:
             flag = orm.Flag.objects.get(name=name)
             flag.delete()
 

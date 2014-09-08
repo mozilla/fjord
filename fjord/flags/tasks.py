@@ -31,7 +31,7 @@ def classify(response, flag):
 
 @task()
 def classify_task(response_id):
-    """Classifies a response as spam or abuse
+    """Classifies a response as abuse
 
     Note: We only classify en-US responses. Do not use this with
     non-en-US responses!
@@ -41,12 +41,6 @@ def classify_task(response_id):
         resp = Response.objects.get(pk=response_id)
     except Response.DoesNotExist:
         return
-
-    # Run the response through the classifier for "spam" and add flag
-    # if necessary.
-    if classify(resp, 'spam'):
-        flagob = Flag.objects.get(name='spam')
-        resp.flag_set.add(flagob)
 
     # Run the response through the classifier for "abuse" and add flag
     # if necessary.
