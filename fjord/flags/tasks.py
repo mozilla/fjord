@@ -4,10 +4,28 @@ from celery import task
 
 from fjord.feedback.models import Response
 from fjord.flags.models import Flag
+from fjord.flags.spicedham_utils import get_spicedham, tokenize
+
+
+ABUSE_CUTOFF = 0.7
 
 
 def classify(response, flag):
-    # FIXME: Do the spicedham thing here.
+    """Run response.description through classifier"""
+    try:
+        score = get_spicedham().classify(tokenize(response.description))
+        if score > ABUSE_CUTOFF:
+            return True
+    except (ZeroDivisionError, TypeError):
+        # If there isn't any training data (and possibly some other
+        # situations), classify can raise a TypeError or
+        # ZeroDivisionError.
+        #
+        # https://github.com/mozilla/spicedham/issues/21
+        #
+        # For now, we'll assume that means it's not abuse.
+        pass
+
     return False
 
 

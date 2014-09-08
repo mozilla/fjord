@@ -1,8 +1,13 @@
 from mock import patch
 from nose.tools import eq_
 
+# These tests require that tasks be imported so that the post_save
+# signal is connected. Don't remove this.
+import fjord.flags.tasks  # noqa
+
 from fjord.base.tests import TestCase
 from fjord.feedback.tests import ResponseFactory
+from fjord.flags.spicedham_utils import get_spicedham, tokenize
 
 
 class TestClassifyTask(TestCase):
@@ -40,3 +45,36 @@ class TestClassifyTask(TestCase):
 
             eq_(classify_mock.called, False)
             eq_([f.name for f in resp1.flag_set.all()], [])
+
+
+class TestClassification(TestCase):
+    def train(self, descriptions, is_abuse=True):
+        # Note: This is probably a cached Spicedham object.
+        sham = get_spicedham()
+        for desc in descriptions:
+            sham.train(tokenize(desc), match=is_abuse)
+
+    def test_abuse(self):
+        self.train([
+            'gross gross is gross gross gross browser',
+            'gross icky gross gross browser',
+            'gross is mcgrossy gross',
+            'omg worst gross',
+            'browser worst'
+        ], is_abuse=True)
+
+        self.train([
+            'Firefox is super!',
+            'Great browser!',
+            'Super fast!',
+            'Not gross!',
+            'super not gross!'
+        ], is_abuse=False)
+
+        # This creates the response and saves it which kicks off
+        # the classifier task. It should be classified as abuse.
+        resp = ResponseFactory(
+            locale=u'en-US', description=u'browser is gross!')
+
+        eq_(sorted([f.name for f in resp.flag_set.all()]),
+            ['abuse'])

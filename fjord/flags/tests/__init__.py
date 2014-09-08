@@ -7,4 +7,4 @@ class FlagFactory(factory.DjangoModelFactory):
     class Meta:
         model = Flag
 
-    name = 'spam'
+    name = 'test-abuse'
