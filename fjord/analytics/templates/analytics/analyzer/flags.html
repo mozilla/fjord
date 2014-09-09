@@ -18,9 +18,9 @@
 
       <div>
         Filter by tag:
-        <a href="?">ALL</a> |
-        <a href="?filter=abuse">abuse</a> |
-        <a href="?filter=abuse-wrong">abuse-wrong (false positive/negative)</a>
+        <a href="?">ALL ({{ counts.total }})</a> |
+        <a href="?filter=abuse">abuse ({{ counts.abuse }})</a> |
+        <a href="?filter=abuse-wrong">abuse-wrong (false positive ({{ counts['false-positive'] }})/negative ({{ counts['false-negative'] }}))</a>
       </div>
 
       <div class="pager">

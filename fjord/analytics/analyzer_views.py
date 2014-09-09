@@ -755,7 +755,25 @@ def analytics_flagged(request):
             return HttpResponseRedirect(request.get_full_path())
 
     resp_filter = smart_str(request.GET.get('filter'))
-    response_list = Response.uncached.filter(locale=u'en-US')
+
+    # Only look at en-US locale responses since Monday September 8th,
+    # 2014 we pushed the integration code out.
+    response_list = (Response.uncached
+                     .filter(locale=u'en-US')
+                     .filter(created__gte='2014-09-08'))
+
+    counts = {
+        'total': response_list.count(),
+        'abuse': response_list.filter(flag__name='abuse').count(),
+        'abuse-wrong': response_list.filter(flag__name='abuse-wrong').count(),
+        'false-positive': (response_list
+                           .filter(flag__name='abuse')
+                           .filter(flag__name='abuse-wrong').count()),
+    }
+    counts['false-negative'] = (
+        counts['abuse-wrong'] - counts['false-positive']
+    )
+
     if resp_filter:
         response_list = response_list.filter(flag__name=resp_filter)
 
@@ -770,5 +788,6 @@ def analytics_flagged(request):
         responses = paginator.page(paginator.num_pages)
 
     return render(request, template, {
+        'counts': counts,
         'responses': responses
     })
