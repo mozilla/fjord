@@ -1,20 +1,27 @@
 # -*- coding: utf-8 -*-
 import datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
 
-class Migration(DataMigration):
+
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        for name in ['abuse', 'abuse-wrong']:
-            flag = orm.Flag.objects.create(name=name)
-            flag.save()
+        # Adding model 'Store'
+        db.create_table(u'flags_store', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('classifier', self.gf('django.db.models.fields.CharField')(max_length=50)),
+            ('key', self.gf('django.db.models.fields.TextField')()),
+            ('value', self.gf('django.db.models.fields.TextField')()),
+        ))
+        db.send_create_signal(u'flags', ['Store'])
+
 
     def backwards(self, orm):
-        for name in ['abuse', 'abuse-wrong']:
-            flag = orm.Flag.objects.get(name=name)
-            flag.delete()
+        # Deleting model 'Store'
+        db.delete_table(u'flags_store')
+
 
     models = {
         u'feedback.response': {
@@ -47,8 +54,14 @@ class Migration(DataMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
             'responses': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['feedback.Response']", 'symmetrical': 'False'})
+        },
+        u'flags.store': {
+            'Meta': {'object_name': 'Store'},
+            'classifier': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'key': ('django.db.models.fields.TextField', [], {}),
+            'value': ('django.db.models.fields.TextField', [], {})
         }
     }
 
     complete_apps = ['flags']
-    symmetrical = True

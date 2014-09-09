@@ -19,9 +19,7 @@
       <div>
         Filter by tag:
         <a href="?">ALL</a> |
-        <a href="?filter=spam">spam</a> |
         <a href="?filter=abuse">abuse</a> |
-        <a href="?filter=spam-wrong">spam-wrong (false positive/negative)</a> |
         <a href="?filter=abuse-wrong">abuse-wrong (false positive/negative)</a>
       </div>
 
@@ -58,13 +56,6 @@
               {% endfor %}
             </td>
             <td>
-              <form method="POST">
-                {{ csrf() }}
-                <input type="hidden" name="id" value="{{ resp.id }}">
-                <input type="hidden" name="flag" value="spam-wrong">
-                <input type="submit" value="Spam flag is wrong">
-              </form>
-
               <form method="POST">
                 {{ csrf() }}
                 <input type="hidden" name="id" value="{{ resp.id }}">

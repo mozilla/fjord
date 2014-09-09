@@ -185,3 +185,40 @@ Bug description template::
     Until these errors are fixed, we can't deploy updates to the strings for this locale.
 
     If you have any questions, let me know.
+
+
+EXPERIMENTAL: Update training data
+==================================
+
+.. Note::
+
+   This is here solely to support the spicedham prototype integration. It's
+   liable to change.
+
+
+Create a directory structure::
+
+    - corpus
+      \
+       |- abuse
+       |  \- bunch of [respid].json files
+       |
+       \- not_abuse
+          \- bunch of [respid].json files
+
+
+Each file is the JSON for a single response. The files are titled
+``<response-id>.json``. For example, ``4011021.json``.
+
+To generate training data::
+
+    $ python manage.py trainabuse corpus/
+
+To generate new fixture::
+
+    $ python manage.py dumpdata --indent=2 --format=json \
+        flags flags.Store > fjord/flags/fixtures/abuse_training.json
+
+To load the fixture::
+
+    $ python manage.py loaddata flags abuse_training.json

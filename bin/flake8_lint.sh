@@ -22,6 +22,7 @@ FLAKE8_SETTINGS="--max-line-length=79"
 FLAKE8_IGNORE=(
     '*migrations*'
     'fjord/settings*'
+    'bin/update/update.py'
     'vendor/*'
 )
 
