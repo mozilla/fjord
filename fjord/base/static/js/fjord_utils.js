@@ -77,4 +77,17 @@ window.fjord = window.fjord || {};
         }
         window.location.search = '?' + parts.join('&');
     };
+
+    /**
+     * Detect browser <input type="date" ...> support
+     * @returns {boolean}
+     */
+    fjord.isDateInputSupported = function() {
+        var input = document.createElement('input');
+        input.setAttribute('type','date');
+        var notADateValue = 'not-a-date';
+        input.setAttribute('value', notADateValue);
+
+        return input.value !== notADateValue;
+    };
 }());

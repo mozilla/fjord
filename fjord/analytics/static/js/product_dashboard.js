@@ -1,8 +1,10 @@
 $(function() {
     // Datepickers.
-    $('input[type=date]').datepicker({
-        dateFormat: 'yy-mm-dd'
-    });
+    if (!fjord.isDateInputSupported()) {
+        $('input[type=date]').datepicker({
+            dateFormat: 'yy-mm-dd'
+        });
+    }
 
     // Set up the when selector.
     var $date_start = $('#whensubmit').siblings('input[name=date_start]');

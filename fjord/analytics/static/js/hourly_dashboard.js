@@ -2,9 +2,11 @@ $(function() {
     var $histogram = $('.graph .hourly-histogram');
 
     // Datepickers.
-    $('input[type=date]').datepicker({
-        dateFormat: 'yy-mm-dd',
-    });
+    if (!fjord.isDateInputSupported()) {
+        $('input[type=date]').datepicker({
+            dateFormat: 'yy-mm-dd',
+        });
+    }
 
     // Set up the when selector.
     var $date_end = $('#whensubmit').siblings('input[name=date_end]');
