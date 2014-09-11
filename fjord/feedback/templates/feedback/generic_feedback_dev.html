@@ -1,5 +1,14 @@
 {% extends "feedback/base.html" %}
 
+{% block site_css %}
+  {{ css('generic_feedback_dev') }}
+{% endblock %}
+
+{% block site_js %}
+  <script src="{{ settings.STATIC_URL }}js/lib/brick-1.0.0.byob.min.js"></script>
+  {{ js('generic_feedback_dev') }}
+{% endblock %}
+
 {% block page_title %}[DEV] {{ _('Submit Your Feedback') }}{% endblock %}
 
 {% set extra_body_attrs = {'data-form-name': 'generic'} %}
