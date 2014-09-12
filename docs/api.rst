@@ -320,6 +320,12 @@ Optional fields
 
     Example: ``'Hacks blog'``
 
+    .. Note::
+
+       Don't set the source if the user is leaving feedback of their
+       own accord. Only set the source if you have prompted or asked
+       the user to leave feedback.
+
 **campaign**
     String. Max length: 100. If this response was initiated by a
     marketing campaign, this is the name of the campaign. It has the
@@ -328,6 +334,12 @@ Optional fields
     https://support.google.com/analytics/answer/1033867
 
     Example: ``'show the firefox love post'``
+
+    .. Note::
+
+       Don't set the campaign if the user is leaving feedback of their
+       own accord. Only set the campaign if you have prompted or asked
+       the user to leave feedback.
 
 
 Extra context
