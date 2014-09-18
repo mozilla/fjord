@@ -274,6 +274,7 @@ INSTALLED_APPS = (
 
     'fjord.analytics',
     'fjord.base',
+    'fjord.events',
     'fjord.feedback',
     'fjord.flags',
     'fjord.heartbeat',
