@@ -34,9 +34,9 @@ https://github.com/jsocol/django-adminplus/archive/09fa38724e8e05afc78f912da0ed7
 # sha256: LTn7BrZL1DKwIiETzYeOHlosfAnsk7K7V3zw4Kq_GNk
 https://github.com/andymckay/django-statsd/archive/bb601976056d0f922c5a613d2a9786b81d179b06.tar.gz#egg=django-statsd
 
-# django-mozilla-product-details: master
-# sha256: LXr-aGWpW7mD4dM2MNJrcqfhBmi5zJM97KBPPorG2ko
-https://github.com/fwenzel/django-mozilla-product-details/archive/515d55ddf20688c71b54d77eb157eaee21214859.tar.gz#egg=django-mozilla-product-details
+# django-product-details: master
+# sha256: tLy18AIevr3_Rd7saf4cKuq_W1M3zpKFVOLBmggiCck
+https://github.com/mozilla/django-product-details/archive/d168ab2e689a1b54a30a923386fe7948a74ff334.tar.gz#egg=django-product-details
 
 # celery: tags/v3.0.24
 # sha256: _ac6RdnCKQYtOWzlu9JE-TNp1GBNPe_6gO2wft0dTAQ

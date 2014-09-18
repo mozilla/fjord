@@ -63,6 +63,9 @@ SETTINGS
 echo "Creating database if we need it..."
 echo "CREATE DATABASE IF NOT EXISTS ${JOB_NAME}"|mysql -u $DB_USER -h $DB_HOST
 
+echo "Fetch product details..."
+python manage.py update_product_details -f
+
 echo "Generating all the static assets..."
 python manage.py collectstatic --noinput
 python manage.py compress_assets

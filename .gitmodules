@@ -106,3 +106,6 @@
 [submodule "vendor/src/spicedham"]
 	path = vendor/src/spicedham
 	url = http://github.com/mozilla/spicedham
+[submodule "vendor/src/django-product-details"]
+	path = vendor/src/django-product-details
+	url = https://github.com/mozilla/django-product-details.git
