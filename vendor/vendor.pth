@@ -44,7 +44,7 @@ src/django-eadred
 src/django-extensions
 src/django-grappelli
 src/django-mobility
-src/django-mozilla-product-details
+src/django-product-details
 src/django-multidb-router
 src/django-nose
 src/django-ratelimit

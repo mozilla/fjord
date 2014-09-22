@@ -79,10 +79,10 @@ After that, the versions of the two things should be the same and you
 should be good to go to the next step.
 
 
-Building a VM and booting it
+Building a vm and booting it
 ============================
 
-This will build a VirtualBox VM using Vagrant. The VM will have Ubuntu
+This will build a VirtualBox vm using Vagrant. The vm will have Ubuntu
 Linux 14.04 installed in it. Fjord works in this environment.
 
 Run this commands in the Fjord repository top-level directory::
@@ -98,7 +98,11 @@ runs in this VM using the files on your machine. This allows you to
 use whatever editor you like on your machine to edit code that runs in
 the VM without having to copy files around.
 
-After that, we have some minor setup to do::
+
+Setting up Fjord
+================
+
+After you've created a vm, we have some minor setup to do::
 
     # Create a shell on the guest virtual machine
     vagrant ssh
@@ -106,8 +110,21 @@ After that, we have some minor setup to do::
     # Change into the fjord/ directory
     cd ~/fjord
 
+
+First we download all the product detail data::
+
+
+    # Update product details
+    ./manage.py update_product_details -f
+
+
+Then we set up the database::
+
     # Create the database and a superuser
     ./manage.py syncdb
+
+    # Run the db migrations
+    ./manage.py migrate
 
 
 It will ask if you want to create a superuser. You totally do! Create
@@ -125,10 +142,11 @@ identity. If you don't have a Persona identity, you can create one at
        ./manage.py createsuperuser
 
 
-After you do that, you need to run migrations::
+After that, let's generate some data in the database so that we have
+something to look at. We'll then need to index that data so it shows
+up in searches.
 
-    # Run the db migrations
-    ./manage.py migrate --all
+::
 
     # Generate sample data
     ./manage.py generatedata
@@ -177,7 +195,7 @@ the generatedata command every time you need fresh data.
 
 The generatedata command only generates data and saves it to the
 db. After running generatedata, you'll need to add that data to the
-Elasticsearch index.
+Elasticsearch index::
 
     ./manage.py generatedata
     ./manage.py esreindex
@@ -220,17 +238,18 @@ For each command, you can get help by typing::
 
 We use the following ones pretty often:
 
-============  ====================================================================
-Command       Explanation
-============  ====================================================================
-generatedata  Generates fake data so Fjord works
-runserver     Runs the Django server
-test          Runs the unit tests
-migrate       Migrates the db with all the migrations specified in the repository
-shell         Opens a Python REPL in the Django context for debugging
-esreindex     Reindexes all the db data into Elasticsearch
-esstatus      Shows the status of things in Elasticsearch
-============  ====================================================================
+======================  ====================================================================
+Command                 Explanation
+======================  ====================================================================
+generatedata            Generates fake data so Fjord works
+runserver               Runs the Django server
+test                    Runs the unit tests
+migrate                 Migrates the db with all the migrations specified in the repository
+shell                   Opens a Python REPL in the Django context for debugging
+esreindex               Reindexes all the db data into Elasticsearch
+esstatus                Shows the status of things in Elasticsearch
+update_product_details  Updates the product details with the latest information
+======================  ====================================================================
 
 
 generatedata
@@ -324,6 +343,19 @@ If you want to see the status of Elasticsearch configuration, indexes,
 doctypes, etc, do::
 
     ./manage.py esstatus
+
+
+update_product_details
+----------------------
+
+Event data like Firefox releases and locale data are all located on a
+server far far away. Fjord keeps a copy of the product details local
+because it requires this to run.
+
+Periodically you want to update your local copy of the data. You can do that by
+running::
+
+    ./manage.py update_product_details
 
 
 Helpful tips

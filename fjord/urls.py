@@ -17,6 +17,7 @@ urlpatterns = patterns(
 
     (r'', include('fjord.analytics.urls')),
     (r'', include('fjord.base.urls')),
+    (r'', include('fjord.events.urls')),
     (r'', include('fjord.feedback.urls')),
     (r'', include('fjord.heartbeat.urls')),
 
