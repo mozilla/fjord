@@ -111,7 +111,8 @@ class TestFeedback(object):
 
     def test_submitting_same_feedback_twice(self, mozwebqa):
         """Submitting the same feedback twice ignores the second"""
-        desc = 'input-tests testing repeat feedback'
+        timestamp = str(time.time())
+        desc = 'input-tests testing repeat feedback ' + timestamp
 
         # Submit the feedback the first time
         feedback_pg = GenericFeedbackFormPage(mozwebqa)
@@ -156,7 +157,8 @@ class TestFeedback(object):
     def test_submit_happy_feedback_with_unicode(self, mozwebqa):
         """Fill out happy feedback with unicode description"""
         timestamp = str(time.time())
-        desc = u'input-tests testing happy feedback with unicode \u2603 ' + timestamp
+        desc = (u'input-tests testing happy feedback with '
+                'unicode \u2603 ' + timestamp)
 
         # 1. go to the feedback form
         feedback_pg = GenericFeedbackFormPage(mozwebqa)
