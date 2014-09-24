@@ -113,8 +113,8 @@ Filters
         ?date_end=2014-08-12
 
 **date_delta**
-    ``1d``, ``7d``, ``14d``. The number of days from ``date_start`` or
-    ``date_end``.
+    String. ``1d``, ``7d``, ``14d``, etc. The number of days from
+    ``date_start`` or ``date_end``.
 
     Example::
 
@@ -124,8 +124,8 @@ Filters
         # Shows 14 days ending 2014-08-12
         ?date_end=2014-08-12&date_delta=14d
 
-        # Shows 14 days starting 2014-08-12
-        ?date_start=2014-08-12&date_delta=14d
+        # Shows 22 days starting 2014-08-12
+        ?date_start=2014-08-12&date_delta=22d
 
 **max**
 

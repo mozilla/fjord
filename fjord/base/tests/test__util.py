@@ -14,6 +14,7 @@ from fjord.base.util import (
     smart_date,
     smart_int,
     smart_str,
+    smart_timedelta,
     smart_truncate
 )
 
@@ -105,6 +106,16 @@ class SmartBoolTest(TestCase):
             b = smart_bool(x, 'fallback')
             assert b == 'fallback', self.msg_template % (x, 'fallback', b)
 
+
+class SmartTimeDeltaTest(TestCase):
+    def test_valid(self):
+        eq_(smart_timedelta('1d'), datetime.timedelta(days=1))
+        eq_(smart_timedelta('14d'), datetime.timedelta(days=14))
+
+    def test_invalid(self):
+        eq_(smart_timedelta('0d', 'fallback'), 'fallback')
+        eq_(smart_timedelta('foo', 'fallback'), 'fallback')
+        eq_(smart_timedelta('d', 'fallback'), 'fallback')
 
 _foo_cache = {}
 
