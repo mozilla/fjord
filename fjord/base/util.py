@@ -162,14 +162,14 @@ def smart_timedelta(s, fallback=None):
     if isinstance(s, datetime.timedelta):
         return s
 
-    # FIXME: Doing this manually for now for specific deltas. We can
-    # figure out how we want this to operate in the future.
-    if s == '1d':
-        return datetime.timedelta(days=1)
-    if s == '7d':
-        return datetime.timedelta(days=7)
-    if s == '14d':
-        return datetime.timedelta(days=14)
+    if s and s.endswith('d'):
+        try:
+            days = int(s[:-1])
+            if days > 0:
+                return datetime.timedelta(days=days)
+        except ValueError:
+            pass
+
     return fallback
 
 
