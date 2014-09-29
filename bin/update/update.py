@@ -60,14 +60,6 @@ def update_locales(ctx):
 
 
 @task
-def update_abuse_training_data(ctx):
-    # NOTE: This is experimental training data loading for the
-    # spicedham prototype!
-    with ctx.lcd(settings.SRC_DIR):
-        ctx.local("python2.6 manage.py loaddata fjord/flags/fixtures/abuse_training.json")
-
-
-@task
 def update_assets(ctx):
     with ctx.lcd(settings.SRC_DIR):
         ctx.local("python2.6 manage.py collectstatic --noinput")
@@ -142,7 +134,6 @@ def update(ctx):
     update_product_details()
     update_locales()
     update_db()
-    update_abuse_training_data()
 
 
 @task
