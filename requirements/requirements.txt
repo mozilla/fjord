@@ -122,10 +122,6 @@ https://github.com/celery/django-celery/archive/b11b358cbc0d7b3ca15575d27332d4ae
 # sha256: qm0q7z3NpXlebil6MCUbfIAahKy4h2MwiBjXscUjCdA
 https://github.com/clouserw/tower/archive/ade9804345eb49dd1b626fd276cd9572fd15d1b3.tar.gz#egg=tower
 
-# spicedham master
-# sha256: i8VyZL619kFOQ2EdFYyh_EwfiQzFeBZs5bBD0ylCKek
-https://github.com/mozilla/spicedham/archive/5be9b4afb136ce052ffefef8540e62d93abc317c.tar.gz#egg=spicedham
-
 # sha256: R85QXFBGw4gXgovuJTtyVocvhsQ0DbGvaYy4VI26oNI
 Django==1.5.9
 
