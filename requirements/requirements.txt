@@ -58,10 +58,6 @@ https://github.com/jsocol/jingo-minify/archive/d2ffefbd31e5035873083107e86893be3
 # sha256: VuDVB_ltoRQj0ejxvwdU05H7OKlyU56Yon2zTmUr_nA
 https://github.com/jezdez/django_compressor/archive/90966edf9777a1c0b5f6389b15f5559a89081d39.tar.gz#egg=django_compressor
 
-# django-nose: tags/1.0~11
-# sha256: 1Ku0Ss6s0sBUpuPm5goJZVSbcQrATj8sGMAE8vAD7yc
-https://github.com/jbalogh/django-nose/archive/83c7867c3f90ff3c7c7471716da91b643e8b2c01.tar.gz#egg=django-nose
-
 # django-multidb-router: tags/v0.5.1~4
 # sha256: I0E4DVGgHJ6DNZiKaPGiZ1s59QAG7iRC9GP_sTDG_Vg
 https://github.com/jbalogh/django-multidb-router/archive/4f78662026b21cfff1ecfddc487fa0f0c31a0215.tar.gz#egg=django-multidb-router
@@ -124,6 +120,9 @@ https://github.com/clouserw/tower/archive/ade9804345eb49dd1b626fd276cd9572fd15d1
 
 # sha256: R85QXFBGw4gXgovuJTtyVocvhsQ0DbGvaYy4VI26oNI
 Django==1.5.9
+
+# sha256: mq4WtWKGak3apeiXhymrrbvtVEco2I4LnJr3sx3Qcu0
+django-nose==1.2
 
 # sha256: 9hjzf43QSX_1qFP77j5HH34aQXmghyoWGTNdKZXztBI
 dennis==0.4.3
