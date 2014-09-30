@@ -52,11 +52,11 @@ The test suite will create a new database named ``test_%s`` where
 ``%s`` is whatever value you have for
 ``settings.DATABASES['default']['NAME']``.
 
-When the schema changes, you may need to drop the test database. You
-can also run the test suite with ``FORCE_DB`` once to cause Django to
-drop and recreate it::
+If you know there haven't been any schema changes, you can run the
+tests with ``REUSE_DB=1`` in the environment. This will reuse the existing
+database::
 
-    FORCE_DB=1 ./manage.py test -s --noinput --logging-clear-handlers
+    REUSE_DB=1 ./manage.py test -s --noinput --logging-clear-handlers
 
 
 Running specific tests
