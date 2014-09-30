@@ -20,7 +20,6 @@ packages/python-dateutil
 packages/python-memcached
 packages/pytz
 packages/requests
-packages/selenium/py
 packages/simplejson
 packages/six
 packages/tldextract

@@ -160,9 +160,6 @@ polib==1.0.3
 # sha256: 1ZeT-bJVvQDegAuX-aUMzk_IpEwgX33vpbt9aR0TuFI
 six==1.3.0
 
-# sha256: YFrOXHP1zvrRTPd-jpytY7hmG_ixse1znShKNEq7CjE
-selenium==2.35.0
-
 # sha256: 2ZQmvkb9kv5rZLn1xZJuqYWTlOROw--eH3xkfTomZX8
 django-picklefield==0.3.1
 
