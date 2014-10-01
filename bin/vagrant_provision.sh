@@ -52,16 +52,16 @@ mysql -uroot -ppassword -hlocalhost \
 VENV=/home/vagrant/.virtualenvs/fjordvagrant
 
 # Build virtual environment and activate it
-sudo -u vagrant virtualenv $VENV
+sudo -H -u vagrant virtualenv $VENV
 
 # Install Fjord requirements
-sudo -u vagrant $VENV/bin/python ./peep install -r requirements/requirements.txt
+sudo -H -u vagrant $VENV/bin/python ./peep install -r requirements/requirements.txt
 
 # Install compiled requirements
 # Note: Need to do this before launching Elasticsearch because of
 # memory issues
 apt-get install -y -q libxml2 libxml2-dev libxslt1.1 libxslt1-dev
-sudo -u vagrant $VENV/bin/python ./peep install -r requirements/compiled.txt
+sudo -H -u vagrant $VENV/bin/python ./peep install -r requirements/compiled.txt
 
 # Install Elasticsearch 0.90.10
 curl http://packages.elasticsearch.org/GPG-KEY-elasticsearch | apt-key add -

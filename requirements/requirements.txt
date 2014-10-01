@@ -124,7 +124,7 @@ Django==1.5.9
 # sha256: mq4WtWKGak3apeiXhymrrbvtVEco2I4LnJr3sx3Qcu0
 django-nose==1.2
 
-# sha256: 9hjzf43QSX_1qFP77j5HH34aQXmghyoWGTNdKZXztBI
+# sha256: Sje0ncwClfVGz2spT9gNcc_ttQT-YhDNq3n5xx5Ocn8
 dennis==0.4.3
 
 # sha256: HDW0rCBs7y0kgWyJ-Jzyid09OM98RJuz-re_bUPwGx8
@@ -205,14 +205,14 @@ requests==1.1.0
 # sha256: N4Ethjya0-NcBzTELgvwMgzow77YLNIK1UyzTRWBV7o
 anyjson==0.3.3
 
-# sha256: xyzOcAUT2_Imn5aV-nlALvSwhg0pJaXMRmayFkfeu2o
+# sha256: 8ZZPc_Xum34DCQmLlRLVh_u6bdXR83l7HJVSnlJBvwk
 chardet==2.2.1
 
 # sha256: 10erSV9JDXxVts9yHGpBn-OoNK2uOfyLelW8rf6v8mk
 django-waffle==0.10
 
-# sha256: CnOPMnGcdnU38yYRjBBcIZ5nfna3hUfthHxqqvvKDGU
+# sha256: fADkAZ7n55EIe3ahrkBnNW642cQlHyk3zHcOkQrvMko
 elasticutils==0.10.1
 
-# sha256: U6gisBsElN-WWMBOhyFhgOXsvoWxeGc92Eix-AnVwQA
+# sha256: u5PYXKflDWjkGXhSu226YJi7dyUA-C9dsv9KgHEVBck
 elasticsearch==1.2.0
