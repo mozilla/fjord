@@ -18,7 +18,11 @@ Git pre-commit hook
 -------------------
 
 We have a Git pre-commit hook that makes it easier to make sure you're
-checking in linted code. To set it up, run::
+checking in linted code. To set it up, first install flake8::
+
+    $ pip install flake8
+
+then run::
 
     $ ./bin/hooks/flake8_lint.pre-commit
 
@@ -37,7 +41,10 @@ Follow `PEP-8 <http://python.org/dev/peps/pep-0008/>`_ for code and
 If you don't have an editor that checks PEP-8 issues and runs pyflakes
 for you, it's worth setting it up.
 
-Use the linting script in ``bin/flake8_lint.sh``.
+If you have flake8 installed, you can use the linting script at
+``bin/flake8_lint.sh``::
+
+    $ ./bin/flake8_lint.sh <files-to-lint>
 
 
 JavaScript
