@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 
-from fjord.base.util import is_url
+from fjord.base.utils import is_url
 
 
 class EnhancedURLValidator(URLValidator):

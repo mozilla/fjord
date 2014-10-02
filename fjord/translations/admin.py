@@ -10,7 +10,7 @@ from .gengo_utils import FjordGengo, GENGO_MACHINE_UNSUPPORTED
 from .models import GengoJob, GengoOrder
 from .tasks import create_translation_tasks
 from .utils import locale_equals_language
-from fjord.base.util import smart_date, smart_str
+from fjord.base.utils import smart_date, smart_str
 from fjord.feedback.models import Product
 from fjord.journal.models import Record
 

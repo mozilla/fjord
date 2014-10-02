@@ -2,7 +2,7 @@ from math import floor
 
 from django.template.defaultfilters import slugify
 
-from fjord.base.util import epoch_milliseconds
+from fjord.base.utils import epoch_milliseconds
 
 
 def counts_to_options(counts, name, display=None, display_map=None,

@@ -2,7 +2,7 @@ import rest_framework.views
 import rest_framework.response
 
 from .models import get_product_details_history
-from fjord.base.util import smart_str
+from fjord.base.utils import smart_str
 
 
 class EventAPI(rest_framework.views.APIView):

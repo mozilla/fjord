@@ -1,7 +1,7 @@
 import rest_framework.views
 import rest_framework.response
 
-from fjord.base.util import RatelimitThrottle, smart_str
+from fjord.base.utils import RatelimitThrottle, smart_str
 
 from .models import Answer, Poll
 

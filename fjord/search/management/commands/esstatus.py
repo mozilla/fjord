@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from fjord.base.util import FakeLogger
+from fjord.base.utils import FakeLogger
 from fjord.search.index import es_status_cmd
 
 

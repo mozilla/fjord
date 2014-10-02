@@ -25,7 +25,7 @@ from fjord.analytics.utils import (
 )
 from fjord.base.helpers import locale_name
 from fjord.base.urlresolvers import reverse
-from fjord.base.util import (
+from fjord.base.utils import (
     analyzer_required,
     check_new_user,
     smart_int,

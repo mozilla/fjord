@@ -12,7 +12,7 @@ from statsd import statsd
 
 from fjord.base.browsers import UNKNOWN
 from fjord.base.urlresolvers import reverse
-from fjord.base.util import (
+from fjord.base.utils import (
     actual_ip_plus_context,
     ratelimit,
     smart_str,
