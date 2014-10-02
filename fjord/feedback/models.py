@@ -144,7 +144,7 @@ class Response(ModelBase):
 
     # If using the api, this is the version of the api used. Otherwise
     # null.
-    api = models.IntegerField(null=True)
+    api = models.IntegerField(null=True, blank=True)
 
     # User agent and inferred data from the user agent
     user_agent = models.CharField(max_length=255, blank=True)
