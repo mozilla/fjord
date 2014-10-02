@@ -2,7 +2,7 @@ from django.db.models.signals import post_save
 
 from celery import task
 
-from fjord.base.util import key_to_instance
+from fjord.base.utils import key_to_instance
 from .utils import translate
 
 

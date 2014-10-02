@@ -31,7 +31,7 @@ from fjord.analytics.utils import (
     counts_to_options,
     zero_fill)
 from fjord.base.helpers import locale_name
-from fjord.base.util import (
+from fjord.base.utils import (
     analyzer_required,
     check_new_user,
     smart_int,
