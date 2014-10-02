@@ -19,7 +19,7 @@ from elasticutils.contrib.django import F, es_required_or_50x
 from mobility.decorators import mobile_template
 from tower import ugettext as _
 
-from fjord.analytics.tools import (
+from fjord.analytics.utils import (
     counts_to_options,
     zero_fill
 )

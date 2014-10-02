@@ -27,7 +27,7 @@ from django.views.generic.edit import FormView
 from django.utils.decorators import method_decorator
 
 from fjord.analytics.forms import OccurrencesComparisonForm, ProductsUpdateForm
-from fjord.analytics.tools import (
+from fjord.analytics.utils import (
     counts_to_options,
     zero_fill)
 from fjord.base.helpers import locale_name
