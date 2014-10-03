@@ -15,8 +15,8 @@ Getting product feedback: GET /api/v1/feedback/
 
 :URL:            ``/api/v1/feedback/``
 :Method:         HTTP GET
-:Payload format: There is no payload--everything is done in the querystring
-:Response format: JSON
+:Payload format: No payload--everything is done in the querystring
+:Response:       JSON
 
 Doing a GET without any querystring arguments will return the most
 recent 1,000 publicly visible responses for all products.
@@ -424,8 +424,8 @@ Getting event data: /api/v1/events/
 
 :URL:             ``/api/v1/events/``
 :Method:          HTTP GET
-:Payload format:  There is no payload--everything is done in the querystring
-:Response format: JSON
+:Payload format:  No payload--everything is done in the querystring
+:Response:        JSON
 
 Doing a GET without any querystring arguments will return all the event
 data.
