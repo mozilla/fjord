@@ -3,8 +3,8 @@ from unittest import TestCase
 
 from nose.tools import eq_
 
-from fjord.analytics.tools import counts_to_options, zero_fill
-from fjord.base.util import epoch_milliseconds
+from fjord.analytics.utils import counts_to_options, zero_fill
+from fjord.base.utils import epoch_milliseconds
 
 
 class TestCountsHelper(TestCase):

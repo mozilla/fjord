@@ -8,7 +8,7 @@ import rest_framework.response
 
 from elasticutils.contrib.django import F
 
-from fjord.base.util import (
+from fjord.base.utils import (
     actual_ip_plus_context,
     cors_enabled,
     RatelimitThrottle,

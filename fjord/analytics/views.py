@@ -19,13 +19,13 @@ from elasticutils.contrib.django import F, es_required_or_50x
 from mobility.decorators import mobile_template
 from tower import ugettext as _
 
-from fjord.analytics.tools import (
+from fjord.analytics.utils import (
     counts_to_options,
     zero_fill
 )
 from fjord.base.helpers import locale_name
 from fjord.base.urlresolvers import reverse
-from fjord.base.util import (
+from fjord.base.utils import (
     analyzer_required,
     check_new_user,
     smart_int,

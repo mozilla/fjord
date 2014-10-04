@@ -13,7 +13,7 @@ from tower import ugettext_lazy as _lazy
 
 from fjord.base.domain import get_domain
 from fjord.base.models import ModelBase, JSONObjectField, EnhancedURLField
-from fjord.base.util import smart_truncate, instance_to_key, is_url
+from fjord.base.utils import smart_truncate, instance_to_key, is_url
 from fjord.feedback.config import CODE_TO_COUNTRY, ANALYSIS_STOPWORDS
 from fjord.feedback.utils import compute_grams
 from fjord.search.index import (
