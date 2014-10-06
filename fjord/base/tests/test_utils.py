@@ -142,11 +142,11 @@ class TestKeys(TestCase):
 
     def test_instance_to_key(self):
         foo = FakeModel(15)
-        eq_(instance_to_key(foo), 'fjord.base.tests.test__util:FakeModel:15')
+        eq_(instance_to_key(foo), 'fjord.base.tests.test_utils:FakeModel:15')
 
     def test_key_to_instance(self):
         foo = FakeModel(15)
-        key = 'fjord.base.tests.test__util:FakeModel:15'
+        key = 'fjord.base.tests.test_utils:FakeModel:15'
         eq_(key_to_instance(key), foo)
 
 
