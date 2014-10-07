@@ -115,10 +115,6 @@ class Response(ModelBase):
 
     """
 
-    # This is the product/channel.
-    # e.g. "firefox.desktop.stable", "firefox.mobile.aurora", etc.
-    prodchan = models.CharField(max_length=255)
-
     # Data coming from the user
     happy = models.BooleanField(default=True)
     url = EnhancedURLField(blank=True)
@@ -388,7 +384,6 @@ class ResponseMappingType(FjordMappingType, Indexable):
     def get_mapping(cls):
         return {
             'id': integer_type(),
-            'prodchan': keyword_type(),
             'happy': boolean_type(),
             'api': integer_type(),
             'url': keyword_type(),
@@ -423,7 +418,6 @@ class ResponseMappingType(FjordMappingType, Indexable):
 
         doc = {
             'id': obj.id,
-            'prodchan': obj.prodchan,
             'happy': obj.happy,
             'api': obj.api,
             'url': obj.url,
@@ -614,15 +608,7 @@ class PostResponseSerializer(serializers.Serializer):
         # Note: instance should never be anything except None here
         # since we only accept POST and not PUT/PATCH.
 
-        # prodchan is composed of product + channel. This is a little
-        # goofy, but we can fix it later if we bump into issues with
-        # the contents.
-        prodchan = u'.'.join([
-            attrs['product'].lower().replace(' ', '') or 'unknown',
-            attrs['channel'].lower().replace(' ', '') or 'unknown'])
-
         opinion = Response(
-            prodchan=prodchan,
             happy=attrs['happy'],
             url=attrs['url'].strip(),
             description=attrs['description'].strip(),
