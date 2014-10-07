@@ -139,7 +139,6 @@ def _handle_feedback_post(request, locale=None, product=None,
         description=data['description'].strip(),
 
         # Inferred data from user agent
-        prodchan=_get_prodchan(request, product, channel),
         user_agent=request.META.get('HTTP_USER_AGENT', ''),
         browser=request.BROWSER.browser,
         browser_version=request.BROWSER.browser_version,
@@ -218,31 +217,6 @@ def _handle_feedback_post(request, locale=None, product=None,
         statsd.incr('feedback.sad')
 
     return HttpResponseRedirect(reverse('thanks'))
-
-
-def _get_prodchan(request, product=None, channel=None):
-    # FIXME - redo this to handle product/channel
-    meta = request.BROWSER
-
-    product = ''
-    platform = ''
-    channel = 'stable'
-
-    if meta.browser == 'Firefox':
-        product = 'firefox'
-    else:
-        product = 'unknown'
-
-    if meta.platform == 'Android':
-        platform = 'android'
-    elif meta.platform == 'Firefox OS':
-        platform = 'fxos'
-    elif product == 'firefox':
-        platform = 'desktop'
-    else:
-        platform = 'unknown'
-
-    return '{0}.{1}.{2}'.format(product, platform, channel)
 
 
 @csrf_protect

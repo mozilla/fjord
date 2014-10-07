@@ -469,40 +469,6 @@ class PostFeedbackAPITest(TestCase):
         eq_(r.status_code, 400)
         assert 'email' in r.content
 
-    def test_composed_prodchan(self):
-        # Test with product and channel
-        data = {
-            'happy': True,
-            'description': u'Great!',
-            'product': u'Firefox OS',
-            'channel': u'stable',
-            'version': u'1.1',
-            'platform': u'Firefox OS',
-            'locale': 'en-US',
-        }
-
-        r = self.client.post(reverse('feedback-api'), data)
-        eq_(r.status_code, 201)
-
-        feedback = models.Response.uncached.latest(field_name='id')
-        eq_(feedback.prodchan, u'firefoxos.stable')
-
-        # Test with a product, but no channel
-        data = {
-            'happy': True,
-            'description': u'Great! Hazzah!',
-            'product': u'Firefox OS',
-            'version': u'1.1',
-            'platform': u'Firefox OS',
-            'locale': 'en-US',
-        }
-
-        r = self.client.post(reverse('feedback-api'), data)
-        eq_(r.status_code, 201)
-
-        feedback = models.Response.uncached.latest(field_name='id')
-        eq_(feedback.prodchan, u'firefoxos.unknown')
-
     # TODO: django-rest-framework 2.3.6 has a bug where BooleanField
     # has a default value of False, so "required=True" has no
     # effect. We really want to require that, so we'll have to wait
