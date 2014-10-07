@@ -1,0 +1,37 @@
+{% extends "admin/base_site.html" %}
+{% block content_title %}
+  <h1>Response Entry</h1>
+{% endblock %}
+
+{% block content %}
+  <p>Copy and paste the WSGIRequest part of the error email here:</p>
+
+  <section>
+    <form method="POST">
+      {% csrf_token %}
+      <div>
+        <fieldset class="grp-module">
+          <div class="grp-row grp-cells-1">
+            <div class="l-2c-fluid l-d-4">
+              <div class="c-1">
+                <label for="id_data">WSGIRequest bits</label>
+              </div>
+              <div class="c-2">
+                <textarea class="vLargeTextField" id="id_data" name="data"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="grp-row grp-cells-1">
+            <div class="1-2c-fluid 1-d-4">
+              <div class="c-1">&nbsp;</div>
+              <div class="c-2">
+        	    <input type="submit" value="Generate response" class="grp-button grp-default" name="_save" />
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    </form>
+  </section>
+
+{% endblock %}
