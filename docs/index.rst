@@ -28,18 +28,14 @@ Project details:
 :new bugs:     https://bugzilla.mozilla.org/enter_bug.cgi?product=Input&rep_platform=all&op_sys=all
 :irc:          #input on irc.mozilla.org
 :mailing list: https://mail.mozilla.org/listinfo/input-dev
-
-.. Note::
-
-   If you're interested in helping out, please see `our GetInolved page
-   <https://wiki.mozilla.org/Webdev/GetInvolved/input.mozilla.org>`_
+:get involved: https://wiki.mozilla.org/Webdev/GetInvolved/input.mozilla.org
 
 
 Contents
 ========
 
-Want to contribute to Input? Planning to hack on Input code? This is
-the section for you!
+Want to contribute to Input? Then this is the section for you! Start
+with :ref:`contributors-chapter` which will guide you through the rest.
 
 .. toctree::
    :maxdepth: 2

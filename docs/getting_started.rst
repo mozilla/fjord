@@ -7,8 +7,8 @@
 .. contents::
    :local:
 
-Best way to set up Fjord on your computer is by using Vagrant to set
-Fjord up in a virtual machine.
+This guide walks through getting a development environment set up
+to allow you to contribute to Fjord.
 
 .. Note::
 
