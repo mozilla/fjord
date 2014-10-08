@@ -100,6 +100,19 @@ def ephemeral_dir():
 def run_pip(initial_args):
     """Delegate to pip the given args (starting with the subcommand), and raise
     ``PipException`` if something goes wrong."""
+
+    # pip 1.4 through 1.5.6 support wheels, but the support is broken
+    # in regards to upgrading: https://github.com/pypa/pip/issues/1825
+    #
+    # pip 1.5 has a ``--no-use-wheel`` argument, so we insert that if it's
+    # not there.
+    #
+    # This prevents pip from using wheels for those versions.
+    pip_version = tuple([int(num) for num in pip.__version__.split('.')])
+    if initial_args[0] == 'install' and pip_version >= (1, 5, 0) and pip_version < (1, 6, 0):
+        initial_args = list(initial_args)
+        initial_args.insert(1, '--no-use-wheel')
+
     status_code = pip.main(initial_args=initial_args)
 
     # Clear out the registrations in the pip "logger" singleton. Otherwise,
@@ -124,7 +137,7 @@ def pip_download(req, argv, temp_path):
     line = getline(*requirements_path_and_line(req))
 
     # Remove any requirement file args.
-    argv = (['install', '--no-use-wheel', '--no-deps', '--download', temp_path] +
+    argv = (['install', '--no-deps', '--download', temp_path] +
             list(requirement_args(argv, want_other=True)) +  # other args
             shlex.split(line))  # ['nose==1.3.0']. split() removes trailing \n.
 
@@ -148,7 +161,7 @@ def pip_install_archives_from(temp_path, argv):
     other_args = list(requirement_args(argv, want_other=True))
     for filename in listdir(temp_path):
         archive_path = join(temp_path, filename)
-        run_pip(['install'] + other_args +  ['--no-use-wheel', '--no-deps', archive_path])
+        run_pip(['install'] + other_args +  ['--no-deps', archive_path])
 
 
 def hash_of_file(path):
