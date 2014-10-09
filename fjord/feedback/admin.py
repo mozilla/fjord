@@ -142,10 +142,22 @@ def generate_response(response_data):
     if response_data['GET']:
         url = url + '?' + urlencode(response_data['GET'])
 
+    # FIXME: Setting the HTTP_HOST to what was in the error works fine
+    # in prod and in my development environment (which has
+    # DEBUG=True), but it probably doesn't work on the -dev or -stage
+    # environments.
+    #
+    # We can derive it from SITE_URL, but not all environments have
+    # SITE_URL.
+    #
+    # Need to figure out a better way to do this.
+    http_host = response_data['META']['HTTP_HOST']
+
     resp = client.post(
         url,
         data=response_data['POST'],
-        HTTP_USER_AGENT=response_data['META']['HTTP_USER_AGENT']
+        HTTP_USER_AGENT=response_data['META']['HTTP_USER_AGENT'],
+        HTTP_HOST=http_host
     )
     return resp
 
