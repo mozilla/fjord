@@ -73,6 +73,7 @@ $(function() {
                 } else {
                     params[name] = undefined;
                 }
+                params.page = undefined;
                 fjord.setQuerystring(fjord.getQuerystring(), params);
             });
         });
