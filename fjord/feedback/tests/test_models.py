@@ -43,6 +43,31 @@ class TestResponseModel(TestCase):
         eq_(resp.url_domain, u'\u30c9\u30e9\u30af\u30a810.jp')
         assert isinstance(resp.url_domain, unicode)
 
+    def test_rating_to_happy(self):
+        """Test that we do populate happy from rating"""
+        data = {
+            1: False,
+            2: False,
+            3: False,
+            4: True,
+            5: True
+        }
+        for rat, expected in data.items():
+            # Create the response, but DON'T save it to the db.
+            resp = ResponseFactory.build(happy=None, rating=rat)
+            resp.save()
+            eq_(resp.happy, expected)
+
+    def test_happy_to_rating(self):
+        """Test we don't populate rating from happy"""
+        resp = ResponseFactory.build(happy=True, rating=None)
+        resp.save()
+        eq_(resp.rating, None)
+
+        resp = ResponseFactory.build(happy=False, rating=None)
+        resp.save()
+        eq_(resp.rating, None)
+
 
 class TestAutoTranslation(TestCase):
     def setUp(self):
