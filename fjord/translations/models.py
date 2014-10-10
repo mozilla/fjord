@@ -1,4 +1,5 @@
 from datetime import datetime
+from textwrap import wrap
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -506,21 +507,40 @@ class GengoHumanTranslator(TranslationSystem):
         exception and everything will be ok data-consistency-wise.
 
         """
+        # FIXME: This should email a different group than admin,
+        # but I'm (ab)using the admin group for now because I know
+        # they're set up right.
         if balance < threshold:
-            # FIXME: This should email a different group than admin,
-            # but I'm (ab)using the admin group for now because I know
-            # they're set up right.
             mail_admins(
                 subject='Gengo account balance {0} < {1}'.format(
                     balance, threshold),
-                message=(
-                    'Dagnabit! Send more money or the translations get it!\n\n'
-                    'Don\'t try no funny business, neither!\n\n'
-                    'Love,\n\n'
-                    'Gengo'
-                )
+                message=''.join(wrap(
+                    'Dagnabit! Send more money or the translations get it! '
+                    'Don\'t try no funny business, neither!'
+                    '\n\n'
+                    'Love,'
+                    '\n\n'
+                    'Fjord McGengo'
+                ))
             )
             return False
+
+        if balance < (2 * threshold):
+            mail_admins(
+                subject='Warning: Gengo account balance {0} < {1}'.format(
+                    balance, threshold),
+                message=''.join(wrap(
+                    'Dear mom,'
+                    '\n\n'
+                    'Translations are the fab. Running low on funds. Send '
+                    'more money when you get a chance.'
+                    '\n\n'
+                    'Love,'
+                    '\n\n'
+                    'Fjord McGengo'
+                ))
+            )
+
         return True
 
     def push_translations(self):

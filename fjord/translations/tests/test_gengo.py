@@ -539,7 +539,9 @@ class HumanTranslationTestCase(BaseGengoTestCase):
             ght.push_translations()
 
             eq_(GengoOrder.objects.count(), 1)
-            eq_(len(mail.outbox), 1)
+            # There are two emails: one warning that it's getting low
+            # and one "it's too low".
+            eq_(len(mail.outbox), 2)
 
         with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
             # FIXME: This returns the same thing both times, but to
@@ -569,7 +571,8 @@ class HumanTranslationTestCase(BaseGengoTestCase):
             ght.push_translations()
 
             eq_(GengoOrder.objects.count(), 1)
-            eq_(len(mail.outbox), 2)
+            # This generates one more email.
+            eq_(len(mail.outbox), 3)
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
