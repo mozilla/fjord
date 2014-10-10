@@ -20,20 +20,17 @@ To run the test suite, do::
     ./manage.py test
 
 
-However, that doesn't provide the most sensible defaults. Amongst
-other things, you see tons and tons and tons and tons and tons and
-tons and tons and tons and tons and tons and tons and tons and tons of
-debugging output. Ew.
+The ``NOSE_ARGS`` setting in ``fjord/settings/local.py`` sets some
+default arguments so you don't see tons and tons and tons and tons and
+tons and tons and tons and tons and tons and tons and tons and tons
+and tons of debugging output. Ew.
 
-I suggest you run it this way::
+If you ever need to see that debugging, comment the arguments out.
 
-    ./manage.py test -s --noinput --logging-clear-handlers
-
-
-The ``-s`` flag is important if you want to be able to drop into PDB
+The ``--nocapture`` flag is important if you want to be able to drop into PDB
 from within tests.
 
-Some other helpful flags are:
+Other helpful flags when debugging are:
 
 ``-x``:
   Fast fail. Exit immediately on failure. No need to run the whole

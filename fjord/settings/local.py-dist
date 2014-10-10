@@ -58,3 +58,10 @@ SECRET_KEY = 'ou812'
 # languages to be computed based on the contents of your locale/
 # directory.
 DEV_LANGUAGES = ('en-US',)
+
+# This sets some nose flags otherwise testing is very noisy. Comment
+# these out if you need the information they're quelling.
+NOSE_ARGS = [
+    '--nocapture',              # Don't capture stdout
+    '--logging-clear-handlers'  # Clear all other logging handlers
+]

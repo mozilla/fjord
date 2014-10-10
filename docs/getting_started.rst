@@ -293,7 +293,7 @@ your development database safe from tests.
 
 Run the test suite this way::
 
-    ./manage.py test -s --noinput --logging-clear-handlers
+    ./manage.py test
 
 
 For more information, see the :ref:`test documentation
