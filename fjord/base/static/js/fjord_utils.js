@@ -90,4 +90,19 @@ window.fjord = window.fjord || {};
 
         return input.value !== notADateValue;
     };
+
+    /**
+    * Validates a URL
+    * @param {param} url - The url we're validating.
+    * @returns {boolean}
+    */
+    fjord.validateUrl = function(url) {
+        var urlRegExp = /^((ftp|http|https):\/\/)?(\w+:{0,1}\w*@)?(\S+\.\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
+        if (url.length > 0 && !url.match(urlRegExp)) {
+            return false;
+        } 
+        else {
+            return true;
+        }
+    };
 }());
