@@ -370,13 +370,13 @@ MINIFY_BUNDLES = {
             'css/fjord.less',
         ),
         'dashboard': (
-            'css/ui-lightness/jquery-ui.css',
+            'css/ui-lightness-jquery-ui.css',
             'css/lib/normalize.css',
             'css/fjord.less',
             'css/dashboard.less',
         ),
         'monitor': (
-            'css/ui-lightness/jquery-ui.css',
+            'css/ui-lightness-jquery-ui.css',
             'css/lib/normalize.css',
             'css/fjord.less',
             'css/monitor.less',
