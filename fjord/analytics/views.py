@@ -322,6 +322,7 @@ def dashboard(request):
     # Navigation facet data
     facets = search.facet(
         'happy', 'platform', 'locale', 'product', 'version',
+        size=1000,
         filtered=bool(search._process_filters(f.filters)))
 
     # This loop does two things. First it maps 'T' -> True and 'F' ->

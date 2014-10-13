@@ -121,7 +121,6 @@ def analytics_occurrences(request):
                 # in the backend.
                 first_params['date_start'] = '2013-01-01'
 
-            # Have to do raw because we want a size > 10.
             first_resp_s = first_resp_s.facet('description_bigrams',
                                               size=30, filtered=True)
             first_resp_s = first_resp_s[0:0]
@@ -480,8 +479,8 @@ def analytics_search(request):
         'organic': {},
     }
     facets = search.facet(*(counts.keys()),
-                          filtered=bool(search._process_filters(f.filters)),
-                          size=25)
+                          size=1000,
+                          filtered=bool(search._process_filters(f.filters)))
 
     for param, terms in facets.facet_counts().items():
         for term in terms:
