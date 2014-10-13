@@ -106,6 +106,7 @@ class Response(ModelBase):
     response was created:
 
     * happy
+    * rating
     * url
     * description
     * user_agent
@@ -117,6 +118,7 @@ class Response(ModelBase):
 
     # Data coming from the user
     happy = models.BooleanField(default=True)
+    rating = models.PositiveIntegerField(null=True)
     url = EnhancedURLField(blank=True)
     description = models.TextField(blank=True)
 
@@ -271,6 +273,8 @@ class Response(ModelBase):
 
     def save(self, *args, **kwargs):
         self.description = self.description.strip()[:TRUNCATE_LENGTH]
+        if self.rating is not None:
+            self.happy = False if self.rating <= 3 else True
         super(Response, self).save(*args, **kwargs)
 
     @property
