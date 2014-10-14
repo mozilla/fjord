@@ -111,12 +111,10 @@
         });
 
         $('#id_url').on('input', function() {
-            var urlRegExp = /^((ftp|http|https):\/\/)?(\w+:{0,1}\w*@)?(\S+\.\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
-
-            if ($(this).val().length > 0 && !$(this).val().match(urlRegExp)) {
-                $(this).addClass('invalid');
-            } else {
+            if (fjord.validateUrl($(this).val())) {
                 $(this).removeClass('invalid');
+            } else {
+                $(this).addClass('invalid');
             }
             toggleNextButton('description-next-btn');
         });
