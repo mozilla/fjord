@@ -11,7 +11,7 @@ test("basic email validation", function() {
 
     for (i=0; i < test_data.length; i++) {
         var item = test_data[i];
-        ok(fjord.validateEmail(item[0]) == item[1], item);
+        ok(fjord.validateEmail(item[0]) === item[1], item);
     }
 });
 
@@ -33,7 +33,7 @@ test("basic url validation", function() {
 
     for (i=0; i < test_data.length; i++) {
         var item = test_data[i];
-        ok(fjord.validateUrl(item[0]) == item[1], item);
+        ok(fjord.validateUrl(item[0]) === item[1], item);
     }
 });
 // FIXME: This causes qunit to reload the page which causes problems.
