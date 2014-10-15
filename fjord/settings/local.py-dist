@@ -62,6 +62,7 @@ DEV_LANGUAGES = ('en-US',)
 # This sets some nose flags otherwise testing is very noisy. Comment
 # these out if you need the information they're quelling.
 NOSE_ARGS = [
+    '-s',                       # Don't ask any questions
     '--nocapture',              # Don't capture stdout
     '--logging-clear-handlers'  # Clear all other logging handlers
 ]
