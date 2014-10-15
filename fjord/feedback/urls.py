@@ -14,14 +14,6 @@ urlpatterns = patterns(
         r'/?$',
         'feedback_router', name='feedback'),
 
-    # feedback-dev/%PRODUCT%/%VERSION%/%CHANNEL% FOR DEVELOPMENT
-    url(r'^feedback-dev'
-        r'(?:/(?P<product>[^/]+)'
-        r'(?:/(?P<version>[^/]+)'
-        r'(?:/(?P<channel>[^/]+))?)?)?'
-        r'/?$',
-        'feedback_router_dev', name='feedback_dev'),
-
     url(r'^thanks/?$', 'thanks', name='thanks'),
     url(r'^downloadfirefox/?$', 'download_firefox', name='download-firefox'),
 

@@ -8,7 +8,6 @@ from nose.tools import eq_
 
 from fjord.base.tests import TestCase, LocalizingClient, reverse
 from fjord.feedback import models
-from fjord.feedback.tests import ProductFactory
 
 
 class TestRedirectFeedback(TestCase):
@@ -21,34 +20,6 @@ class TestRedirectFeedback(TestCase):
     def test_sad_redirect(self):
         r = self.client.get(reverse('sad-redirect'))
         self.assertRedirects(r, reverse('feedback') + '#sad')
-
-
-class TestPicker(TestCase):
-    client_class = LocalizingClient
-
-    def test_picker_no_products(self):
-        # FIXME: We can nix this when we stop doing data migrations in
-        # test setup.
-        models.Product.objects.all().delete()
-
-        resp = self.client.get(reverse('feedback_dev'))
-
-        eq_(resp.status_code, 200)
-        self.assertTemplateUsed(resp, 'feedback/picker.html')
-
-    def test_picker_with_products(self):
-        ProductFactory(display_name=u'ProductFoo', slug=u'productfoo')
-        ProductFactory(display_name=u'ProductBar', slug=u'productbar')
-
-        cache.clear()
-
-        resp = self.client.get(reverse('feedback_dev'))
-
-        eq_(resp.status_code, 200)
-        self.assertContains(resp, 'ProductFoo')
-        self.assertContains(resp, 'productfoo')
-        self.assertContains(resp, 'ProductBar')
-        self.assertContains(resp, 'productbar')
 
 
 class TestFeedback(TestCase):
@@ -141,12 +112,6 @@ class TestFeedback(TestCase):
         )
         r = self.client.get(url, HTTP_USER_AGENT=ua)
         self.assertTemplateUsed(r, 'feedback/fxos_feedback.html')
-
-    def test_generic_dev_view(self):
-        # FIXME: Remove this when the dev view lands.
-        url = reverse('feedback_dev', args=('firefox',))
-        resp = self.client.get(url)
-        self.assertTemplateUsed(resp, 'feedback/generic_feedback_dev.html')
 
     @override_settings(DEV_LANGUAGES=('en-US', 'es'))
     def test_urls_locale(self):
