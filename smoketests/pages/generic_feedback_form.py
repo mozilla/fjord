@@ -97,7 +97,9 @@ class GenericFeedbackFormPage(Page):
             checkbox.click()
 
     def set_email(self, text):
-        self.wait_for(self._email_locator)
+        if not self.is_element_visible(self._email_locator):
+            self.wait_for(self._email_locator)
+
         email = self.selenium.find_element(*self._email_locator)
         email.clear()
         email.send_keys(text)
