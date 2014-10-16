@@ -74,7 +74,7 @@ class FxOSFeedbackFormPage(Page):
         return self.selenium.find_element(*self._moreinfo_next_locator).is_enabled()
 
     def click_moreinfo_next(self):
-        self.selenium.find_element(*self._device_next_locator).click()
+        self.selenium.find_element(*self._moreinfo_next_locator).click()
         self.wait_for(self._email_checkbox_locator)
 
     # Email card
@@ -84,11 +84,17 @@ class FxOSFeedbackFormPage(Page):
     _thanks_locator = (By.CSS_SELECTOR, '#thanks')
 
     def check_email_checkbox(self, checked=True):
+        if not self.is_element_visible(self._email_checkbox_locator):
+            self.wait_for(self._email_checkbox_locator)
+
         checkbox = self.selenium.find_element(*self._email_checkbox_locator)
         if checked != checkbox.is_selected():
             checkbox.click()
 
     def set_email(self, text):
+        if not self.is_element_visible(self._email_text_locator):
+            self.wait_for(self._email_text_locator)
+
         email = self.selenium.find_element(*self._email_text_locator)
         email.clear()
         email.send_keys(text)
@@ -96,7 +102,7 @@ class FxOSFeedbackFormPage(Page):
     def submit(self, expect_success=True):
         self.selenium.find_element(*self._submit_locator).click()
         if expect_success:
-            self.wait_for(self._thanks_locator)
+            self.wait_for((By.CSS_SELECTOR, '#thanks'))
 
     @property
     def current_card(self):

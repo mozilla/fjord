@@ -6,11 +6,13 @@ import time
 
 from unittestzero import Assert
 
+
+from tests import TestCase
 from pages.dashboard import DashboardPage
 from pages.fxos_feedback_form import FxOSFeedbackFormPage
 
 
-class TestFeedback(object):
+class TestFeedback(TestCase):
     def test_submit_happy_feedback(self, mozwebqa):
         timestamp = str(time.time())
         desc = 'input-tests testing happy fxos feedback ' + timestamp
@@ -34,12 +36,15 @@ class TestFeedback(object):
         Assert.true(feedback_pg.is_moreinfo_next_enabled)
         feedback_pg.click_moreinfo_next()
 
+        self.take_a_breather()
+
         # 6. fill in email address
         feedback_pg.check_email_checkbox()
         feedback_pg.set_email('foo@example.com')
 
         # 7. submit
         feedback_pg.submit(expect_success=True)
+        self.take_a_breather()
         Assert.equal(feedback_pg.current_card, 'thanks')
 
         # 8. verify
