@@ -91,11 +91,13 @@ class GenericFeedbackFormPage(Page):
         self.wait_for(self._description_locator)
 
     def check_email_checkbox(self, checked=True):
+        self.wait_for(self._email_checkbox_locator)
         checkbox = self.selenium.find_element(*self._email_checkbox_locator)
         if checked != checkbox.is_selected():
             checkbox.click()
 
     def set_email(self, text):
+        self.wait_for(self._email_locator)
         email = self.selenium.find_element(*self._email_locator)
         email.clear()
         email.send_keys(text)

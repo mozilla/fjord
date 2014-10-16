@@ -24,6 +24,7 @@ FLAKE8_IGNORE=(
     'fjord/settings*'
     'bin/update/update.py'
     'vendor/*'
+    'smoketests/*'
 )
 
 # Files to lint is either the list of arguments to this script, or the
