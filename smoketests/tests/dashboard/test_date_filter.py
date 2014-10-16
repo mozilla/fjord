@@ -164,10 +164,7 @@ class TestSearchDates(object):
 
     @pytest.mark.nondestructive
     def test_feedback_custom_date_filter_with_future_start_date(self, mozwebqa):
-        """Verify future start date are ignored as erroneous input and
-        results for a 30 day period are returned
-
-        """
+        """Future time span will bring up no messages"""
         dashboard_pg = DashboardPage(mozwebqa)
 
         dashboard_pg.go_to_dashboard_page()
