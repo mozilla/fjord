@@ -270,6 +270,11 @@ def dashboard(request):
     if search_date_start is None:
         search_date_start = search_date_end - timedelta(days=7)
 
+    # If the start and end dates are inverted, switch them into proper
+    # chronoligcal order
+    search_date_start, search_date_end = sorted(
+        [search_date_start, search_date_end])
+
     # Restrict the frontpage dashboard to only show the last 6 months
     # of data
     six_months_ago = date.today() - timedelta(days=180)

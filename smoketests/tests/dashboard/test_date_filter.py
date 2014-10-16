@@ -172,18 +172,22 @@ class TestSearchDates(object):
 
         dashboard_pg.go_to_dashboard_page()
 
-        start_date = "2900-01-01"
-        end_date = ""
+        start_date = "2020-01-01"
+        end_date = "2020-01-10"
 
         dashboard_pg.date_filter.filter_by_custom_dates_using_keyboard(start_date, end_date)
+
+        # No messages!
+        Assert.equal(dashboard_pg.total_message_count, 0)
+
+        # Check the url bits are correct
         Assert.equal(dashboard_pg.date_start_from_url, start_date)
         Assert.equal(dashboard_pg.date_end_from_url, end_date)
 
-        Assert.equal(len(dashboard_pg.messages), 0)
-
+        # Verify the dates
         dashboard_pg.date_filter.enable_custom_dates()
         Assert.equal(dashboard_pg.date_filter.custom_start_date, start_date)
-        Assert.equal(dashboard_pg.date_filter.custom_end_date, self.default_end_date)
+        Assert.equal(dashboard_pg.date_filter.custom_end_date, end_date)
 
     @pytest.mark.nondestructive
     def test_feedback_custom_date_filter_with_end_date_lower_than_start_date(self, mozwebqa):
@@ -206,6 +210,7 @@ class TestSearchDates(object):
         # the final result is within range. Currently blocked by bug
         # 615844.
 
+        # Test that the dates in the date filter are reordered chronologically
         dashboard_pg.date_filter.enable_custom_dates()
-        Assert.equal(dashboard_pg.date_filter.custom_start_date, start_date.strftime('%Y-%m-%d'))
-        Assert.equal(dashboard_pg.date_filter.custom_end_date, end_date.strftime('%Y-%m-%d'))
+        Assert.equal(dashboard_pg.date_filter.custom_start_date, end_date.strftime('%Y-%m-%d'))
+        Assert.equal(dashboard_pg.date_filter.custom_end_date, start_date.strftime('%Y-%m-%d'))
