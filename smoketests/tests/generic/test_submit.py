@@ -128,9 +128,9 @@ class TestSubmit(object):
 
     def test_submit_happy_feedback_with_unicode(self, mozwebqa):
         """Fill out happy feedback with unicode description"""
-        timestamp = str(time.time())
-        desc = (u'input-tests testing happy feedback with '
-                'unicode \u2603 ' + timestamp)
+        timestamp = unicode(time.time())
+        desc = u'input-tests testing happy feedback with unicode \u2603'
+        desc = desc + u' ' + timestamp
 
         # 1. go to the feedback form
         feedback_pg = GenericFeedbackFormPage(mozwebqa)
