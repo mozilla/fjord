@@ -27,7 +27,7 @@ class Migration(DataMigration):
         "Write your backwards methods here."
         Flag = orm['waffle.flag']
         try:
-            flag = Flag.objects.filter(name='feedbackdev')[0]
+            flag = Flag.objects.get(name='feedbackdev')
             flag.delete()
         except Flag.DoesNotExist:
             pass
