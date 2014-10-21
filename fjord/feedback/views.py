@@ -9,6 +9,7 @@ from django.views.decorators.http import require_POST
 
 from mobility.decorators import mobile_template
 from statsd import statsd
+import waffle
 
 from fjord.base.browsers import UNKNOWN
 from fjord.base.urlresolvers import reverse
@@ -77,8 +78,7 @@ def _handle_feedback_post(request, locale=None, product=None,
 
     :arg request: request we're handling the post for
     :arg locale: locale specified in the url
-    :arg product: validated and sanitized product slug specified in
-        the url
+    :arg product: None or the Product
     :arg version: validated and sanitized version specified in the url
     :arg channel: validated and sanitized channel specified in the url
 
@@ -104,13 +104,11 @@ def _handle_feedback_post(request, locale=None, product=None,
         # so thank the user and move on.
         return HttpResponseRedirect(reverse('thanks'))
 
-    # Do some data validation of product, channel and version
-    # coming from the url.
     if product:
         # If there was a product in the url, that's a product slug, so
         # we map it to a db_name which is what we want to save to the
         # db.
-        product = models.Product.get_product_map()[product]
+        product = product.db_name
 
     # src, then source, then utm_source
     source = get_data.pop('src', [u''])[0]
@@ -231,21 +229,7 @@ def generic_feedback(request, locale=None, product=None, version=None,
 
     return render(request, 'feedback/generic_feedback.html', {
         'form': form,
-    })
-
-
-@csrf_protect
-def generic_feedback_dev(request, locale, product, version=None, channel=None):
-    """IN DEVELOPMENT NEXT GENERATION GENERIC FEEDBACK FORM"""
-    form = ResponseForm()
-
-    if request.method == 'POST':
-        return _handle_feedback_post(request, locale, product,
-                                     version, channel)
-
-    return render(request, 'feedback/generic_feedback_dev.html', {
-        'form': form,
-        'product': models.Product.from_slug(product),
+        'product': product
     })
 
 
@@ -305,74 +289,24 @@ def android_about_feedback(request, locale=None):
 
 
 PRODUCT_OVERRIDE = {
-    'genericdev': generic_feedback_dev,
 }
 
 
-@csrf_exempt
-@never_cache
-def feedback_router_dev(request, product=None, version=None, channel=None,
-                        *args, **kwargs):
-    """DEV ONLY FEEDBACK ROUTER"""
-    view = None
+def persist_feedbackdev(fun):
+    """Persists a feedbackdev flag set via querystring in the cookies"""
+    def _persist_feedbackdev(request, *args, **kwargs):
+        qs_feedbackdev = request.GET.get('feedbackdev', None)
+        resp = fun(request, *args, **kwargs)
+        if resp is not None and qs_feedbackdev is not None:
+            resp.set_cookie(waffle.COOKIE_NAME % 'feedbackdev', qs_feedbackdev)
 
-    if '_type' in request.POST:
-        # Checks to see if `_type` is in the POST data and if so this
-        # is coming from Firefox for Android which doesn't know
-        # anything about csrf tokens. If that's the case, we send it
-        # to a view specifically for FfA Otherwise we pass it to one
-        # of the normal views, which enforces CSRF. Also, nix the
-        # product just in case we're crossing the streams and
-        # confusing new-style product urls with old-style backwards
-        # compatability for the Android form.
-        #
-        # FIXME: Remove this hairbrained monstrosity when we don't need to
-        # support the method that Firefox for Android currently uses to
-        # post feedback which worked with the old input.mozilla.org.
-
-        # This lets us measure how often this section of code kicks
-        # off and thus how often old android stuff is happening. When
-        # we're not seeing this anymore, we can nix all the old
-        # android stuff.
-        statsd.incr('feedback.oldandroid')
-
-        return android_about_feedback(request, request.locale)
-
-    product = smart_str(product, fallback=None)
-    # FIXME - validate these better
-    version = smart_str(version)
-    channel = smart_str(channel).lower()
-
-    if product == 'fxos' or request.BROWSER.browser == 'Firefox OS':
-        # Firefox OS gets shunted to a different form which has
-        # different Firefox OS specific questions.
-        view = firefox_os_stable_feedback
-        product = 'fxos'
-
-    elif product in PRODUCT_OVERRIDE:
-        # The "product" is really a specific form to use. So we None
-        # out the product and let that form view deal with everything.
-        view = PRODUCT_OVERRIDE[product]
-        product = None
-
-    elif product is None or product not in models.Product.get_product_map():
-        # The product wasn't specified or doesn't exist, so we spit
-        # out the product picker.
-        template = 'feedback/picker.html'
-
-        products = models.Product.objects.all()
-        return render(request, template, {
-            'products': products
-        })
-
-    view = view or generic_feedback_dev
-
-    return view(request, request.locale, product, version, channel,
-                *args, **kwargs)
+        return resp
+    return _persist_feedbackdev
 
 
 @csrf_exempt
 @never_cache
+@persist_feedbackdev
 def feedback_router(request, product=None, version=None, channel=None,
                     *args, **kwargs):
     """Determine a view to use, and call it.
@@ -418,30 +352,62 @@ def feedback_router(request, product=None, version=None, channel=None,
         return android_about_feedback(request, request.locale)
 
     # FIXME - validate these better
+    product = smart_str(product, fallback=None)
     version = smart_str(version)
     channel = smart_str(channel).lower()
 
-    if product == 'fxos' or request.BROWSER.browser == 'Firefox OS':
-        # Firefox OS gets shunted to a different form which has
-        # different Firefox OS specific questions.
-        view = firefox_os_stable_feedback
-        product = 'fxos'
+    feedbackdev_flag = waffle.flag_is_active(request, 'feedbackdev')
 
-    elif product:
-        product = smart_str(product)
+    if feedbackdev_flag:
+        # Routing for when we're doing feedbackdevs. This is different
+        # enough from regular routing that it's best to segregate it
+        # rather than mix it all together.
+        if product == 'fxos' or request.BROWSER.browser == 'Firefox OS':
+            # Firefox OS gets shunted to a different form which has
+            # different Firefox OS specific questions.
+            view = firefox_os_stable_feedback
+            product = 'fxos'
 
-        if product in PRODUCT_OVERRIDE:
+        elif product in PRODUCT_OVERRIDE:
             # If the product is really a form name, we use that
             # form specifically.
             view = PRODUCT_OVERRIDE[product]
             product = None
 
-        elif product not in models.Product.get_product_map():
-            # If they passed in a product and we don't know about
-            # it, stop here.
-            return render(request, 'feedback/unknownproduct.html', {
-                'product': product
+        elif (product is None
+              or product not in models.Product.get_product_map()):
+            return render(request, 'feedback/picker.html', {
+                'products': models.Product.objects.all()
             })
+
+        product = models.Product.from_slug(product)
+
+    else:
+        # Routing for the currently running generic feedback form.
+        if product == 'fxos' or request.BROWSER.browser == 'Firefox OS':
+            # Firefox OS gets shunted to a different form which has
+            # different Firefox OS specific questions.
+            view = firefox_os_stable_feedback
+            product = 'fxos'
+
+        elif product:
+            product = smart_str(product)
+
+            if product in PRODUCT_OVERRIDE:
+                # If the product is really a form name, we use that
+                # form specifically.
+                view = PRODUCT_OVERRIDE[product]
+                product = None
+
+            elif product not in models.Product.get_product_map():
+                return render(request, 'feedback/unknownproduct.html', {
+                    'product': product
+                })
+
+            else:
+                # This is a valid existing product, so grab it and pass
+                # it along.
+                product = models.Product.from_slug(product)
 
     if view is None:
         view = generic_feedback

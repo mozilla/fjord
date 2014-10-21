@@ -666,6 +666,10 @@ REST_FRAMEWORK = {
 # Grappelli settings
 GRAPPELLI_ADMIN_TITLE = 'Input admin and diabolical dashboard'
 
+# Waffle settings
+# Always allow for override via querystring
+WAFFLE_OVERRIDE = True
+
 # For absolute urls
 try:
     DOMAIN = socket.gethostname()

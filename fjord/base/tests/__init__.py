@@ -2,8 +2,6 @@ import inspect
 import os
 from functools import wraps
 
-from nose import SkipTest
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
@@ -11,9 +9,11 @@ from django.test import TestCase as OriginalTestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 
-from django_browserid.tests import mock_browserid
-
 import factory
+import waffle
+from django_browserid.tests import mock_browserid
+from nose import SkipTest
+
 # reverse is here for convenience so other test modules import it from
 # here rather than importing it from urlresolvers
 from fjord.base.urlresolvers import reverse  # noqa
@@ -63,6 +63,75 @@ def skip_if(test_func, msg=''):
             return skipping_fun(cls_or_func)
 
     return skipping_cls_or_fun
+
+
+def with_waffle(flagname, flagvalue=True):
+    """Decorator that enables a given flag
+
+    You can wrap a test class with this decorator and all the tests in
+    the class will run with the waffle flag enabled/disabled.
+
+    You can wrap a single test function with this decorator and that
+    test will run with the waffle flag enabled/disabled.
+
+    Usage::
+
+        @with_waffle('some_flag', True)
+        class TestClass(TestCase):
+            ...
+
+        @with_waffle('some_flag', False)
+        def test_my_view():
+            ...
+
+    """
+
+    def with_waffle_cls_or_fun(cls_or_func):
+        """Class or function decorator for enabling waffle flags"""
+
+        def give_me_waffles(func):
+            """Function decorator for enabling the waffle flag"""
+            @wraps(func)
+            def _give_me_waffles(*args, **kwargs):
+                origvalue = None
+                try:
+                    flag = waffle.Flag.objects.filter(name=flagname)[0]
+                    origvalue = flag.everyone
+                    flag.everyone = flagvalue
+                except waffle.Flag.DoesNotExist:
+                    flag = waffle.Flag(name=flagname, everyone=True)
+                flag.save()
+
+                try:
+                    return func(*args, **kwargs)
+                except Exception:
+                    # FIXME: This breaks if saving the flag also
+                    # raises an exception, but that really shouldn't
+                    # happen in our test suite and if it does, we've
+                    # probably got other more serious issues to deal
+                    # with.
+                    if origvalue is not None:
+                        flag.everyone = origvalue
+                        flag.save()
+                    raise
+            return _give_me_waffles
+
+        if inspect.isclass(cls_or_func):
+            # If cls_or_func is a class, then we wrap all the callable
+            # methods that start with 'test'.
+            for attr in cls_or_func.__dict__.keys():
+                if (attr.startswith('test')
+                        and callable(getattr(cls_or_func, attr))):
+
+                    setattr(cls_or_func, attr,
+                            give_me_waffles(getattr(cls_or_func, attr)))
+            return cls_or_func
+        else:
+            # If cls_or_func is a function, then we return the
+            # skipping_fun
+            return give_me_waffles(cls_or_func)
+
+    return with_waffle_cls_or_fun
 
 
 class LocalizingClient(Client):

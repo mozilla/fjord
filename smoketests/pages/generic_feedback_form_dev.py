@@ -5,15 +5,18 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.base import Page
+from pages.generic_feedback_picker import PickerPage
 from pages.generic_feedback_thanks import ThanksPage
 
 
-class GenericFeedbackFormPage(Page):
-    _page_title = 'Submit Your Feedback :: Firefox Input'
+class GenericFeedbackFormDevPage(Page):
+    _page_title = '[DEV] Submit Your Feedback :: Firefox Input'
 
     _intro_card_locator = (By.ID, 'intro')
+    _picker_link_locator = (By.CSS_SELECTOR, '#back-to-picker a')
 
     _happy_button_locator = (By.CSS_SELECTOR, '#buttons button.happy')
     _sad_button_locator = (By.CSS_SELECTOR, '#buttons button.sad')
@@ -34,9 +37,24 @@ class GenericFeedbackFormPage(Page):
 
     _support_page_locator = (By.LINK_TEXT, 'Firefox Support')
 
-    def go_to_feedback_page(self):
-        self.selenium.get(self.base_url + '/feedback/')
+    def go_to_feedback_page(self, product_name):
+        self.selenium.get(self.base_url + '/feedback/' + product_name + '/?feedbackdev=1')
         self.is_the_current_page
+
+    def is_product(self, product_name):
+        # Make sure we're on the intro card
+        self.selenium.find_element(*self._intro_card_locator)
+
+        # Get the first paragraph and make sure it has the product
+        # name in it
+        first_p = self.selenium.find_element(By.CSS_SELECTOR, 'p:first-child').text
+        return product_name in first_p
+
+    def go_to_picker_page(self):
+        picker_pg = PickerPage(self.testsetup)
+        self.selenium.find_element(*self._picker_link_locator).click()
+        WebDriverWait(self.selenium, 10).until(lambda s: picker_pg.is_the_current_page)
+        return picker_pg
 
     def type_feedback(self, feedback):
         self.selenium.find_element(*self._feedback_locator).send_keys(feedback)
@@ -72,7 +90,7 @@ class GenericFeedbackFormPage(Page):
         desc = self.selenium.find_element(*self._description_locator)
         desc.clear()
         desc.send_keys(text)
-        
+
     def update_description(self, text):
         desc = self.selenium.find_element(*self._description_locator)
         desc.send_keys(text)

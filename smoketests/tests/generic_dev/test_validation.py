@@ -5,15 +5,15 @@
 import pytest
 from unittestzero import Assert
 
-from pages.generic_feedback_form import GenericFeedbackFormPage
+from pages.generic_feedback_form_dev import GenericFeedbackFormDevPage
 from tests import TestCase
 
 
 class TestValidation(TestCase):
     @pytest.mark.nondestructive
     def test_remaining_character_count(self, mozwebqa):
-        feedback_pg = GenericFeedbackFormPage(mozwebqa)
-        feedback_pg.go_to_feedback_page()
+        feedback_pg = GenericFeedbackFormDevPage(mozwebqa)
+        feedback_pg.go_to_feedback_page('firefox')
 
         feedback_pg.click_happy_feedback()
 
@@ -40,8 +40,8 @@ class TestValidation(TestCase):
 
     @pytest.mark.nondestructive
     def test_url_verification(self, mozwebqa):
-        feedback_pg = GenericFeedbackFormPage(mozwebqa)
-        feedback_pg.go_to_feedback_page()
+        feedback_pg = GenericFeedbackFormDevPage(mozwebqa)
+        feedback_pg.go_to_feedback_page('firefox')
 
         feedback_pg.click_happy_feedback()
         feedback_pg.set_description('ou812')
@@ -71,8 +71,8 @@ class TestValidation(TestCase):
 
     @pytest.mark.nondestructive
     def test_email_verification(self, mozwebqa):
-        feedback_pg = GenericFeedbackFormPage(mozwebqa)
-        feedback_pg.go_to_feedback_page()
+        feedback_pg = GenericFeedbackFormDevPage(mozwebqa)
+        feedback_pg.go_to_feedback_page('firefox')
 
         feedback_pg.click_happy_feedback()
         feedback_pg.set_description('ou812')
