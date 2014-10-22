@@ -23,6 +23,7 @@ class ProductFactory(factory.DjangoModelFactory):
 
     enabled = True
     on_dashboard = True
+    on_picker = True
 
 
 class ResponseFactory(factory.DjangoModelFactory):

@@ -700,6 +700,7 @@ class ProductsUpdateView(FormView):
             instance.notes = form.data.get('notes') or instance.notes
             instance.enabled = form.data.get('enabled') or False
             instance.on_dashboard = form.data.get('on_dashboard') or False
+            instance.on_picker = form.data.get('on_picker') or False
             self.object = instance.save()
         except Product.DoesNotExist:
             self.object = form.save()

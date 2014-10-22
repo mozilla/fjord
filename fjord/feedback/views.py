@@ -376,8 +376,11 @@ def feedback_router(request, product=None, version=None, channel=None,
 
         elif (product is None
               or product not in models.Product.get_product_map()):
+
+            picker_products = models.Product.objects.filter(
+                enabled=True, on_picker=True)
             return render(request, 'feedback/picker.html', {
-                'products': models.Product.objects.all()
+                'products': picker_products
             })
 
         product = models.Product.from_slug(product)
