@@ -8,7 +8,7 @@ import urllib
 import requests
 
 
-BUGZILLA_API_URL = 'https://api-dev.bugzilla.mozilla.org/latest'
+BUGZILLA_API_URL = 'https://bugzilla.mozilla.org/bzapi/'
 
 QUARTERS = {
     1: [(1, 1), (3, 31)],
@@ -64,6 +64,8 @@ def print_bugzilla_stats(from_date, to_date):
     creators = {}
     for bug in json_data['bugs']:
         creator = bug['creator_detail']['real_name']
+        if not creator:
+            creator = bug['creator'].split('@')[0]
         creators[creator] = creators.get(creator, 0) + 1
 
     params = {
@@ -90,6 +92,8 @@ def print_bugzilla_stats(from_date, to_date):
         resolution = bug['resolution']
         resolved_map[resolution] = resolved_map.get(resolution, 0) + 1
         assigned = bug['assigned_to_detail']['real_name']
+        if not assigned:
+            assigned = bug['assigned_to'].split('@')[0]
         resolvers[assigned] = resolvers.get(assigned, 0) + 1
 
     print 'Bugs created: %s' % creation_count
@@ -97,7 +101,7 @@ def print_bugzilla_stats(from_date, to_date):
     print ''
     creators = sorted(creators.items(), reverse=True, key=lambda item: item[1])
     for person, count in creators:
-        print ' %40s : %s' % (person, count)
+        print ' %40s : %s' % (person[:20], count)
     print ''
 
     print 'Bugs resolved: %s' % resolved_count
@@ -110,7 +114,7 @@ def print_bugzilla_stats(from_date, to_date):
     resolvers = sorted(resolvers.items(), reverse=True,
                        key=lambda item: item[1])
     for person, count in resolvers:
-        print ' %40s : %s' % (person, count)
+        print ' %40s : %s' % (person[:20], count)
 
 
 def git(*args):
