@@ -20,15 +20,19 @@
       </x-appbar>
 
       <section class="product-picker">
-        <ul class="content">
-          {% for prod in products %}
-            <a href="{{ url('feedback', product=prod.slug) }}?{{ request.GET.urlencode() }}" class="product-card {{ prod.slug }}">
-              <li>
-                <h3>{{ prod.display_name }}</h3>
-              </li>
-            </a>
-          {% endfor %}
-        </ul>
+        {% if not products %}
+          <p class="no-products">{{ _('No products available.') }}</p>
+        {% else %}
+          <ul class="content">
+            {% for prod in products %}
+              <a href="{{ url('feedback', product=prod.slug) }}?{{ request.GET.urlencode() }}" class="product-card {{ prod.slug }}">
+                <li>
+                  <h3>{{ prod.display_name }}</h3>
+                </li>
+              </a>
+            {% endfor %}
+          </ul>
+        {% endif %}
       </section>
     </x-card>
   </x-deck>

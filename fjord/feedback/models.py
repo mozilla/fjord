@@ -63,8 +63,12 @@ class Product(ModelBase):
     # the SlugField because we don't require slugs be unique
     slug = models.CharField(max_length=20)
 
-    # Whether or not this product shows up on the dashboard
+    # Whether or not this product shows up on the dashboard; we sort of
+    # use this to denote whether data is publicly available, too
     on_dashboard = models.BooleanField(default=True)
+
+    # Whether or not this product shows up in the product picker
+    on_picker = models.BooleanField(default=True)
 
     # System slated for automatic translation, or null if none;
     # See translation app for details.
