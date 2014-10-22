@@ -49,7 +49,27 @@ class TestPicker(TestCase):
         self.assertContains(resp, 'ProductBar')
         self.assertContains(resp, 'productbar')
 
-    def test_picker_with_products_set_to_not_on_picker(self):
+    def test_picker_with_disabled_products(self):
+        ProductFactory(display_name=u'ProductFoo', slug=u'productfoo',
+                       enabled=True)
+        ProductFactory(display_name=u'ProductBar', slug=u'productbar',
+                       enabled=False)
+
+        cache.clear()
+
+        resp = self.client.get(reverse('feedback'))
+
+        eq_(resp.status_code, 200)
+
+        # This is on the picker
+        self.assertContains(resp, 'ProductFoo')
+        self.assertContains(resp, 'productfoo')
+
+        # This is not on the picker
+        self.assertNotContains(resp, 'ProductBar')
+        self.assertNotContains(resp, 'productbar')
+
+    def test_picker_with_not_on_picker_products(self):
         ProductFactory(display_name=u'ProductFoo', slug=u'productfoo',
                        on_picker=True)
         ProductFactory(display_name=u'ProductBar', slug=u'productbar',

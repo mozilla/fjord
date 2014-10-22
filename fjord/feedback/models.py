@@ -87,8 +87,10 @@ class Product(ModelBase):
 
     @classmethod
     def get_product_map(cls):
-        """Returns map of product slug -> db_name"""
-        products = cls.objects.values_list('slug', 'db_name')
+        """Returns map of product slug -> db_name for enabled products"""
+        products = (cls.objects
+                    .filter(enabled=True)
+                    .values_list('slug', 'db_name'))
         return dict(prod for prod in products)
 
     def __unicode__(self):

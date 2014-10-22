@@ -15,12 +15,13 @@ class ProductAdmin(admin.ModelAdmin):
         'id',
         'enabled',
         'on_dashboard',
+        'on_picker',
         'display_name',
         'db_name',
         'translation_system',
         'notes',
         'slug')
-    list_filter = ('enabled', 'on_dashboard')
+    list_filter = ('enabled', 'on_dashboard', 'on_picker')
 
 
 class EmptyFriendlyAVFLF(admin.AllValuesFieldListFilter):
