@@ -80,10 +80,10 @@ Comment template::
     list of things you need to do before contributing and then add a comment
     to this bug asking to have it assigned to you.
 
-    [1] http://fjord.readthedocs.org/en/latest/welcome.html
-
     If you have any questions, please ask on the mailing list or in the
     #input channel on irc.mozilla.org.
+
+    [1] http://fjord.readthedocs.org/en/latest/welcome.html
 
 
 Adding support for a new product
