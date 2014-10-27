@@ -53,13 +53,11 @@ system works.
 Good first bugs are denoted in Bugzilla with:
 
 * ``[good first bug]`` in the Whiteboard field
-* (for now) ``[mentor=xxx]`` in the Whiteboard field
 * a mentor listed in the Mentors field
 * a comment explaining the problem and what needs to be done to fix it
 
 Good next bugs are everything else and are denoted in Bugzilla with:
 
-* (for now) ``[mentor=xxx]`` in the Whiteboard field
 * a mentor listed in the Mentors field
 * a comment explaining the problem and what needs to be done to fix it
 
@@ -84,6 +82,9 @@ Comment template::
     #input channel on irc.mozilla.org.
 
     [1] http://fjord.readthedocs.org/en/latest/welcome.html
+
+Once a week, go through any assigned mentored bugs and ping them to
+see how they're coming along.
 
 
 Adding support for a new product
