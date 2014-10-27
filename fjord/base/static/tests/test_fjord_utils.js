@@ -36,6 +36,25 @@ test("basic url validation", function() {
         ok(fjord.validateUrl(item[0]) === item[1], item);
     }
 });
+
+
+test("basic format test", function() {
+    var i;
+    test_data = [
+        ['{0}', ['zzz'], 'zzz'],
+        ['{x}', {x: 1}, '1'],
+        ["Hello {1}", ['Adam', 'World'], 'Hello World'],
+        ['{y}', {x: 1, y: 2}, '2']
+    ];
+    
+    for (i=0; i < test_data.length; i++) {
+        var item = test_data[i];
+        equal(fjord.format(item[0], item[1]), item[2]);
+    }
+});
+
+
+
 // FIXME: This causes qunit to reload the page which causes problems.
 // It'd be nice if we could test this without causing problems.
 // test("set and get querystring", function() {
