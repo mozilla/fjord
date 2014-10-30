@@ -128,7 +128,7 @@
 
 <div class="col wide">
 {% block content_middle %}
-  {% if selected != '1d' %}
+  {% if selected != '1d' and not waffle.flag('ditchchart') %}
     <div class="block graph">
       {# A graph will be dynamically inserted in these divs by Flot. #}
       <div class="histogram" data-histogram="{{ histogram|to_json }}"></div>
@@ -138,9 +138,9 @@
   {% endif %}
 
   <div class="block feedback">
-    <h2>{{ _('Latest Feedback') }}</h2>
+    <h2>{{ _('Feedback') }}</h2>
 
-    <form id="feedback_search" action="{{ request.get_full_path() }}" method="get">
+    <form id="feedback_search{% if waffle.flag('ditchchart') %}_no_chart{% endif %}" action="{{ request.get_full_path() }}" method="get">
       <input class="search_box" type="text" name="q"
         placeholder="{{ _('Search by keyword') }}" value="{{ current_search.q }}" />
 
