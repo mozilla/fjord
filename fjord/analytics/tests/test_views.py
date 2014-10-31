@@ -344,7 +344,7 @@ class TestDashboardView(ElasticTestCase):
         # The histogram data is of the form [d, v], where d is a number of
         # milliseconds since the epoch, and v is the value at that time stamp.
         dates = [d[0] for d in r.context['histogram'][0]['data']]
-        dates = [date.fromtimestamp(d / 1000) for d in dates]
+        dates = [date.fromtimestamp(d // 1000) for d in dates]
         days = [d.day for d in dates]
 
         d = start
