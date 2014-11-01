@@ -316,6 +316,7 @@ SUPPORTED_NONLOCALES = [
     'browserid',
     'media',
     'robots.txt',
+    'contribute.json',
     'services',
     'static',
 ]

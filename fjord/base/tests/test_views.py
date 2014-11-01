@@ -101,6 +101,13 @@ class TestRobots(TestCase):
         self.assertTemplateUsed(resp, 'robots.txt')
 
 
+class TestContribute(TestCase):
+    def test_contribute(self):
+        resp = self.client.get('/contribute.json')
+        eq_(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'contribute.json')
+
+
 class TestNewUserView(ElasticTestCase):
     def setUp(self):
         super(TestNewUserView, self).setUp()
