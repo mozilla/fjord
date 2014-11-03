@@ -1,5 +1,4 @@
 from datetime import datetime
-from textwrap import wrap
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -19,6 +18,7 @@ from .gengo_utils import (
 )
 from .utils import locale_equals_language
 from fjord.base.models import ModelBase
+from fjord.base.utils import wrap_with_paragraphs
 from fjord.journal.models import Record
 from fjord.journal.utils import j_error, j_info
 
@@ -514,14 +514,14 @@ class GengoHumanTranslator(TranslationSystem):
             mail_admins(
                 subject='Gengo account balance {0} < {1}'.format(
                     balance, threshold),
-                message=''.join(wrap(
+                message=wrap_with_paragraphs(
                     'Dagnabit! Send more money or the translations get it! '
                     'Don\'t try no funny business, neither!'
                     '\n\n'
                     'Love,'
                     '\n\n'
                     'Fjord McGengo'
-                ))
+                )
             )
             return False
 
@@ -529,7 +529,7 @@ class GengoHumanTranslator(TranslationSystem):
             mail_admins(
                 subject='Warning: Gengo account balance {0} < {1}'.format(
                     balance, threshold),
-                message=''.join(wrap(
+                message=wrap_with_paragraphs(
                     'Dear mom,'
                     '\n\n'
                     'Translations are the fab. Running low on funds. Send '
@@ -538,7 +538,7 @@ class GengoHumanTranslator(TranslationSystem):
                     'Love,'
                     '\n\n'
                     'Fjord McGengo'
-                ))
+                )
             )
 
         return True

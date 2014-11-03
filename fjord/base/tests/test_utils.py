@@ -15,7 +15,8 @@ from fjord.base.utils import (
     smart_int,
     smart_str,
     smart_timedelta,
-    smart_truncate
+    smart_truncate,
+    wrap_with_paragraphs,
 )
 
 
@@ -116,6 +117,30 @@ class SmartTimeDeltaTest(TestCase):
         eq_(smart_timedelta('0d', 'fallback'), 'fallback')
         eq_(smart_timedelta('foo', 'fallback'), 'fallback')
         eq_(smart_timedelta('d', 'fallback'), 'fallback')
+
+
+class WrapWithParagraphsTest(TestCase):
+    def test_basic(self):
+        test_data = [
+            ('', 72, ''),
+            ('abc', 72, 'abc'),
+            ('abc\ndef', 72, 'abc\ndef'),
+            ('abc def ghi jkl\nfoo bar\nbaz', 8,
+             'abc def\nghi jkl\nfoo bar\nbaz'),
+        ]
+
+        for arg, width, expected in test_data:
+            eq_(wrap_with_paragraphs(arg, width), expected)
+
+    def test_edge_cases(self):
+        test_data = [
+            (None, 72, None),
+            ('abcdefghijkl\nfoo bar', 8, 'abcdefgh\nijkl\nfoo bar'),
+        ]
+
+        for arg, width, expected in test_data:
+            eq_(wrap_with_paragraphs(arg, width), expected)
+
 
 _foo_cache = {}
 
