@@ -2,7 +2,7 @@ import json
 import time
 from datetime import date, datetime, timedelta
 
-from django.core.cache import cache
+from django.core.cache import get_cache
 from django.test.client import Client
 
 from nose.tools import eq_
@@ -595,10 +595,15 @@ class PostFeedbackAPITest(TestCase):
             eq_(r.status_code, 201,
                 msg=('%s != 201 (%s)' % (r.status_code, url)))
 
-            cache.clear()
+            get_cache('default').clear()
 
 
 class PostFeedbackAPIThrottleTest(TestCase):
+    def setUp(self):
+        super(TestCase, self).setUp()
+
+        get_cache('default').clear()
+
     def test_throttle(self):
         # We allow 50 posts per hour.
         throttle_trigger = 50
@@ -622,6 +627,11 @@ class PostFeedbackAPIThrottleTest(TestCase):
         # Now hit the api a fajillion times making sure things got
         # created
         for i in range(throttle_trigger):
+            # django-ratelimit fails the throttling if we hit the url
+            # a fajillion times in rapid succession. For now, we add
+            # a sleep which means this test takes 5 seconds now.
+            # FIXME: Look into this more for a better solution.
+            time.sleep(0.05)
             r = self.client.post(reverse('feedback-api'), data.next())
             eq_(r.status_code, 201)
 
