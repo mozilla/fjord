@@ -26,10 +26,6 @@ https://github.com/jbalogh/jingo/archive/5e985a5c16e343a30482cc526127a856b1cb45e
 # sha256: Aff-Wq92Uwupotohk5IJAGe-WqzSlxTxLJgW-zjaAWA
 https://github.com/sehmaschine/django-grappelli/archive/7ac34941117da730865967a74e714da4a180eddb.tar.gz#egg=django-grappelli
 
-# django-adminplus: tags/v0.1.7
-# sha256: r9QC3Jp7_juBcqjKkKb3yQ_8J6o6cUfaTtromZjJuWY
-https://github.com/jsocol/django-adminplus/archive/09fa38724e8e05afc78f912da0ed78ef892da910.tar.gz#egg=django-adminplus
-
 # django-statsd: tags/0.3.8.5
 # sha256: LTn7BrZL1DKwIiETzYeOHlosfAnsk7K7V3zw4Kq_GNk
 https://github.com/andymckay/django-statsd/archive/bb601976056d0f922c5a613d2a9786b81d179b06.tar.gz#egg=django-statsd
@@ -107,8 +103,8 @@ https://github.com/jsocol/django-ratelimit/archive/e7ec3ded4ffe86afdcd39bc2ee665
 https://github.com/mozilla/nuggets/archive/ce506882b6943ea45ea4f98290fc4ef23e09a083.tar.gz#egg=nuggets
 
 # django-cache-machine: master
-# sha256: M4J3yBJ3cD1hn926MUw3jGxr7yZqN-lRAvkESWrxvBA
-https://github.com/jbalogh/django-cache-machine/archive/449861a61bcf096b792039128f044659e3e96eb6.tar.gz#egg=django-cache-machine
+# sha256: 8e1XsfN7i4b-Nn-Wm2Eovc4ZoPSZ4AvOtEGkA0wAC1g
+https://github.com/jbalogh/django-cache-machine/archive/f827f05b195ad3fc1b0111131669471d843d631f.tar.gz#egg=django-cache-machine
 
 # django-celery: tags/v3.0.23
 # sha256: ESLN3T2iyCrFz0i2k9G1Um7goYVPgRaii1DpoxwqmOg
@@ -118,11 +114,15 @@ https://github.com/celery/django-celery/archive/b11b358cbc0d7b3ca15575d27332d4ae
 # sha256: qm0q7z3NpXlebil6MCUbfIAahKy4h2MwiBjXscUjCdA
 https://github.com/clouserw/tower/archive/ade9804345eb49dd1b626fd276cd9572fd15d1b3.tar.gz#egg=tower
 
-# sha256: R85QXFBGw4gXgovuJTtyVocvhsQ0DbGvaYy4VI26oNI
-Django==1.5.9
+# django-nose: master
+# sha256: MVtqowQF3_m7mBNAa0lxcjVkSN4NuKurVFDvAZgzFPA
+https://github.com/jbalogh/django-nose/archive/b81f8471e74b9dd95581c39a17eac2657dbb72fe.tar.gz#egg=django-nose
 
-# sha256: mq4WtWKGak3apeiXhymrrbvtVEco2I4LnJr3sx3Qcu0
-django-nose==1.2
+# sha256: qGhcH7WwvK2QB9lByBSTZo-WE1eK3WMfQG0_lbhM9tA
+Django==1.6.8
+
+# sha256: JL4TJtBHNh5HWbqZkqyoPtZd9Vg3UN_ovoEOscEx2HY
+django-adminplus==0.3
 
 # sha256: Sje0ncwClfVGz2spT9gNcc_ttQT-YhDNq3n5xx5Ocn8
 dennis==0.4.3
