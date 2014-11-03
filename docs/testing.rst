@@ -56,6 +56,27 @@ database::
     REUSE_DB=1 ./manage.py test -s --noinput --logging-clear-handlers
 
 
+Further, running the test suite can be a good way to suss out Python
+warnings and 2to3 problems. To do that, run the test suite like this::
+
+    python -t -3 -Wd ./manage.py test
+
+
+Argument explanations:
+
+``-t``
+    Issue warnings about inconsistent tab usage.
+
+``-3``
+    Warns about Python 3.x incompatabilities that 2to3 can't fix.
+
+``-Wd``
+    Enables default warnings.
+
+
+See ``python -h`` for details and other arguments you can use.
+
+
 Running specific tests
 ----------------------
 

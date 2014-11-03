@@ -4,6 +4,7 @@ import re
 import time
 from functools import wraps
 from hashlib import md5
+from textwrap import wrap
 
 from django.contrib.auth.decorators import permission_required
 from django.core import validators
@@ -29,6 +30,17 @@ class JSONDatetimeEncoder(json.JSONEncoder):
         if hasattr(value, 'strftime'):
             return value.isoformat()
         return super(JSONDatetimeEncoder, self).default(value)
+
+
+def wrap_with_paragraphs(text, width=72):
+    """Runs textwrap on text, but keeps pre-existing paragraphs"""
+    if not text:
+        return text
+
+    return '\n'.join(
+        ['\n'.join(wrap(segment, width=width))
+         for segment in text.splitlines()]
+    )
 
 
 def is_url(url):

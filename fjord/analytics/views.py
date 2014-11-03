@@ -128,7 +128,7 @@ def generate_json_feed(request, search):
     }
     return HttpResponse(
         json.dumps(json_data, cls=JSONDatetimeEncoder),
-        mimetype='application/json')
+        content_type='application/json')
 
 
 def generate_atom_feed(request, search):
@@ -174,7 +174,7 @@ def generate_atom_feed(request, search):
             link_related=response.url_domain,
         )
     return HttpResponse(
-        feed.writeString('utf-8'), mimetype='application/atom+xml')
+        feed.writeString('utf-8'), content_type='application/atom+xml')
 
 
 def generate_dashboard_url(request, output_format='atom',

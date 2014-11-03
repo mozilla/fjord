@@ -74,7 +74,7 @@ def about_view(request):
 def robots_view(request):
     """Generate a robots.txt."""
     template = render(request, 'robots.txt')
-    return HttpResponse(template, mimetype='text/plain')
+    return HttpResponse(template, content_type='text/plain')
 
 
 def contribute_view(request):

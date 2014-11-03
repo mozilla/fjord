@@ -27,7 +27,7 @@ urlpatterns = patterns(
         lambda r: HttpResponse(
             ("User-agent: *\n%s: /" % (
                 'Allow' if settings.ENGAGE_ROBOTS else 'Disallow')),
-            mimetype="text/plain"
+            content_type="text/plain"
         )
     ),
 
