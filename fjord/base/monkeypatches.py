@@ -21,7 +21,7 @@ def patch():
     from django.contrib import admin
     from django.contrib.auth.decorators import login_required
     from session_csrf import anonymous_csrf
-    from adminplus import AdminSitePlus
+    from adminplus.sites import AdminSitePlus
 
     # Patch the admin
     admin.site = AdminSitePlus()
