@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth.models import Group
 from django.test.utils import override_settings
 
@@ -99,6 +101,19 @@ class TestRobots(TestCase):
         resp = self.client.get('/robots.txt')
         eq_(resp.status_code, 200)
         self.assertTemplateUsed(resp, 'robots.txt')
+
+
+class TestContribute(TestCase):
+
+    def test_contribute(self):
+        resp = self.client.get('/contribute.json')
+        eq_(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'contribute.json')
+
+    def test_contribute_if_valid_json(self):
+        resp = self.client.get('/contribute.json')
+        # json.loads throws a ValueError when contribute.json is invalid JSON.
+        json.loads(resp.content)
 
 
 class TestNewUserView(ElasticTestCase):

@@ -77,6 +77,12 @@ def robots_view(request):
     return HttpResponse(template, content_type='text/plain')
 
 
+def contribute_view(request):
+    """Generate a contribute.json."""
+    template = render(request, 'contribute.json')
+    return HttpResponse(template, mimetype='application/json')
+
+
 def test_memcached(host, port):
     """Connect to memcached.
 

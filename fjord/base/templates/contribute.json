@@ -1,0 +1,33 @@
+{
+    "name": "Input",
+    "description": "Input is one of several tools the Mozilla community uses to gather user sentiment on Mozilla products. This data helps us track down problems, guide new development and generally make Mozilla products better for users using them.",
+    "repository": {
+        "url": "https://github.com/mozilla/fjord/",
+        "license": "MPL2"
+    },
+    "participate": {
+        "home": "https://wiki.mozilla.org/Firefox/Input",
+        "docs": "https://fjord.readthedocs.org/",
+        "mailing-list": "https://mail.mozilla.org/listinfo/input-dev",
+        "irc": "irc://irc.mozilla.org/#input",
+        "irc-contacts": [
+            "willkg",
+            "r1cky",
+            "mythmon"
+        ]
+    },
+    "bugs": {
+        "list": "https://bugzilla.mozilla.org/buglist.cgi?quicksearch=OPEN+product%3AInput",
+        "report": "https://bugzilla.mozilla.org/enter_bug.cgi?product=Input"
+    },
+    "urls": {
+        "prod": "https://input.mozilla.org/",
+        "stage": "https://input.allizom.org/",
+        "dev": "https://input-dev.allizom.org/"
+    },
+    "keywords": [
+        "python",
+        "django",
+        "JSON"
+    ]
+}
