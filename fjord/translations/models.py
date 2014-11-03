@@ -528,7 +528,7 @@ class GengoHumanTranslator(TranslationSystem):
         if balance < (2 * threshold):
             mail_admins(
                 subject='Warning: Gengo account balance {0} < {1}'.format(
-                    balance, threshold),
+                    balance, 2 * threshold),
                 message=wrap_with_paragraphs(
                     'Dear mom,'
                     '\n\n'
