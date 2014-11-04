@@ -525,7 +525,15 @@ class GengoHumanTranslator(TranslationSystem):
             )
             return False
 
-        if balance < (2 * threshold):
+        return True
+
+    def balance_check(self, balance, threshold):
+        """Checks the balance and emails a warning if we're getting low
+
+        This doesn't halt translation--just issues a warning via email.
+
+        """
+        if balance > threshold and balance < (2 * threshold):
             mail_admins(
                 subject='Warning: Gengo account balance {0} < {1}'.format(
                     balance, 2 * threshold),
@@ -540,8 +548,6 @@ class GengoHumanTranslator(TranslationSystem):
                     'Fjord McGengo'
                 )
             )
-
-        return True
 
     def push_translations(self):
         gengo_api = FjordGengo()
@@ -560,6 +566,8 @@ class GengoHumanTranslator(TranslationSystem):
         if not self.balance_good_to_continue(balance, threshold):
             # If we don't have enough balance, stop.
             return
+
+        self.balance_check(balance, threshold)
 
         # Create language buckets for the jobs
         jobs = GengoJob.objects.filter(status=STATUS_CREATED)
