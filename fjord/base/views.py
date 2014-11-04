@@ -80,7 +80,7 @@ def robots_view(request):
 def contribute_view(request):
     """Generate a contribute.json."""
     template = render(request, 'contribute.json')
-    return HttpResponse(template, mimetype='application/json')
+    return HttpResponse(template, content_type='application/json')
 
 
 def test_memcached(host, port):
