@@ -537,7 +537,7 @@ class ResponseContext(ModelBase):
     """Holds context data we were sent as a JSON blob."""
 
     opinion = models.ForeignKey(Response)
-    data = JSONObjectField(default=u'{}')
+    data = JSONObjectField()
 
     def __unicode__(self):
         return unicode(self.id)
