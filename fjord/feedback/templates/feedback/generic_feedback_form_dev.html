@@ -1,115 +1,140 @@
 {# Generic feedback form: Rating version #}
 <form id="responseform" action="" method="post">
-  <x-deck transition-type="slide-left">
-    <x-card id="intro">
-      <x-appbar>
-        <header>[DEV] {{ _('Submit Your Feedback') }}</header>
-      </x-appbar>
-
-      <section>
-        <div id="sentiment">
-          <p>
-            {% trans product=product.display_name, support_url='https://support.mozilla.org/' %}
-              If you need help or have a problem
-              with {{ product }}, please visit <a href="{{ support_url }}">Mozilla
-              Support</a>.
-            {% endtrans %}
-          </p>
-          <p>{{ _('Your feedback helps us improve {product}.')|fe(product=product.display_name) }}</p>
-          <div id="buttons">
-            <button class="happy">{{ _('{product} made me happy')|fe(product=product.display_name) }}</button>
-            <button class="sad">{{ _('{product} made me sad')|fe(product=product.display_name) }}</button>
+  <div class="main">
+    <header>
+      <div class="header-content">
+        <div class="left-side">
+          <div id="back-button-container" tabindex=0>
+            <svg id="back-button" viewBox="0 0 55 100">
+              <g>
+                <path d="M 45 13 L 0 50 L 45 87" stroke-width="7" fill="none"/>
+              </g>
+            </svg>
           </div>
         </div>
-
-        <aside>
-          <div id="back-to-picker">
-            {% trans url=(url('feedback') + '?' + request.GET.urlencode()) %}
-              Not the product you want to give feedback on? <a href="{{ url }}">Go back
-              to the product picker</a>.
-            {% endtrans %}
-          </div>
-        </aside>
-      </section>
-    </x-card>
-
-    <x-card id="moreinfo">
-      <x-appbar>
-        <button class="back"></button>
-        <header>{{ _('Details') }}</header>
-      </x-appbar>
-
-      <section>
-        <aside>
-          <div>
-            {% trans %}
-              The content of your feedback will be public, so please be
-              sure not to include any personal information.
-            {% endtrans %}
-          </div>
-        </aside>
-
-        <p>
-          <label class="happy" for="description">
-            {{ _('Please describe what you liked.') }}
-          </label>
-          <label class="sad" for="description">
-            {{ _('Please describe your problem below.') }}
-            {{ _('Please be as specific as you can.') }}
-          </label>
-        </p>
-
-        <div id="description-counter"></div>
-        <textarea data-max-length="10000" id="description" name="description" cols="40" rows="4"></textarea>
-
-        <div>
-          <label for="id_url">
-            {{ _('If your feedback is related to a website, you can include it here.') }}
-          </label>
-          <p>{{ form.url }}</p>
-          {{ form.url.errors }}
+        <div class="middle">
+          <h1>&nbsp;</h1>
         </div>
+      </div>
+    </header>
 
-        <button id="description-next-btn" class="next btn submit">{{ _('Next') }}</button>
-      </section>
-    </x-card>
+    <div class="deck">
+      <div class="card" id="intro" data-title="{{ _('{product} feedback')|fe(product=product.display_name) }}">
+        <section>
+          <div class="ask">
+            {% trans product=product.display_name %}
+              How does {{product}} make you feel?
+            {% endtrans %}
+          </div>
 
-    <x-card id="email">
-      <x-appbar>
-        <button class="back"></button>
-        <header>{{ _('Can we contact you?') }}</header>
-      </x-appbar>
+          <div id="sentiment">
+            <div id="happy-button" class="sentiment-button" tabindex=0>
+              <svg class="face happy-face" viewBox="0 0 100 100">
+                <g>
+                  <!-- 100 by 100 -->
+                  <circle cx="50" cy="50" r="43" stroke-width="7" fill="none"/>
+                  <circle cx="33" cy="37" r="7" stroke-width="0" />
+                  <circle cx="67" cy="37" r="7" stroke-width="0" />
+                  <path d="M22 58 C 35 85, 65 85, 78 58" stroke-width="6" fill="none"/>
+                </g>
+              </svg>
+              <div class="face-description">
+                {% trans product=product.display_name %}
+                  {{product}} makes me happy
+                {% endtrans %}
+              </div>
+            </div>
 
-      <section>
-        <label class="email-ok">
-          <p>
-            <input id="email-ok" type="checkbox" name="email_ok"/>
-            {{ _('Check here to let us contact you to follow up on your feedback.') }}
-          </p>
-        </label>
-
-        <div id="email-details">
-          <label for="id_email">
-            {{ _('Email address (optional):') }}
-          </label>
-          <p>{{ form.email }}</p>
-          {{ form.email.errors }}
+            <div id="sad-button" class="sentiment-button" tabindex=0>
+              <svg class="face sad-face" viewBox="0 0 100 100">
+                <g>
+                  <!-- 100 by 100 -->
+                  <circle cx="50" cy="50" r="43" stroke-width="7" fill="none"/>
+                  <circle cx="33" cy="37" r="7" stroke-width="0" />
+                  <circle cx="67" cy="37" r="7" stroke-width="0" />
+                  <path d="M24 72 C 35 55, 65 55, 76 72" stroke-width="6" fill="none"/>
+                </g>
+              </svg>
+              <div class="face-description">
+                {% trans product=product.display_name %}
+                  {{product}} makes me sad
+                {% endtrans %}
+              </div>
+            </div>
+          </div>
 
           <aside>
-            <div>
-              {% trans %}
-                While your feedback will be publicly visible, email addresses are
-                kept private. We understand your privacy is important.
+            <div id="back-to-picker">
+              {% trans product=product.display_name, url='/en-US/feedback?feedbackdev=1' %}
+                Is {{product}} not the product you want to give feedback on?<br />
+                <a href="{{url}}">Pick a different product</a>.
               {% endtrans %}
             </div>
           </aside>
-        </div>
+        </section>
+      </div>
 
-        <button id="form-submit-btn" class="complete btn submit">{{ _('Send Feedback') }}</button>
-      </section>
-    </x-card>
+      <div class="card inactive" id="moreinfo" data-focus="#description" data-title="{{ _('Details') }}" data-back-id="intro">
+        <section>
+          <div class="ask">
+            <label class="happy" for="description">
+              {% trans %}
+                Please describe what you like.
+                The content of your feedback will be public, so please be
+                sure not to include personal information such as email
+                address, passwords or phone number.
+              {% endtrans %}
+            </label>
+            <label class="sad" for="description">
+              {% trans %}
+                Please describe your problem below and be as specific as
+                you can.
+                The content of your feedback will be public, so please be
+                sure not to include personal information such as email
+                address, passwords or phone number.
+              {% endtrans %}
+            </label>
+          </div>
+          <div class="input-box">
+            <div id="description-counter">10000</div>
+            <textarea data-max-length="10000" id="description" name="description"></textarea>
+          </div>
 
-  </x-deck>
+          <div class="ask">
+            <label for="id_url">
+              {% trans %}
+                If your feedback is related to a website, you can include it here:
+              {% endtrans %}
+            </label>
+          </div>
+
+          <div class="input-box">
+            <input class="url" id="id_url" name="url" placeholder="http://" type="text">
+          </div>
+
+          <div class="private">
+            <div class="ask private">
+              <input id="email-ok" name="email_ok" type="checkbox">
+              <label class="email-ok" for="email-ok">
+                {% trans %}
+                  (Optional) Check here to let us contact you to follow
+                  up on your feedback. Your email address will be kept
+                  private.
+                {% endtrans %}
+              </label>
+            </div>
+
+            <div id="email-details" class="input-box">
+              <input id="id_email" name="email" type="text" placeholder="username@example.com" disabled/>
+            </div>
+          </div>
+          <div class="input-box">
+            <button id="form-submit-btn" class="complete btn submit" disabled>{{ _('Submit feedback') }}</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
   {% for hidden in form.hidden_fields() %}
     {{ hidden }}
   {% endfor %}

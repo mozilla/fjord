@@ -1,131 +1,75 @@
-(function($) {
-    var xdeck = $('x-deck')[0];
+(function($, fjord, document, window) {
+    'use strict';
 
-    function goNext() {
-        // Moves to the next card and updates history.
-        var oldIndex = xdeck.selectedIndex;
-        xdeck.nextCard();
-        window.history.pushState({page: xdeck.selectedIndex}, '', '#' + xdeck.selectedIndex);
-    }
+    $(document).ready(function() {
+        /**
+         * Switches to the card with id #cardId. This also updates the
+         * window history via pushState.
+         */
+        function changeCard(cardId) {
+            // Make active card inactive
+            $('.card:not(.inactive)').addClass('inactive');
 
-    window.onpopstate = function(ev) {
-        // Switches the the appropriate card
-        var pageId = ev.state ? ev.state.page : 0;
-        if (pageId >= 0 && pageId < xdeck.cards.length) {
-            xdeck.showCard(pageId);
-        }
-    };
-
-    function countRemaining(inputElement) {
-        // Updates the counter and inputElement based on the number of
-        // characters in the specified inputElement.
-        var $desc = $(inputElement);
-        var $counter = $('#' + $desc.attr('id') + '-counter');
-        var max = $desc.attr('data-max-length');
-        var remaining = max - $desc.val().replace(/\s+/, '').length;
-
-        $desc.toggleClass('error', remaining < 0);
-
-        $counter.text(remaining);
-        $counter.toggleClass('error', remaining < 0);
-        $counter.toggleClass('warning', (remaining >= 0 && remaining <= Math.round(max * 0.2)));
-    }
-
-    function toggleNextButton(id) {
-        // Toggles the enabling of the next button
-        // id is the id of the button we want to affect
-        var isValid = true;
-        switch (id) {
-            case 'description-next-btn':
-                // Check if the description and url fields are valid
-                if ($('#description').hasClass('invalid') ||
-                        $('#id_url').hasClass('invalid')) {
-                    isValid = false;
-                }
-                break;
-            case 'form-submit-btn':
-                if ($('#email-ok').is(':checked') &&
-                        $('#id_email').hasClass('invalid')) {
-                    isValid = false;
-                }
-                break;
-        }
-
-
-        if (isValid) {
-            $('#' + id).prop('disabled', false);
-        } else {
-            $('#' + id).prop('disabled', true);
-        }
-    }
-
-    function init() {
-        $('input[type="text"]').keypress(function(event) {
-            // Tweak handling for CR for input text fields so they go
-            // to the next card or, if on the last card, submit the
-            // form.
-            if (event.which == 13) {
-                if (xdeck.selectedIndex < (xdeck.cards.length - 1)) {
-                    // If it's not on the last card, nextCard().
-                    goNext();
-                } else {
-                    // It's on the last card, so we submit the form.
-                    $('button.complete').click();
-                }
-                return false;
+            // Set title, add back-button, make new card active
+            var $card = $('#' + cardId);
+            $('header h1').text($card.attr('data-title'));
+            if ($card.attr('data-back-id') !== undefined) {
+                $('#back-button-container').show();
+            } else {
+                $('#back-button-container').hide();
             }
-        });
+            $card.removeClass('inactive');
+            if ($card.attr('data-focus') !== undefined) {
+                $($card.attr('data-focus')).focus();
+            }
+            window.history.pushState({page: cardId}, '', '#' + cardId);
+        }
 
-        $('#intro button').click(function(event) {
-            var happy = $(this).hasClass('happy');
+        window.onpopstate = function(ev) {
+            // Switches the the appropriate card
+            var pageId = ev.state ? ev.state.page : 'intro';
+            changeCard(pageId);
+        };
 
-            $('#moreinfo')
-                .removeClass(happy ? 'sad' : 'happy')
-                .addClass(happy ? 'happy' : 'sad');
-            $('#id_happy').val(happy ? '1' : '0');
-            goNext();
-            return false;
-        });
+        /**
+         * Makes the submit button valid/invalid depending on whether
+         * the form is valid.
+         */
+        function toggleSubmitButton() {
+            var isValid = true;
 
-        $('button.back').click(function(event) {
-            // We do what the browser back button would do here
-            window.history.back();
-            return false;
-        });
+            if ($('#description').val().replace(/^\s+/, '') === ''
+                    || $('#description').hasClass('invalid')
+                    || $('#id_url').hasClass('invalid')
+                    || $('#id_email').hasClass('invalid')) {
+                isValid = false;
+            }
 
-        $('button.next').click(function(event) {
-            goNext();
-            return false;
-        });
+            $('#form-submit-btn').prop('disabled', !isValid);
+        }
 
-        countRemaining($('#description'));
+        fjord.countRemaining($('#description'));
 
         $('#description').on('input', function() {
-            countRemaining(this);
+            fjord.countRemaining(this);
             if ($(this).val().replace(/^\s+/, '') === '') {
                 $(this).addClass('invalid');
             } else {
                 $(this).removeClass('invalid');
             }
-            toggleNextButton('description-next-btn');
+            toggleSubmitButton();
         });
 
         $('#id_url').on('input', function() {
-            var urlRegExp = /^((ftp|http|https):\/\/)?(\w+:{0,1}\w*@)?(\S+\.\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
-
-            if ($(this).val().length > 0 && !$(this).val().match(urlRegExp)) {
-                $(this).addClass('invalid');
-            } else {
+            if (fjord.validateUrl($(this).val())) {
                 $(this).removeClass('invalid');
+            } else {
+                $(this).addClass('invalid');
             }
-            toggleNextButton('description-next-btn');
+            toggleSubmitButton();
         });
 
-        $('#email-ok').on('change', function() {
-            var on = $(this).is(':checked');
-            $('#email-details').toggle(on);
-            toggleNextButton('form-submit-btn');
-        });
+        $('email-details').hide();
 
         $('#id_email').on('input', function() {
             if (fjord.validateEmail($(this).val())) {
@@ -133,23 +77,56 @@
             } else {
                 $(this).addClass('invalid');
             }
-            toggleNextButton('form-submit-btn');
+            toggleSubmitButton();
         });
 
-        // If there's a hash and a number, wipe it out with a
+        $('#happy-button').click(function(ev) {
+            $('.happy').show();
+            $('.sad').hide();
+            $('#id_happy').val(1);
+            changeCard('moreinfo');
+            return false;
+        });
+        $('#happy-button').keypress(function(ev) {
+            if ((ev.keyCode || ev.which) === '13') {
+                $('#happy-button').click();
+            }
+        });
+        $('#sad-button').click(function(ev) {
+            $('.happy').hide();
+            $('.sad').show();
+            $('#id_happy').val(0);
+            changeCard('moreinfo');
+            return false;
+        });
+        $('#sad-button').keypress(function(ev) {
+            if ((ev.keyCode || ev.which) === '13') {
+                $('#sad-button').click();
+            }
+        });
+        $('#back-button-container').click(function(ev) {
+            // We do what the browser back button would do here. We
+            // use #back-button-container because svg elements can't
+            // do tabindex in Firefox (bug #778654).
+            window.history.back();
+            return false;
+        });
+        $('#back-button-container').keypress(function(ev) {
+            if ((ev.keyCode || ev.which) === '13') {
+                $('#back-button-container').click();
+            }
+        });
+        $('#email-ok').on('change', function() {
+            var checked = $(this).is(':checked');
+            $('#id_email').prop('disabled', !checked);
+        });
+
+        // If there's a hash and a word, wipe it out with a
         // replaceState.
-        if (window.location.hash.match(/^#\d+$/)) {
+        if (window.location.hash.match(/^#\w+$/)) {
             window.history.replaceState('', '', '#');
         }
 
-        // Toggle the email-ok off.
-        $('#email-ok').change();
-
-        // Disable the "next" button on the details card. It gets
-        // re-enabled when they've started typing.
-        $('#description-next-btn').prop('disabled', true);
-    }
-
-    $(init);
-
-}(jQuery));
+        changeCard('intro');
+    });
+}(jQuery, fjord, document, window));
