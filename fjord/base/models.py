@@ -56,6 +56,14 @@ class JSONObjectField(models.TextField):
     empty_strings_allowed = False
     description = _lazy(u'JSON Object')
 
+    def __init__(self, *args, **kwargs):
+        # "default" should default to an empty JSON dict. We implement
+        # that this way rather than getting involved in the
+        # get_default/has_default Field machinery since this makes it
+        # easier to subclass.
+        kwargs['default'] = kwargs.get('default', u'{}')
+        super(JSONObjectField, self).__init__(self, *args, **kwargs)
+
     def pre_init(self, value, obj):
         if obj._state.adding:
             if isinstance(value, basestring):

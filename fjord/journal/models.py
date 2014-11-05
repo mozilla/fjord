@@ -77,7 +77,7 @@ class Record(ModelBase):
 
     # Any metadata related to this entry in the form of a Python dict which
     # is stored as a JSON object
-    metadata = JSONObjectField(default=u'{}')
+    metadata = JSONObjectField()
 
     # Note: This doesn't use django-cache-machine. These objects are
     # mostly for site maintenance purposes and thus we don't really
