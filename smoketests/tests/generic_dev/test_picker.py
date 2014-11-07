@@ -36,4 +36,5 @@ class TestPicker(object):
 
         # Go back to the product picker
         picker_pg = feedback_pg.go_to_picker_page()
-        # FIXME:
+        products = picker_pg.products
+        Assert.greater(len(products), 0)

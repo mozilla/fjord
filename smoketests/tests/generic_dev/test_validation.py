@@ -76,9 +76,6 @@ class TestValidation(TestCase):
 
         feedback_pg.click_happy_feedback()
         feedback_pg.set_description('ou812')
-        feedback_pg.click_moreinfo_next()
-
-        self.take_a_breather()
         feedback_pg.check_email_checkbox()
 
         valid = [
