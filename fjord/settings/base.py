@@ -212,7 +212,8 @@ PROD_LANGUAGES = [
     'zu'
 ]
 
-DEV_LANGUAGES = PROD_LANGUAGES
+DEV_LANGUAGES = PROD_LANGUAGES + ['xx']
+
 
 def lazy_lang_url_map():
     from django.conf import settings
