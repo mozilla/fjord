@@ -4,7 +4,7 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
-from fjord.base.models import ModelBase, JSONObjectField
+from fjord.base.models import JSONObjectField
 
 
 RECORD_INFO = u'info'
@@ -42,7 +42,7 @@ class RecordManager(models.Manager):
         )
 
 
-class Record(ModelBase):
+class Record(models.Model):
     """Defines an audit record for something that happened in translations"""
 
     TYPE_CHOICES = [
