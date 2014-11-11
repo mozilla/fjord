@@ -42,8 +42,6 @@ urlpatterns += patterns(
         name='analytics_hourly_histogram'),
     url(r'^analytics/duplicates/?$', 'analytics_duplicates',
         name='analytics_duplicates'),
-    url(r'^analytics/hb/?$', 'analytics_hb',
-        name='analytics_hb'),
     url(r'^analytics/flagged/?$', 'analytics_flagged',
         name='analytics_flagged'),
 )
