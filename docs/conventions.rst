@@ -200,8 +200,7 @@ Testing strings
 
 Fjord comes with ``bin/test_locales.sh`` script which makes it pretty
 easy to test that strings in the user interface are getting gettext'd.
-It creates a faux "Swedish Chef" translation of the strings in the
-`xx` locale.
+It creates a faux "Pirate" translation of the strings in the `xx` locale.
 
 You need to install polib for the script to work::
 

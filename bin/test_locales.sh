@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This creates a faux Swedish Chef locale under xx and transforms all the
+# This creates a faux Pirate locale under xx and transforms all the
 # strings such that every resulting string has four properties:
 #
 # 1. it's longer than the English equivalent (tests layout issues)
@@ -8,6 +8,8 @@
 # 3, every string ends up with a non-ascii character (tests unicode)
 # 4. looks close enough to the English equivalent that you can quickly
 #    figure out what's wrong
+# 5. it's kind of funny so it adds some lightness to the heavy hardships
+#    of development toil
 #
 # Run this from the project root directory like this:
 #
