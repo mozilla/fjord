@@ -8,7 +8,6 @@ from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.http import (
     HttpResponse,
-    HttpResponseForbidden,
     HttpResponseRedirect
 )
 from django.shortcuts import get_object_or_404, render
@@ -65,21 +64,6 @@ def spot_translate(request, responseid):
 @mobile_template('analytics/{mobile/}response.html')
 def response_view(request, responseid, template):
     response = get_object_or_404(Response, id=responseid)
-
-    try:
-        prod = Product.objects.get(db_name=response.product)
-
-        if (not prod.on_dashboard
-                and (not request.user.is_authenticated()
-                     or not request.user.has_perm(
-                         'analytics.can_view_dashboard'))):
-
-            # If this is a response for a hidden product and the user
-            # isn't in the analytics group, then they can't see it.
-            return HttpResponseForbidden()
-
-    except Product.DoesNotExist:
-        pass
 
     mlt = None
     records = None

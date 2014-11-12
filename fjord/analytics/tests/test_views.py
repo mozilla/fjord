@@ -411,38 +411,6 @@ class TestResponseview(ElasticTestCase):
         self.assertTemplateUsed(r, 'analytics/mobile/response.html')
         assert str(resp.description) in r.content
 
-    def test_hidden_products_with_unauthed_user(self):
-        prod = ProductFactory(display_name='HiddenProduct', on_dashboard=False)
-        resp = ResponseFactory(product=prod.db_name)
-        self.refresh()
-
-        r = self.client.get(reverse('response_view', args=(resp.id,)))
-        eq_(403, r.status_code)
-
-    def test_hidden_products_with_authed_user(self):
-        prod = ProductFactory(display_name='HiddenProduct', on_dashboard=False)
-        resp = ResponseFactory(product=prod.db_name)
-        self.refresh()
-
-        jane = ProfileFactory(user__email='jane@example.com').user
-        self.client_login_user(jane)
-
-        r = self.client.get(reverse('response_view', args=(resp.id,)))
-        eq_(403, r.status_code)
-
-    def test_hidden_products_with_analyzer_user(self):
-        prod = ProductFactory(display_name='HiddenProduct', on_dashboard=False)
-        resp = ResponseFactory(product=prod.db_name)
-        self.refresh()
-
-        jane = ProfileFactory(user__email='jane@example.com').user
-        jane.groups.add(Group.objects.get(name='analyzers'))
-
-        self.client_login_user(jane)
-
-        r = self.client.get(reverse('response_view', args=(resp.id,)))
-        eq_(200, r.status_code)
-
     def test_response_view_analyzer(self):
         """Test secret section only shows up for analyzers"""
         resp = ResponseFactory(happy=True, description=u'the bestest best!')
