@@ -438,6 +438,7 @@ def underconstruction(request):
 
 def generate_totals_histogram(search_date_start, search_date_end,
                               search_query, prod):
+    # Note: Not localized because it's ultra-alpha.
     search_date_start = search_date_start - timedelta(days=1)
 
     search = ResponseMappingType.search()
@@ -518,7 +519,7 @@ def generate_totals_histogram(search_date_start, search_date_end,
         },
         {
             'name': 'total',
-            'label': _('Total # responses'),
+            'label': 'Total # responses',
             'data': totals_data,
             'yaxis': 1,
             'lines': {'show': True, 'fill': False},
@@ -527,7 +528,7 @@ def generate_totals_histogram(search_date_start, search_date_end,
         },
         {
             'name': 'updeltas',
-            'label': _('Percent change in sentiment upwards'),
+            'label': 'Percent change in sentiment upwards',
             'data': up_deltas,
             'yaxis': 2,
             'bars': {'show': True, 'lineWidth': 3},
@@ -536,7 +537,7 @@ def generate_totals_histogram(search_date_start, search_date_end,
         },
         {
             'name': 'downdeltas',
-            'label': _('Percent change in sentiment downwards'),
+            'label': 'Percent change in sentiment downwards',
             'data': down_deltas,
             'yaxis': 2,
             'bars': {'show': True, 'lineWidth': 3},
@@ -549,6 +550,7 @@ def generate_totals_histogram(search_date_start, search_date_end,
 
 
 def product_dashboard_firefox(request, prod):
+    # Note: Not localized because it's ultra-alpha.
     template = 'analytics/product_dashboard_firefox.html'
     current_search = {}
 
@@ -664,6 +666,7 @@ def product_dashboard_firefox(request, prod):
 
 
 def product_dashboard_generic(request, prod):
+    # Note: Not localized because it's ultra-alpha.
     template = 'analytics/product_dashboard.html'
     current_search = {}
 
