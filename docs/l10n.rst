@@ -75,7 +75,7 @@ After that, send an email to the `dev-l10n-web mailing list
 
     I've just pushed new strings to Verbatim for Input.
 
-    https://lists.mozilla.org/listinfo/dev-l10n-web
+    https://localize.mozilla.org/projects/input/
 
     < explanation of strings changes here >
 
