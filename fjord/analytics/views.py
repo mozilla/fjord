@@ -367,7 +367,7 @@ def dashboard(request):
     else:
         filter_data.append({
             'display': _('Version'),
-            'note': _('Select product to see version facet')
+            'note': _('Select product to see version breakdown')
         })
 
     filter_data.extend(

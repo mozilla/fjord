@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
+{# Note: This is not l10n-ized since it's only available to admin. #}
 
 {% block site_css %}
   {{ css('monitor') }}
 {% endblock %}
 
-{% block page_title %}{{ _('Input Services Monitor') }}{% endblock %}
+{% block page_title %}Input Services Monitor{% endblock %}
 
 {% macro status(b) %}
   {% if b %}info{% else %}error{% endif %}
@@ -15,11 +16,10 @@
   </div>
   <div class="col wide">
     <div class="block monitor">
-      <h1>{{ _('Input Services Monitor') }}</h1>
+      <h1>Input Services Monitor</h1>
       <p>
-        {% trans %}
-        List of components that Input uses and whether they are functioning correctly.
-        {% endtrans %}
+        List of components that Input uses and whether they are functioning
+        correctly.
       </p>
 
       {% for component, output in component_status|dictsort %}
