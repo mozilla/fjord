@@ -431,11 +431,6 @@ def dashboard(request):
     })
 
 
-@check_new_user
-def underconstruction(request):
-    return render(request, 'analytics/underconstruction.html')
-
-
 def generate_totals_histogram(search_date_start, search_date_end,
                               search_query, prod):
     # Note: Not localized because it's ultra-alpha.
