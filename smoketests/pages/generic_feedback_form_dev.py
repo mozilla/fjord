@@ -18,20 +18,17 @@ class GenericFeedbackFormDevPage(Page):
     _intro_card_locator = (By.ID, 'intro')
     _picker_link_locator = (By.CSS_SELECTOR, '#back-to-picker a')
 
-    _happy_button_locator = (By.CSS_SELECTOR, '#buttons button.happy')
-    _sad_button_locator = (By.CSS_SELECTOR, '#buttons button.sad')
+    _back_locator = (By.ID, 'back-button')
+
+    _happy_button_locator = (By.ID, 'happy-button')
+    _sad_button_locator = (By.ID, 'sad-button')
 
     _moreinfo_card_locator = (By.ID, 'moreinfo')
     _description_locator = (By.ID, 'description')
+    _description_character_count_locator = (By.ID, 'description-counter')
     _url_locator = (By.ID, 'id_url')
-    _moreinfo_character_count_locator = (By.ID, 'description-counter')
-    _moreinfo_back_locator = (By.CSS_SELECTOR, '#moreinfo button.back')
-    _moreinfo_next_locator = (By.ID, 'description-next-btn')
-
-    _email_card_locator = (By.ID, 'email')
     _email_checkbox_locator = (By.ID, 'email-ok')
     _email_locator = (By.ID, 'id_email')
-    _email_back_locator = (By.CSS_SELECTOR, '#email button.back')
 
     _submit_locator = (By.ID, 'form-submit-btn')
 
@@ -45,10 +42,10 @@ class GenericFeedbackFormDevPage(Page):
         # Make sure we're on the intro card
         self.selenium.find_element(*self._intro_card_locator)
 
-        # Get the first paragraph and make sure it has the product
-        # name in it
-        first_p = self.selenium.find_element(By.CSS_SELECTOR, 'p:first-child').text
-        return product_name in first_p
+        # Get the first ask and make sure it has the product name in
+        # it
+        first_ask = self.selenium.find_element(By.CSS_SELECTOR, 'div.ask:first-child').text
+        return product_name in first_ask
 
     def go_to_picker_page(self):
         picker_pg = PickerPage(self.testsetup)
@@ -70,8 +67,8 @@ class GenericFeedbackFormDevPage(Page):
         self.selenium.find_element(*self._sad_button_locator).click()
         self.wait_for(self._description_locator)
 
-    def click_moreinfo_back(self):
-        self.selenium.find_element(*self._moreinfo_back_locator).click()
+    def click_back(self):
+        self.selenium.find_element(*self._back_locator).click()
         self.wait_for(self._happy_button_locator)
 
     def set_description_execute_script(self, text):
@@ -100,14 +97,6 @@ class GenericFeedbackFormDevPage(Page):
         url.clear()
         url.send_keys(text)
 
-    def click_moreinfo_next(self):
-        self.selenium.find_element(*self._moreinfo_next_locator).click()
-        self.wait_for(self._email_checkbox_locator)
-
-    def click_email_back(self):
-        self.selenium.find_element(*self._email_back_locator).click()
-        self.wait_for(self._description_locator)
-
     def check_email_checkbox(self, checked=True):
         self.wait_for(self._email_checkbox_locator)
         checkbox = self.selenium.find_element(*self._email_checkbox_locator)
@@ -122,6 +111,11 @@ class GenericFeedbackFormDevPage(Page):
         email.clear()
         email.send_keys(text)
 
+    @property
+    def is_submit_enabled(self):
+        # return not 'disabled' in self.selenium.find_element(*self._submit_feedback_locator).get_attribute('class'        
+        return self.selenium.find_element(*self._submit_locator).is_enabled()
+
     def submit(self, expect_success=True):
         self.selenium.find_element(*self._submit_locator).click()
         if expect_success:
@@ -130,10 +124,6 @@ class GenericFeedbackFormDevPage(Page):
     @property
     def support_page_link_address(self):
         return self.selenium.find_element(*self._support_page_locator).get_attribute('href')
-
-    @property
-    def is_moreinfo_next_enabled(self):
-        return self.selenium.find_element(*self._moreinfo_next_locator).is_enabled()
 
     @property
     def is_url_valid(self):
@@ -145,8 +135,4 @@ class GenericFeedbackFormDevPage(Page):
 
     @property
     def remaining_character_count(self):
-        return int(self.selenium.find_element(*self._moreinfo_character_count_locator).text)
-
-    @property
-    def is_submit_feedback_enabled(self):
-        return not 'disabled' in self.selenium.find_element(*self._submit_feedback_locator).get_attribute('class')
+        return int(self.selenium.find_element(*self._description_character_count_locator).text)

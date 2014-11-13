@@ -11,7 +11,7 @@ from pages.generic_feedback_form_dev import GenericFeedbackFormDevPage
 class TestCards(object):
     @pytest.mark.nondestructive
     def test_back_and_forth(self, mozwebqa):
-        """Test next and back buttons"""
+        """Test back buttons"""
         desc = 'input-tests testing'
 
         # 1. go to the feedback form
@@ -21,17 +21,13 @@ class TestCards(object):
         # 2. click on happy
         feedback_pg.click_happy_feedback()
 
-        # 3. click back and happy again
-        feedback_pg.click_moreinfo_back()
-        feedback_pg.click_happy_feedback()
+        # 3. click back and click sad
+        feedback_pg.click_back()
+        feedback_pg.click_sad_feedback()
 
-        # 4. check next button is disabled, fill out description,
-        # check next button is enabled and move on
-        Assert.false(feedback_pg.is_moreinfo_next_enabled)
+        # 4. verify submit button is disabled
+        Assert.false(feedback_pg.is_submit_enabled)
+
+        # 5. fill out description, check submit button enabled
         feedback_pg.set_description(desc)
-        Assert.true(feedback_pg.is_moreinfo_next_enabled)
-        feedback_pg.click_moreinfo_next()
-
-        # 5. click back and next again
-        feedback_pg.click_email_back()
-        feedback_pg.click_moreinfo_next()
+        Assert.true(feedback_pg.is_submit_enabled)
