@@ -367,7 +367,7 @@ def dashboard(request):
     else:
         filter_data.append({
             'display': _('Version'),
-            'note': _('Select product to see version facet')
+            'note': _('Select product to see version breakdown')
         })
 
     filter_data.extend(
@@ -429,11 +429,6 @@ def dashboard(request):
         'selected': selected,
         'atom_url': generate_dashboard_url(request),
     })
-
-
-@check_new_user
-def underconstruction(request):
-    return render(request, 'analytics/underconstruction.html')
 
 
 def generate_totals_histogram(search_date_start, search_date_end,

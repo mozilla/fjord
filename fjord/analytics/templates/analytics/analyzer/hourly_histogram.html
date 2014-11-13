@@ -6,8 +6,8 @@
     <div class="block graph">
       <div class="expando">
         <label for="date_end">End date</label>
-        <input id="date_end" type="date" name="date_end" value="{{ end_date }}" placeholder="{{ _('End') }}">
-        <a href="#" class="button" id="whensubmit">{{ _('Set') }}</a>
+        <input id="date_end" type="date" name="date_end" value="{{ end_date }}" placeholder="End">
+        <a href="#" class="button" id="whensubmit">Set</a>
       </div>
 
       <h1>Hourly number of responses from {{ start_date }} to {{ end_date }}</h1>
@@ -15,7 +15,7 @@
       {# A graph will be dynamically inserted in these divs by Flot. #}
       <div class="hourly-histogram" data-histogram="{{ histogram|to_json }}"></div>
       <div class="legend"></div>
-      <div class="note">{{ _('Note: All dates and times are in Pacific Time.') }}</div>
+      <div class="note">Note: All dates and times are in Pacific Time.</div>
     </div>
   </div>
 {% endblock %}

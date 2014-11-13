@@ -20,9 +20,6 @@ urlpatterns = patterns(
     # Translate a specific response
     url(r'^dashboard/translate/(?P<responseid>\d+)/?$',
         'spot_translate', name='spot_translate'),
-
-    # Temporary!: The under construction view
-    url(r'^underc/?$', 'underconstruction', name='underconstruction'),
 )
 
 # These are analyzer-group only views.
