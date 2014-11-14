@@ -85,16 +85,21 @@ def display_summary(last_item, app, highlight):
         print '{0:>8}: {1}'.format(loc, format_bar(perc))
 
 
-def mark_movement(data):
+def mark_movement(data, space):
     """Adds ^ and v for up and down movement based on previous day"""
+    data = list(data)
     for i, day in enumerate(data):
         if i == 0:
             continue
 
-        if data[i-1] > data[i]:
-            data[i] = TERM.bold_red('v' + data[i])
-        elif data[i-1] < data[i]:
-            data[i] = TERM.bold_green('^' + data[i])
+        item = data[i]
+        prespace = ' ' * (space - len(str(item)) - 1)
+        if data[i-1] > item:
+            item = prespace + TERM.bold_red('v' + str(item))
+        elif data[i-1] < item:
+            item = prespace + TERM.bold_green('^' + str(item))
+
+        data[i] = item
 
     return data
 
@@ -132,18 +137,15 @@ def display_history(data, app, highlight):
         for loc in hlocales:
             values = []
             values.append(loc)
-            day_data = mark_movement([get_data(day['locales'][loc]) for day in data])
-            values.extend(day_data)
+            day_data = [get_data(day['locales'][loc]) for day in data]
+            values.extend(mark_movement(day_data, 6))
 
-            if values[-1] < 90:
+            if day_data[-1] < 90:
                 values.append('**')
             else:
                 values.append('')
 
-            if loc in highlight:
-                print TERM.bold_green(tmpl.format(*values))
-            else:
-                print tmpl.format(*values)
+            print tmpl.format(*values)
         print ''
 
     print 'Locales:'
@@ -164,8 +166,9 @@ def display_history(data, app, highlight):
 
 
 def main(argv):
-    parser = argparse.ArgumentParser(description=DESC, usage=USAGE,
-                                     epilog='Note: Install blessings for color.')
+    parser = argparse.ArgumentParser(
+        description=DESC, usage=USAGE,
+        epilog='Note: Install blessings for color.')
     parser.add_argument('--app',
                         help='Specify the app to show data for')
     parser.add_argument('--highlight', default=[],
