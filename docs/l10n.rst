@@ -18,25 +18,32 @@ Things to know about l10n
    minutes that updates the svn locale repository so that translators
    can see the latest stuff
 
-:svn url:           https://svn.mozilla.org/projects/l10n-misc/trunk/input/locale
-:viewvc svn:        http://viewvc.svn.mozilla.org/vc/projects/l10n-misc/trunk/input/locale/
-:Input in Verbatim: https://localize.mozilla.org/projects/input/
+:svn url:    https://svn.mozilla.org/projects/l10n-misc/trunk/input/locale
+:viewvc svn: http://viewvc.svn.mozilla.org/vc/projects/l10n-misc/trunk/input/locale/
+:Verbatim:   https://localize.mozilla.org/projects/input/
 
 
 Installing localizations from svn
 =================================
 
-Localizations are not stored in this repository, but are in Mozilla's SVN.
+Localizations are not stored in this repository--they're in Mozilla's
+subversion repository.
 
 To get the localizations, do::
 
+    cd locale
     svn checkout https://svn.mozilla.org/projects/l10n-misc/trunk/input/locale locale
+
+To see the translated strings, you need to first compile the .po files to
+.mo files::
+
+    ./bin/compile-mo.sh locale/
 
 
 .. _l10n-update-strings:
 
-Updating strings in svn
-=======================
+Extract/merge/sync strings with svn
+===================================
 
 First, ping Kadir (or whoever else) and tell him/her we're merging strings
 (i.e. extracting them from our codebase and committing the changes to svn).
@@ -52,14 +59,10 @@ Then, extract the strings from the codebase::
     ./manage.py extract
     ./manage.py merge
 
-(Optional) To see changes in the project::
-
-    ./bin/compile-mo.sh locale/
-
 Then, commit the new strings to svn::
 
     cd locale
-    svn commit -m 'String update YYYY/MM/DD'
+    svn commit -m 'Input strings update YYYY/MM/DD'
 
 Then, tell him/her that the strings have been extracted. He/she will
 update Verbatim for all locales.
@@ -93,6 +96,8 @@ After that, send an email to the `dev-l10n-web mailing list
 
 Creating new localization locales
 =================================
+
+FIXME: This section is probably wrong.
 
 In your projects ``settings.py`` add the new locale to
 ``KNOWN_LANGUAGES``.
