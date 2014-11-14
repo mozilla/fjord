@@ -375,7 +375,7 @@ class PostFeedbackAPITest(TestCase):
         eq_(r.status_code, 201)
 
         context = models.ResponseContext.objects.latest(field_name='id')
-        eq_(context.data, u'{"slopmenow": "bar"}')
+        eq_(context.data, {'slopmenow': 'bar'})
 
     def test_with_context_truncate_key(self):
         data = {
@@ -394,7 +394,7 @@ class PostFeedbackAPITest(TestCase):
         eq_(r.status_code, 201)
 
         context = models.ResponseContext.objects.latest(field_name='id')
-        eq_(context.data, u'{"foo01234567890123456": "bar"}')
+        eq_(context.data, {'foo01234567890123456': 'bar'})
 
     def test_with_context_truncate_value(self):
         data = {
@@ -413,7 +413,7 @@ class PostFeedbackAPITest(TestCase):
         eq_(r.status_code, 201)
 
         context = models.ResponseContext.objects.latest(field_name='id')
-        eq_(context.data, u'{"foo": "' + ('a' * 100) + '"}')
+        eq_(context.data, {'foo': ('a' * 100)})
 
     def test_with_context_20_pairs(self):
         data = {
@@ -434,7 +434,7 @@ class PostFeedbackAPITest(TestCase):
         eq_(r.status_code, 201)
 
         context = models.ResponseContext.objects.latest(field_name='id')
-        data = sorted(json.loads(context.data).items())
+        data = sorted(context.data.items())
         eq_(len(data), 20)
         eq_(data[0], ('foo00', '0'))
         eq_(data[-1], ('foo19', '19'))
