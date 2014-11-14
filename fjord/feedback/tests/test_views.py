@@ -1,5 +1,3 @@
-import json
-
 from django.core.cache import cache
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
@@ -539,7 +537,7 @@ class TestFeedback(TestCase):
         self.assertRedirects(r, reverse('thanks'))
 
         context = models.ResponseContext.objects.latest(field_name='id')
-        eq_(context.data, u'{"foo": "bar"}')
+        eq_(context.data, {'foo': 'bar'})
 
     def test_save_context_long_key(self):
         """Long keys are truncated"""
@@ -553,7 +551,7 @@ class TestFeedback(TestCase):
         self.assertRedirects(r, reverse('thanks'))
 
         context = models.ResponseContext.objects.latest(field_name='id')
-        eq_(context.data, u'{"foo12345678901234567": "bar"}')
+        eq_(context.data, {'foo12345678901234567': 'bar'})
 
     def test_save_context_long_val(self):
         """Long values are truncated"""
@@ -567,7 +565,7 @@ class TestFeedback(TestCase):
         self.assertRedirects(r, reverse('thanks'))
 
         context = models.ResponseContext.objects.latest(field_name='id')
-        eq_(context.data, u'{"foo": "' + ('a' * 100) + '"}')
+        eq_(context.data, {'foo': ('a' * 100)})
 
     def test_save_context_maximum_pairs(self):
         """Only save 20 pairs"""
@@ -583,7 +581,7 @@ class TestFeedback(TestCase):
         self.assertRedirects(r, reverse('thanks'))
 
         context = models.ResponseContext.objects.latest(field_name='id')
-        data = sorted(json.loads(context.data).items())
+        data = sorted(context.data.items())
         eq_(len(data), 20)
         eq_(data[0], (u'foo00', '0'))
         eq_(data[-1], (u'foo19', '19'))

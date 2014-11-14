@@ -45,7 +45,7 @@ from south.modelsinspector import add_introspection_rules
 add_introspection_rules([], ["^fjord\.base\.models\.EnhancedURLField"])
 
 
-class JSONObjectField(models.TextField):
+class JSONObjectField(models.Field):
     """Represents a JSON object.
 
     Note: This might be missing a lot of Django infrastructure to
@@ -56,13 +56,18 @@ class JSONObjectField(models.TextField):
     empty_strings_allowed = False
     description = _lazy(u'JSON Object')
 
+    __metaclass__ = models.SubfieldBase
+
     def __init__(self, *args, **kwargs):
         # "default" should default to an empty JSON dict. We implement
         # that this way rather than getting involved in the
         # get_default/has_default Field machinery since this makes it
         # easier to subclass.
-        kwargs['default'] = kwargs.get('default', u'{}')
+        kwargs['default'] = kwargs.get('default', {})
         super(JSONObjectField, self).__init__(self, *args, **kwargs)
+
+    def get_internal_type(self):
+        return 'TextField'
 
     def pre_init(self, value, obj):
         if obj._state.adding:
@@ -71,18 +76,34 @@ class JSONObjectField(models.TextField):
         return value
 
     def to_python(self, value):
-        # FIXME: This isn't called when accessing the field value.
-        # So it must be something else.
-        return json.loads(value)
+        if isinstance(value, basestring):
+            return json.loads(value)
+        return value
 
     def get_db_prep_value(self, value, connection, prepared=False):
         if self.null and value is None:
             return None
-        return json.dumps(value, sort_keys=True) if value else '{}'
+        return json.dumps(value, sort_keys=True)
 
     def value_to_string(self, obj):
         val = self._get_val_from_obj(obj)
         return self.get_db_prep_value(val)
+
+    def value_from_object(self, obj):
+        value = super(JSONObjectField, self).value_from_object(obj)
+        if self.null and value is None:
+            return None
+        return json.dumps(value)
+
+    def get_default(self):
+        if self.has_default():
+            if callable(self.default):
+                return self.default()
+            return self.default
+
+        if self.null:
+            return None
+        return {}
 
 
 from south.modelsinspector import add_introspection_rules
