@@ -87,21 +87,25 @@ def display_summary(last_item, app, highlight):
 
 def mark_movement(data, space):
     """Adds ^ and v for up and down movement based on previous day"""
-    data = list(data)
+    ret = []
     for i, day in enumerate(data):
+        item = data[i]
+
         if i == 0:
+            ret.append(item)
             continue
 
-        item = data[i]
         prespace = ' ' * (space - len(str(item)) - 1)
         if data[i-1] > item:
             item = prespace + TERM.bold_red('v' + str(item))
         elif data[i-1] < item:
             item = prespace + TERM.bold_green('^' + str(item))
+        elif item < 100:
+            item = prespace + TERM.bold_yellow('=' + str(item))
 
-        data[i] = item
+        ret.append(item)
 
-    return data
+    return ret
 
 
 def display_history(data, app, highlight):
@@ -132,9 +136,8 @@ def display_history(data, app, highlight):
     hlocales = [loc for loc in locales if loc in highlight]
     locales = [loc for loc in locales if loc not in highlight]
 
-    if hlocales:
-        print 'Highlighted locales:'
-        for loc in hlocales:
+    def print_data(loc_list, data):
+        for loc in loc_list:
             values = []
             values.append(loc)
             day_data = [get_data(day['locales'][loc]) for day in data]
@@ -146,23 +149,15 @@ def display_history(data, app, highlight):
                 values.append('')
 
             print tmpl.format(*values)
+
+    if hlocales:
+        print 'Highlighted locales:'
+        print_data(hlocales, data)
         print ''
 
-    print 'Locales:'
-    for loc in locales:
-        values = []
-        values.append(loc)
-        values.extend([get_data(day['locales'][loc]) for day in data])
-
-        if values[-1] < 90:
-            values.append('**')
-        else:
-            values.append('')
-
-        if loc in highlight:
-            print TERM.bold_green(tmpl.format(*values))
-        else:
-            print tmpl.format(*values)
+    if locales:
+        print 'Locales:'
+        print_data(locales, data)
 
 
 def main(argv):
