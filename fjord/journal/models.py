@@ -22,10 +22,11 @@ class RecordManager(models.Manager):
             type=type_,
             src=src,
             action=action,
-            content_object=instance,
             msg=msg,
             metadata=metadata
         )
+        if instance:
+            rec.content_object = instance
         rec.save()
         return rec
 
