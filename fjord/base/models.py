@@ -87,7 +87,7 @@ class JSONObjectField(models.Field):
 
     def value_to_string(self, obj):
         val = self._get_val_from_obj(obj)
-        return self.get_db_prep_value(val)
+        return self.get_db_prep_value(val, None)
 
     def value_from_object(self, obj):
         value = super(JSONObjectField, self).value_from_object(obj)
