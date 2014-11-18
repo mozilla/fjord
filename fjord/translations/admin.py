@@ -144,8 +144,9 @@ def gengo_translator_view(request):
     })
 
 
-admin.site.register_view('gengo-translator-view', gengo_translator_view,
-                         'Translations - Gengo Maintenance')
+admin.site.register_view(path='gengo-translator-view',
+                         name='Translations - Gengo Maintenance',
+                         view=gengo_translator_view)
 
 
 def translations_management_backfill_view(request):
@@ -200,9 +201,9 @@ def translations_management_backfill_view(request):
 
 
 admin.site.register_view(
-    'translations-management-backfill-view',
-    translations_management_backfill_view,
-    'Translations - General - Backfill')
+    path='translations-management-backfill-view',
+    name='Translations - General - Backfill',
+    view=translations_management_backfill_view)
 
 
 def translations_management_view(request):
@@ -225,5 +226,6 @@ def translations_management_view(request):
 
 
 admin.site.register_view(
-    'translations-management-view', translations_management_view,
-    'Translations - General')
+    path='translations-management-view',
+    name='Translations - General',
+    view=translations_management_view)

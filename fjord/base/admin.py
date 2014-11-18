@@ -21,8 +21,9 @@ def settings_view(request):
     })
 
 
-admin.site.register_view('settings', settings_view,
-                         'Settings - App Settings')
+admin.site.register_view(path='settings',
+                         name='Settings - App settings',
+                         view=settings_view)
 
 
 def celery_settings_view(request):
@@ -41,12 +42,15 @@ def celery_settings_view(request):
     })
 
 
-admin.site.register_view('celery', celery_settings_view,
-                         'Settings - Celery Settings')
+admin.site.register_view(path='celery',
+                         name='Settings - Celery Settings',
+                         view=celery_settings_view)
 
 
 def env_view(request):
     """Admin view that displays the wsgi env."""
     return http.HttpResponse(u'<pre>%s</pre>' % (jinja2.escape(request)))
 
-admin.site.register_view('env', env_view, 'WSGI Environment')
+admin.site.register_view(path='env',
+                         name='WSGI Environment',
+                         view=env_view)

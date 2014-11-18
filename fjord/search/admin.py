@@ -132,5 +132,6 @@ def search_admin_view(request):
     })
 
 
-admin.site.register_view('search-admin-view', search_admin_view,
-                         'ElasticSearch - Index Maintenance')
+admin.site.register_view(path='search-admin-view',
+                         name='ElasticSearch - Index Maintenance',
+                         view=search_admin_view)
