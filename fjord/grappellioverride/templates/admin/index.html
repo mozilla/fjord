@@ -58,19 +58,19 @@
             {% empty %}
                 <p>{% trans "You don´t have permission to edit anything." %}</p>
             {% endfor %}
-
-<!-- added for adminplus -->
-<div class="grp-module" id="custom_views">
-  <h2>Custom Views</h2>
-  {% for path, name in custom_list %}   
-    <div class="grp-row">
-      <a href="{{ path }}"><strong>{{ name }}</strong></a>
-      </div>
-  {% endfor %}    
-</div>  
-<!-- end added for adminplus -->
-
+{# tweaked for django-adminplus #}
+            {% if custom_list %}
+                <div class="grp-module" id="custom_views">
+                    <h2>{% trans 'Custom Views' %}</h2>
+                        {% for path, name in custom_list %}
+                    <div class="grp-row">
+                            <a href="{{ path }}"><strong>{{ name }}</strong></a>
+                    </div>
+                        {% endfor %}
+                </div>
+            {% endif %}
         </div>
+{# endtweaked #}
         <div class="g-d-6 g-d-l">
             <div class="grp-module" id="grp-recent-actions-module">
                 <h2>{% trans 'Recent Actions' %}</h2>

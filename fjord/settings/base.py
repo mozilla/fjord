@@ -259,9 +259,9 @@ INSTALLED_APPS = (
 
     'adminplus',
 
-    # This has to come before Grappelli since it contains the
-    # admin/index.html template that overrides the Grappelli one
-    # and provides the adminplus stuff.
+    # This has to come before Grappelli since it contains fixed HTML
+    # for displaying django-adminplus custom views in the Grappelli
+    # index.html page.
     'fjord.grappellioverride',
     'grappelli',
     'django.contrib.admin',

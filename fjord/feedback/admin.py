@@ -196,5 +196,6 @@ def response_entry_view(request):
     return render(request, 'admin/response_entry.html')
 
 
-admin.site.register_view('response-entry-view', response_entry_view,
-                         'Response Entry')
+admin.site.register_view(path='response-entry-view',
+                         name='Response Entry',
+                         view=response_entry_view)
