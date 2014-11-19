@@ -1,0 +1,161 @@
+{% extends "analytics/analyzer/dashboard.html" %}
+{# Note: This is not l10n-ized since it's only available to analyzers for now. #}
+
+{% block content %}
+  <div class="col full">
+    <div class="block feedback">
+      <h2>Heartbeat v2 data</h2>
+      <p class="secret">
+        Do not tweet!
+      </p>
+
+      {% if answer %}
+        <p><a href="{{ url('hb_data') }}">Back to hb list</a></p>
+
+        <dl class="inline">
+          <dt>id</dt>
+          <dd>{{ answer.id }}</dd>
+
+          <dt>updated_ts</dt>
+          <dd>{{ answer.updated_ts }}</dd>
+
+          <dt>response_version</dt>
+          <dd>{{ answer.response_version or "--" }}</dd>
+
+          <dt>person_id</dt>
+          <dd>{{ answer.person_id or "--" }}</dd>
+
+          <dt>survey_id</dt>
+          <dd>{{ answer.survey_id.name or "--" }}</dd>
+
+          <dt>flow_id</dt>
+          <dd>{{ answer.flow_id or "--" }}</dd>
+
+          <dt>question_id</dt>
+          <dd>{{ answer.question_id or "--" }}</dd>
+
+          <dt>question_text</dt>
+          <dd>{{ answer.question_text or "--" }}</dd>
+
+          <dt>variation_id</dt>
+          <dd>{{ answer.variation_id or "--" }}</dd>
+
+          <dt>score</dt>
+          <dd>{{ answer.score or "--" }}</dd>
+
+          <dt>max_score</dt>
+          <dd>{{ answer.max_score or "--" }}</dd>
+
+          <dt>flow_began_ts</dt>
+          <dd>{{ answer.flow_began_ts }}</dd>
+
+          <dt>flow_offered_ts</dt>
+          <dd>{{ answer.flow_offered_ts }}</dd>
+
+          <dt>flow_voted_ts</dt>
+          <dd>{{ answer.flow_voted_ts }}</dd>
+
+          <dt>flow_engaged_ts</dt>
+          <dd>{{ answer.flow_engaged_ts }}</dd>
+
+          <dt>platform</dt>
+          <dd>{{ answer.platform or "--" }}</dd>
+
+          <dt>channel</dt>
+          <dd>{{ answer.channel or "--" }}</dd>
+
+          <dt>version</dt>
+          <dd>{{ answer.version or "--" }}</dd>
+
+          <dt>locale</dt>
+          <dd>{{ answer.locale or "--" }}</dd>
+
+          <dt>build_id</dt>
+          <dd>{{ answer.build_id or "--" }}</dd>
+
+          <dt>partner_id</dt>
+          <dd>{{ answer.partner_id or "--" }}</dd>
+
+          <dt>profile_age</dt>
+          <dd>{{ answer.profile_age or "--" }}</dd>
+
+          <dt>profile_usage</dt>
+          <dd>{{ answer.profile_usage or "--" }}</dd>
+
+          <dt>addons</dt>
+          <dd>{{ answer.adtons or "--" }}</dd>
+
+          <dt>extra</dt>
+          <dd>{{ answer.extra or "--" }}</dd>
+        </dl>
+
+        <p><a href="{{ url('hb_data') }}">Back to hb list</a></p>
+      {% else %}
+        <h2>Total answers: {{ answers.paginator.count }}</h2>
+
+        <div class="pager">
+          {% if next_page %}
+            <a class="older" href="{{ request.get_full_path()|urlparams(page=answers.previous_page_number) }}">
+              Older
+            </a>
+          {% else %}
+            Older
+          {% endif %}
+          | Page {{ answers.number }} of {{ answers.paginator.num_pages }} |
+          {% if prev_page %}
+            <a class="newer" href="{{ request.get_full_path()|urlparams(page=answers.next_page_number) }}">
+              Newer
+            </a>
+          {% else %}
+            Newer
+          {% endif %}
+        </div>
+
+        <table class="summarytable">
+          {% for ans in answers %}
+            <tr>
+              <td><a href="{{ url('hb_data', answerid=ans.id) }}">{{ ans.id }}</a></td>
+              <td>{{ ans.updated_ts }}</td>
+              <td>{{ ans.response_version }}</td>
+              <td>{{ ans.person_id }}</td>
+              <td>{{ ans.survey_id.name }}</td>
+              <td>{{ ans.flow_id }}</td>
+              <td>{{ ans.question_id }}</td>
+              <td>{{ ans.variation_id }}</td>
+
+              <td>{{ ans.score }}</td>
+              <td>{{ ans.max_score }}</td>
+              <td>{{ ans.flow_began_ts }}</td>
+              <td>{{ ans.flow_offered_ts }}</td>
+              <td>{{ ans.flow_voted_ts }}</td>
+              <td>{{ ans.flow_engaged_ts }}</td>
+              <td>{{ ans.platform }}</td>
+              <td>{{ ans.channel }}</td>
+              <td>{{ ans.version }}</td>
+              <td>{{ ans.locale }}</td>
+              <td>{{ ans.profile_age }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+
+        <div class="pager">
+          {% if next_page %}
+            <a class="older" href="{{ request.get_full_path()|urlparams(page=answers.previous_page_number) }}">
+              Older
+            </a>
+          {% else %}
+            Older
+          {% endif %}
+          | Page {{ answers.number }} of {{ answers.paginator.num_pages }} |
+          {% if prev_page %}
+            <a class="newer" href="{{ request.get_full_path()|urlparams(page=answers.next_page_number) }}">
+              Newer
+            </a>
+          {% else %}
+            Newer
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
