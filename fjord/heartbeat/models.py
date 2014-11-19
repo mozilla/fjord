@@ -1,5 +1,7 @@
 from django.db import models
 
+from rest_framework import serializers
+
 from fjord.base.models import ModelBase, JSONObjectField
 
 
@@ -20,7 +22,7 @@ class Survey(ModelBase):
 
     def __unicode__(self):
         return '%s: %s' % (
-            self.slug, 'enabled' if self.enabled else 'disabled')
+            self.name, 'enabled' if self.enabled else 'disabled')
 
 
 class Answer(ModelBase):
@@ -43,7 +45,7 @@ class Answer(ModelBase):
     response_version = models.IntegerField()
 
     # Timestamp of the last update to this Answer.
-    updated_ts = models.PositiveIntegerField()
+    updated_ts = models.BigIntegerField(default=0)
 
     # uuids of things. person_id can have multiple flows where each
     # flow represents a different time the person was asked to
@@ -52,44 +54,66 @@ class Answer(ModelBase):
     # without requiring extra maintenance (e.g. updating a Question
     # table).
     person_id = models.CharField(max_length=50)
-    survey_id = models.ForeignKey(Survey, to_field='name', db_index=True)
+    survey_id = models.ForeignKey(
+        Survey, db_column='survey_id', to_field='name', db_index=True)
     flow_id = models.CharField(max_length=50)
-    question_id = models.CharField(max_length=50)
-    question_text = models.TextField(blank=True)
-    variation_id = models.CharField(max_length=50, blank=True)
 
-    # score out of max_score.
-    score = models.FloatField()
-    max_score = models.FloatField()
+    # The id, text and variation of the question being asked.
+    question_id = models.CharField(max_length=50)
+    question_text = models.TextField()
+    variation_id = models.CharField(max_length=50)
+
+    # score out of max_score. Use null for no value.
+    score = models.FloatField(null=True, blank=True)
+    max_score = models.FloatField(null=True, blank=True)
 
     # These are the timestamps the user performed various actions in
-    # the flow.
-    flow_began_ts = models.PositiveIntegerField()
-    flow_offered_ts = models.PositiveIntegerField()
-    flow_voted_ts = models.PositiveIntegerField()
-    flow_engaged_ts = models.PositiveIntegerField()
+    # the flow. Use 0 for no value.
+    flow_began_ts = models.BigIntegerField(default=0)
+    flow_offered_ts = models.BigIntegerField(default=0)
+    flow_voted_ts = models.BigIntegerField(default=0)
+    flow_engaged_ts = models.BigIntegerField(default=0)
 
-    # Data about the user's browser.
-    platform = models.CharField(max_length=50, blank=True)
-    channel = models.CharField(max_length=50, blank=True)
-    version = models.CharField(max_length=50, blank=True)
-    locale = models.CharField(max_length=50, blank=True)
-    build_id = models.CharField(max_length=50, blank=True)
-    partner_id = models.CharField(max_length=50, blank=True)
+    # Data about the user's browser. Use '' for no value.
+    platform = models.CharField(max_length=50, blank=True, default=u'')
+    channel = models.CharField(max_length=50, blank=True, default=u'')
+    version = models.CharField(max_length=50, blank=True, default=u'')
+    locale = models.CharField(max_length=50, blank=True, default=u'')
+    build_id = models.CharField(max_length=50, blank=True, default=u'')
+    partner_id = models.CharField(max_length=50, blank=True, default=u'')
 
-    # Data about the user's profile.
-    profile_age = models.PositiveIntegerField()
-    profile_usage = JSONObjectField()
-    addons = JSONObjectField()
+    # Data about the user's profile. Use null for no value.
+    profile_age = models.BigIntegerField(null=True, blank=True)
 
-    # Whether or not this is test data.
-    is_test = models.BooleanField(default=False)
+    # Data about the profile usage, addons and extra stuff. Use {} for
+    # no value.
+    profile_usage = JSONObjectField(blank=True)
+    addons = JSONObjectField(blank=True)
 
     # This will likely include data like "crashiness", "search
     # settings" and any "weird settings". This will have some context
     # surrounding the rating score.
-    slop = JSONObjectField()
+    extra = JSONObjectField(blank=True)
+
+    # Whether or not this is test data.
+    is_test = models.BooleanField(default=False, blank=True)
 
     def __unicode__(self):
         return '%s: %s %s %s' % (
-            self.id, self.surveyid, self.flowid, self.ts_updated)
+            self.id, self.survey_id, self.flow_id, self.updated_ts)
+
+
+class AnswerSerializer(serializers.ModelSerializer):
+    updated_ts = serializers.IntegerField(source='updated_ts', required=True)
+    survey_id = serializers.SlugRelatedField(slug_field='name')
+
+    class Meta:
+        model = Answer
+
+    def validate_survey_id(self, attrs, source):
+        # Make sure the survey is enabled--otherwise error out.
+        survey = attrs[source]
+        if not survey.enabled:
+            raise serializers.ValidationError(
+                'survey "%s" is not enabled' % survey.name)
+        return attrs

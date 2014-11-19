@@ -60,6 +60,7 @@ Are you an Input user? This is the section for you!
    :maxdepth: 1
 
    api
+   hb_api
 
 
 Part 3: Maintaining The Site
