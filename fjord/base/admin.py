@@ -1,11 +1,11 @@
 import re
+import sys
 
-from django import http
+from django import VERSION
 from django.contrib import admin
 from django.shortcuts import render
 from django.views import debug
 
-import jinja2
 from celery import current_app
 
 
@@ -49,8 +49,11 @@ admin.site.register_view(path='celery',
 
 def env_view(request):
     """Admin view that displays the wsgi env."""
-    return http.HttpResponse(u'<pre>%s</pre>' % (jinja2.escape(request)))
+    return render(request, 'admin/env_view.html', {
+        'pythonver': sys.version,
+        'djangover': VERSION
+    })
 
 admin.site.register_view(path='env',
-                         name='WSGI Environment',
+                         name='Environment',
                          view=env_view)
