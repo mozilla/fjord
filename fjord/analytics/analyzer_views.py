@@ -20,6 +20,7 @@ import csv
 
 from elasticutils.contrib.django import F, es_required_or_50x
 
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.encoding import force_bytes
@@ -40,7 +41,61 @@ from fjord.base.utils import (
 )
 from fjord.feedback.helpers import country_name
 from fjord.feedback.models import Product, Response, ResponseMappingType
+from fjord.heartbeat.models import Answer
+from fjord.journal.models import Record
 from fjord.search.utils import es_error_statsd
+
+
+@check_new_user
+@analyzer_required
+def hb_data(request, answerid=None):
+    """View for hb data that shows one or all of the answers"""
+    answer = None
+    answers = []
+
+    if answerid is not None:
+        answer = Answer.objects.get(id=answerid)
+
+    else:
+        page = request.GET.get('page')
+        paginator = Paginator(Answer.objects.all(), 25)
+        try:
+            answers = paginator.page(page)
+        except PageNotAnInteger:
+            answers = paginator.page(1)
+        except EmptyPage:
+            answers = paginator.page(paginator.num_pages)
+
+    return render(request, 'analytics/analyzer/hb_data.html', {
+        'answer': answer,
+        'answers': answers
+    })
+
+
+@check_new_user
+@analyzer_required
+def hb_errorlog(request, errorid=None):
+    """View for hb errorlog that shows one or all of the errors"""
+    error = None
+    errors = []
+
+    if errorid is not None:
+        error = Record.objects.get(id=errorid)
+
+    else:
+        page = request.GET.get('page')
+        paginator = Paginator(Record.objects.filter(app='heartbeat'), 25)
+        try:
+            errors = paginator.page(page)
+        except PageNotAnInteger:
+            errors = paginator.page(1)
+        except EmptyPage:
+            errors = paginator.page(paginator.num_pages)
+
+    return render(request, 'analytics/analyzer/hb_errorlog.html', {
+        'error': error,
+        'errors': errors
+    })
 
 
 @check_new_user
