@@ -597,6 +597,37 @@ class PostFeedbackAPITest(TestCase):
 
             get_cache('default').clear()
 
+    def test_user_agent_inferred_bits(self):
+        """Tests that we infer the right bits from the user-agent"""
+        data = {
+            'happy': True,
+            'description': u'Great!',
+            'category': u'ui',
+            'product': u'Firefox OS',
+            'channel': u'stable',
+            'version': u'1.1',
+            'platform': u'Firefox OS',
+            'locale': 'en-US',
+            'email': 'foo@example.com',
+            'url': 'http://example.com/',
+            'manufacturer': 'OmniCorp',
+            'device': 'OmniCorp',
+            'country': 'US',
+            'user_agent': (
+                'Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0'
+            ),
+            'source': 'email',
+            'campaign': 'email_test',
+        }
+
+        r = self.client.post(reverse('feedback-api'), data)
+        eq_(r.status_code, 201)
+
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(feedback.browser, u'Firefox OS')
+        eq_(feedback.browser_version, u'1.0')
+        eq_(feedback.browser_platform, u'Firefox OS')
+
 
 class PostFeedbackAPIThrottleTest(TestCase):
     def setUp(self):

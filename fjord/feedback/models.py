@@ -11,6 +11,7 @@ from rest_framework import serializers
 from statsd import statsd
 from tower import ugettext_lazy as _lazy
 
+from fjord.base.browsers import parse_ua
 from fjord.base.domain import get_domain
 from fjord.base.models import ModelBase, JSONObjectField, EnhancedURLField
 from fjord.base.utils import smart_truncate, instance_to_key, is_url
@@ -650,11 +651,22 @@ class PostResponseSerializer(serializers.Serializer):
             manufacturer=attrs['manufacturer'].strip(),
             device=attrs['device'].strip(),
             country=attrs['country'].strip(),
-            user_agent=attrs['user_agent'].strip(),
             source=attrs['source'].strip(),
             campaign=attrs['campaign'].strip(),
             api=1,  # Hard-coded api version number
         )
+
+        # If there's a user agent, infer all the things from the user
+        # agent.
+        user_agent = attrs['user_agent'].strip()
+        if user_agent:
+            opinion.user_agent = user_agent
+            browser = parse_ua(user_agent)
+            opinion.browser = browser.browser
+            opinion.browser_version = browser.browser_version
+            opinion.browser_platform = browser.platform
+            if browser.platform == 'Windows':
+                opinion.browser_platform += (' ' + browser.platform_version)
 
         # If there is an email address, stash it on this instance so
         # we can save it later in .save() and so it gets returned
