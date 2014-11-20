@@ -137,6 +137,7 @@ class Response(ModelBase):
     # Data inferred from urls or explicitly stated by the thing saving
     # the data (webform, client of the api, etc)
     product = models.CharField(max_length=30, blank=True)
+    platform = models.CharField(max_length=30, blank=True)
     channel = models.CharField(max_length=30, blank=True)
     version = models.CharField(max_length=30, blank=True)
     locale = models.CharField(max_length=8, blank=True)
@@ -154,7 +155,7 @@ class Response(ModelBase):
     user_agent = models.CharField(max_length=255, blank=True)
     browser = models.CharField(max_length=30, blank=True)
     browser_version = models.CharField(max_length=30, blank=True)
-    platform = models.CharField(max_length=30, blank=True)
+    browser_platform = models.CharField(max_length=30, blank=True)
 
     source = models.CharField(max_length=100, blank=True, null=True,
                               default=u'')
