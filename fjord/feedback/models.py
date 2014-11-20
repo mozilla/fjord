@@ -333,6 +333,7 @@ class Response(ModelBase):
 
     @classmethod
     def infer_product(cls, platform):
+        # FIXME: This is hard-coded.
         if platform == u'Firefox OS':
             return u'Firefox OS'
 
@@ -343,6 +344,23 @@ class Response(ModelBase):
             return u''
 
         return u'Firefox'
+
+    @classmethod
+    def infer_platform(cls, product, browser):
+        # FIXME: This is hard-coded.
+        if product == u'Firefox OS':
+            return u'Firefox OS'
+
+        elif product == u'Firefox for Android':
+            return u'Android'
+
+        elif (browser.browser == u'Firefox' and
+              product in (u'Firefox', u'Firefox dev')):
+            if browser.platform == 'Windows':
+                return browser.platform + ' ' + browser.platform_version
+            return browser.platform
+
+        return u''
 
 
 @register_mapping_type

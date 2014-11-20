@@ -98,49 +98,18 @@ def _handle_feedback_post(request, locale=None, product=None,
     get_data = request.GET.copy()
 
     data = form.cleaned_data
+
     description = data.get('description', u'').strip()
     if not description:
         # If there's no description, then there's nothing to do here,
         # so thank the user and move on.
         return HttpResponseRedirect(reverse('thanks'))
 
-    if product:
-        # If there was a product in the url, that's a product slug, so
-        # we map it to a db_name which is what we want to save to the
-        # db.
-        product = product.db_name
-
-    # src, then source, then utm_source
-    source = get_data.pop('src', [u''])[0]
-    if not source:
-        source = get_data.pop('utm_source', [u''])[0]
-
-    campaign = get_data.pop('utm_campaign', [u''])[0]
-
-    # If the product came in on the url, then we only want to populate
-    # the platfrom from the user agent data iff the product specified
-    # by the url is the same as the browser product.
-    platform = u''
-    if product is None or product == request.BROWSER.browser:
-        # Most platforms aren't different enough between versions to care.
-        # Windows is.
-        platform = request.BROWSER.platform
-        if platform == 'Windows':
-            platform += ' ' + request.BROWSER.platform_version
-
-    product = product or u''
-
     opinion = models.Response(
         # Data coming from the user
         happy=data['happy'],
         url=clean_url(data.get('url', u'')),
-        description=data['description'].strip(),
-
-        # Inferred data from user agent
-        user_agent=request.META.get('HTTP_USER_AGENT', ''),
-        browser=request.BROWSER.browser,
-        browser_version=request.BROWSER.browser_version,
-        platform=platform,
+        description=description,
 
         # Pulled from the form data or the url
         locale=data.get('locale', locale),
@@ -151,35 +120,62 @@ def _handle_feedback_post(request, locale=None, product=None,
         device=data.get('device', ''),
     )
 
+    # Add user_agent and inferred data.
+    user_agent = request.META.get('HTTP_USER_AGENT', '')
+    if user_agent:
+        browser = request.BROWSER
+
+        opinion.browser = browser.browser
+        opinion.browser_version = browser.browser_version
+        opinion.browser_platform = browser.platform
+        if browser.platform == 'Windows':
+            opinion.browser_platform += ' ' + browser.platform_version
+
+    # source is src or utm_source
+    source = (
+        get_data.pop('src', [u''])[0] or
+        get_data.pop('utm_source', [u''])[0]
+    )
     if source:
         opinion.source = source[:100]
 
+    campaign = get_data.pop('utm_campaign', [u''])[0]
     if campaign:
         opinion.campaign = campaign[:100]
 
+    platform = u''
+
+    # Figure out product, version, channel and platform. We either get
+    # them from the url, from the user_agent, or we don't set them at
+    # all.
     if product:
-        # If we picked up the product from the url, we use url
-        # bits for everything.
-        product = product or u''
-        version = version or u''
-        channel = channel or u''
+        # If there was a product in the url, then we get a Product
+        # instance as an argument and we want the db_name from that.
+        product = product.db_name
+
+        # FIXME: We should be able to "match" the product with the
+        # user agent browser and if they're the same, then set
+        # platform == browser_platform. However, it's tricky since
+        # our "products" are "interesting".
 
     elif opinion.browser != UNKNOWN:
         # If we didn't pick up a product from the url, then we
         # infer as much as we can from the user agent.
         product = data.get(
-            'product', models.Response.infer_product(platform))
+            'product', models.Response.infer_product(opinion.browser_platform))
         version = data.get(
             'version', request.BROWSER.browser_version)
         # Assume everything we don't know about is stable channel.
         channel = u'stable'
 
-    else:
-        product = channel = version = u''
+    # Try to infer the platform from the product.
+    if product and not platform:
+        platform = models.Response.infer_platform(product, request.BROWSER)
 
     opinion.product = product or u''
     opinion.version = version or u''
     opinion.channel = channel or u''
+    opinion.platform = platform or u''
 
     opinion.save()
 
