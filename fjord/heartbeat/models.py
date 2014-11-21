@@ -38,6 +38,9 @@ class Answer(ModelBase):
        it can **never** be made publicly available.
 
     """
+    # The version of the experiment addon.
+    experiment_version = models.CharField(max_length=50)
+
     # The version of the HTTP POST packet shape. This allows us to
     # change how some of the values in the packet are calculated and
     # distinguish between different iterations of answers for the same
@@ -61,7 +64,7 @@ class Answer(ModelBase):
     # The id, text and variation of the question being asked.
     question_id = models.CharField(max_length=50)
     question_text = models.TextField()
-    variation_id = models.CharField(max_length=50)
+    variation_id = models.CharField(max_length=100)
 
     # score out of max_score. Use null for no value.
     score = models.FloatField(null=True, blank=True)

@@ -38,47 +38,53 @@ These fields are required and have no defaults. If you do not provide
 them, then you'll get back an HTTP 400 with a message stating you
 missed a required field.
 
-+----------------+-------+--------------------------------------------------------+
-|field           |type   |notes                                                   |
-+================+=======+========================================================+
-|person_id       |string |max length: 50; Id representating a person's browser.   |
-|                |       |Global across surveys and flows.                        |
-+----------------+-------+--------------------------------------------------------+
-|survey_id       |string |This is the survey name as it is set up in Input. This  |
-|                |       |is the only field that has a foreign key to another     |
-|                |       |table in Input and must be set up before running a      |
-|                |       |survey.                                                 |
-|                |       |                                                        |
-+----------------+-------+--------------------------------------------------------+
-|flow_id         |string |max length: 50; Id uniquely identifying a flow attempt  |
-|                |       |for this survey.                                        |
-|                |       |                                                        |
-|                |       |                                                        |
-|                |       |                                                        |
-+----------------+-------+--------------------------------------------------------+
-|question_id     |string |max length: 50; Id uniquely identifying a question for  |
-|                |       |this survey. This allows us to tweak the question text  |
-|                |       |for a survey without launching a new survey.            |
-|                |       |                                                        |
-|                |       |                                                        |
-+----------------+-------+--------------------------------------------------------+
-|response_version|integer|This is the version of the packet specification. Any    |
-|                |       |time the values of the packet or the calculation of the |
-|                |       |values for the packet change, we should increase the    |
-|                |       |``response_version``. This allows us to distinguish     |
-|                |       |between different packet builds when doing analysis.    |
-+----------------+-------+--------------------------------------------------------+
-|updated_ts      |integer|Milliseconds since the epoch for when this packet was   |
-|                |       |created.                                                |
-|                |       |                                                        |
-|                |       |Every time you update data for a flow attempt, it should|
-|                |       |include a new and more recent ``updated_ts``.           |
-+----------------+-------+--------------------------------------------------------+
-|question_text   |string |Max length: None; Default: ``""``; The actual question  |
-|                |       |asked. This can be localized.                           |
-+----------------+-------+--------------------------------------------------------+
-|variation_id    |string |Max length: 50; Default: ``""``                         |
-+----------------+-------+--------------------------------------------------------+
++------------------+-------+--------------------------------------------------------+
+|field             |type   |notes                                                   |
++==================+=======+========================================================+
+|response_version  |integer|This is the version of the packet specification. Any    |
+|                  |       |time the values of the packet or the calculation of the |
+|                  |       |values for the packet change, we should increase the    |
+|                  |       |``response_version``. This allows us to distinguish     |
+|                  |       |between different packet builds when doing analysis.    |
++------------------+-------+--------------------------------------------------------+
+|experiment_version|string |Max length: 50; The version of the experiment addon.    |
+|                  |       |                                                        |
+|                  |       |                                                        |
+|                  |       |                                                        |
+|                  |       |                                                        |
++------------------+-------+--------------------------------------------------------+
+|person_id         |string |Max length: 50; Id representating a person's browser.   |
+|                  |       |Global across surveys and flows.                        |
++------------------+-------+--------------------------------------------------------+
+|survey_id         |string |This is the survey name as it is set up in Input. This  |
+|                  |       |is the only field that has a foreign key to another     |
+|                  |       |table in Input and must be set up before running a      |
+|                  |       |survey.                                                 |
+|                  |       |                                                        |
++------------------+-------+--------------------------------------------------------+
+|flow_id           |string |Max length: 50; Id uniquely identifying a flow attempt  |
+|                  |       |for this survey.                                        |
+|                  |       |                                                        |
+|                  |       |                                                        |
+|                  |       |                                                        |
++------------------+-------+--------------------------------------------------------+
+|question_id       |string |Max length: 50; Id uniquely identifying a question for  |
+|                  |       |this survey. This allows us to tweak the question text  |
+|                  |       |for a survey without launching a new survey.            |
+|                  |       |                                                        |
+|                  |       |                                                        |
++------------------+-------+--------------------------------------------------------+
+|updated_ts        |integer|Milliseconds since the epoch for when this packet was   |
+|                  |       |created.                                                |
+|                  |       |                                                        |
+|                  |       |Every time you update data for a flow attempt, it should|
+|                  |       |include a new and more recent ``updated_ts``.           |
++------------------+-------+--------------------------------------------------------+
+|question_text     |string |Max length: None; Default: ``""``; The actual question  |
+|                  |       |asked. This can be localized.                           |
++------------------+-------+--------------------------------------------------------+
+|variation_id      |string |Max length: 100; Default: ``""``                        |
++------------------+-------+--------------------------------------------------------+
 
 
 Optional fields
@@ -159,6 +165,7 @@ Example curl::
         "person_id": "c1dd81f2-6ece-11e4-8a01-843a4bc832e4",
         "survey_id": "lunch",
         "flow_id": "20141117_attempt1",
+        "experiment_version": "1",
         "response_version": 1,
         "question_id": "howwaslunch",
         "question_text": "how was lunch?",
@@ -200,6 +207,7 @@ Example curl::
         "survey_id": "nonexistent",
         "flow_id": "20141114_attempt2",
         "response_version": 1,
+        "experiment_version": "1",
         "question_id": "howwaslunch",
         "updated_ts": 1416011156000,
         "is_test": true
@@ -257,6 +265,7 @@ Anything less than this will kick up "required" type errors.
         "person_id": "c1dd81f2-6ece-11e4-8a01-843a4bc832e4",
         "survey_id": "lunch",
         "flow_id": "20141117_attempt1",
+        "experiment_version": "1",
         "response_version": 1,
         "question_id": "howwaslunch",
         "question_text": "how was lunch?",
@@ -284,6 +293,7 @@ Began:
         "person_id": "c1dd81f2-6ece-11e4-8a01-843a4bc832e4",
         "survey_id": "lunch",
         "flow_id": "20141117_attempt5",
+        "experiment_version": "1",
         "response_version": 1,
         "question_id": "howwaslunch",
         "updated_ts": 1416011156000,
@@ -319,6 +329,7 @@ Voted, but not engaged, yet::
         "person_id": "c1dd81f2-6ece-11e4-8a01-843a4bc832e4",
         "survey_id": "lunch",
         "flow_id": "20141117_attempt7",
+        "experiment_version": "1",
         "response_version": 1,
         "question_id": "howwaslunch",
         "updated_ts": 1416011180000,
