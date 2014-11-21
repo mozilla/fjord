@@ -125,6 +125,7 @@ def _handle_feedback_post(request, locale=None, product=None,
     if user_agent:
         browser = request.BROWSER
 
+        opinion.user_agent = user_agent
         opinion.browser = browser.browser
         opinion.browser_version = browser.browser_version
         opinion.browser_platform = browser.platform
