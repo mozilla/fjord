@@ -362,6 +362,24 @@ class MachineTranslateTestCase(BaseGengoTestCase):
             # Make sure we don't call postTranslationJobs().
             eq_(gengo_mock_instance.postTranslationJobs.call_count, 0)
 
+    @guess_language('es')
+    def test_no_translate_if_disabled(self):
+        """No GengoAPI calls if gengosystem switch is disabled"""
+        with patch('fjord.translations.models.waffle') as waffle_mock:
+            waffle_mock.switch_is_active.return_value = False
+
+            with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
+                obj = SuperModel(locale='es', desc=u'Muy lento')
+                obj.save()
+
+                eq_(obj.trans_desc, u'')
+                translate(obj, 'gengo_machine', 'es', 'desc', 'en',
+                          'trans_desc')
+                eq_(obj.trans_desc, u'')
+
+                # We should not have used the API at all.
+                eq_(GengoMock.called, False)
+
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
 class HumanTranslationTestCase(BaseGengoTestCase):
@@ -381,6 +399,31 @@ class HumanTranslationTestCase(BaseGengoTestCase):
         eq_(obj.trans_desc, u'')
 
         eq_(len(GengoJob.objects.all()), 1)
+
+    @guess_language('es')
+    def test_no_translate_if_disabled(self):
+        """No GengoAPI calls if gengosystem switch is disabled"""
+        with patch('fjord.translations.models.waffle') as waffle_mock:
+            waffle_mock.switch_is_active.return_value = False
+
+            with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
+                # Note: This just sets up the GengoJob--it doesn't
+                # create any Gengo human translation jobs.
+                obj = SuperModel(
+                    locale='es',
+                    desc=u'Facebook no se puede enlazar con peru'
+                )
+                obj.save()
+
+                eq_(obj.trans_desc, u'')
+                translate(obj, 'gengo_human', 'es', 'desc', 'en', 'trans_desc')
+                eq_(obj.trans_desc, u'')
+
+                # Verify no jobs were created
+                eq_(len(GengoJob.objects.all()), 0)
+
+                # Verify we didn't call the API at all.
+                eq_(GengoMock.called, False)
 
     @guess_language('en')
     def test_translate_gengo_human_english_copy_over(self):

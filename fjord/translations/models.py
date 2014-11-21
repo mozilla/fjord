@@ -8,6 +8,7 @@ from django.db import models
 
 from dennis.translator import Translator
 from statsd import statsd
+import waffle
 
 from .gengo_utils import (
     FjordGengo,
@@ -190,6 +191,11 @@ class GengoMachineTranslator(TranslationSystem):
     name = 'gengo_machine'
 
     def translate(self, instance, src_lang, src_field, dst_lang, dst_field):
+        # If gengosystem is disabled, we just return immediately. We
+        # can backfill later.
+        if not waffle.switch_is_active('gengosystem'):
+            return
+
         text = getattr(instance, src_field)
         metadata = {
             'locale': instance.locale,
@@ -426,6 +432,11 @@ class GengoHumanTranslator(TranslationSystem):
     use_push_and_pull = True
 
     def translate(self, instance, src_lang, src_field, dst_lang, dst_field):
+        # If gengosystem is disabled, we just return immediately. We
+        # can backfill later.
+        if not waffle.switch_is_active('gengosystem'):
+            return
+
         text = getattr(instance, src_field)
         metadata = {
             'locale': instance.locale,
@@ -550,6 +561,11 @@ class GengoHumanTranslator(TranslationSystem):
             )
 
     def push_translations(self):
+        # If gengosystem is disabled, we just return immediately. We
+        # can backfill later.
+        if not waffle.switch_is_active('gengosystem'):
+            return
+
         gengo_api = FjordGengo()
 
         if not gengo_api.is_configured():
@@ -614,6 +630,11 @@ class GengoHumanTranslator(TranslationSystem):
                 return
 
     def pull_translations(self):
+        # If gengosystem is disabled, we just return immediately. We
+        # can backfill later.
+        if not waffle.switch_is_active('gengosystem'):
+            return
+
         gengo_api = FjordGengo()
 
         if not gengo_api.is_configured():
