@@ -19,6 +19,9 @@
           <dt>updated_ts</dt>
           <dd>{{ answer.updated_ts }}</dd>
 
+          <dt>experiment_version</dt>
+          <dd>{{ answer.experiment_version or "--" }}</dd>
+
           <dt>response_version</dt>
           <dd>{{ answer.response_version or "--" }}</dd>
 
@@ -112,10 +115,34 @@
         </div>
 
         <table class="summarytable">
+          <tr>
+            <th>updated</th>
+            <th>experiment ver</th>
+            <th>response ver</th>
+            <th>person_id</th>
+            <th>survey_id</th>
+            <th>flow_id</th>
+            <th>question_id</th>
+            <th>variation_id</th>
+
+            <th>score</th>
+            <th>max_score</th>
+            <th>flow_began_ts</th>
+            <th>flow_offered_ts</th>
+            <th>flow_voted_ts</th>
+            <th>flow_engaged_ts</th>
+            <th>platform</th>
+            <th>channel</th>
+            <th>version</th>
+            <th>locale</th>
+            <th>profile_age</th>
+          </tr>
+
           {% for ans in answers %}
             <tr>
               <td><a href="{{ url('hb_data', answerid=ans.id) }}">{{ ans.id }}</a></td>
               <td>{{ ans.updated_ts }}</td>
+              <td>{{ ans.experiment_version }}</td>
               <td>{{ ans.response_version }}</td>
               <td>{{ ans.person_id }}</td>
               <td>{{ ans.survey_id.name }}</td>
