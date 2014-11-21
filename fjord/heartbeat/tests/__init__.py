@@ -17,6 +17,7 @@ class AnswerFactory(factory.DjangoModelFactory):
     class Meta:
         model = Answer
 
+    experiment_version = '1'
     response_version = 1
     updated_ts = int(time.time())
     survey = factory.SubFactory(SurveyFactory)

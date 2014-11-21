@@ -27,6 +27,7 @@ class HeartbeatPostAPITest(TestCase):
         """Minimum amount of data required"""
         survey = SurveyFactory.create()
         data = {
+            'experiment_version': '1',
             'response_version': 1,
             'person_id': 'joemamma',
             'survey_id': survey.name,
@@ -49,12 +50,13 @@ class HeartbeatPostAPITest(TestCase):
         survey = SurveyFactory.create()
 
         data = {
+            'experiment_version': '1',
+            'response_version': 1,
             'person_id': 'joemamma',
             'survey_id': survey.name,
             'flow_id': '20141113',
             'question_id': '1',
             'updated_ts': self.timestamp(),
-            'response_version': 1,
 
             'question_text': 'ou812?',
             'variation_id': '1',
@@ -102,12 +104,13 @@ class HeartbeatPostAPITest(TestCase):
         survey = SurveyFactory.create()
 
         data = {
+            'experiment_version': '1',
+            'response_version': 1,
             'person_id': 'joemamma',
             'survey_id': survey.name,
             'flow_id': '20141113',
             'question_id': '1',
             'updated_ts': self.timestamp(),
-            'response_version': 1,
 
             'question_text': 'ou812?',
             'variation_id': '1',
@@ -154,6 +157,7 @@ class HeartbeatPostAPITest(TestCase):
     def test_survey_doesnt_exist(self):
         """If the survey doesn't exist, kick up an error"""
         data = {
+            'experiment_version': '1',
             'response_version': 1,
             'person_id': 'joemamma',
             'survey_id': 'foosurvey',
@@ -179,6 +183,7 @@ class HeartbeatPostAPITest(TestCase):
         survey = SurveyFactory.create(enabled=False)
 
         data = {
+            'experiment_version': '1',
             'response_version': 1,
             'person_id': 'joemamma',
             'survey_id': survey.name,
@@ -204,6 +209,7 @@ class HeartbeatPostAPITest(TestCase):
         survey = SurveyFactory.create()
 
         orig_data = {
+            'experiment_version': '1',
             'response_version': 1,
             'person_id': 'joemamma',
             'survey_id': survey.name,
@@ -233,6 +239,7 @@ class HeartbeatPostAPITest(TestCase):
         eq_(len(Record.objects.recent('heartbeat')), 0)
 
         data = {
+            'experiment_version': '1',
             'response_version': 1,
             'person_id': 'joemamma',
             'survey_id': 'foosurvey',
@@ -260,6 +267,7 @@ class HeartbeatPostAPITest(TestCase):
         survey = SurveyFactory.create()
 
         data = {
+            'experiment_version': '1',
             'response_version': 1,
             'person_id': 'joemamma',
             'survey_id': survey.name,
@@ -293,6 +301,7 @@ class HeartbeatPostAPITest(TestCase):
         ans_id = ans.id
 
         data = {
+            'experiment_version': '1',
             'response_version': 1,
             'person_id': 'joemamma',
             'survey_id': survey.name,
@@ -329,6 +338,7 @@ class HeartbeatPostAPITest(TestCase):
         survey = SurveyFactory.create()
 
         data = {
+            'experiment_version': '1',
             'response_version': 1,
             'person_id': 'joemamma',
             'survey_id': survey.name,
