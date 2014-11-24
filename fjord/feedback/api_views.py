@@ -104,8 +104,8 @@ class PublicFeedbackAPI(rest_framework.views.APIView):
         """Returns throttle class instances"""
         return [
             RatelimitThrottle(
-                rulename='api_get_100ph',
-                rate='100/h',
+                rulename='api_get_200ph',
+                rate='200/h',
                 methods=('GET',))
         ]
 
