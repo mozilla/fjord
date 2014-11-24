@@ -480,7 +480,7 @@ class ResponseMappingType(FjordMappingType, Indexable):
                 (obj.source or '--'),
                 (obj.campaign or '--')
             ]),
-            'organic': (not obj.source and not obj.campaign),
+            'organic': (not obj.campaign),
             'created': obj.created,
         }
 

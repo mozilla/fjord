@@ -1,5 +1,3 @@
-.. _api-chapter:
-
 ===============
  Heartbeat API
 ===============

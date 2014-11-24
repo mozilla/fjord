@@ -59,6 +59,7 @@ Are you an Input user? This is the section for you!
 .. toctree::
    :maxdepth: 1
 
+   feedback_urls
    api
    hb_api
 
