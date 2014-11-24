@@ -54,15 +54,15 @@ class Product(ModelBase):
     notes = models.CharField(max_length=255, blank=True, default=u'')
 
     # This is the name we display everywhere
-    display_name = models.CharField(max_length=20)
+    display_name = models.CharField(max_length=50)
 
     # We're not using foreign keys, so when we save something to the
     # database, we use this name
-    db_name = models.CharField(max_length=20)
+    db_name = models.CharField(max_length=50)
 
     # This is the slug used in the feedback product urls; we don't use
     # the SlugField because we don't require slugs be unique
-    slug = models.CharField(max_length=20)
+    slug = models.CharField(max_length=50)
 
     # Whether or not this product shows up on the dashboard; we sort of
     # use this to denote whether data is publicly available, too
