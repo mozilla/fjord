@@ -41,7 +41,7 @@ from fjord.base.utils import (
 )
 from fjord.feedback.helpers import country_name
 from fjord.feedback.models import Product, Response, ResponseMappingType
-from fjord.heartbeat.models import Answer
+from fjord.heartbeat.models import Answer, Survey
 from fjord.journal.models import Record
 from fjord.search.utils import es_error_statsd
 
@@ -69,6 +69,24 @@ def hb_data(request, answerid=None):
     return render(request, 'analytics/analyzer/hb_data.html', {
         'answer': answer,
         'answers': answers
+    })
+
+
+@check_new_user
+@analyzer_required
+def hb_surveys(request, answerid=None):
+    """View for hb that shows Survey objects"""
+    page = request.GET.get('page')
+    paginator = Paginator(Survey.objects.order_by('-created'), 25)
+    try:
+        surveys = paginator.page(page)
+    except PageNotAnInteger:
+        surveys = paginator.page(1)
+    except EmptyPage:
+        surveys = paginator.page(paginator.num_pages)
+
+    return render(request, 'analytics/analyzer/hb_surveys.html', {
+        'surveys': surveys
     })
 
 

@@ -45,4 +45,5 @@ urlpatterns += patterns(
         name='hb_data'),
     url(r'^analytics/hberrorlog(?:/(?P<errorid>\d+))?/?$', 'hb_errorlog',
         name='hb_errorlog'),
+    url(r'^analytics/hbsurveys/?$', 'hb_surveys', name='hb_surveys'),
 )
