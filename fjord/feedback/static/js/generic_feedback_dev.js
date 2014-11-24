@@ -6,7 +6,7 @@
          * Switches to the card with id #cardId. This also updates the
          * window history via pushState.
          */
-        function changeCard(cardId) {
+        function changeCard(cardId, firstCard) {
             // Make active card inactive
             $('.card:not(.inactive)').addClass('inactive');
 
@@ -22,7 +22,9 @@
             if ($card.attr('data-focus') !== undefined) {
                 $($card.attr('data-focus')).focus();
             }
-            window.history.pushState({page: cardId}, '', '#' + cardId);
+            if (!firstCard) {
+                window.history.pushState({page: cardId}, '', '#' + cardId);
+            }
         }
 
         window.onpopstate = function(ev) {
@@ -127,6 +129,6 @@
             window.history.replaceState('', '', '#');
         }
 
-        changeCard('intro');
+        changeCard('intro', true);
     });
 }(jQuery, fjord, document, window));
