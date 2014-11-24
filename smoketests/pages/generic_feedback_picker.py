@@ -33,7 +33,7 @@ class Product(Page):
 
 
 class PickerPage(Page):
-    _page_title = 'Which product? :: Firefox Input'
+    _page_title = 'Select A Product :: Firefox Input'
 
     _products_locator = (By.CSS_SELECTOR, '.product-card')
 

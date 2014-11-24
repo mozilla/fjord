@@ -1,39 +1,57 @@
 {% extends "feedback/base.html" %}
 {# Note: This is not l10n-ized since it's a prototype. #}
 
-{% block page_title %}Which product?{% endblock %}
+{% block page_title %}{{ _('Select A Product') }}{% endblock %}
+
+{% block extra_headers %}
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+{% endblock %}
 
 {% block site_js %}
-  <script src="{{ settings.STATIC_URL }}js/lib/brick-1.0.0.byob.min.js"></script>
   {{ js('singlecard') }}
 {% endblock %}
 
 {% block site_css %}
-  {{ css('product_picker') }}
+  {{ css('generic_feedback_dev') }}
 {% endblock %}
 
 {% block body %}
-  <x-deck selected-index=0>
-    <x-card id="picker">
-      <x-appbar>
-        <header>{{ _('Select A Product To Leave Feedback') }}</header>
-      </x-appbar>
+  <div class="main">
+    <header>
+      <div class="header-content">
+        <div class="middle">
+          <h1>{{ _('Select a product') }}</h1>
+        </div>
+      </div>
+    </header>
 
-      <section class="product-picker">
-        {% if not products %}
-          <p class="no-products">{{ _('No products available.') }}</p>
-        {% else %}
-          <ul class="content">
-            {% for prod in products %}
-              <a href="{{ url('feedback', product=prod.slug) }}?{{ request.GET.urlencode() }}" class="product-card {{ prod.slug }}">
-                <li>
-                  <h3>{{ prod.display_name }}</h3>
-                </li>
-              </a>
-            {% endfor %}
-          </ul>
-        {% endif %}
-      </section>
-    </x-card>
-  </x-deck>
+    <div class="deck">
+      <div class="card" id="picker">
+        <section class="product-picker">
+          {% if not products %}
+            <p class="no-products">{{ _('No products available.') }}</p>
+          {% else %}
+            <div class="ask">
+              {% trans %}
+                Select a product to leave feedback for.
+              {% endtrans %}
+            </div>
+            <ul class="content">
+              {% for prod in products %}
+                <a href="{{ url('feedback', product=prod.slug) }}?{{ request.GET.urlencode() }}"
+                   {% if prod.image_file %}
+                     style="background-image: url({{ settings.STATIC_URL }}img/{{ prod.image_file }})"
+                   {% endif %}
+                   class="product-card">
+                  <li>
+                    <h3>{{ prod.display_name }}</h3>
+                  </li>
+                </a>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </section>
+      </div>
+    </div>
+  </div>
 {% endblock %}

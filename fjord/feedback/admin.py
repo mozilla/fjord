@@ -19,6 +19,7 @@ class ProductAdmin(admin.ModelAdmin):
         'display_name',
         'db_name',
         'translation_system',
+        'image_file',
         'notes',
         'slug')
     list_filter = ('enabled', 'on_dashboard', 'on_picker')
