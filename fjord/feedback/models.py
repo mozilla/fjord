@@ -71,6 +71,13 @@ class Product(ModelBase):
     # Whether or not this product shows up in the product picker
     on_picker = models.BooleanField(default=True)
 
+    # The image we use on the product picker. This has to be a valid
+    # image in fjord/feedback/static/img/ and should be a .png of
+    # size 295x285.
+    # FIXME: Make this more flexible.
+    image_file = models.CharField(max_length=100, null=True, blank=True,
+                                  default=u'noimage.png')
+
     # System slated for automatic translation, or null if none;
     # See translation app for details.
     translation_system = models.CharField(

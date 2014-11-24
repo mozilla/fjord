@@ -400,13 +400,6 @@ MINIFY_BUNDLES = {
             'css/lib/normalize.css',
             'css/generic_feedback_dev.less',
         ),
-        'product_picker': (
-            'css/lib/normalize.css',
-            'css/lib/brick-1.0.0.byob.min.css',
-            'css/feedback_base.less',
-            'css/generic_feedback.less',
-            'css/product_picker.less',
-        ),
         'thanks': (
             'css/lib/normalize.css',
             'css/thanks.less',
