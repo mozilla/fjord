@@ -25,6 +25,6 @@ def celery_health_task(creation_dt):
     message += '\n\nThank you for playing!\n'
 
     mail_admins(
-        subject='celery health: {0}'.format(now),
+        subject=' celery health: {0}'.format(now),
         message=message
     )
