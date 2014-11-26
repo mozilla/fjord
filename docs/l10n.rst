@@ -94,6 +94,15 @@ After that, send an email to the `dev-l10n-web mailing list
     Input development team
 
 
+Sometimes we have to create bugs for each individual locale to update the
+translations. It's nice to copy/paste the specific strings that need to be 
+translated.
+
+Sometimes the translator says they've finished, but the string updates aren't
+in svn. If that happens, tell the translator that they have to push the
+"Commit to VCS" button/link.
+
+
 Creating new localization locales
 =================================
 
