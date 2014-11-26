@@ -65,7 +65,7 @@
 
           <aside>
             <div id="back-to-picker">
-              {% trans product=product.display_name, url='/en-US/feedback?feedbackdev=1' %}
+              {% trans product=product.display_name, url=url('feedback') + '?' + request.GET.urlencode() %}
                 Is {{product}} not the product you want to give feedback on?<br />
                 <a href="{{url}}">Pick a different product</a>.
               {% endtrans %}
