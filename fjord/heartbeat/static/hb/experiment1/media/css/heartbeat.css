@@ -300,6 +300,9 @@ button.btn-block {
 .other-download:before {
   content: '\f019';
 }
+.other-newsletter:before {
+  content: '\f0e0';
+}
 /* Newsletter */
 #newsletter-complete {
   display: none;
