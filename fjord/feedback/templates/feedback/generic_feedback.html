@@ -25,7 +25,7 @@
   {% endif %}
 {% endblock %}
 
-{% block page_title %}{% if waffle.flag('feedbackdev') %}[DEV] {% endif %}{{ _('Submit Your Feedback') }}{% endblock %}
+{% block page_title %}{{ _('Submit Your Feedback') }}{% endblock %}
 
 {% set extra_body_attrs = {'data-form-name': 'generic'} %}
 

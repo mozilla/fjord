@@ -104,7 +104,7 @@ class TestFeedbackDev(TestCase):
         self.assertTemplateUsed(resp, 'feedback/generic_feedback.html')
 
         # unless we check for a magic string.
-        assert '[DEV]' in resp.content
+        assert 'make you feel' in resp.content
 
         # FIXME: Find a better way to verify dev version vs. non-dev
         # version.
@@ -122,4 +122,4 @@ class TestFeedbackNotDev(TestCase):
         self.assertTemplateUsed(resp, 'feedback/generic_feedback.html')
 
         # Make sure the magic string is NOT in the content.
-        assert '[DEV]' not in resp.content
+        assert 'make you feel' not in resp.content
