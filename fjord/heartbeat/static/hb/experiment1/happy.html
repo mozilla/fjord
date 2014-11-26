@@ -97,9 +97,10 @@ _gaq.push(['_trackPageview']);
     one but you! If you have more detailed feedback, please...
   </p>
 
-<a href="https://input.mozilla.org/en-US/feedback?utm_campaign=telemetry-experiment-heartbeat-1-happy" class="btn btn-success btn-block">Give more feedback</a>
+<a href="https://input.mozilla.org/en-US/feedback?utm_campaign=telemetry-experiment-heartbeat-1-happy" data-ga-action="feedback-feedback" class="ga-link btn btn-success btn-block" id="feedbackbutton">Give more feedback</a>
 
-<div class="well">
+<div class="well ga-link" data-ga-action="engage-tweet">
+<!-- note this only gets div, not the iFrame.  So, comment here is for ref -->
   <h4>Want to spread the word?</h4>
   <p>Tweet your love of Firefox!</p>
  <a class="twitter-share-button"
@@ -155,6 +156,7 @@ window.twttr=(function(d,s,id){var t,js,fjs=d.getElementsByTagName(s)[0];if(d.ge
         id="newsletter-form" action="/en-US/newsletter/" method="post">
     <input id="id_newsletters" name="newsletters" type="hidden" value="about-mozilla" />
     <input type="hidden" name="source_url" value="/en-US/firefox/desktop/heartbeat/happy/">
+
 
 
     <div class="form-contents">
@@ -422,7 +424,7 @@ window.twttr=(function(d,s,id){var t,js,fjs=d.getElementsByTagName(s)[0];if(d.ge
       </div>
     </div>
 
-    <div class="form-submit">
+    <div class="form-submit ga-link" data-ga-action="engage-email-signup">
       <input type="submit" id="footer_email_submit"
              value="Sign me up »" class="button">
 
