@@ -2,10 +2,8 @@
 <html class="windows x86 no-js" lang="en-US" dir="ltr" data-latest-firefox="33.1.1" data-esr-versions="[31]">
   <head>
     <meta charset="utf-8">
-
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-
-        <title>Mozilla Input - Heartbeat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mozilla Input - Heartbeat</title>
     <meta name="description" content="">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Mozilla">
@@ -25,152 +23,137 @@
     <link rel="stylesheet" media="screen,projection,tv" href="media/css/heartbeat.css" />
     <script src="media/js/site.js"></script>
 
+    <script>
+     // Temporary anonymous count of DNT signals. More info: https://bugzilla.mozilla.org/show_bug.cgi?id=1087011
+     var _dntStatus = navigator.doNotTrack || navigator.msDoNotTrack;
 
+     (function() {
+       var fxMatch = navigator.userAgent.match(/Firefox\/(\d+)/);
 
-              <script>
-// Temporary anonymous count of DNT signals. More info: https://bugzilla.mozilla.org/show_bug.cgi?id=1087011
-var _dntStatus = navigator.doNotTrack || navigator.msDoNotTrack;
+       if (fxMatch && Number(fxMatch[1]) < 32) {
+         // Can't say for sure if it is 1 or 0, due to Fx bug 887703
+         _dntStatus = (_dntStatus === 'yes') ? 'Unknown' : 'Unspecified';
+       } else {
+         _dntStatus = { '0': 'Disabled', '1': 'Enabled' }[_dntStatus] || 'Unspecified';
+       }
+     })();
 
-(function() {
-    var fxMatch = navigator.userAgent.match(/Firefox\/(\d+)/);
+     var _gaq = _gaq || [];
+     var pluginUrl = '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
+     _gaq.push(['_require', 'inpage_linkid', pluginUrl]);
+     _gaq.push(['_setAccount', 'UA-35433268-26']);
+     _gaq.push(['_setAllowLinker', true]);
+     _gaq.push(['_setAllowAnchor', true]);
+     _gaq.push(['_gat._anonymizeIp']);
+     _gaq.push(['_setCustomVar', 13, 'DNT', _dntStatus, 3]);
+     _gaq.push(['_trackPageview']);
 
-    if (fxMatch && Number(fxMatch[1]) < 32) {
-        // Can't say for sure if it is 1 or 0, due to Fx bug 887703
-        _dntStatus = (_dntStatus === 'yes') ? 'Unknown' : 'Unspecified';
-    } else {
-        _dntStatus = { '0': 'Disabled', '1': 'Enabled' }[_dntStatus] || 'Unspecified';
-    }
-})();
+     (function() {
+       var ga = document.createElement('script');
+       ga.type = 'text/javascript';
+       ga.async = true;
 
-var _gaq = _gaq || [];
-var pluginUrl = '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
-_gaq.push(['_require', 'inpage_linkid', pluginUrl]);
-_gaq.push(['_setAccount', 'UA-35433268-26']);
-_gaq.push(['_setAllowLinker', true]);
-_gaq.push(['_setAllowAnchor', true]);
-_gaq.push(['_gat._anonymizeIp']);
-_gaq.push(['_setCustomVar', 13, 'DNT', _dntStatus, 3]);
-_gaq.push(['_trackPageview']);
+       var prefix = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www');
+       ga.src = prefix + '.google-analytics.com/ga.js';
 
-(function() {
-    var ga = document.createElement('script');
-    ga.type = 'text/javascript';
-    ga.async = true;
-
-    var prefix = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www');
-    ga.src = prefix + '.google-analytics.com/ga.js';
-
-    var s = document.getElementsByTagName('script')[0];
-    s.parentNode.insertBefore(ga, s);
-})();
-</script>      </head>
+       var s = document.getElementsByTagName('script')[0];
+       s.parentNode.insertBefore(ga, s);
+     })();
+    </script>
+  </head>
 
   <body class="html-ltr ">
     <div id="strings"
-      data-global-close="Close"
-      data-global-next="Next"
-      data-global-previous="Previous"
-      data-global-update-firefox="Update your Firefox"
-      ></div>
+         data-global-close="Close"
+         data-global-next="Next"
+         data-global-previous="Previous"
+         data-global-update-firefox="Update your Firefox"
+         ></div>
     <div id="outer-wrapper">
-    <div id="wrapper">
+      <div id="wrapper">
+        <div class="spacer" style="height:100px;"></div>
 
+        <section class="container">
+          <div class="span8">
+            <h1>Thank you</h1>
+            <p>
+              Thank you for leaving feedback. We use feedback from users like you to
+              help shape our products and services. We always want to hear from you&mdash;if
+              you have more detailed feedback, please ...
+            </p>
 
+            <a href="https://input.mozilla.org/en-US/feedback?utm_campaign=telemetry-experiment-heartbeat-1-neutral" data-ga-action="feedback-feedback" class="ga-link btn btn-success btn-block" id="feedbackbutton">Tell us more</a>
 
+            <div class="well">
+              <h2>Need some help with Firefox?</h2>
+              <p>We have a wealth of knowledge, useful tips, fixes and even dedicated volunteers on our support site to help make Firefox work better for you. Try one of these selected articles to get started.</p>
+              <ul class="button-group">
+                <li>
+                  <a data-ga-action="support-firefox-slow" href="index.html#" class="ga-link btn btn-white">Firefox is slow</a>
+                </li>
+                <li>
+                  <a data-ga-action="support-firefox-videos" href="index.html#" class="ga-link btn btn-white">Videos don't work</a>
+                </li>
+                <li>
+                  <a data-ga-action="support-firefox-general" href="index.html#" class="ga-link btn btn-white">General troubleshooting</a>
+                </li>
+                <li>
+                  <a data-ga-action="support-firefox-reset" href="index.html#" class="ga-link btn btn-white">Resetting Firefox</a>
+                </li>
+                <li>
+                  <a data-ga-action="support-firefox-crash" href="index.html#" class="ga-link btn btn-white">Firefox crashes all the time</a>
+                </li>
+                <li>
+                  <a data-ga-action="support-firefox-tips" href="index.html#" class="ga-link btn btn-white">General tips and tricks</a>
+                </li>
+                <li>
+                  <a data-ga-action="support-firefox-learn" href="index.html#" class="ga-link btn btn-white">Learn how to use Firefox</a>
+                </li>
+                <li>
+                  <a data-ga-action="support-firefox-custom" href="index.html#" class="ga-link btn btn-white">Customizing Firefox</a>
+                </li>
+                <li>
+                  <a data-ga-action="support-other" href="index.html#" class="ga-link btn btn-white">Something else...</a>
+                </li>
+              </ul>
+            </div>
 
+            <div class="promos">
+              <a data-ga-action="promo-sync" class="promo-callout well ga-link" href="https://www.mozilla.org/en-US/firefox/sync/">
+                <img src="media/img/Firefox_Sync_logo.png" alt="" class="img-sync">
+                <h3>Ready, Set, Sync.</h3>
+                <p>Sign up to access your Firefox info from any device</p>
+              </a>
+              <a data-ga-action="promo-ffa" class="promo-callout well ga-link" href="https://www.mozilla.org/en-US/firefox/android/">
+                <img src="media/img/android_snippet_v3.png" alt="" class="img-ffa">
+                <h3>Love Firefox?</h3>
+                <p>Try Firefox for Android</p>
+              </a>
+              <a data-ga-action="promo-fde" class="promo-callout well ga-link" href="https://www.mozilla.org/en-US/firefox/developer/">
+                <img src="media/img/blue-firefox.png" alt="">
+                <h3>Web Developer?</h3>
+                <p>Check out Firefox Developer Edition</p>
+              </a>
+            </div>
+          </div>
 
-<div class="spacer" style="height:100px;"></div>
-
-<section class="container">
-  <div class="span8">
-  <h1>Thank you</h1>
-  <p>
-
-Thank you for leaving feedback. We use feedback from users like you to
-help shape our products and services. We always want to hear from you&mdash;if
-you have more detailed feedback, please ...
-  </p>
-
-<a href="https://input.mozilla.org/en-US/feedback?utm_campaign=telemetry-experiment-heartbeat-1-neutral" data-ga-action="feedback-feedback" class="ga-link btn btn-success btn-block" id="feedbackbutton">Tell us more</a>
-
-<div class="well">
-  <h2>Need some help with Firefox?</h2>
-  <p>We have a wealth of knowledge, useful tips, fixes and even dedicated volunteers on our support site to help make Firefox work better for you. Try one of these selected articles to get started.</p>
-  <ul class="button-group">
-    <li>
-      <a data-ga-action="support-firefox-slow" href="index.html#" class="ga-link btn btn-white">Firefox is slow</a>
-    </li>
-    <li>
-      <a data-ga-action="support-firefox-videos" href="index.html#" class="ga-link btn btn-white">Videos don't work</a>
-    </li>
-    <li>
-      <a data-ga-action="support-firefox-general" href="index.html#" class="ga-link btn btn-white">General troubleshooting</a>
-    </li>
-    <li>
-      <a data-ga-action="support-firefox-reset" href="index.html#" class="ga-link btn btn-white">Resetting Firefox</a>
-    </li>
-    <li>
-      <a data-ga-action="support-firefox-crash" href="index.html#" class="ga-link btn btn-white">Firefox crashes all the time</a>
-    </li>
-    <li>
-      <a data-ga-action="support-firefox-tips" href="index.html#" class="ga-link btn btn-white">General tips and tricks</a>
-    </li>
-    <li>
-      <a data-ga-action="support-firefox-learn" href="index.html#" class="ga-link btn btn-white">Learn how to use Firefox</a>
-    </li>
-    <li>
-      <a data-ga-action="support-firefox-custom" href="index.html#" class="ga-link btn btn-white">Customizing Firefox</a>
-    </li>
-    <li>
-      <a data-ga-action="support-other" href="index.html#" class="ga-link btn btn-white">Something else...</a>
-    </li>
-  </ul>
-</div>
-
-<div class="promos">
-  <a data-ga-action="promo-sync" class="promo-callout well ga-link" href="https://www.mozilla.org/en-US/firefox/sync/">
-    <img src="media/img/Firefox_Sync_logo.png" alt="" class="img-sync">
-    <h3>Ready, Set, Sync.</h3>
-    <p>Sign up to access your Firefox info from any device</p>
-  </a>
-  <a data-ga-action="promo-ffa" class="promo-callout well ga-link" href="https://www.mozilla.org/en-US/firefox/android/">
-    <img src="media/img/android_snippet_v3.png" alt="" class="img-ffa">
-    <h3>Love Firefox?</h3>
-    <p>Try Firefox for Android</p>
-  </a>
-  <a data-ga-action="promo-fde" class="promo-callout well ga-link" href="https://www.mozilla.org/en-US/firefox/developer/">
-    <img src="media/img/blue-firefox.png" alt="">
-    <h3>Web Developer?</h3>
-    <p>Check out Firefox Developer Edition</p>
-  </a>
-</div>
-
- </div>
-
-  <div class="span4 other-actions">
-    <p>Get more involved</p>
-    <a data-ga-action="engage-donate" href="https://sendto.mozilla.org/page/contribute/Give-Now" class="ga-link other-donate btn btn-block btn-white">Donate to Mozilla</a>
-    <a data-ga-action="engage-facebook" href="https://www.facebook.com/mozilla" class="ga-link other-facebook btn btn-block btn-white">Like us on Facebook</a>
-    <a data-ga-action="engage-twitter-follow" href="https://twitter.com/mozilla" class="ga-link other-twitter btn btn-block btn-white">Follow us on Twitter</a>
-    <a data-ga-action="engage-contribute" href="https://www.mozilla.org/en-US/contribute/" class="ga-link other-contribute btn btn-block btn-white">Contribute to Mozilla</a>
-    <a data-ga-action="engage-newsletter" href="https://www.mozilla.org/en-US/newsletter/" class="ga-link other-newsletter btn btn-block btn-white">Sign up for Firefox news</a>
-  </div>
-</section>
-
-
-
-    </div><!-- close #wrapper -->
-
-
+          <div class="span4 other-actions">
+            <p>Get more involved</p>
+            <a data-ga-action="engage-donate" href="https://sendto.mozilla.org/page/contribute/Give-Now" class="ga-link other-donate btn btn-block btn-white">Donate to Mozilla</a>
+            <a data-ga-action="engage-facebook" href="https://www.facebook.com/mozilla" class="ga-link other-facebook btn btn-block btn-white">Like us on Facebook</a>
+            <a data-ga-action="engage-twitter-follow" href="https://twitter.com/mozilla" class="ga-link other-twitter btn btn-block btn-white">Follow us on Twitter</a>
+            <a data-ga-action="engage-contribute" href="https://www.mozilla.org/en-US/contribute/" class="ga-link other-contribute btn btn-block btn-white">Contribute to Mozilla</a>
+            <a data-ga-action="engage-newsletter" href="https://www.mozilla.org/en-US/newsletter/" class="ga-link other-newsletter btn btn-block btn-white">Sign up for Firefox news</a>
+          </div>
+        </section>
+      </div><!-- close #wrapper -->
     </div><!-- close #outer-wrapper -->
 
-
-<script src="media/js/jquery.js"></script>
-<script src="media/js/global.js"></script>
-<script src="media/js/nav-main-resp.js"></script>
-<script src="media/js/mozilla-input-placeholder.js"></script>
-<script src="media/js/mozilla-image-helper.js"></script>
-<script src="media/js/ga-instrumentation.js"></script>
-
-      </body>
+    <script src="media/js/jquery.js"></script>
+    <script src="media/js/global.js"></script>
+    <script src="media/js/nav-main-resp.js"></script>
+    <script src="media/js/mozilla-input-placeholder.js"></script>
+    <script src="media/js/mozilla-image-helper.js"></script>
+    <script src="media/js/ga-instrumentation.js"></script>
+  </body>
 </html>
