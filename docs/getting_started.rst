@@ -375,7 +375,7 @@ Where to go from here?
 :ref:`conventions-chapter` covers project conventions for Python,
 JavaScript, git usage, etc.
 
-:ref:`workflow-chapter` covers the general workflow for taking a but,
+:ref:`workflow-chapter` covers the general workflow for taking a bug,
 working on it and submitting your changes.
 
 :ref:`db-chapter` covers database-related things like updating your
