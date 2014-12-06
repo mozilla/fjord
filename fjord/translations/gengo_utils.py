@@ -189,7 +189,7 @@ class FjordGengo(object):
         # get_language is a "private API" thing Gengo has, so it's not
         # included in the gengo library and we have to do it manually.
         resp = requests.post(
-            'http://api2.gengo.com/api/service/detect/language',
+            'https://api.gengo.com/service/detect_language',
             data=json.dumps({'text': text.encode('utf-8')}),
             headers={
                 'Content-Type': 'application/json',
@@ -198,7 +198,7 @@ class FjordGengo(object):
 
         resp_json = resp.json()
 
-        if resp_json['opstat'] == 'ok':
+        if 'detected_lang_code' in resp_json:
             lang = resp_json['detected_lang_code']
             if lang == 'un':
                 raise GengoUnknownLanguage('unknown language')
