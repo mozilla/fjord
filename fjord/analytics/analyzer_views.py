@@ -58,7 +58,7 @@ def hb_data(request, answerid=None):
 
     else:
         page = request.GET.get('page')
-        paginator = Paginator(Answer.objects.all(), 25)
+        paginator = Paginator(Answer.objects.order_by('-id'), 25)
         try:
             answers = paginator.page(page)
         except PageNotAnInteger:

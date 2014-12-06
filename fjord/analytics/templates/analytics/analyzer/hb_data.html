@@ -97,16 +97,16 @@
         <h2>Total answers: {{ answers.paginator.count }}</h2>
 
         <div class="pager">
-          {% if next_page %}
-            <a class="older" href="{{ request.get_full_path()|urlparams(page=answers.previous_page_number) }}">
+          {% if answers.has_previous() %}
+            <a class="older-link" href="{{ request.get_full_path()|urlparams(page=answers.previous_page_number()) }}">
               Older
             </a>
           {% else %}
             Older
           {% endif %}
           | Page {{ answers.number }} of {{ answers.paginator.num_pages }} |
-          {% if prev_page %}
-            <a class="newer" href="{{ request.get_full_path()|urlparams(page=answers.next_page_number) }}">
+          {% if answers.has_next() %}
+            <a class="newer-link" href="{{ request.get_full_path()|urlparams(page=answers.next_page_number()) }}">
               Newer
             </a>
           {% else %}
@@ -116,6 +116,7 @@
 
         <table class="summarytable">
           <tr>
+            <th>id</th>
             <th>updated</th>
             <th>experiment ver</th>
             <th>response ver</th>
@@ -166,16 +167,16 @@
         </table>
 
         <div class="pager">
-          {% if next_page %}
-            <a class="older" href="{{ request.get_full_path()|urlparams(page=answers.previous_page_number) }}">
+          {% if answers.has_previous() %}
+            <a class="older-link" href="{{ request.get_full_path()|urlparams(page=answers.previous_page_number()) }}">
               Older
             </a>
           {% else %}
             Older
           {% endif %}
           | Page {{ answers.number }} of {{ answers.paginator.num_pages }} |
-          {% if prev_page %}
-            <a class="newer" href="{{ request.get_full_path()|urlparams(page=answers.next_page_number) }}">
+          {% if answers.has_next() %}
+            <a class="newer-link" href="{{ request.get_full_path()|urlparams(page=answers.next_page_number()) }}">
               Newer
             </a>
           {% else %}
