@@ -50,7 +50,6 @@ class TestFeedback(TestCase):
         eq_(u'en-US', feedback.locale)
         # Note: This comes from the user agent from the LocalizingClient
         eq_(u'Firefox', feedback.product)
-        eq_(u'stable', feedback.channel)
         eq_(u'14.0.1', feedback.version)
 
         # Make sure it doesn't create an email record
@@ -84,7 +83,6 @@ class TestFeedback(TestCase):
         eq_(u'en-US', feedback.locale)
         # Note: This comes from the user agent from the LocalizingClient
         eq_(u'Firefox', feedback.product)
-        eq_(u'stable', feedback.channel)
         eq_(u'14.0.1', feedback.version)
 
     def test_firefox_os_view(self):
@@ -132,7 +130,6 @@ class TestFeedback(TestCase):
             eq_(u'es', feedback.locale)
             eq_(u'Firefox', feedback.product)
             eq_(u'14.0.1', feedback.version)
-            eq_(u'stable', feedback.channel)
 
         finally:
             # FIXME - We have to do another request to set the
@@ -145,19 +142,23 @@ class TestFeedback(TestCase):
         """Test setting product from the url"""
         amount = models.Response.objects.count()
 
+        ua = 'Mozilla/5.0 (Android; Tablet; rv:24.0) Gecko/24.0 Firefox/24.0'
         url = reverse('feedback', args=(u'android',))
-        resp = self.client.post(url, {
+        data = {
             'happy': 1,
             'description': u'Firefox rocks FFA!',
             'url': u'http://mozilla.org/'
-        })
-
+        }
+        resp = self.client.post(url, data, HTTP_USER_AGENT=ua)
         self.assertRedirects(resp, reverse('thanks'))
         eq_(amount + 1, models.Response.objects.count())
         feedback = models.Response.objects.latest(field_name='id')
         eq_(u'en-US', feedback.locale)
+        # Product comes from the url
         eq_(u'Firefox for Android', feedback.product)
-        eq_(u'', feedback.version)
+        # Since product in user agent matches url, we set the version,
+        # too.
+        eq_(u'24.0', feedback.version)
         eq_(u'', feedback.channel)
 
     def test_urls_unknown_product(self):
@@ -361,6 +362,52 @@ class TestFeedback(TestCase):
         feedback = models.Response.objects.latest(field_name='id')
         eq_(u'en-US', feedback.locale)
         eq_(u'Someprod', feedback.product)
+        eq_(u'', feedback.platform)
+
+    def test_infer_version_if_product_matches(self):
+        """Infer the version from the user agent if products match"""
+        amount = models.Response.objects.count()
+
+        # Test that we infer the platform if the products are the
+        # same.
+        ua = 'Mozilla/5.0 (Windows NT 6.0; rv:14.0) Gecko/20100101 Firefox/14.0.1'  # noqa
+        url = reverse('feedback', args=(u'firefox',))
+        data = {
+            'happy': 1,
+            'description': u'Firefox rocks FFA!',
+            'url': u'http://mozilla.org/'
+        }
+        resp = self.client.post(url, data, HTTP_USER_AGENT=ua)
+
+        self.assertRedirects(resp, reverse('thanks'))
+        eq_(amount + 1, models.Response.objects.count())
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(u'en-US', feedback.locale)
+        eq_(u'Firefox', feedback.product)
+        eq_(u'14.0.1', feedback.version)
+        eq_(u'Windows Vista', feedback.platform)
+
+    def test_dont_infer_version_if_product_doesnt_match(self):
+        """Don't infer version from the user agent if product doesn't match"""
+        amount = models.Response.objects.count()
+
+        # Using a Firefox for Android browser to leave feedback for Firefox
+        # Desktop.
+        ua = 'Mozilla/5.0 (Android; Tablet; rv:24.0) Gecko/24.0 Firefox/24.0'
+        url = reverse('feedback', args=(u'firefox',))
+        data = {
+            'happy': 1,
+            'description': u'Firefox rocks FFA!',
+            'url': u'http://mozilla.org/'
+        }
+        resp = self.client.post(url, data, HTTP_USER_AGENT=ua)
+
+        self.assertRedirects(resp, reverse('thanks'))
+        eq_(amount + 1, models.Response.objects.count())
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(u'en-US', feedback.locale)
+        eq_(u'Firefox', feedback.product)
+        eq_(u'', feedback.version)
         eq_(u'', feedback.platform)
 
     def test_invalid_form(self):
@@ -681,7 +728,6 @@ class TestFeedback(TestCase):
         eq_(u'en-US', feedback.locale)
         # Note: This comes from the user agent from the LocalizingClient
         eq_(u'Firefox for Android', feedback.product)
-        eq_(u'stable', feedback.channel)
         eq_(u'24.0', feedback.version)
 
     def test_deprecated_firefox_for_android_sad_is_sad(self):
@@ -707,7 +753,6 @@ class TestFeedback(TestCase):
         eq_(u'en-US', feedback.locale)
         # Note: This comes from the user agent from the LocalizingClient
         eq_(u'Firefox for Android', feedback.product)
-        eq_(u'stable', feedback.channel)
         eq_(u'24.0', feedback.version)
 
     def test_deprecated_firefox_for_android_ideas_are_sad(self):
@@ -734,7 +779,6 @@ class TestFeedback(TestCase):
         eq_(u'en-US', feedback.locale)
         # Note: This comes from the user agent from the LocalizingClient
         eq_(u'Firefox for Android', feedback.product)
-        eq_(u'stable', feedback.channel)
         eq_(u'24.0', feedback.version)
 
     def test_deprecated_firefox_for_android_minimal(self):
@@ -759,7 +803,6 @@ class TestFeedback(TestCase):
         eq_(u'en-US', feedback.locale)
         # Note: This comes from the user agent from the LocalizingClient
         eq_(u'Firefox for Android', feedback.product)
-        eq_(u'stable', feedback.channel)
         eq_(u'24.0', feedback.version)
 
     def test_deprecated_firefox_for_android_phony_ua(self):
