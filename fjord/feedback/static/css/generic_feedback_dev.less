@@ -55,7 +55,8 @@ section {
 .ask {
   margin: 0 auto;
   padding: 0 20px;
-  text-align: left;
+  text-align: center;
+  width: 65%;
 }
 
 body.html-rtl .ask {
@@ -98,7 +99,6 @@ header {
       box-sizing: border-box;
       display: inline;
       float: left;
-      margin: 5px 0 0 5px;
       padding: 0;
       text-align: left;
     }
@@ -138,16 +138,16 @@ body.html-rtl header .header-content .left-side {
   height: 30px;
   margin: 0;
   padding: 0;
-  width: 30px;
+  width:60px;
   z-index: 1;
 
   #back-button {
     cursor: pointer;
     height: 30px;
-    margin: 0;
+    margin: -8px;
     padding: 0;
     stroke: #f0f0f0;
-    width: 30px;
+    width:60px;
   }
 }
 
@@ -210,7 +210,7 @@ body.html-rtl #back-button {
 .private {
   background-color: #d5d5df;
   .border-radius(3px);
-  margin: 0 20px;
+  margin: 0 25%;
   padding: 5px;
 }
 
@@ -226,7 +226,8 @@ body.html-rtl #back-button {
 #description {
   box-sizing: border-box;
   height: 16vh;
-  width: 100%;
+  width: 50%;
+  margin: 0px 25% auto;
 }
 
 #description-counter {
@@ -234,7 +235,7 @@ body.html-rtl #back-button {
   font-size: 0.8em;
   margin: 0;
   text-align: right;
-  width: 100%;
+  width: 74%;
 
   &.error {
     color: red;
@@ -253,12 +254,14 @@ body.html-rtl #description-counter {
 
 #id_url {
   box-sizing: border-box;
-  width: 100%;
+  width: 50%;
+  margin: auto 25% auto;
 }
 
 #id_email {
   box-sizing: border-box;
-  width: 100%;
+  width: 50%;
+  margin: auto 25% auto;
 }
 
 aside {
@@ -266,9 +269,10 @@ aside {
   .border-radius(10px);
   border: 1px solid #a4c5db;
   box-sizing: border-box;
-  margin: 20px;
+  margin: 0px auto 10vh;
   padding: 10px;
   text-align: center;
+  width:50%;
 }
 
 .btn.submit {
@@ -291,6 +295,7 @@ aside {
 
   &:disabled {
     opacity: 0.5;
+    width: 20%;
   }
 }
 
@@ -347,7 +352,7 @@ aside {
 /* media-query based overrides */
 @media only screen and (min-width: 768px) {
   body {
-    font-size: 16px;
+    font-size: 14px;
   }
   .main {
     width: 700px;
@@ -389,10 +394,10 @@ aside {
 @media only screen and (min-width: 1024px) {
   .main {
     margin: 0 auto;
-    width: 900px;
+    width: 100%;
   }
   header .header-content {
     margin: 0 auto;
-    width: 900px;
+    width: 100%;
   }
 }
