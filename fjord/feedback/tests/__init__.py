@@ -44,7 +44,7 @@ class ResponseFactory(factory.DjangoModelFactory):
 
     product = factory.LazyAttribute(
         lambda a: Response.infer_product(
-            browsers.parse_ua(a.user_agent).platform))
+            browsers.parse_ua(a.user_agent)))
     channel = u'stable'
     version = factory.LazyAttribute(
         lambda a: browsers.parse_ua(a.user_agent).browser_version)

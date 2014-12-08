@@ -340,7 +340,9 @@ class Response(ModelBase):
         return ResponseMappingType
 
     @classmethod
-    def infer_product(cls, platform):
+    def infer_product(cls, browser):
+        platform = browser.platform
+
         # FIXME: This is hard-coded.
         if platform == u'Firefox OS':
             return u'Firefox OS'

@@ -146,33 +146,40 @@ def _handle_feedback_post(request, locale=None, product=None,
 
     platform = u''
 
-    # Figure out product, version, channel and platform. We either get
-    # them from the url, from the user_agent, or we don't set them at
-    # all.
     if product:
-        # If there was a product in the url, then we get a Product
-        # instance as an argument and we want the db_name from that.
+        # If we have a product at this point, then it came from the
+        # url and it's a Product instance and we need to turn it into
+        # the product.db_name which is a string.
         product = product.db_name
+    else:
+        # Check the POST data for the product.
+        product = data.get('product', '')
 
-        # FIXME: We should be able to "match" the product with the
-        # user agent browser and if they're the same, then set
-        # platform == browser_platform. However, it's tricky since
-        # our "products" are "interesting".
+    # For the version, we try the url data, then the POST data.
+    version = version or data.get('version', '')
 
-    elif opinion.browser != UNKNOWN:
-        # If we didn't pick up a product from the url, then we
-        # infer as much as we can from the user agent.
-        product = data.get(
-            'product', models.Response.infer_product(opinion.browser_platform))
-        version = data.get(
-            'version', request.BROWSER.browser_version)
-        # Assume everything we don't know about is stable channel.
-        channel = u'stable'
+    # At this point, we have a bunch of values, but we might be
+    # missing some values, too. We're going to cautiously infer data
+    # from the user agent where we're very confident it's appropriate
+    # to do so.
+    if request.BROWSER != UNKNOWN:
+        # If we don't have a product, try to infer that from the user
+        # agent.
+        if not product:
+            product = models.Response.infer_product(request.BROWSER)
 
-    # Try to infer the platform from the product.
-    if product and not platform:
-        platform = models.Response.infer_platform(product, request.BROWSER)
+        # If we have a product and it matches the user agent product,
+        # then we can infer the version and platform from the user
+        # agent if they're missing.
+        if (product and product == models.Response.infer_product(
+                request.BROWSER)):
+            if not version:
+                version = request.BROWSER.browser_version
+            if not platform:
+                platform = models.Response.infer_platform(
+                    product, request.BROWSER)
 
+    # Make sure values are at least empty strings--no Nones.
     opinion.product = product or u''
     opinion.version = version or u''
     opinion.channel = channel or u''
