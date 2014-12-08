@@ -1,6 +1,30 @@
 {% extends "analytics/analyzer/dashboard.html" %}
 {# Note: This is not l10n-ized since it's only available to analyzers for now. #}
 
+{% macro page_links(request, answers) %}
+  <div class="pager">
+    {% if answers.has_previous() %}
+      <a class="prev-link" href="{{ request.get_full_path()|urlparams(page=answers.previous_page_number()) }}">
+        Prev
+      </a>
+    {% else %}
+      Prev
+    {% endif %}
+    | Page {{ answers.number }} of {{ answers.paginator.num_pages }} |
+    {% if answers.has_next() %}
+      <a class="next-link" href="{{ request.get_full_path()|urlparams(page=answers.next_page_number()) }}">
+        Next
+      </a>
+    {% else %}
+      Next
+    {% endif %}
+    |
+    <a class="first-link" href="{{ request.get_full_path()|urlparams(page=1) }}">First</a>
+    |
+    <a class="last-link" href="{{ request.get_full_path()|urlparams(page=answers.paginator.num_pages) }}">Last</a>
+  </div>
+{% endmacro %}
+
 {% block content %}
   <div class="col full">
     <div class="block feedback">
@@ -96,23 +120,7 @@
       {% else %}
         <h2>Total answers: {{ answers.paginator.count }}</h2>
 
-        <div class="pager">
-          {% if answers.has_previous() %}
-            <a class="older-link" href="{{ request.get_full_path()|urlparams(page=answers.previous_page_number()) }}">
-              Older
-            </a>
-          {% else %}
-            Older
-          {% endif %}
-          | Page {{ answers.number }} of {{ answers.paginator.num_pages }} |
-          {% if answers.has_next() %}
-            <a class="newer-link" href="{{ request.get_full_path()|urlparams(page=answers.next_page_number()) }}">
-              Newer
-            </a>
-          {% else %}
-            Newer
-          {% endif %}
-        </div>
+        {{ page_links(request, answers) }}
 
         <table class="summarytable">
           <tr>
@@ -166,23 +174,7 @@
           {% endfor %}
         </table>
 
-        <div class="pager">
-          {% if answers.has_previous() %}
-            <a class="older-link" href="{{ request.get_full_path()|urlparams(page=answers.previous_page_number()) }}">
-              Older
-            </a>
-          {% else %}
-            Older
-          {% endif %}
-          | Page {{ answers.number }} of {{ answers.paginator.num_pages }} |
-          {% if answers.has_next() %}
-            <a class="newer-link" href="{{ request.get_full_path()|urlparams(page=answers.next_page_number()) }}">
-              Newer
-            </a>
-          {% else %}
-            Newer
-          {% endif %}
-        </div>
+        {{ page_links(request, answers) }}
       {% endif %}
     </div>
   </div>
