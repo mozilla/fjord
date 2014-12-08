@@ -1,10 +1,10 @@
 {% extends "analytics/analyzer/dashboard.html" %}
 {# Note: This is not l10n-ized since it's only available to analyzers for now. #}
 
-{% macro page_links(request, answers) %}
+{% macro page_links(request, sortby, answers) %}
   <div class="pager">
     {% if answers.has_previous() %}
-      <a class="prev-link" href="{{ request.get_full_path()|urlparams(page=answers.previous_page_number()) }}">
+      <a class="prev-link" href="{{ request.get_full_path()|urlparams(sortby=sortby, page=answers.previous_page_number()) }}">
         Prev
       </a>
     {% else %}
@@ -12,17 +12,25 @@
     {% endif %}
     | Page {{ answers.number }} of {{ answers.paginator.num_pages }} |
     {% if answers.has_next() %}
-      <a class="next-link" href="{{ request.get_full_path()|urlparams(page=answers.next_page_number()) }}">
+      <a class="next-link" href="{{ request.get_full_path()|urlparams(sortby=sortby, page=answers.next_page_number()) }}">
         Next
       </a>
     {% else %}
       Next
     {% endif %}
     |
-    <a class="first-link" href="{{ request.get_full_path()|urlparams(page=1) }}">First</a>
+    <a class="first-link" href="{{ request.get_full_path()|urlparams(sortby=sortby, page=1) }}">First</a>
     |
-    <a class="last-link" href="{{ request.get_full_path()|urlparams(page=answers.paginator.num_pages) }}">Last</a>
+    <a class="last-link" href="{{ request.get_full_path()|urlparams(sortby=sortby, page=answers.paginator.num_pages) }}">Last</a>
   </div>
+{% endmacro %}
+
+{% macro display_ts(fix_ts, value) %}
+  {% if value %}
+    <span class="nowrap" title="{{ value }}">{{ fix_ts(value) }}</span>
+  {% else %}
+    {{ value }}
+  {% endif %}
 {% endmacro %}
 
 {% block content %}
@@ -120,12 +128,12 @@
       {% else %}
         <h2>Total answers: {{ answers.paginator.count }}</h2>
 
-        {{ page_links(request, answers) }}
+        {{ page_links(request, sortby, answers) }}
 
         <table class="summarytable">
           <tr>
-            <th>id</th>
-            <th>updated</th>
+            <th><a href="{{ request.get_full_path()|urlparams(sortby='id') }}">id</a>{% if sortby == 'id' %} v{% endif %}</th>
+            <th><a href="{{ request.get_full_path()|urlparams(sortby='updated_ts') }}">updated</a>{% if sortby == 'updated_ts' %} v{% endif %}</th>
             <th>experiment ver</th>
             <th>response ver</th>
             <th>person_id</th>
@@ -150,7 +158,7 @@
           {% for ans in answers %}
             <tr>
               <td><a href="{{ url('hb_data', answerid=ans.id) }}">{{ ans.id }}</a></td>
-              <td>{{ ans.updated_ts }}</td>
+              <td><span class="nowrap" title="{{ ans.updated_ts }}">{{ fix_ts(ans.updated_ts) }}</span></td>
               <td>{{ ans.experiment_version }}</td>
               <td>{{ ans.response_version }}</td>
               <td>{{ ans.person_id }}</td>
@@ -161,10 +169,10 @@
 
               <td>{{ ans.score }}</td>
               <td>{{ ans.max_score }}</td>
-              <td>{{ ans.flow_began_ts }}</td>
-              <td>{{ ans.flow_offered_ts }}</td>
-              <td>{{ ans.flow_voted_ts }}</td>
-              <td>{{ ans.flow_engaged_ts }}</td>
+              <td>{{ display_ts(fix_ts, ans.flow_began_ts) }}</td>
+              <td>{{ display_ts(fix_ts, ans.flow_offered_ts) }}</td>
+              <td>{{ display_ts(fix_ts, ans.flow_voted_ts) }}</td>
+              <td>{{ display_ts(fix_ts, ans.flow_engaged_ts) }}</td>
               <td>{{ ans.platform }}</td>
               <td>{{ ans.channel }}</td>
               <td>{{ ans.version }}</td>
@@ -174,7 +182,7 @@
           {% endfor %}
         </table>
 
-        {{ page_links(request, answers) }}
+        {{ page_links(request, sortby, answers) }}
       {% endif %}
     </div>
   </div>

@@ -57,8 +57,9 @@ def hb_data(request, answerid=None):
         answer = Answer.objects.get(id=answerid)
 
     else:
+        sortby = request.GET.get('sortby', 'id')
         page = request.GET.get('page')
-        paginator = Paginator(Answer.objects.order_by('-id'), 25)
+        paginator = Paginator(Answer.objects.order_by('-' + sortby), 25)
         try:
             answers = paginator.page(page)
         except PageNotAnInteger:
@@ -66,9 +67,15 @@ def hb_data(request, answerid=None):
         except EmptyPage:
             answers = paginator.page(paginator.num_pages)
 
+    def fix_ts(ts):
+        ts = float(ts / 1000)
+        return datetime.fromtimestamp(ts)
+
     return render(request, 'analytics/analyzer/hb_data.html', {
+        'sortby': sortby,
         'answer': answer,
-        'answers': answers
+        'answers': answers,
+        'fix_ts': fix_ts,
     })
 
 
