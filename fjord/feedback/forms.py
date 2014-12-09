@@ -24,6 +24,9 @@ class ResponseForm(forms.Form):
     email_ok = forms.BooleanField(required=False)
     email = forms.EmailField(required=False)
 
+    browser_ok = forms.BooleanField(required=False)
+    browser_data = forms.CharField(widget=forms.Textarea(), required=False)
+
     # These are hidden fields on the form which we have here so we can
     # abuse the fields for data validation.
     manufacturer = forms.CharField(required=False, widget=forms.HiddenInput(

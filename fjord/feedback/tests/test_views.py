@@ -1,10 +1,12 @@
+import json
+
 from django.core.cache import cache
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
 from nose.tools import eq_
 
-from fjord.base.tests import TestCase, LocalizingClient, reverse
+from fjord.base.tests import TestCase, LocalizingClient, reverse, with_waffle
 from fjord.feedback import models
 from fjord.feedback.tests import ProductFactory
 
@@ -580,6 +582,88 @@ class TestFeedback(TestCase):
         assert not models.ResponseEmail.objects.exists()
         # Bad email if the box is not checked is not an error.
         eq_(r.status_code, 302)
+
+    def test_browser_data_collection(self):
+        """If the user checks the box, collect the browser data."""
+        url = reverse('feedback', args=(u'firefox',))
+        browser_data = {'application': 'foo'}
+
+        r = self.client.post(url, {
+            'happy': 0,
+            'description': u"I like the colors.",
+            'browser_ok': 'on',
+            'browser_data': json.dumps(browser_data)
+        })
+        eq_(r.status_code, 302)
+        eq_(models.ResponseTroubleshootingInfo.objects.count(), 1)
+        rti = models.ResponseTroubleshootingInfo.objects.latest('id')
+        eq_(rti.data, browser_data)
+
+    def test_browser_data_not_ok(self):
+        """If the user doesn't check the box, don't collect data."""
+        # Note: We shouldn't ever be in this situation since the form
+        # only adds the browser data when the user checks the box and
+        # when they uncheck the box, the form removes it. This test is
+        # here in case that code is busted.
+        count = models.ResponseTroubleshootingInfo.objects.count()
+        url = reverse('feedback', args=(u'firefox',))
+        browser_data = {'application': 'foo'}
+
+        r = self.client.post(url, {
+            'happy': 0,
+            'description': u"I like the colors.",
+            'browser_ok': '',
+            'browser_data': json.dumps(browser_data)
+        })
+        eq_(r.status_code, 302)
+        eq_(models.ResponseTroubleshootingInfo.objects.count(), count)
+
+    def test_browser_data_invalid(self):
+        """If browser_data is not valid json, don't collect it."""
+        count = models.ResponseTroubleshootingInfo.objects.count()
+        url = reverse('feedback', args=(u'firefox',))
+
+        r = self.client.post(url, {
+            'happy': 0,
+            'description': u"I like the colors.",
+            'browser_ok': 'on',
+            'browser_data': 'invalid json'
+        })
+        eq_(r.status_code, 302)
+        eq_(models.ResponseTroubleshootingInfo.objects.count(), count)
+
+    @with_waffle('feedbackdev', True)
+    def test_browser_data_is_in_en_US(self):
+        """en-US folks should see this"""
+        url = reverse('feedback', args=(u'firefox',))
+        resp = self.client.get(url)
+        assert 'browser-data' in resp.content
+
+    @with_waffle('feedbackdev', False)
+    def test_browser_data_not_there_when_feedbackdev_is_false(self):
+        """Doesn't show if feedbackdev flag is false"""
+        url = reverse('feedback', args=(u'firefox',))
+        resp = self.client.get(url)
+        assert 'browser-data' not in resp.content
+
+    @with_waffle('feedbackdev', True)
+    @override_settings(DEV_LANGUAGES=('en-US', 'es'))
+    def test_browser_data_is_not_in_non_en_US(self):
+        """Only en-US folks should see this now"""
+        # FIXME: Remove this test when this is no longer true.
+        try:
+            # Hard-coded url so we're guaranteed to get /es/.
+            url = '/es/feedback/firefox'
+            resp = self.client.get(url)
+
+            assert 'browser-data' not in resp.content
+
+        finally:
+            # FIXME - We have to do another request to set the
+            # LocalizingClient back to en-US otherwise it breaks all
+            # tests ever. This is goofy-pants since it should get
+            # reset in test teardown.
+            self.client.get('/en-US/feedback/')
 
     def test_src_to_source(self):
         """We capture the src querystring arg in the source column"""
