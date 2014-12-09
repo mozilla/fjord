@@ -18,25 +18,23 @@ class TestSubmit(object):
 
         # 1. go to the feedback form
         feedback_pg = GenericFeedbackFormPage(mozwebqa)
-        feedback_pg.go_to_feedback_page()
+        feedback_pg.go_to_feedback_page('firefox')
 
         # 2. click on happy
         feedback_pg.click_happy_feedback()
 
-        # 3. fill out description and url
+        # 3. fill out description, url, email checkbox and email
+        # address
         feedback_pg.set_description(desc)
         feedback_pg.set_url(url)
-        feedback_pg.click_moreinfo_next()
-
-        # 4. fill in email address
         feedback_pg.check_email_checkbox()
         feedback_pg.set_email('foo@example.com')
 
-        # 5. submit
+        # 4. submit
         thanks_pg = feedback_pg.submit(expect_success=True)
         Assert.true(thanks_pg.is_the_current_page)
 
-        # 6. verify
+        # 5. verify
         dashboard_pg = DashboardPage(mozwebqa)
         dashboard_pg.go_to_dashboard_page()
         dashboard_pg.search_for(desc)
@@ -53,25 +51,23 @@ class TestSubmit(object):
 
         # 1. go to the feedback form
         feedback_pg = GenericFeedbackFormPage(mozwebqa)
-        feedback_pg.go_to_feedback_page()
+        feedback_pg.go_to_feedback_page('firefox')
 
         # 2. click on sad
         feedback_pg.click_sad_feedback()
 
-        # 3. fill out description and url
+        # 3. fill out description, url, email checkbox and email
+        # address
         feedback_pg.set_description(desc)
         feedback_pg.set_url(url)
-        feedback_pg.click_moreinfo_next()
-
-        # 4. fill in email address
         feedback_pg.check_email_checkbox()
         feedback_pg.set_email('foo@example.com')
 
-        # 5. submit
+        # 4. submit
         thanks_pg = feedback_pg.submit(expect_success=True)
         Assert.true(thanks_pg.is_the_current_page)
 
-        # 6. verify
+        # 5. verify
         dashboard_pg = DashboardPage(mozwebqa)
         dashboard_pg.go_to_dashboard_page()
         dashboard_pg.search_for(desc)
@@ -88,10 +84,9 @@ class TestSubmit(object):
 
         # Submit the feedback the first time
         feedback_pg = GenericFeedbackFormPage(mozwebqa)
-        feedback_pg.go_to_feedback_page()
+        feedback_pg.go_to_feedback_page('firefox')
         feedback_pg.click_happy_feedback()
         feedback_pg.set_description(desc)
-        feedback_pg.click_moreinfo_next()
         thanks_pg = feedback_pg.submit(expect_success=True)
         Assert.true(thanks_pg.is_the_current_page)
 
@@ -105,10 +100,9 @@ class TestSubmit(object):
         # Submit it a second time--we get the Thank You page again and
         # it looks identical to the first time.
         feedback_pg = GenericFeedbackFormPage(mozwebqa)
-        feedback_pg.go_to_feedback_page()
+        feedback_pg.go_to_feedback_page('firefox')
         feedback_pg.click_happy_feedback()
         feedback_pg.set_description(desc)
-        feedback_pg.click_moreinfo_next()
         thanks_pg = feedback_pg.submit(expect_success=True)
         Assert.true(thanks_pg.is_the_current_page)
 
@@ -134,14 +128,13 @@ class TestSubmit(object):
 
         # 1. go to the feedback form
         feedback_pg = GenericFeedbackFormPage(mozwebqa)
-        feedback_pg.go_to_feedback_page()
+        feedback_pg.go_to_feedback_page('firefox')
 
         # 2. click on happy
         feedback_pg.click_happy_feedback()
 
         # 3. fill out description and url
         feedback_pg.set_description(desc)
-        feedback_pg.click_moreinfo_next()
 
         # 4. submit
         thanks_pg = feedback_pg.submit(expect_success=True)

@@ -13,7 +13,7 @@ class TestValidation(TestCase):
     @pytest.mark.nondestructive
     def test_remaining_character_count(self, mozwebqa):
         feedback_pg = GenericFeedbackFormPage(mozwebqa)
-        feedback_pg.go_to_feedback_page()
+        feedback_pg.go_to_feedback_page('firefox')
 
         feedback_pg.click_happy_feedback()
 
@@ -41,7 +41,7 @@ class TestValidation(TestCase):
     @pytest.mark.nondestructive
     def test_url_verification(self, mozwebqa):
         feedback_pg = GenericFeedbackFormPage(mozwebqa)
-        feedback_pg.go_to_feedback_page()
+        feedback_pg.go_to_feedback_page('firefox')
 
         feedback_pg.click_happy_feedback()
         feedback_pg.set_description('ou812')
@@ -72,13 +72,10 @@ class TestValidation(TestCase):
     @pytest.mark.nondestructive
     def test_email_verification(self, mozwebqa):
         feedback_pg = GenericFeedbackFormPage(mozwebqa)
-        feedback_pg.go_to_feedback_page()
+        feedback_pg.go_to_feedback_page('firefox')
 
         feedback_pg.click_happy_feedback()
         feedback_pg.set_description('ou812')
-        feedback_pg.click_moreinfo_next()
-
-        self.take_a_breather()
         feedback_pg.check_email_checkbox()
 
         valid = [

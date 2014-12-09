@@ -31,7 +31,7 @@ class TestFeedback(TestCase):
         """
         amount = models.Response.objects.count()
 
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
         r = self.client.post(url, {
             'happy': 1,
             'description': u'Firefox rocks!',
@@ -65,7 +65,7 @@ class TestFeedback(TestCase):
         """
         amount = models.Response.objects.count()
 
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
         r = self.client.post(url, {
             'happy': 0,
             'description': u"Firefox doesn't make me sandwiches. :("
@@ -117,7 +117,7 @@ class TestFeedback(TestCase):
             count = models.Response.uncached.count()
 
             # Hard-coded url so we're guaranteed to get /es/.
-            url = '/es/feedback'
+            url = '/es/feedback/firefox'
             resp = self.client.post(url, {
                 'happy': 1,
                 'description': u'Firefox rocks for es!',
@@ -160,13 +160,6 @@ class TestFeedback(TestCase):
         # too.
         eq_(u'24.0', feedback.version)
         eq_(u'', feedback.channel)
-
-    def test_urls_unknown_product(self):
-        """Test unknown product shows unknown product page"""
-        url = reverse('feedback', args=(u'fakeproduct',))
-        resp = self.client.get(url)
-
-        self.assertContains(resp, 'Unknown product')
 
     def test_urls_product_version(self):
         """Test setting version from the url"""
@@ -412,7 +405,7 @@ class TestFeedback(TestCase):
 
     def test_invalid_form(self):
         """Bad data gets ignored. Thanks!"""
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
         r = self.client.post(url, {
             'url': 'http://mozilla.org/'
             # No happy/sad
@@ -424,7 +417,7 @@ class TestFeedback(TestCase):
 
     def test_invalid_form_happy(self):
         """Bad data gets ignored. Thanks!"""
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
         r = self.client.post(url, {
             'url': 'http://mozilla.org/',
             'happy': 0
@@ -436,7 +429,7 @@ class TestFeedback(TestCase):
 
     def test_invalid_form_sad(self):
         """Bad data gets ignored. Thanks!"""
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
         r = self.client.post(url, {
             'url': 'http://mozilla.org/',
             'happy': 1
@@ -448,7 +441,7 @@ class TestFeedback(TestCase):
 
     def test_whitespace_description(self):
         """Descriptions with just whitespace get thrown out"""
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
         r = self.client.post(url, {
             'url': 'http://mozilla.org/',
             'happy': 0,
@@ -460,7 +453,7 @@ class TestFeedback(TestCase):
 
     def test_unicode_in_description(self):
         """Description should accept unicode data"""
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
         r = self.client.post(url, {
             'url': 'http://mozilla.org/',
             'happy': 0,
@@ -472,7 +465,7 @@ class TestFeedback(TestCase):
 
     def test_unicode_in_url(self):
         """URL should accept unicode data"""
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
         r = self.client.post(url, {
             'url': u'http://mozilla.org/\u2713',
             'happy': 0,
@@ -494,7 +487,7 @@ class TestFeedback(TestCase):
             ('chrome://foo', 'chrome://foo')
         ]
 
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
         for item, expected in test_data:
             cache.clear()
 
@@ -510,29 +503,18 @@ class TestFeedback(TestCase):
 
     def test_url_cleaning(self):
         """Clean urls before saving"""
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
         self.client.post(url, {
             'url': u'http://mozilla.org:8000/path/?foo=bar#bar',
             'happy': 0,
             'description': u'foo'
         })
-
         feedback = models.Response.objects.latest(field_name='id')
         eq_(feedback.url, u'http://mozilla.org/path/')
 
-    def test_feedback_router(self):
-        """Requesting a generic template should give a feedback form."""
-        url = reverse('feedback')
-        ua = ('Mozilla/5.0 (X11; Linux x86_64; rv:21.0) Gecko/20130212 '
-              'Firefox/21.0')
-
-        r = self.client.get(url, HTTP_USER_AGENT=ua)
-        eq_(200, r.status_code)
-        self.assertTemplateUsed(r, 'feedback/generic_feedback.html')
-
     def test_email_collection(self):
         """If the user enters an email and checks the box, collect email."""
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
 
         r = self.client.post(url, {
             'happy': 0,
@@ -547,7 +529,7 @@ class TestFeedback(TestCase):
         """If an email is entered, but box is not checked, don't collect."""
         email_count = models.ResponseEmail.objects.count()
 
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
 
         r = self.client.post(url, {
             'happy': 0,
@@ -560,7 +542,7 @@ class TestFeedback(TestCase):
 
     def test_email_missing(self):
         """If no email, ignore it."""
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
 
         r = self.client.post(url, {
             'happy': 0,
@@ -574,7 +556,7 @@ class TestFeedback(TestCase):
 
     def test_email_invalid(self):
         """If email_ok box is checked, but bad email or no email, ignore it."""
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
 
         # Invalid email address gets ignored, but response is
         # otherwise saved.
@@ -601,7 +583,7 @@ class TestFeedback(TestCase):
 
     def test_src_to_source(self):
         """We capture the src querystring arg in the source column"""
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
 
         r = self.client.post(url + '?src=newsletter', {
             'happy': 0,
@@ -615,7 +597,7 @@ class TestFeedback(TestCase):
 
     def test_utm_source_to_source(self):
         """We capture the utm_source querystring arg in the source column"""
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
 
         r = self.client.post(url + '?utm_source=newsletter', {
             'happy': 0,
@@ -629,7 +611,7 @@ class TestFeedback(TestCase):
 
     def test_utm_campaign_to_source(self):
         """We capture the utm_campaign querystring arg in the source column"""
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
 
         r = self.client.post(url + '?utm_campaign=20140220_email', {
             'happy': 0,
@@ -643,7 +625,7 @@ class TestFeedback(TestCase):
 
     def test_save_context_basic(self):
         """We capture any querystring vars as context"""
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
 
         r = self.client.post(url + '?foo=bar', {
             'happy': 0,
@@ -657,7 +639,7 @@ class TestFeedback(TestCase):
 
     def test_save_context_long_key(self):
         """Long keys are truncated"""
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
 
         r = self.client.post(url + '?foo12345678901234567890=bar', {
             'happy': 0,
@@ -671,7 +653,7 @@ class TestFeedback(TestCase):
 
     def test_save_context_long_val(self):
         """Long values are truncated"""
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
 
         r = self.client.post(url + '?foo=' + ('a' * 100) + 'b', {
             'happy': 0,
@@ -685,7 +667,7 @@ class TestFeedback(TestCase):
 
     def test_save_context_maximum_pairs(self):
         """Only save 20 pairs"""
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
 
         qs = '&'.join(['foo%02d=%s' % (i, i) for i in range(25)])
 
@@ -701,6 +683,10 @@ class TestFeedback(TestCase):
         eq_(len(data), 20)
         eq_(data[0], (u'foo00', '0'))
         eq_(data[-1], (u'foo19', '19'))
+
+
+class TestDeprecatedAndroidFeedback(TestCase):
+    client_class = LocalizingClient
 
     def test_deprecated_firefox_for_android_feedback_works(self):
         """Verify firefox for android can post feedback"""
@@ -834,6 +820,77 @@ class TestFeedback(TestCase):
         eq_(feedback.version, u'')
 
 
+class TestPicker(TestCase):
+    client_class = LocalizingClient
+
+    def setUp(self):
+        # FIXME: We can nix this when we stop doing data migrations in
+        # test setup.
+        models.Product.objects.all().delete()
+
+    def test_picker_no_products(self):
+        resp = self.client.get(reverse('feedback'))
+
+        eq_(resp.status_code, 200)
+        self.assertTemplateUsed(resp, 'feedback/picker.html')
+        assert 'No products available.' in resp.content
+
+    def test_picker_with_products(self):
+        ProductFactory(display_name=u'ProductFoo', slug=u'productfoo')
+        ProductFactory(display_name=u'ProductBar', slug=u'productbar')
+
+        cache.clear()
+
+        resp = self.client.get(reverse('feedback'))
+
+        eq_(resp.status_code, 200)
+
+        self.assertContains(resp, 'ProductFoo')
+        self.assertContains(resp, 'productfoo')
+        self.assertContains(resp, 'ProductBar')
+        self.assertContains(resp, 'productbar')
+
+    def test_picker_with_disabled_products(self):
+        ProductFactory(display_name=u'ProductFoo', slug=u'productfoo',
+                       enabled=True)
+        ProductFactory(display_name=u'ProductBar', slug=u'productbar',
+                       enabled=False)
+
+        cache.clear()
+
+        resp = self.client.get(reverse('feedback'))
+
+        eq_(resp.status_code, 200)
+
+        # This is on the picker
+        self.assertContains(resp, 'ProductFoo')
+        self.assertContains(resp, 'productfoo')
+
+        # This is not on the picker
+        self.assertNotContains(resp, 'ProductBar')
+        self.assertNotContains(resp, 'productbar')
+
+    def test_picker_with_not_on_picker_products(self):
+        ProductFactory(display_name=u'ProductFoo', slug=u'productfoo',
+                       on_picker=True)
+        ProductFactory(display_name=u'ProductBar', slug=u'productbar',
+                       on_picker=False)
+
+        cache.clear()
+
+        resp = self.client.get(reverse('feedback'))
+
+        eq_(resp.status_code, 200)
+
+        # This is on the picker
+        self.assertContains(resp, 'ProductFoo')
+        self.assertContains(resp, 'productfoo')
+
+        # This is not on the picker
+        self.assertNotContains(resp, 'ProductBar')
+        self.assertNotContains(resp, 'productbar')
+
+
 class TestCSRF(TestCase):
     def setUp(self):
         super(TestCSRF, self).setUp()
@@ -842,7 +899,7 @@ class TestCSRF(TestCase):
 
     def test_no_csrf_regular_form_fails(self):
         """No csrf token in post data from anonymous user yields 403."""
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
         r = self.client.post(url, {
             'happy': 1,
             'description': u'Firefox rocks!',
@@ -853,7 +910,7 @@ class TestCSRF(TestCase):
 
     def test_firefox_for_android(self):
         """No csrf token for a FfA post works fine."""
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
         r = self.client.post(url, {
             '_type': 1,
             'description': u'Firefox rocks!',
@@ -873,7 +930,7 @@ class TestWebFormThrottling(TestCase):
         initial_amount = models.Response.objects.count()
         eq_(initial_amount, 0)
 
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
 
         # Toss 100 responses in.
         for i in range(100):
@@ -903,7 +960,7 @@ class TestWebFormThrottling(TestCase):
         initial_amount = models.Response.objects.count()
         eq_(initial_amount, 0)
 
-        url = reverse('feedback')
+        url = reverse('feedback', args=(u'firefox',))
 
         data = {
             'happy': 1,

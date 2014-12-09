@@ -23,10 +23,10 @@ class Product(Page):
 
     def click(self):
         # FIXME: Import here to avoid circular import
-        from pages.generic_feedback_form_dev import GenericFeedbackFormDevPage
+        from pages.generic_feedback_form import GenericFeedbackFormPage
 
         # Clicks on the product which goes to the feedback page.
-        feedback_pg = GenericFeedbackFormDevPage(self.testsetup)
+        feedback_pg = GenericFeedbackFormPage(self.testsetup)
         self._root_element.click()
         WebDriverWait(self.selenium, 10).until(lambda s: feedback_pg.is_the_current_page)
         return feedback_pg
@@ -38,7 +38,7 @@ class PickerPage(Page):
     _products_locator = (By.CSS_SELECTOR, '.product-card')
 
     def go_to_picker_page(self):
-        self.selenium.get(self.base_url + '/feedback/?feedbackdev=1')
+        self.selenium.get(self.base_url + '/feedback/')
         self.is_the_current_page
 
     @property

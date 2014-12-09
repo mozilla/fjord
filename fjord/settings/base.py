@@ -392,13 +392,7 @@ MINIFY_BUNDLES = {
         ),
         'generic_feedback': (
             'css/lib/normalize.css',
-            'css/lib/brick-1.0.0.byob.min.css',
-            'css/feedback_base.less',
             'css/generic_feedback.less',
-        ),
-        'generic_feedback_dev': (
-            'css/lib/normalize.css',
-            'css/generic_feedback_dev.less',
         ),
         'thanks': (
             'css/lib/normalize.css',
@@ -479,13 +473,6 @@ MINIFY_BUNDLES = {
             'js/fjord_utils.js',
             'js/common_feedback.js',
             'js/generic_feedback.js',
-            'js/ga.js',
-        ),
-        'generic_feedback_dev': (
-            'js/lib/jquery.min.js',
-            'js/fjord_utils.js',
-            'js/common_feedback.js',
-            'js/generic_feedback_dev.js',
             'js/ga.js',
         ),
         'thanks': (

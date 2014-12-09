@@ -360,61 +360,28 @@ def feedback_router(request, product=None, version=None, channel=None,
     version = smart_str(version)
     channel = smart_str(channel).lower()
 
-    feedbackdev_flag = waffle.flag_is_active(request, 'feedbackdev')
+    if product == 'fxos' or request.BROWSER.browser == 'Firefox OS':
+        # Firefox OS gets shunted to a different form which has
+        # different Firefox OS specific questions.
+        view = firefox_os_stable_feedback
+        product = 'fxos'
 
-    if feedbackdev_flag:
-        # Routing for when we're doing feedbackdevs. This is different
-        # enough from regular routing that it's best to segregate it
-        # rather than mix it all together.
-        if product == 'fxos' or request.BROWSER.browser == 'Firefox OS':
-            # Firefox OS gets shunted to a different form which has
-            # different Firefox OS specific questions.
-            view = firefox_os_stable_feedback
-            product = 'fxos'
+    elif product in PRODUCT_OVERRIDE:
+        # If the product is really a form name, we use that
+        # form specifically.
+        view = PRODUCT_OVERRIDE[product]
+        product = None
 
-        elif product in PRODUCT_OVERRIDE:
-            # If the product is really a form name, we use that
-            # form specifically.
-            view = PRODUCT_OVERRIDE[product]
-            product = None
+    elif (product is None
+          or product not in models.Product.get_product_map()):
 
-        elif (product is None
-              or product not in models.Product.get_product_map()):
+        picker_products = models.Product.objects.filter(
+            enabled=True, on_picker=True)
+        return render(request, 'feedback/picker.html', {
+            'products': picker_products
+        })
 
-            picker_products = models.Product.objects.filter(
-                enabled=True, on_picker=True)
-            return render(request, 'feedback/picker.html', {
-                'products': picker_products
-            })
-
-        product = models.Product.from_slug(product)
-
-    else:
-        # Routing for the currently running generic feedback form.
-        if product == 'fxos' or request.BROWSER.browser == 'Firefox OS':
-            # Firefox OS gets shunted to a different form which has
-            # different Firefox OS specific questions.
-            view = firefox_os_stable_feedback
-            product = 'fxos'
-
-        elif product:
-            product = smart_str(product)
-
-            if product in PRODUCT_OVERRIDE:
-                # If the product is really a form name, we use that
-                # form specifically.
-                view = PRODUCT_OVERRIDE[product]
-                product = None
-
-            elif product not in models.Product.get_product_map():
-                return render(request, 'feedback/unknownproduct.html', {
-                    'product': product
-                })
-
-            else:
-                # This is a valid existing product, so grab it and pass
-                # it along.
-                product = models.Product.from_slug(product)
+    product = models.Product.from_slug(product)
 
     if view is None:
         view = generic_feedback
