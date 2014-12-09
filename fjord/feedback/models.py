@@ -572,6 +572,16 @@ class ResponseContext(ModelBase):
         return unicode(self.id)
 
 
+class ResponseTroubleshootingInfo(ModelBase):
+    """Holds remote-troubleshooting data."""
+
+    opinion = models.ForeignKey(Response)
+    data = JSONObjectField()
+
+    def __unicode__(self):
+        return unicode(self.id)
+
+
 class NoNullsCharField(serializers.CharField):
     """Further restricts CharField so it doesn't accept nulls
 
@@ -748,6 +758,16 @@ def purge_data(cutoff=None, verbose=False):
 
     if verbose:
         print 'Purged %d feedback_responsecontext records' % count
+
+    # Third, ResponseTroubleshootingInfo.
+    objs = ResponseTroubleshootingInfo.objects.filter(
+        opinion__created__lte=cutoff)
+    responses_to_update.update(objs.values_list('opinion_id', flat=True))
+    count = objs.count()
+    objs.delete()
+
+    if verbose:
+        print 'Purged %d feedback_responsetroubleshootinginfo records' % count
 
     if responses_to_update:
         if verbose:
