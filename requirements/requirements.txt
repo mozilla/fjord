@@ -22,10 +22,6 @@ https://github.com/gengo/gengo-python/archive/8388e35e6ef1ae946a39268763e741d826
 # sha256: Orqipd_IL9e7ZWjQsG0DDHclCBmuCITl4Iv0kQAlnxE
 https://github.com/jbalogh/jingo/archive/5e985a5c16e343a30482cc526127a856b1cb45ed.tar.gz#egg=jingo
 
-# django-grappelli: tags/2.4.10^0
-# sha256: Aff-Wq92Uwupotohk5IJAGe-WqzSlxTxLJgW-zjaAWA
-https://github.com/sehmaschine/django-grappelli/archive/7ac34941117da730865967a74e714da4a180eddb.tar.gz#egg=django-grappelli
-
 # django-statsd: tags/0.3.8.5
 # sha256: LTn7BrZL1DKwIiETzYeOHlosfAnsk7K7V3zw4Kq_GNk
 https://github.com/andymckay/django-statsd/archive/bb601976056d0f922c5a613d2a9786b81d179b06.tar.gz#egg=django-statsd
@@ -123,6 +119,9 @@ Django==1.6.8
 
 # sha256: JL4TJtBHNh5HWbqZkqyoPtZd9Vg3UN_ovoEOscEx2HY
 django-adminplus==0.3
+
+# sha256: Vh8l3OA57P9ngqJpP0BRw9oh2mbZMuItZvePIAmDf4o
+django-grappelli==2.5.6
 
 # sha256: Sje0ncwClfVGz2spT9gNcc_ttQT-YhDNq3n5xx5Ocn8
 dennis==0.4.3
