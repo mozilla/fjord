@@ -22,8 +22,8 @@ apt-get install -y -q npm
 # Homogenize binary name with production RHEL:
 ln -sf /usr/bin/nodejs /usr/local/bin/node
 
-# Install LESSC
-npm install -g less
+# Install node modules from package.json
+sudo -H -u vagrant npm install
 
 # Install Python development-related things:
 apt-get install -y -q libapache2-mod-wsgi python-pip libpython-dev
@@ -84,6 +84,9 @@ apt-get autoremove -y -q
 
 # Activate the virtual environment in .bashrc
 echo ". $VENV/bin/activate" >> /home/vagrant/.bashrc
+
+# Add the 'bin' folder of local node modules to $PATH
+echo "export PATH=$PATH:/home/vagrant/fjord/node_modules/.bin/" >> /home/vagrant/.bashrc
 
 # FIXME: Change the motd file so that it has a link to Fjord docs,
 # tells the user where the code is and lists common commands.

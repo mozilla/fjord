@@ -1,0 +1,15 @@
+{
+    "name": "Fjord",
+    "description": "Platform for Mozilla Input",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/mozilla/fjord.git"
+    },
+    "devDependencies": {
+        "jshint": "2.5.10"
+    },
+    "dependencies": {
+        "less": "1.7.0"
+    }
+
+}
