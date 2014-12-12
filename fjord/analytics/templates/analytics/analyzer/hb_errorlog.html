@@ -1,6 +1,30 @@
 {% extends "analytics/analyzer/dashboard.html" %}
 {# Note: This is not l10n-ized since it's only available to analyzers for now. #}
 
+{% macro page_links(request, sortby, errors) %}
+  <div class="pager">
+    {% if errors.has_previous() %}
+      <a class="prev-link" href="{{ request.get_full_path()|urlparams(sortby=sortby, page=errors.previous_page_number()) }}">
+        Prev
+      </a>
+    {% else %}
+      Prev
+    {% endif %}
+    | Page {{ errors.number }} of {{ errors.paginator.num_pages }} |
+    {% if errors.has_next() %}
+      <a class="next-link" href="{{ request.get_full_path()|urlparams(sortby=sortby, page=errors.next_page_number()) }}">
+        Next
+      </a>
+    {% else %}
+      Next
+    {% endif %}
+    |
+    <a class="first-link" href="{{ request.get_full_path()|urlparams(sortby=sortby, page=1) }}">First</a>
+    |
+    <a class="last-link" href="{{ request.get_full_path()|urlparams(sortby=sortby, page=errors.paginator.num_pages) }}">Last</a>
+  </div>
+{% endmacro %}
+
 {% block content %}
   <div class="col full">
     <div class="block feedback">
@@ -33,23 +57,7 @@
       {% else %}
         <h2>Total errors: {{ errors.paginator.count }}</h2>
 
-        <div class="pager">
-          {% if next_page %}
-            <a class="older" href="{{ request.get_full_path()|urlparams(page=errors.previous_page_number) }}">
-              Older
-            </a>
-          {% else %}
-            Older
-          {% endif %}
-          | Page {{ errors.number }} of {{ errors.paginator.num_pages }} |
-          {% if prev_page %}
-            <a class="newer" href="{{ request.get_full_path()|urlparams(page=errors.next_page_number) }}">
-              Newer
-            </a>
-          {% else %}
-            Newer
-          {% endif %}
-        </div>
+        {{ page_links(request, sortby, errors) }}
 
         <table class="summarytable">
           {% for err in errors %}
@@ -62,23 +70,8 @@
           {% endfor %}
         </table>
 
-        <div class="pager">
-          {% if next_page %}
-            <a class="older" href="{{ request.get_full_path()|urlparams(page=errors.previous_page_number) }}">
-              Older
-            </a>
-          {% else %}
-            Older
-          {% endif %}
-          | Page {{ errors.number }} of {{ errors.paginator.num_pages }} |
-          {% if prev_page %}
-            <a class="newer" href="{{ request.get_full_path()|urlparams(page=errors.next_page_number) }}">
-              Newer
-            </a>
-          {% else %}
-            Newer
-          {% endif %}
-        </div>
+        {{ page_links(request, sortby, errors) }}
+
       {% endif %}
     </div>
   </div>

@@ -109,7 +109,8 @@ def hb_errorlog(request, errorid=None):
 
     else:
         page = request.GET.get('page')
-        paginator = Paginator(Record.objects.filter(app='heartbeat'), 25)
+        paginator = Paginator(
+            Record.objects.filter(app='heartbeat').order_by('-id'), 100)
         try:
             errors = paginator.page(page)
         except PageNotAnInteger:
