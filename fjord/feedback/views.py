@@ -234,7 +234,8 @@ def generic_feedback(request, locale=None, product=None, version=None,
 
     return render(request, 'feedback/generic_feedback.html', {
         'form': form,
-        'product': product
+        'product': product,
+        'TRUNCATE_LENGTH': TRUNCATE_LENGTH,
     })
 
 
