@@ -386,3 +386,9 @@ ANALYSIS_STOPWORDS = set([
     'yourselves',
     'z'
 ])
+
+
+# This defines the number of characters the description can have.  We
+# do this in code rather than in the db since it makes it easier to
+# tweak the value.
+TRUNCATE_LENGTH = 10000

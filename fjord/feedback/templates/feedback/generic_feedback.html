@@ -114,8 +114,8 @@
               </label>
             </div>
             <div class="input-box">
-              <div id="description-counter">10000</div>
-              <textarea data-max-length="10000" id="description" name="description"></textarea>
+              <div id="description-counter">{{ TRUNCATE_LENGTH }}</div>
+              <textarea data-max-length="{{ TRUNCATE_LENGTH }}" id="description" name="description"></textarea>
             </div>
 
             <div class="ask">

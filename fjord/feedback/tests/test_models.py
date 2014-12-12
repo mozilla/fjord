@@ -18,13 +18,14 @@ from fjord.feedback.tests import (
 )
 from fjord.feedback.utils import compute_grams
 from fjord.search.tests import ElasticTestCase
+from fjord.feedback.config import TRUNCATE_LENGTH
 
 
 class TestResponseModel(TestCase):
     def test_description_truncate_on_save(self):
         # Extra 10 characters get lopped off on save.
-        resp = ResponseFactory(description=('a' * 10010))
-        eq_(resp.description, 'a' * 10000)
+        resp = ResponseFactory(description=('a' * (TRUNCATE_LENGTH + 10)))
+        eq_(resp.description, 'a' * TRUNCATE_LENGTH)
 
     def test_description_strip_on_save(self):
         # Nix leading and trailing whitespace.
