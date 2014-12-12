@@ -23,6 +23,7 @@ from fjord.feedback import config
 from fjord.feedback import models
 from fjord.feedback.forms import ResponseForm
 from fjord.feedback.utils import clean_url
+from fjord.feedback.config import TRUNCATE_LENGTH
 
 
 def happy_redirect(request):
@@ -253,6 +254,7 @@ def firefox_os_stable_feedback(request, locale=None, product=None,
     return render(request, 'feedback/fxos_feedback.html', {
         'countries': countries,
         'devices': config.FIREFOX_OS_DEVICES,
+        'TRUNCATE_LENGTH': TRUNCATE_LENGTH,
     })
 
 
