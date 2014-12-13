@@ -51,6 +51,7 @@ src/django-ratelimit
 src/django-rest-framework
 src/django-session-csrf
 src/django-sha2
+src/django-sslserver
 src/django-statsd
 src/elasticutils
 src/elasticsearch-py

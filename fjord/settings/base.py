@@ -475,6 +475,14 @@ MINIFY_BUNDLES = {
             'js/generic_feedback.js',
             'js/ga.js',
         ),
+        'generic_feedback_dev': (
+            'js/lib/jquery.min.js',
+            'js/fjord_utils.js',
+            'js/remote.js',
+            'js/common_feedback.js',
+            'js/generic_feedback_dev.js',
+            'js/ga.js',
+        ),
         'thanks': (
             'js/lib/jquery.min.js',
             'js/init.js',

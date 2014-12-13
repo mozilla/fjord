@@ -9,7 +9,11 @@
 {% endblock %}
 
 {% block site_js %}
-  {{ js('generic_feedback') }}
+  {% if waffle.flag('feedbackdev') %}
+    {{ js('generic_feedback_dev') }}
+  {% else %}
+    {{ js('generic_feedback') }}
+  {% endif %}
 {% endblock %}
 
 {% block page_title %}{{ _('Submit Your Feedback') }}{% endblock %}
@@ -95,22 +99,24 @@
         <div class="card inactive" id="moreinfo" data-focus="#description" data-title="{{ _('Details') }}" data-back-id="intro">
           <section>
             <div class="ask">
-              <label class="happy" for="description">
-                {% trans %}
-                  Please describe what you like.
-                  The content of your feedback will be public, so please be
-                  sure not to include personal information such as email
-                  address, passwords or phone number.
-                {% endtrans %}
-              </label>
-              <label class="sad" for="description">
-                {% trans %}
-                  Please describe your problem below and be as specific as
-                  you can.
-                  The content of your feedback will be public, so please be
-                  sure not to include personal information such as email
-                  address, passwords or phone number.
-                {% endtrans %}
+              <label for="description">
+                <span class="happy">
+                  {% trans %}
+                    Please describe what you like.
+                    The content of your feedback will be public, so please be
+                    sure not to include personal information such as email
+                    address, passwords or phone number.
+                  {% endtrans %}
+                </span>
+                <span class="sad">
+                  {% trans %}
+                    Please describe your problem below and be as specific as
+                    you can.
+                    The content of your feedback will be public, so please be
+                    sure not to include personal information such as email
+                    address, passwords or phone number.
+                  {% endtrans %}
+                </span>
               </label>
             </div>
             <div class="input-box">
@@ -130,8 +136,39 @@
               <input class="url" id="id_url" name="url" placeholder="http://" type="text">
             </div>
 
+            {% if waffle.flag('feedbackdev') and LANG == 'en-US' %}
+              {# NOTE: en-US only until we're sure it's good and translations are done. #}
+              <div id="browser-ask" class="private">
+                <div class="ask">
+                  <input id="browser-ok" name="browser_ok" type="checkbox">
+                  <label class="browser-ok" for="browser-ok">
+                    <span class="happy">
+                      {% trans %}
+                        (Optional)
+                        Check here to provide technical information
+                        about your browser. This information helps us
+                        better understand our users and create better
+                        products.
+                        This data will be kept private.
+                      {% endtrans %}
+                    </span>
+                    <span class="sad">
+                      {% trans %}
+                        (Optional)
+                        Check here to provide technical information
+                        about your browser. This will help us diagnose
+                        problems more quickly.
+                        This data will be kept private.
+                      {% endtrans %}
+                    </span>
+                  </label>
+                  <input id="browser-data" name="browser_data" type="hidden" value="{}" />
+                </div>
+              </div>
+            {% endif %}
+
             <div class="private">
-              <div class="ask private">
+              <div class="ask">
                 <input id="email-ok" name="email_ok" type="checkbox">
                 <label class="email-ok" for="email-ok">
                   {% trans %}

@@ -1,3 +1,4 @@
+import json
 from functools import wraps
 
 from django.http import HttpResponseRedirect
@@ -192,6 +193,21 @@ def _handle_feedback_post(request, locale=None, product=None,
     if data.get('email_ok') and data.get('email'):
         e = models.ResponseEmail(email=data['email'], opinion=opinion)
         e.save()
+
+    # If there's browser data, save that separately.
+    if data.get('browser_ok') and data.get('browser_data'):
+        # This comes in as a JSON string. Because we're using
+        # JSONObjectField, we need to convert it back to Python and
+        # then save it. This is kind of silly, but it does guarantee
+        # we have valid JSON.
+        try:
+            browser_data = data['browser_data']
+            browser_data = json.loads(browser_data)
+            rti = models.ResponseTroubleshootingInfo(
+                data=browser_data, opinion=opinion)
+            rti.save()
+        except ValueError:
+            pass
 
     if get_data:
         # There was extra context in the query string, so we grab that
