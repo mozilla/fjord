@@ -1,0 +1,184 @@
+Click Changelog
+===============
+
+This contains all major version changes between Click releases.
+
+Version 3.3
+-----------
+
+(bugfix release, released on September 8th 2014)
+
+- Fixed an issue with error reporting on Python 3 for invalid forwarding
+  of commands.
+
+Version 3.2
+-----------
+
+(bugfix release, released on August 22nd 2014)
+
+- Added missing `err` parameter forwarding to the `secho` function.
+- Fixed default parameters not being handled properly by the context
+  invoke method.  This is a backwards incompatible change if the function
+  was used improperly.  See :ref:`upgrade-to-3.2` for more information.
+- Removed the `invoked_subcommands` attribute largely.  It is not possible
+  to provide it to work error free due to how the parsing works so this
+  API has been deprecated.  See :ref:`upgrade-to-3.2` for more information.
+- Restored the functionality of `invoked_subcommand` which was broken as
+  a regression in 3.1.
+
+Version 3.1
+-----------
+
+(bugfix release, released on August 13th 2014)
+
+- Fixed a regression that caused contexts of subcommands to be
+  created before the parent command was invoked which was a
+  regression from earlier Click versions.
+
+Version 3.0
+-----------
+
+(codename "clonk clonk", released on August 12th 2014)
+
+- formatter now no longer attempts to accomodate for terminals
+  smaller than 50 characters.  If that happens it just assumes
+  a minimal width.
+- added a way to not swallow exceptions in the test system.
+- added better support for colors with pagers and ways to
+  override the autodetection.
+- the CLI runner's result object now has a traceback attached.
+- improved automatic short help detection to work better with
+  dots that do not terminate sentences.
+- when definining options without actual valid option strings
+  now, Click will give an error message instead of silently
+  passing.  This should catch situations where users wanted to
+  created arguments instead of options.
+- Restructured Click internally to support vendoring.
+- Added support for multi command chaining.
+- Added support for defaults on options with `multiple` and
+  options and arguments with `nargs != 1`.
+- label passed to `progressbar` is no longer rendered with
+  whitespace stripped.
+- added a way to disable the standalone mode of the `main`
+  method on a Click command to be able to handle errors better.
+- added support for returning values from command callbacks.
+- added simplifications for printing to stderr from `echo`.
+- added result callbacks for groups.
+- entering a context multiple times defers the cleanup until
+  the last exit occurs.
+- added `open_file`.
+
+Version 2.6
+-----------
+
+(bugfix release, released on August 11th 2014)
+
+- Fixed an issue where the wrapped streams on Python 3 would be reporting
+  incorrect values for seekable.
+
+Version 2.5
+-----------
+
+(bugfix release, released on July 28th 2014)
+
+- Fixed a bug with text wrapping on Python 3.
+
+Version 2.4
+-----------
+
+(bugfix release, released on July 4th 2014)
+
+- Corrected a bug in the change of the help option in 2.3.
+
+Version 2.3
+-----------
+
+(bugfix release, released on July 3rd 2014)
+
+- Fixed an incorrectly formatted help record for count options.'
+- Add support for ansi code stripping on Windows if colorama
+  is not available.
+- restored the Click 1.0 handling of the help parameter for certain
+  edge cases.
+
+Version 2.2
+-----------
+
+(bugfix release, released on June 26th 2014)
+
+- fixed tty detection on PyPy.
+- fixed an issue that progress bars were not rendered when the
+  context manager was entered.
+
+Version 2.1
+-----------
+
+(bugfix release, released on June 14th 2014)
+
+- fixed the :func:`launch` function on windows.
+- improved the colorama support on windows to try hard to not
+  screw up the console if the application is interrupted.
+- fixed windows terminals incorrectly being reported to be 80
+  characters wide instead of 79
+- use colorama win32 bindings if available to get the correct
+  dimensions of a windows terminal.
+- fixed an issue with custom function types on Python 3.
+- fixed an issue with unknown options being incorrectly reported
+  in error messages.
+
+Version 2.0
+-----------
+
+(codename "tap tap tap", released on June 6th 2014)
+
+- added support for opening stdin/stdout on Windows in
+  binary mode correctly.
+- added support for atomic writes to files by going through
+  a temporary file.
+- introduced :exc:`BadParameter` which can be used to easily perform
+  custom validation with the same error messages as in the type system.
+- added :func:`progressbar`; a function to show progress bars.
+- added :func:`get_app_dir`; a function to calculate the home folder
+  for configs.
+- Added transparent handling for ANSI codes into the :func:`echo`
+  function through `colorama`.
+- Added :func:`clear` function.
+- Breaking change: parameter callbacks now get the parameter object
+  passed as second argument.  There is legacy support for old callbacks
+  which will warn but still execute the script.
+- Added :func:`style`, :func:`unstyle` and :func:`secho` for ANSI
+  styles.
+- Added an :func:`edit` function that invokes the default editor.
+- Added an :func:`launch` function that launches browsers and applications.
+- nargs of -1 for arguments can now be forced to be a single item through
+  the required flag.  It defaults to not required.
+- setting a default for arguments now implicitly makes it non required.
+- changed "yN" / "Yn" to "y/N" and "Y/n" in confirmation prompts.
+- added basic support for bash completion.
+- added :func:`getchar` to fetch a single character from the terminal.
+- errors now go to stderr as intended.
+- fixed various issues with more exotic parameter formats like DOS/Windows
+  style arguments.
+- added :func:`pause` which works similar to the Windows ``pause`` cmd
+  built-in but becomes an automatic noop if the application is not run
+  through a terminal.
+- added a bit of extra information about missing choice parameters.
+- changed how the help function is implemented to allow global overriding
+  of the help option.
+- added support for token normalization to implement case insensitive handling.
+- added support for providing defaults for context settings.
+
+Version 1.1
+-----------
+
+(bugfix release, released on May 23rd 2014)
+
+- fixed a bug that caused text files in Python 2 to not accept
+  native strings.
+
+Version 1.0
+-----------
+
+(no codename, released on May 21st 2014)
+
+- Initial release.

@@ -1,3 +1,4 @@
+README.rst
 polib.py
 pip-egg-info/polib.egg-info/PKG-INFO
 pip-egg-info/polib.egg-info/SOURCES.txt

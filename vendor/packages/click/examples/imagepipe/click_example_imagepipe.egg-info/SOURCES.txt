@@ -1,0 +1,8 @@
+README
+imagepipe.py
+click_example_imagepipe.egg-info/PKG-INFO
+click_example_imagepipe.egg-info/SOURCES.txt
+click_example_imagepipe.egg-info/dependency_links.txt
+click_example_imagepipe.egg-info/entry_points.txt
+click_example_imagepipe.egg-info/requires.txt
+click_example_imagepipe.egg-info/top_level.txt

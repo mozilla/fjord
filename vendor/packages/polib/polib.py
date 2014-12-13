@@ -13,7 +13,7 @@ modify entries, comments or metadata, etc. or create new po files from scratch.
 """
 
 __author__ = 'David Jean Louis <izimobil@gmail.com>'
-__version__ = '1.0.3'
+__version__ = '1.0.5'
 __all__ = ['pofile', 'POFile', 'POEntry', 'mofile', 'MOFile', 'MOEntry',
            'default_encoding', 'escape', 'unescape', 'detect_encoding', ]
 
@@ -24,6 +24,16 @@ import re
 import struct
 import sys
 import textwrap
+
+try:
+    import io
+except ImportError:
+    # replacement of io.open() for python < 2.6
+    # we use codecs instead
+    class io(object):
+        @staticmethod
+        def open(fpath, mode='r', encoding=None):
+            return codecs.open(fpath, mode, encoding)
 
 
 # the default encoding to use when encoding cannot be detected
@@ -76,6 +86,24 @@ def _pofile_or_mofile(f, type, **kwargs):
     instance = parser.parse()
     instance.wrapwidth = kwargs.get('wrapwidth', 78)
     return instance
+# }}}
+# _is_file {{{
+
+
+def _is_file(filename_or_contents):
+    """
+    Safely returns the value of os.path.exists(filename_or_contents).
+
+    Arguments:
+
+    ``filename_or_contents``
+        either a filename, or a string holding the contents of some file.
+        In the latter case, this function will always return False.
+    """
+    try:
+        return os.path.exists(filename_or_contents)
+    except (ValueError, UnicodeEncodeError):
+        return False
 # }}}
 # function pofile() {{{
 
@@ -172,12 +200,7 @@ def detect_encoding(file, binary_mode=False):
             return False
         return True
 
-    try:
-        is_file = os.path.exists(file)
-    except (ValueError, UnicodeEncodeError):
-        is_file = False
-
-    if not is_file:
+    if not _is_file(file):
         match = rxt.search(file)
         if match:
             enc = match.group(1).strip()
@@ -270,7 +293,7 @@ class _BaseFile(list):
         list.__init__(self)
         # the opened file handle
         pofile = kwargs.get('pofile', None)
-        if pofile and os.path.exists(pofile):
+        if pofile and _is_file(pofile):
             self.fpath = pofile
         else:
             self.fpath = kwargs.get('fpath')
@@ -404,7 +427,7 @@ class _BaseFile(list):
         if repr_method == 'to_binary':
             fhandle = open(fpath, 'wb')
         else:
-            fhandle = codecs.open(fpath, 'w', self.encoding)
+            fhandle = io.open(fpath, 'w', encoding=self.encoding)
             if not isinstance(contents, text_type):
                 contents = contents.decode(self.encoding)
         fhandle.write(contents)
@@ -536,16 +559,11 @@ class _BaseFile(list):
             koffsets += [l1, o1 + keystart]
             voffsets += [l2, o2 + valuestart]
         offsets = koffsets + voffsets
-        # check endianness for magic number
-        if struct.pack('@h', 1) == struct.pack('<h', 1):
-            magic_number = MOFile.LITTLE_ENDIAN
-        else:
-            magic_number = MOFile.BIG_ENDIAN
 
         output = struct.pack(
             "Iiiiiii",
             # Magic number
-            magic_number,
+            MOFile.MAGIC,
             # Version
             0,
             # number of entries
@@ -688,8 +706,8 @@ class MOFile(_BaseFile):
     This class inherits the :class:`~polib._BaseFile` class and, by
     extension, the python ``list`` type.
     """
-    BIG_ENDIAN = 0xde120495
-    LITTLE_ENDIAN = 0x950412de
+    MAGIC = 0x950412de
+    MAGIC_SWAPPED = 0xde120495
 
     def __init__(self, *args, **kwargs):
         """
@@ -914,6 +932,9 @@ class POEntry(_BaseEntry):
 
         ``previous_msgid_plural``
             string, the entry previous msgid_plural.
+
+        ``linenum``
+            integer, the line number of the entry
         """
         _BaseEntry.__init__(self, *args, **kwargs)
         self.comment = kwargs.get('comment', '')
@@ -923,6 +944,7 @@ class POEntry(_BaseEntry):
         self.previous_msgctxt = kwargs.get('previous_msgctxt', None)
         self.previous_msgid = kwargs.get('previous_msgid', None)
         self.previous_msgid_plural = kwargs.get('previous_msgid_plural', None)
+        self.linenum = kwargs.get('linenum', None)
 
     def __unicode__(self, wrapwidth=78):
         """
@@ -1089,6 +1111,9 @@ class POEntry(_BaseEntry):
                     self.msgstr_plural[pos]
                 except KeyError:
                     self.msgstr_plural[pos] = ''
+
+    def __hash__(self):
+        return hash((self.msgid, self.msgstr))
 # }}}
 # class MOEntry {{{
 
@@ -1097,7 +1122,35 @@ class MOEntry(_BaseEntry):
     """
     Represents a mo file entry.
     """
-    pass
+    def __init__(self, *args, **kwargs):
+        """
+        Constructor, accepts the following keyword arguments,
+        for consistency with :class:`~polib.POEntry`:
+
+        ``comment``
+        ``tcomment``
+        ``occurrences``
+        ``flags``
+        ``previous_msgctxt``
+        ``previous_msgid``
+        ``previous_msgid_plural``
+
+        Note: even though these keyword arguments are accepted,
+        they hold no real meaning in the context of MO files
+        and are simply ignored.
+        """
+        _BaseEntry.__init__(self, *args, **kwargs)
+        self.comment = ''
+        self.tcomment = ''
+        self.occurrences = []
+        self.flags = []
+        self.previous_msgctxt = None
+        self.previous_msgid = None
+        self.previous_msgid_plural = None
+
+    def __hash__(self):
+        return hash((self.msgid, self.msgstr))
+
 # }}}
 # class _POFileParser {{{
 
@@ -1126,12 +1179,12 @@ class _POFileParser(object):
             file (optional, default: ``False``).
         """
         enc = kwargs.get('encoding', default_encoding)
-        if os.path.exists(pofile):
+        if _is_file(pofile):
             try:
-                self.fhandle = codecs.open(pofile, 'rU', enc)
+                self.fhandle = io.open(pofile, 'rt', encoding=enc)
             except LookupError:
                 enc = default_encoding
-                self.fhandle = codecs.open(pofile, 'rU', enc)
+                self.fhandle = io.open(pofile, 'rt', encoding=enc)
         else:
             self.fhandle = pofile.splitlines()
 
@@ -1144,8 +1197,9 @@ class _POFileParser(object):
             check_for_duplicates=kwargs.get('check_for_duplicates', False)
         )
         self.transitions = {}
-        self.current_entry = POEntry()
-        self.current_state = 'ST'
+        self.current_line = 0
+        self.current_entry = POEntry(linenum=self.current_line)
+        self.current_state = 'st'
         self.current_token = None
         # two memo flags used in handlers
         self.msgstr_index = 0
@@ -1167,48 +1221,47 @@ class _POFileParser(object):
         #     * MS: a msgstr
         #     * MX: a msgstr plural
         #     * MC: a msgid or msgstr continuation line
-        all = ['ST', 'HE', 'GC', 'OC', 'FL', 'CT', 'PC', 'PM', 'PP', 'TC',
-               'MS', 'MP', 'MX', 'MI']
+        all = ['st', 'he', 'gc', 'oc', 'fl', 'ct', 'pc', 'pm', 'pp', 'tc',
+               'ms', 'mp', 'mx', 'mi']
 
-        self.add('TC', ['ST', 'HE'],                                     'HE')
-        self.add('TC', ['GC', 'OC', 'FL', 'TC', 'PC', 'PM', 'PP', 'MS',
-                        'MP', 'MX', 'MI'],                               'TC')
-        self.add('GC', all,                                              'GC')
-        self.add('OC', all,                                              'OC')
-        self.add('FL', all,                                              'FL')
-        self.add('PC', all,                                              'PC')
-        self.add('PM', all,                                              'PM')
-        self.add('PP', all,                                              'PP')
-        self.add('CT', ['ST', 'HE', 'GC', 'OC', 'FL', 'TC', 'PC', 'PM',
-                        'PP', 'MS', 'MX'],                               'CT')
-        self.add('MI', ['ST', 'HE', 'GC', 'OC', 'FL', 'CT', 'TC', 'PC',
-                 'PM', 'PP', 'MS', 'MX'],                                'MI')
-        self.add('MP', ['TC', 'GC', 'PC', 'PM', 'PP', 'MI'],             'MP')
-        self.add('MS', ['MI', 'MP', 'TC'],                               'MS')
-        self.add('MX', ['MI', 'MX', 'MP', 'TC'],                         'MX')
-        self.add('MC', ['CT', 'MI', 'MP', 'MS', 'MX', 'PM', 'PP', 'PC'], 'MC')
+        self.add('tc', ['st', 'he'],                                     'he')
+        self.add('tc', ['gc', 'oc', 'fl', 'tc', 'pc', 'pm', 'pp', 'ms',
+                        'mp', 'mx', 'mi'],                               'tc')
+        self.add('gc', all,                                              'gc')
+        self.add('oc', all,                                              'oc')
+        self.add('fl', all,                                              'fl')
+        self.add('pc', all,                                              'pc')
+        self.add('pm', all,                                              'pm')
+        self.add('pp', all,                                              'pp')
+        self.add('ct', ['st', 'he', 'gc', 'oc', 'fl', 'tc', 'pc', 'pm',
+                        'pp', 'ms', 'mx'],                               'ct')
+        self.add('mi', ['st', 'he', 'gc', 'oc', 'fl', 'ct', 'tc', 'pc',
+                 'pm', 'pp', 'ms', 'mx'],                                'mi')
+        self.add('mp', ['tc', 'gc', 'pc', 'pm', 'pp', 'mi'],             'mp')
+        self.add('ms', ['mi', 'mp', 'tc'],                               'ms')
+        self.add('mx', ['mi', 'mx', 'mp', 'tc'],                         'mx')
+        self.add('mc', ['ct', 'mi', 'mp', 'ms', 'mx', 'pm', 'pp', 'pc'], 'mc')
 
     def parse(self):
         """
         Run the state machine, parse the file line by line and call process()
         with the current matched symbol.
         """
-        i = 0
 
         keywords = {
-            'msgctxt': 'CT',
-            'msgid': 'MI',
-            'msgstr': 'MS',
-            'msgid_plural': 'MP',
+            'msgctxt': 'ct',
+            'msgid': 'mi',
+            'msgstr': 'ms',
+            'msgid_plural': 'mp',
         }
         prev_keywords = {
-            'msgid_plural': 'PP',
-            'msgid': 'PM',
-            'msgctxt': 'PC',
+            'msgid_plural': 'pp',
+            'msgid': 'pm',
+            'msgctxt': 'pc',
         }
-
+        tokens = []
         for line in self.fhandle:
-            i += 1
+            self.current_line += 1
             line = line.strip()
             if line == '':
                 continue
@@ -1234,9 +1287,9 @@ class _POFileParser(object):
                 if re.search(r'([^\\]|^)"', line[1:-1]):
                     raise IOError('Syntax error in po file %s (line %s): '
                                   'unescaped double quote found' %
-                                  (self.instance.fpath, i))
+                                  (self.instance.fpath, self.current_line))
                 self.current_token = line
-                self.process(keywords[tokens[0]], i)
+                self.process(keywords[tokens[0]])
                 continue
 
             self.current_token = line
@@ -1245,42 +1298,42 @@ class _POFileParser(object):
                 if nb_tokens <= 1:
                     continue
                 # we are on a occurrences line
-                self.process('OC', i)
+                self.process('oc')
 
             elif line[:1] == '"':
                 # we are on a continuation line
                 if re.search(r'([^\\]|^)"', line[1:-1]):
                     raise IOError('Syntax error in po file %s (line %s): '
                                   'unescaped double quote found' %
-                                  (self.instance.fpath, i))
-                self.process('MC', i)
+                                  (self.instance.fpath, self.current_line))
+                self.process('mc')
 
             elif line[:7] == 'msgstr[':
                 # we are on a msgstr plural
-                self.process('MX', i)
+                self.process('mx')
 
             elif tokens[0] == '#,':
                 if nb_tokens <= 1:
                     continue
                 # we are on a flags line
-                self.process('FL', i)
+                self.process('fl')
 
             elif tokens[0] == '#' or tokens[0].startswith('##'):
                 if line == '#':
                     line += ' '
                 # we are on a translator comment line
-                self.process('TC', i)
+                self.process('tc')
 
             elif tokens[0] == '#.':
                 if nb_tokens <= 1:
                     continue
                 # we are on a generated comment line
-                self.process('GC', i)
+                self.process('gc')
 
             elif tokens[0] == '#|':
                 if nb_tokens <= 1:
                     raise IOError('Syntax error in po file %s (line %s)' %
-                                  (self.instance.fpath, i))
+                                  (self.instance.fpath, self.current_line))
 
                 # Remove the marker and any whitespace right after that.
                 line = line[2:].lstrip()
@@ -1288,36 +1341,40 @@ class _POFileParser(object):
 
                 if tokens[1].startswith('"'):
                     # Continuation of previous metadata.
-                    self.process('MC', i)
+                    self.process('mc')
                     continue
 
                 if nb_tokens == 2:
                     # Invalid continuation line.
                     raise IOError('Syntax error in po file %s (line %s): '
                                   'invalid continuation line' %
-                                  (self.instance.fpath, i))
+                                  (self.instance.fpath, self.current_line))
 
                 # we are on a "previous translation" comment line,
                 if tokens[1] not in prev_keywords:
                     # Unknown keyword in previous translation comment.
                     raise IOError('Syntax error in po file %s (line %s): '
                                   'unknown keyword %s' %
-                                  (self.instance.fpath, i, tokens[1]))
+                                  (self.instance.fpath, self.current_line,
+                                   tokens[1]))
 
                 # Remove the keyword and any whitespace
                 # between it and the starting quote.
                 line = line[len(tokens[1]):].lstrip()
                 self.current_token = line
-                self.process(prev_keywords[tokens[1]], i)
+                self.process(prev_keywords[tokens[1]])
 
             else:
                 raise IOError('Syntax error in po file %s (line %s)' %
-                              (self.instance.fpath, i))
+                              (self.instance.fpath, self.current_line))
 
-        if self.current_entry:
+        if self.current_entry and len(tokens) > 0 and \
+           not tokens[0].startswith('#'):
             # since entries are added when another entry is found, we must add
-            # the last entry here (only if there are lines)
+            # the last entry here (only if there are lines). Trailing comments
+            # are ignored
             self.instance.append(self.current_entry)
+
         # before returning the instance, check if there's metadata and if
         # so extract it in a dict
         metadataentry = self.instance.find('')
@@ -1354,10 +1411,10 @@ class _POFileParser(object):
             the next state the fsm will have after the action.
         """
         for state in states:
-            action = getattr(self, 'handle_%s' % next_state.lower())
+            action = getattr(self, 'handle_%s' % next_state)
             self.transitions[(symbol, state)] = (action, next_state)
 
-    def process(self, symbol, linenum):
+    def process(self, symbol):
         """
         Process the transition corresponding to the current state and the
         symbol provided.
@@ -1375,7 +1432,8 @@ class _POFileParser(object):
             if action():
                 self.current_state = state
         except Exception:
-            raise IOError('Syntax error in po file (line %s)' % linenum)
+            raise IOError('Syntax error in po file (line %s)' %
+                          self.current_line)
 
     # state handlers
 
@@ -1388,9 +1446,9 @@ class _POFileParser(object):
 
     def handle_tc(self):
         """Handle a translator comment."""
-        if self.current_state in ['MC', 'MS', 'MX']:
+        if self.current_state in ['mc', 'ms', 'mx']:
             self.instance.append(self.current_entry)
-            self.current_entry = POEntry()
+            self.current_entry = POEntry(linenum=self.current_line)
         if self.current_entry.tcomment != '':
             self.current_entry.tcomment += '\n'
         tcomment = self.current_token.lstrip('#')
@@ -1401,9 +1459,9 @@ class _POFileParser(object):
 
     def handle_gc(self):
         """Handle a generated comment."""
-        if self.current_state in ['MC', 'MS', 'MX']:
+        if self.current_state in ['mc', 'ms', 'mx']:
             self.instance.append(self.current_entry)
-            self.current_entry = POEntry()
+            self.current_entry = POEntry(linenum=self.current_line)
         if self.current_entry.comment != '':
             self.current_entry.comment += '\n'
         self.current_entry.comment += self.current_token[3:]
@@ -1411,9 +1469,9 @@ class _POFileParser(object):
 
     def handle_oc(self):
         """Handle a file:num occurence."""
-        if self.current_state in ['MC', 'MS', 'MX']:
+        if self.current_state in ['mc', 'ms', 'mx']:
             self.instance.append(self.current_entry)
-            self.current_entry = POEntry()
+            self.current_entry = POEntry(linenum=self.current_line)
         occurrences = self.current_token[3:].split()
         for occurrence in occurrences:
             if occurrence != '':
@@ -1429,52 +1487,53 @@ class _POFileParser(object):
 
     def handle_fl(self):
         """Handle a flags line."""
-        if self.current_state in ['MC', 'MS', 'MX']:
+        if self.current_state in ['mc', 'ms', 'mx']:
             self.instance.append(self.current_entry)
-            self.current_entry = POEntry()
-        self.current_entry.flags += self.current_token[3:].split(', ')
+            self.current_entry = POEntry(linenum=self.current_line)
+        self.current_entry.flags += [c.strip() for c in
+                                     self.current_token[3:].split(',')]
         return True
 
     def handle_pp(self):
         """Handle a previous msgid_plural line."""
-        if self.current_state in ['MC', 'MS', 'MX']:
+        if self.current_state in ['mc', 'ms', 'mx']:
             self.instance.append(self.current_entry)
-            self.current_entry = POEntry()
+            self.current_entry = POEntry(linenum=self.current_line)
         self.current_entry.previous_msgid_plural = \
             unescape(self.current_token[1:-1])
         return True
 
     def handle_pm(self):
         """Handle a previous msgid line."""
-        if self.current_state in ['MC', 'MS', 'MX']:
+        if self.current_state in ['mc', 'ms', 'mx']:
             self.instance.append(self.current_entry)
-            self.current_entry = POEntry()
+            self.current_entry = POEntry(linenum=self.current_line)
         self.current_entry.previous_msgid = \
             unescape(self.current_token[1:-1])
         return True
 
     def handle_pc(self):
         """Handle a previous msgctxt line."""
-        if self.current_state in ['MC', 'MS', 'MX']:
+        if self.current_state in ['mc', 'ms', 'mx']:
             self.instance.append(self.current_entry)
-            self.current_entry = POEntry()
+            self.current_entry = POEntry(linenum=self.current_line)
         self.current_entry.previous_msgctxt = \
             unescape(self.current_token[1:-1])
         return True
 
     def handle_ct(self):
         """Handle a msgctxt."""
-        if self.current_state in ['MC', 'MS', 'MX']:
+        if self.current_state in ['mc', 'ms', 'mx']:
             self.instance.append(self.current_entry)
-            self.current_entry = POEntry()
+            self.current_entry = POEntry(linenum=self.current_line)
         self.current_entry.msgctxt = unescape(self.current_token[1:-1])
         return True
 
     def handle_mi(self):
         """Handle a msgid."""
-        if self.current_state in ['MC', 'MS', 'MX']:
+        if self.current_state in ['mc', 'ms', 'mx']:
             self.instance.append(self.current_entry)
-            self.current_entry = POEntry()
+            self.current_entry = POEntry(linenum=self.current_line)
         self.current_entry.obsolete = self.entry_obsolete
         self.current_entry.msgid = unescape(self.current_token[1:-1])
         return True
@@ -1492,31 +1551,28 @@ class _POFileParser(object):
     def handle_mx(self):
         """Handle a msgstr plural."""
         index, value = self.current_token[7], self.current_token[11:-1]
-        self.current_entry.msgstr_plural[index] = unescape(value)
-        self.msgstr_index = index
+        self.current_entry.msgstr_plural[int(index)] = unescape(value)
+        self.msgstr_index = int(index)
         return True
 
     def handle_mc(self):
         """Handle a msgid or msgstr continuation line."""
         token = unescape(self.current_token[1:-1])
-        if self.current_state == 'CT':
+        if self.current_state == 'ct':
             self.current_entry.msgctxt += token
-        elif self.current_state == 'MI':
+        elif self.current_state == 'mi':
             self.current_entry.msgid += token
-        elif self.current_state == 'MP':
+        elif self.current_state == 'mp':
             self.current_entry.msgid_plural += token
-        elif self.current_state == 'MS':
+        elif self.current_state == 'ms':
             self.current_entry.msgstr += token
-        elif self.current_state == 'MX':
+        elif self.current_state == 'mx':
             self.current_entry.msgstr_plural[self.msgstr_index] += token
-        elif self.current_state == 'PP':
-            token = token[3:]
+        elif self.current_state == 'pp':
             self.current_entry.previous_msgid_plural += token
-        elif self.current_state == 'PM':
-            token = token[3:]
+        elif self.current_state == 'pm':
             self.current_entry.previous_msgid += token
-        elif self.current_state == 'PC':
-            token = token[3:]
+        elif self.current_state == 'pc':
             self.current_entry.previous_msgctxt += token
         # don't change the current state
         return False
@@ -1557,6 +1613,14 @@ class _MOFileParser(object):
             check_for_duplicates=kwargs.get('check_for_duplicates', False)
         )
 
+    def __del__(self):
+        """
+        Make sure the file is closed, this prevents warnings on unclosed file
+        when running tests with python >= 3.2.
+        """
+        if self.fhandle:
+            self.fhandle.close()
+
     def parse(self):
         """
         Build the instance with the file handle provided in the
@@ -1564,15 +1628,20 @@ class _MOFileParser(object):
         """
         # parse magic number
         magic_number = self._readbinary('<I', 4)
-        if magic_number == MOFile.LITTLE_ENDIAN:
+        if magic_number == MOFile.MAGIC:
             ii = '<II'
-        elif magic_number == MOFile.BIG_ENDIAN:
+        elif magic_number == MOFile.MAGIC_SWAPPED:
             ii = '>II'
         else:
             raise IOError('Invalid mo file, magic number is incorrect !')
         self.instance.magic_number = magic_number
         # parse the version number and the number of strings
-        self.instance.version, numofstrings = self._readbinary(ii, 8)
+        version, numofstrings = self._readbinary(ii, 8)
+        # from MO file format specs: "A program seeing an unexpected major
+        # revision number should stop reading the MO file entirely"
+        if version not in (0, 1):
+            raise IOError('Invalid mo file, unexpected major revision number')
+        self.instance.version = version
         # original strings and translation strings hash table offset
         msgids_hash_offset, msgstrs_hash_offset = self._readbinary(ii, 8)
         # move to msgid hash table and read length and offset of msgids
@@ -1593,7 +1662,7 @@ class _MOFileParser(object):
 
             self.fhandle.seek(msgstrs_index[i][1])
             msgstr = self.fhandle.read(msgstrs_index[i][0])
-            if i == 0:  # metadata
+            if i == 0 and not msgid:  # metadata
                 raw_metadata, metadata = msgstr.split(b('\n')), {}
                 for line in raw_metadata:
                     tokens = line.split(b(':'), 1)
