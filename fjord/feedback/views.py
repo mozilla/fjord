@@ -206,8 +206,12 @@ def _handle_feedback_post(request, locale=None, product=None,
             rti = models.ResponseTroubleshootingInfo(
                 data=browser_data, opinion=opinion)
             rti.save()
+            statsd.incr('feedback.browserdata.optin')
         except ValueError:
-            pass
+            statsd.incr('feedback.browserdata.badvalue')
+
+    else:
+        statsd.incr('feedback.browserdata.optout')
 
     if get_data:
         # There was extra context in the query string, so we grab that
