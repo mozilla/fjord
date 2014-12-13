@@ -97,6 +97,50 @@ msgstr "bar"
         po = polib.pofile('tests/test_obsolete_previousmsgid.po')
         self.assertTrue(isinstance(po, polib.POFile))
 
+    def test_previous_msgid_1(self):
+        """
+        Test previous msgid multiline.
+        """
+        po = polib.pofile('tests/test_previous_msgid.po')
+        expected = "\nPartition table entries are not in disk order\n"
+        self.assertEquals(
+            po[0].previous_msgid,
+            expected
+        )
+
+    def test_previous_msgid_2(self):
+        """
+        Test previous msgid single line.
+        """
+        po = polib.pofile('tests/test_previous_msgid.po')
+        expected = "Partition table entries are not in disk order2\n"
+        self.assertEquals(
+            po[1].previous_msgid,
+            expected
+        )
+
+    def test_previous_msgctxt_1(self):
+        """
+        Test previous msgctxt multiline.
+        """
+        po = polib.pofile('tests/test_previous_msgid.po')
+        expected = "\nSome message context"
+        self.assertEquals(
+            po[0].previous_msgctxt,
+            expected
+        )
+
+    def test_previous_msgctxt_2(self):
+        """
+        Test previous msgctxt single line.
+        """
+        po = polib.pofile('tests/test_previous_msgid.po')
+        expected = "Some message context"
+        self.assertEquals(
+            po[1].previous_msgctxt,
+            expected
+        )
+
     def test_unescaped_double_quote1(self):
         """
         Test that polib reports an error when unescaped double quote is found.
@@ -252,7 +296,23 @@ msgstr ""
             pass
         
         mofile = polib.mofile('tests/test_utf8.mo', klass=CustomMOFile)
-        self.assertEqual(mofile.__class__, CustomMOFile)     
+        self.assertEqual(mofile.__class__, CustomMOFile)
+
+    def test_empty(self):
+        po = polib.pofile('')
+        self.assertEqual(po.__unicode__(), '# \nmsgid ""\nmsgstr ""\n')
+
+    def test_linenum_1(self):
+        po = polib.pofile('tests/test_utf8.po')
+        self.assertEqual(po[0].linenum, 18)
+
+    def test_linenum_2(self):
+        po = polib.pofile('tests/test_utf8.po')
+        self.assertEqual(po.find('XML text').linenum, 1799)
+
+    def test_linenum_3(self):
+        po = polib.pofile('tests/test_utf8.po')
+        self.assertEqual(po[-1].linenum, 3478)
 
 
 class TestBaseFile(unittest.TestCase):
@@ -453,6 +513,17 @@ msgstr ""
 ''')
         self.assertEqual(pofile.__unicode__(), expected)
 
+    def test_trailing_comment(self):
+        pofile  = polib.pofile('tests/test_trailing_comment.po')
+        expected = r'''# 
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "foo"
+msgstr "oof"
+'''
+        self.assertEqual(str(pofile), expected)
+
 class TestPoFile(unittest.TestCase):
     """
     Tests for PoFile class.
@@ -530,6 +601,11 @@ class TestPoFile(unittest.TestCase):
         e = po.find("Some comment starting with two '#'", by='tcomment')
         self.assertTrue(isinstance(e, polib.POEntry))
 
+    def test_word_garbage(self):
+        po = polib.pofile('tests/test_word_garbage.po')
+        e = po.find("Whatever", by='msgid')
+        self.assertTrue(isinstance(e, polib.POEntry))
+
 class TestMoFile(unittest.TestCase):
     """
     Tests for MoFile class.
@@ -585,6 +661,22 @@ msgid "singular"
 msgid_plural "plural"
 msgstr[0] "singulier"
 msgstr[1] "pluriel"
+''')
+        self.assertEqual(mo.__unicode__(), expected)
+
+    def test_invalid_version(self):
+        self.assertRaises(IOError, polib.mofile, 'tests/test_invalid_version.mo')
+
+    def test_no_header(self):
+        mo = polib.mofile('tests/test_no_header.mo')
+        expected = u('''msgid ""
+msgstr ""
+
+msgid "bar"
+msgstr "rab"
+
+msgid "foo"
+msgstr "oof"
 ''')
         self.assertEqual(mo.__unicode__(), expected)
 

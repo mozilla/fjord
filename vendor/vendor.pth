@@ -6,6 +6,7 @@ packages/anyjson
 packages/carrot
 packages/certifi
 packages/chardet
+packages/click
 packages/cssselect
 packages/django-picklefield/src
 packages/fancy-tag

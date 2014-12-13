@@ -1,3 +1,3 @@
 #!/bin/bash
 
-pip install --no-install --build=vendor/packages --src=vendor/src -I $@
+pip install --no-install --build=vendor/packages --no-use-wheel --src=vendor/src -I $@
