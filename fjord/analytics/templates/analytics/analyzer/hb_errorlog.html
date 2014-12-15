@@ -47,10 +47,10 @@
           <dd>{{ error.created }}</dd>
 
           <dt>post_data</dt>
-          <dd>{{ error.metadata['post_data'] }}</dd>
+          <dd><pre>{{ pformat(error.metadata['post_data']) }}</pre></dd>
 
           <dt>errors</dt>
-          <dd>{{ error.metadata['errors'] }}</dd>
+          <dd><pre>{{ pformat(error.metadata['errors']) }}</pre></dd>
         </dl>
 
         <p><a href="{{ url('hb_data') }}">Back to hb list</a></p>

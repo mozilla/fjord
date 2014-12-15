@@ -16,6 +16,7 @@
 
 from collections import defaultdict
 from datetime import date, datetime, timedelta
+from pprint import pformat
 import csv
 
 from elasticutils.contrib.django import F, es_required_or_50x
@@ -120,7 +121,8 @@ def hb_errorlog(request, errorid=None):
 
     return render(request, 'analytics/analyzer/hb_errorlog.html', {
         'error': error,
-        'errors': errors
+        'errors': errors,
+        'pformat': pformat
     })
 
 
