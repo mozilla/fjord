@@ -7,10 +7,9 @@
 
 DIR=$(dirname $0)
 
-function lint() {
-    echo 'Linting...'
-    FILES_TO_LINT=$(git diff --cached --name-only --diff-filter=ACMR -- *.py **/*.py)
-    ./bin/flake8_lint.sh $FILES_TO_LINT
+function flake8_lint() {
+    PY_FILES_TO_LINT=$(git diff --cached --name-only --diff-filter=ACMR -- *.py **/*.py)
+    ./bin/flake8_lint.sh $PY_FILES_TO_LINT
     LINT_STATUS=$?
     if [[ $LINT_STATUS -ne 0 ]]; then
         echo
@@ -18,6 +17,24 @@ function lint() {
         echo "Alternatively, run 'git commit --no-verify' to ignore lint errors."
         exit 1
     fi
+}
+
+function jshint_lint() {
+    JS_FILES_TO_LINT=$(git diff --cached --name-only --diff-filter=ACMR -- *.js **/*.js)
+    jshint $JS_FILES_TO_LINT
+    LINT_STATUS=$?
+    if [[ $LINT_STATUS -ne 0 ]]; then
+        echo
+        echo "Lint errors found. Please fix the above and retry."
+        echo "Alternatively, run 'git commit --no-verify' to ignore lint errors."
+        exit 1
+    fi
+}
+
+function lint() {
+    echo 'Linting...'
+    flake8_lint
+    jshint_lint
 }
 
 function install() {
@@ -37,7 +54,7 @@ function install() {
         exit 1
     fi
 
-    ln -s ../../bin/hooks/flake8_lint.pre-commit $GITDIR/hooks/pre-commit
+    ln -s ../../bin/hooks/lint.pre-commit $GITDIR/hooks/pre-commit
 }
 
 if echo $DIR | grep -E ".git/hooks$" > /dev/null; then
