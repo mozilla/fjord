@@ -51,6 +51,7 @@ from fjord.search.utils import es_error_statsd
 @analyzer_required
 def hb_data(request, answerid=None):
     """View for hb data that shows one or all of the answers"""
+    sortby = 'id'
     answer = None
     answers = []
 
@@ -58,7 +59,7 @@ def hb_data(request, answerid=None):
         answer = Answer.objects.get(id=answerid)
 
     else:
-        sortby = request.GET.get('sortby', 'id')
+        sortby = request.GET.get('sortby', sortby)
         page = request.GET.get('page')
         paginator = Paginator(Answer.objects.order_by('-' + sortby), 100)
         try:
@@ -77,6 +78,7 @@ def hb_data(request, answerid=None):
         'answer': answer,
         'answers': answers,
         'fix_ts': fix_ts,
+        'pformat': pformat
     })
 
 

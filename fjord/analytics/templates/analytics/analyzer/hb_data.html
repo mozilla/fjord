@@ -118,10 +118,10 @@
           <dd>{{ answer.profile_usage or "--" }}</dd>
 
           <dt>addons</dt>
-          <dd>{{ answer.addons or "--" }}</dd>
+          <dd><pre>{{ pformat(answer.addons or "--") }}</pre></dd>
 
           <dt>extra</dt>
-          <dd>{{ answer.extra or "--" }}</dd>
+          <dd><pre>{{ pformat(answer.extra or "--") }}</pre></dd>
         </dl>
 
         <p><a href="{{ url('hb_data') }}">Back to hb list</a></p>
