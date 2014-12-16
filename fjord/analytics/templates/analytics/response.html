@@ -176,6 +176,14 @@
                 &mdash;
               {% endif %}
             </dd>
+            <dt>{{ _('Browser data') }}</dt>
+            <dd>
+              {% if response.has_browserdata %}
+                {{ _('yes') }}
+              {% else %}
+                &mdash;
+              {% endif %}
+            </dd>
             <dt>{{ _('API version')  }}</dt>
             <dd>
               {{ response.api or '--' }}

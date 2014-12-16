@@ -300,6 +300,12 @@ class Response(ModelBase):
         return u''
 
     @property
+    def has_browserdata(self):
+        if self.responsetroubleshootinginfo_set.exists():
+            return True
+        return False
+
+    @property
     def sentiment(self):
         if self.happy:
             return _lazy(u'Happy')
