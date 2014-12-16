@@ -129,6 +129,10 @@
 
         var browserData;
 
+        // Hide the "browser-ask" section by default. Only show it if
+        // the api is there and there's data.
+        $('#browser-ask').hide();
+
         remoteTroubleshooting.available(function (yesno) {
             if (yesno) {
                 $('#browser-ask').show();
@@ -150,5 +154,3 @@
         changeCard('intro', true);
     });
 }(jQuery, fjord, remoteTroubleshooting, document, window));
-
-
