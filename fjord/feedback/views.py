@@ -195,7 +195,7 @@ def _handle_feedback_post(request, locale=None, product=None,
         e.save()
 
     # If there's browser data, save that separately.
-    if data.get('browser_ok') and data.get('browser_data'):
+    if data.get('browser_ok'):
         # This comes in as a JSON string. Because we're using
         # JSONObjectField, we need to convert it back to Python and
         # then save it. This is kind of silly, but it does guarantee
@@ -203,12 +203,24 @@ def _handle_feedback_post(request, locale=None, product=None,
         try:
             browser_data = data['browser_data']
             browser_data = json.loads(browser_data)
-            rti = models.ResponseTroubleshootingInfo(
-                data=browser_data, opinion=opinion)
-            rti.save()
-            statsd.incr('feedback.browserdata.optin')
+
         except ValueError:
+            # Handles empty string and any non-JSON value.
             statsd.incr('feedback.browserdata.badvalue')
+
+        except KeyError:
+            # Handles the case where it's missing from the data
+            # dict. If it's missing, we don't want to do anything
+            # including metrics.
+            pass
+
+        else:
+            # If browser_data isn't an empty dict, then save it.
+            if browser_data:
+                rti = models.ResponseTroubleshootingInfo(
+                    data=browser_data, opinion=opinion)
+                rti.save()
+                statsd.incr('feedback.browserdata.optin')
 
     else:
         statsd.incr('feedback.browserdata.optout')
