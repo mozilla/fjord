@@ -132,6 +132,18 @@
           <dd>
             {{ response.campaign or _('None') }}
           </dd>
+          <dt>{{ _('Browser') }}</dt>
+          <dd>
+            {{ response.browser or _('None') }}
+          </dd>
+          <dt>{{ _('Browser Ver.') }}</dt>
+          <dd>
+            {{ response.browser_version or _('None') }}
+          </dd>
+          <dt>{{ _('Browser Plat.') }}</dt>
+          <dd>
+            {{ response.browser_platform or _('None') }}
+          </dd>
         </dl>
 
         {% if user.is_authenticated() and user.has_perm('analytics.can_view_dashboard') %}
