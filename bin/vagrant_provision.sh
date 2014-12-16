@@ -86,7 +86,7 @@ apt-get autoremove -y -q
 echo ". $VENV/bin/activate" >> /home/vagrant/.bashrc
 
 # Add the 'bin' folder of local node modules to $PATH
-echo "export PATH=$PATH:/home/vagrant/fjord/node_modules/.bin/" >> /home/vagrant/.bashrc
+echo "export PATH=\$PATH:/home/vagrant/fjord/node_modules/.bin/" >> /home/vagrant/.bashrc
 
 # FIXME: Change the motd file so that it has a link to Fjord docs,
 # tells the user where the code is and lists common commands.
