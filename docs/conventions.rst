@@ -24,7 +24,7 @@ checking in linted code. To set it up, first install flake8::
 
 then run::
 
-    $ ./bin/hooks/flake8_lint.pre-commit
+    $ ./bin/hooks/lint.pre-commit
 
 That'll set up the pre-commit hook. After that, every time you commit
 something in Git, it'll run the hook first and if everything is fine
