@@ -271,6 +271,9 @@ class Response(ModelBase):
             'manufacturer',
             'device',
             'platform',
+            'browser',
+            'browser_version',
+            'browser_platform',
         ]
 
         if confidential:
