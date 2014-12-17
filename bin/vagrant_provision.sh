@@ -57,6 +57,9 @@ sudo -H -u vagrant virtualenv $VENV
 # Install Fjord requirements
 sudo -H -u vagrant $VENV/bin/python ./peep install -r requirements/requirements.txt
 
+# Install Fjord dev requirements
+sudo -H -u vagrant $VENV/bin/pip install -r requirements/dev.txt
+
 # Install compiled requirements
 # Note: Need to do this before launching Elasticsearch because of
 # memory issues

@@ -1,0 +1,9 @@
+# These requirements are helpful, but not required, for working on fjord
+
+# For lint
+flake8==2.2.5
+
+# We need this because we are installing pep8 from a fork.
+# Once there is a new pep8 release with willkg's changes,
+# this can be removed.
+http://people.mozilla.org/~wkahngreene/pep8/pep8-1.6.0a0-willkg.1.tar.gz#egg=pep8==1.6.0a0-willkg.1
