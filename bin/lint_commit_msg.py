@@ -13,7 +13,8 @@ BUG_PREFIX_REGEX = r'\[bug (\d+)\]'
 
 
 def are_lines_not_more_than_79_chars(contents):
-    if filter(lambda x: len(x) > 79, contents):
+    long_lines = [line for line in contents if len(line) > 79]
+    if long_lines:
         print('Error:')
         print('The commit message should not have more than '
               '79 characters per line')
@@ -66,7 +67,8 @@ LINT_FUNCTIONS = [is_bug_number_in_right_format,
 
 def lint_commit_msg(commit_msg_file):
     with open(commit_msg_file) as commit_contents:
-        commit_msg = commit_contents.readlines()
+        commit_msg = [line for line in commit_contents.readlines()
+                      if not line.strip().startswith('#')]
         return_values = map(lambda x: x(commit_msg), LINT_FUNCTIONS)
         if not all(return_values):
             return 1
