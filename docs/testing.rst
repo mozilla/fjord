@@ -12,6 +12,24 @@ correctness for behavioral details.
 Running tests
 =============
 
+Setup
+-----
+
+Before you run the tests, you have to run the ``collectstatic`` command. This
+compiles LESS files to CSS files and creates the bundles that some of
+the tests require to run. If you don't do this, then a few of the
+tests will fail.
+
+To run collectstatic, do::
+
+    ./manage.py collectstatic
+
+You don't have to do this often. I'd do it the first time and then any
+time you run the tests with a fresh db.
+
+FIXME: This is annoying and it'd be nice to get it fixed.
+
+
 Running tests and arguments
 ---------------------------
 

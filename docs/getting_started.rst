@@ -243,6 +243,7 @@ Command                 Explanation
 ======================  ====================================================================
 generatedata            Generates fake data so Fjord works
 runserver               Runs the Django server
+collectstatic           Collects static files and "compiles" them
 test                    Runs the unit tests
 migrate                 Migrates the db with all the migrations specified in the repository
 shell                   Opens a Python REPL in the Django context for debugging
@@ -285,19 +286,45 @@ Run it like this::
     ./manage.py runserver 0.0.0.0:8000
 
 
+collectstatic
+-------------
+
+When you're running the dev server (i.e. ``./manage.py runserver ...``),
+Fjord compiles the LESS files to CSS files and serves them
+individually. When you're running Fjord in a server environment, you
+run::
+
+    ./manage.py collectstatic
+
+to compile the LESS files to CSS files and then bundle the CSS files
+and JS files into single files and minify them. This reduces the
+number of HTTP requests the browser has to make to fetch all the
+relevant CSS and JS files for a page. It makes our pages load faster.
+
+However, a handful of tests depend on the bundles being built and will
+fail unless you run ``collectstatic`` first.
+
+
 test
 ----
 
 The test suite will create and use this database, to keep any data in
 your development database safe from tests.
 
-Run the test suite this way::
+Before you run the tests, make sure you run ``collectstatic``::
+
+    ./manage.py collectstatic
+
+I run this any time I run the tests with a clean database.
+
+The test suite is run like this::
 
     ./manage.py test
 
 
-For more information, see the :ref:`test documentation
-<tests-chapter>`.
+For more information about running the tests, writing tests, flags you
+can pass, running specific tests and other such things, see the
+:ref:`test documentation <tests-chapter>`.
 
 
 migrate
