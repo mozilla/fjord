@@ -32,6 +32,14 @@
             <p class="no-products">{{ _('No products available.') }}</p>
           {% else %}
             <div class="ask">
+              <noscript>
+                <p class="error">
+                  {% trans %}
+                    JavaScript is required to leave feedback. Please enable JavaScript in your browser and refresh this page.
+                  {% endtrans %}
+                </p>
+              </noscript>
+
               {% trans %}
                 Select a product to leave feedback for.
               {% endtrans %}

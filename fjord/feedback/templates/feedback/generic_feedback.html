@@ -44,6 +44,14 @@
         <div class="card" id="intro" data-title="{{ _('{product} feedback')|fe(product=product.display_name) }}">
           <section>
             <div class="ask">
+              <noscript>
+                <p class="error">
+                  {% trans %}
+                    JavaScript is required to leave feedback. Please enable JavaScript in your browser and refresh this page.
+                  {% endtrans %}
+                </p>
+              </noscript>
+              
               {% trans product=product.display_name %}
                 How does {{product}} make you feel?
               {% endtrans %}
