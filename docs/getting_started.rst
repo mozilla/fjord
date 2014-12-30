@@ -22,6 +22,13 @@ Getting the requirements
 1. Download and install git if you don't have it already:
    http://git-scm.com/
 
+   .. Note::
+
+      **Windows users:** When you install git, make sure to choose
+      "Checkout as-is, commit Unix-style line endings". If you don't,
+      then you'll end up with Windows-style line endings in your
+      checkout and Fjord won't work in the virtual machine.
+
 2. Download and install VirtualBox if you don't have it already:
    https://www.virtualbox.org/
 
