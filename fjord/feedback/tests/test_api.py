@@ -120,88 +120,6 @@ class PublicFeedbackAPITest(ElasticTestCase):
         eq_(json_data['count'], 2)
         eq_(len(json_data['results']), 2)
 
-    def create_date_data(self):
-        """Create and send test data"""
-        testdata = [
-            ('2014-07-01', True, 'en-US', 'Firefox'),
-            ('2014-07-02', True, 'en-US', 'Firefox for Android'),
-            ('2014-07-03', False, 'de', 'Firefox'),
-            ('2014-07-04', False, 'de', 'Firefox for Android'),
-        ]
-        for date_start, happy, platform, product in testdata:
-            ResponseFactory(
-                happy=happy, platform=platform, product=product,
-                created=date_start)
-        self.refresh()
-
-    def _test_date(self, getoptions, expectedresponse):
-        """Helper method for tests"""
-        self.create_date_data()
-        resp = self.client.get(reverse('feedback-api'), getoptions)
-        json_data = json.loads(resp.content)
-        results = json_data['results']
-        eq_(len(json_data['results']), len(expectedresponse))
-        for result, expected in zip(results, expectedresponse):
-            eq_(result['created'], expected)
-
-    def test_date_start(self):
-        """date_start returns responses from that day forward"""
-        self._test_date(
-            {'date_start': '2014-07-02'},
-            ['2014-07-04T00:00:00', '2014-07-03T00:00:00',
-             '2014-07-02T00:00:00'])
-
-    def test_date_end(self):
-        """date_end returns responses from before that day"""
-        self._test_date(
-            {'date_end': '2014-07-03'},
-            ['2014-07-03T00:00:00', '2014-07-02T00:00:00',
-                '2014-07-01T00:00:00'])
-
-    def test_date_delta_with_date_end(self):
-        """Test date_delta filtering when date_end exists"""
-        self._test_date(
-            {'date_delta': '1d', 'date_end': '2014-07-03'},
-            ['2014-07-03T00:00:00', '2014-07-02T00:00:00'])
-
-    def test_date_delta_with_date_start(self):
-        """Test date_delta filtering when date_start exists"""
-        self._test_date(
-            {'date_delta': '1d', 'date_start': '2014-07-02'},
-            ['2014-07-03T00:00:00', '2014-07-02T00:00:00'])
-
-    def test_date_delta_with_date_end_and_date_start(self):
-        """When all three date fields are specified ignore date_start"""
-        self._test_date(
-            {'date_delta': '1d', 'date_end': '2014-07-03',
-             'date_start': '2014-07-02'},
-            ['2014-07-03T00:00:00', '2014-07-02T00:00:00'])
-
-    def test_date_delta_with_no_constraints(self):
-        """Test date_delta filtering without date_end or date_start"""
-        timeformatsuffix = 'T00:00:00'
-        today = (str(date.today()) + timeformatsuffix)
-        yesterday = (str(date.today() + timedelta(days=-1)) + timeformatsuffix)
-        beforeyesterday = (str(date.today() + timedelta(days=-2)) +
-                           timeformatsuffix)
-        testdata = [
-            (True, 'de', 'Firefox for Android', beforeyesterday),
-            (True, 'en-US', 'Firefox', yesterday),
-            (True, 'en-US', 'Firefox for Android', today)
-        ]
-        for happy, platform, product, date_start in testdata:
-            ResponseFactory(
-                happy=happy, platform=platform, product=product,
-                created=date_start)
-        self.refresh()
-        self._test_date({'date_delta': '1d'}, [today, yesterday])
-
-    def test_both_date_end_and_date_start_with_no_date_delta(self):
-        self._test_date(
-            {'date_start': '2014-07-02', 'date_end': '2014-07-03'},
-            ['2014-07-03T00:00:00', '2014-07-02T00:00:00']
-        )
-
     def test_old_responses(self):
         # Make sure we can't see responses from > 180 days ago
         cutoff = datetime.today() - timedelta(days=180)
@@ -255,6 +173,127 @@ class PublicFeedbackAPITest(ElasticTestCase):
         resp = self.client.get(reverse('feedback-api'), {'max': 'foo'})
         json_data = json.loads(resp.content)
         eq_(json_data['count'], 10)
+
+
+class PublicFeedbackAPIDateTest(ElasticTestCase):
+    # Get the YYYY-MM part of the date for last month. We use last
+    # month since arbitrarily appending the day will always create
+    # dates in the past.
+    last_month = str(date.today() - timedelta(days=31))[:7]
+
+    def create_data(self, days):
+        """Create response data for specified days
+
+        This creates the specified responses and also refreshes the
+        Elasticsearch index.
+
+        :arg days: List of day-of-month strings. For example
+            ``['01', '02', '03']``
+
+        """
+        for day in days:
+            ResponseFactory(created=self.last_month + '-' + day)
+        self.refresh()
+
+    def _test_date(self, params, expected):
+        """Helper method for tests"""
+        resp = self.client.get(reverse('feedback-api'), params)
+        json_data = json.loads(resp.content)
+        results = json_data['results']
+        eq_(len(json_data['results']), len(expected))
+        for result, expected in zip(results, expected):
+            eq_(result['created'], expected + 'T00:00:00')
+
+    def test_date_start(self):
+        """date_start returns responses from that day forward"""
+        self.create_data(['01', '02', '03', '04'])
+
+        self._test_date(
+            params={'date_start': self.last_month + '-02'},
+            expected=[
+                self.last_month + '-04',
+                self.last_month + '-03',
+                self.last_month + '-02'
+            ])
+
+    def test_date_end(self):
+        """date_end returns responses from before that day"""
+        self.create_data(['01', '02', '03', '04'])
+
+        self._test_date(
+            params={'date_end': self.last_month + '-03'},
+            expected=[
+                self.last_month + '-03',
+                self.last_month + '-02',
+                self.last_month + '-01'
+            ])
+
+    def test_date_delta_with_date_end(self):
+        """Test date_delta filtering when date_end exists"""
+        self.create_data(['01', '02', '03', '04'])
+
+        self._test_date(
+            params={'date_delta': '1d', 'date_end': self.last_month + '-03'},
+            expected=[
+                self.last_month + '-03',
+                self.last_month + '-02'
+            ])
+
+    def test_date_delta_with_date_start(self):
+        """Test date_delta filtering when date_start exists"""
+        self.create_data(['01', '02', '03', '04'])
+
+        self._test_date(
+            params={'date_delta': '1d', 'date_start': self.last_month + '-02'},
+            expected=[
+                self.last_month + '-03',
+                self.last_month + '-02'
+            ])
+
+    def test_date_delta_with_date_end_and_date_start(self):
+        """When all three date fields are specified ignore date_start"""
+        self.create_data(['01', '02', '03', '04'])
+
+        self._test_date(
+            params={
+                'date_delta': '1d',
+                'date_end': self.last_month + '-03',
+                'date_start': self.last_month + '-02'
+            },
+            expected=[
+                self.last_month + '-03',
+                self.last_month + '-02'
+            ])
+
+    def test_date_delta_with_no_constraints(self):
+        """Test date_delta filtering without date_end or date_start"""
+        today = str(date.today())
+        yesterday = str(date.today() + timedelta(days=-1))
+        beforeyesterday = str(date.today() + timedelta(days=-2))
+
+        for d in [beforeyesterday, yesterday, today]:
+            ResponseFactory(created=d)
+        self.refresh()
+
+        self._test_date(
+            params={'date_delta': '1d'},
+            expected=[
+                today,
+                yesterday
+            ])
+
+    def test_both_date_end_and_date_start_with_no_date_delta(self):
+        self.create_data(['01', '02', '03', '04'])
+
+        self._test_date(
+            params={
+                'date_start': self.last_month + '-02',
+                'date_end': self.last_month + '-03'
+            },
+            expected=[
+                self.last_month + '-03',
+                self.last_month + '-02'
+            ])
 
 
 class PostFeedbackAPITest(TestCase):
