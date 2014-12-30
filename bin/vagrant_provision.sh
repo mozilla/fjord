@@ -54,6 +54,12 @@ VENV=/home/vagrant/.virtualenvs/fjordvagrant
 # Build virtual environment and activate it
 sudo -H -u vagrant virtualenv $VENV
 
+# FIXME: This is here to deal with the fact that our version of peep
+# doesn't work so hot with recent versions of pip. We can remove this
+# when peep is fixed.
+# Install a version of pip that works with peep.
+sudo -H -u vagrant $VENV/bin/pip install pip==1.5.6
+
 # Install Fjord requirements
 sudo -H -u vagrant $VENV/bin/python ./peep install -r requirements/requirements.txt
 
