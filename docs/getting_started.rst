@@ -148,6 +148,11 @@ identity. If you don't have a Persona identity, you can create one at
 
        ./manage.py createsuperuser
 
+   Additionally, you can convert any account into a superuser account
+   by doing::
+
+       ./manage.py ihavepower <email-address>
+
 
 After that, let's generate some data in the database so that we have
 something to look at. We'll then need to index that data so it shows
@@ -257,6 +262,7 @@ shell                   Opens a Python REPL in the Django context for debugging
 esreindex               Reindexes all the db data into Elasticsearch
 esstatus                Shows the status of things in Elasticsearch
 update_product_details  Updates the product details with the latest information
+ihavepower              Turns a user account into a superuser
 ======================  ====================================================================
 
 
@@ -390,6 +396,16 @@ Periodically you want to update your local copy of the data. You can do that by
 running::
 
     ./manage.py update_product_details
+
+
+ihavepower
+----------
+
+If you create an account on Fjord and want to turn it into a superuser
+account that can access the admin, then you need to grant that account
+superuser/admin status. To do that, do::
+
+    ./manage.py ihavepower <email-address>
 
 
 Helpful tips
