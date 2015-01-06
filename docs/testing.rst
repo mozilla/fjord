@@ -139,9 +139,31 @@ runner as long as the look like a test.
 Writing New JavaScript Tests
 ============================
 
+JavaScript tests are not run in our normal unit test suite. Instead we have
+a different test system.
+
 We test JavaScript utility functions using `QUnit <http://qunitjs.com/>`_.
 
-These tests are in ``fjord/base/static/tests/``.
+These tests are located in ``fjord/base/static/tests/``.
+
+
+Running tests
+-------------
+
+Launch the server with::
+
+    ./manage.py runserver
+
+Then go to::
+
+    http://127.0.0.1:8000/static/tests/index.html
+
+(You might have to use a different protocol, host and port depending
+on how you have Fjord set up.)
+
+
+Adding tests
+------------
 
 To add a new test suite, add a couple of ``script`` lines to ``index.html`` in
 the relevant place and then create a new ``test_FILENAMEHERE.js`` file
