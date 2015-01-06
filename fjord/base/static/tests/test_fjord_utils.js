@@ -19,10 +19,11 @@ test("basic url validation", function() {
     var i;
     var test_data = [
         ['a', false],
-        ['about:start', false],
-        ['chrome://somepage', false],
+        ['about:start', true],
+        ['chrome://somepage', true],
         ['http://example', false],
-        ['', true],
+        ['', false],
+        [' www.google.com ', false],
         ['example.com', true],
         ['ftp://example.com', true],
         ['http://example.com', true],
@@ -46,7 +47,7 @@ test("basic format test", function() {
         ["Hello {1}", ['Adam', 'World'], 'Hello World'],
         ['{y}', {x: 1, y: 2}, '2']
     ];
-    
+
     for (i=0; i < test_data.length; i++) {
         var item = test_data[i];
         equal(fjord.format(item[0], item[1]), item[2]);
