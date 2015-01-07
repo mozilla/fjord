@@ -40,10 +40,10 @@
         function toggleSubmitButton() {
             var isValid = true;
 
-            if ($('#description').val().replace(/^\s+/, '') === ''
-                    || $('#description').hasClass('invalid')
-                    || $('#id_url').hasClass('invalid')
-                    || $('#id_email').hasClass('invalid')) {
+            if ($('#description').val().replace(/^\s+/, '') === '' ||
+                    $('#description').hasClass('invalid') ||
+                    $('#id_url').hasClass('invalid') ||
+                    $('#id_email').hasClass('invalid')) {
                 isValid = false;
             }
 
