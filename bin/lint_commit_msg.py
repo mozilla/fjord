@@ -69,9 +69,10 @@ def lint_commit_msg(commit_msg_file):
     with open(commit_msg_file) as commit_contents:
         commit_msg = [line for line in commit_contents.readlines()
                       if not line.strip().startswith('#')]
-        return_values = map(lambda x: x(commit_msg), LINT_FUNCTIONS)
-        if not all(return_values):
-            return 1
+        if commit_msg:
+            return_values = map(lambda x: x(commit_msg), LINT_FUNCTIONS)
+            if not all(return_values):
+                return 1
     return 0
 
 if __name__ == '__main__':
