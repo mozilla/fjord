@@ -514,6 +514,17 @@ class TestFeedback(TestCase):
         feedback = models.Response.objects.latest(field_name='id')
         eq_(feedback.url, u'http://mozilla.org/path/')
 
+    def test_url_leading_trailing_whitespace_removal(self):
+        """Leading/trailing whitespace in urls is stripped"""
+        url = reverse('feedback', args=(u'firefox',))
+        self.client.post(url, {
+            'url': u'   \t\n\r',
+            'happy': 0,
+            'description': u'foo'
+        })
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(feedback.url, u'')
+
     def test_email_collection(self):
         """If the user enters an email and checks the box, collect email."""
         url = reverse('feedback', args=(u'firefox',))
