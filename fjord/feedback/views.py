@@ -110,7 +110,7 @@ def _handle_feedback_post(request, locale=None, product=None,
     opinion = models.Response(
         # Data coming from the user
         happy=data['happy'],
-        url=clean_url(data.get('url', u'')),
+        url=clean_url(data.get('url', u'').strip()),
         description=description,
 
         # Pulled from the form data or the url
