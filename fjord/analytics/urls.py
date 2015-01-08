@@ -39,8 +39,6 @@ urlpatterns += patterns(
         name='analytics_hourly_histogram'),
     url(r'^analytics/duplicates/?$', 'analytics_duplicates',
         name='analytics_duplicates'),
-    url(r'^analytics/flagged/?$', 'analytics_flagged',
-        name='analytics_flagged'),
     url(r'^analytics/hbdata(?:/(?P<answerid>\d+))?/?$', 'hb_data',
         name='hb_data'),
     url(r'^analytics/hberrorlog(?:/(?P<errorid>\d+))?/?$', 'hb_errorlog',
