@@ -53,7 +53,9 @@ class TestValidation(TestCase):
             'http://example.com',
             'https://example.com',
             'https://foo.example.com:8000/blah/blah/?foo=bar#baz',
-            u'http://mozilla.org/\u2713'
+            u'http://mozilla.org/\u2713',
+            'about:config',
+            'chrome://foo'
         ]
         for url in valid:
             feedback_pg.set_url(url)
@@ -61,8 +63,6 @@ class TestValidation(TestCase):
 
         invalid = [
             'a',
-            'about:start',
-            'chrome://somepage',
             'http://example'
         ]
         for url in invalid:
