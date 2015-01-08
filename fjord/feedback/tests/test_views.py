@@ -60,6 +60,21 @@ class TestFeedback(TestCase):
         # Make sure it doesn't create a context record
         eq_(models.ResponseContext.objects.count(), 0)
 
+    def test_opinion_id_in_session(self):
+        """Test that the opinion ID is in the session."""
+
+        url = reverse('feedback', args=(u'firefox',))
+        self.client.post(url, {
+            'happy': 1,
+            'description': u'Firefox rocks!',
+            'url': u'http://mozilla.org/'
+        })
+        opinion = models.Response.objects.order_by('-id')[0]
+
+        # Make sure that the ID has been saved to the user's session
+        eq_(self.client.session['opinion_id'], opinion.id)
+
+
     def test_valid_sad(self):
         """Submitting a valid sad form creates an item in the DB.
 

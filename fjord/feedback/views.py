@@ -251,6 +251,8 @@ def _handle_feedback_post(request, locale=None, product=None,
     else:
         statsd.incr('feedback.sad')
 
+    request.session['opinion_id'] = opinion.id
+
     return HttpResponseRedirect(reverse('thanks'))
 
 
