@@ -63,7 +63,7 @@
         });
 
         $('#id_url').on('input', function() {
-            url = $.trim($(this).val());
+            var url = $.trim($(this).val());
             if (fjord.validateUrl(url) || !url.length) {
                 $(this).removeClass('invalid');
             } else {
