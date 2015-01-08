@@ -17,6 +17,7 @@ from fjord.base.models import ModelBase, JSONObjectField, EnhancedURLField
 from fjord.base.utils import smart_truncate, instance_to_key, is_url
 from fjord.feedback.config import CODE_TO_COUNTRY, ANALYSIS_STOPWORDS, TRUNCATE_LENGTH
 from fjord.feedback.utils import compute_grams
+from fjord.journal.utils import j_info
 from fjord.search.index import (
     register_mapping_type,
     FjordMappingType,
@@ -750,18 +751,14 @@ def purge_data(cutoff=None, verbose=False):
     responses_to_update.update(objs.values_list('opinion_id', flat=True))
     count = objs.count()
     objs.delete()
-
-    if verbose:
-        print 'Purged %d feedback_responseemail records' % count
+    msg = 'feedback_responseemail: %d, ' % (count, )
 
     # Second, ResponseContext.
     objs = ResponseContext.objects.filter(opinion__created__lte=cutoff)
     responses_to_update.update(objs.values_list('opinion_id', flat=True))
     count = objs.count()
     objs.delete()
-
-    if verbose:
-        print 'Purged %d feedback_responsecontext records' % count
+    msg += 'feedback_responsecontext: %d, ' % (count, )
 
     # Third, ResponseTroubleshootingInfo.
     objs = ResponseTroubleshootingInfo.objects.filter(
@@ -769,11 +766,12 @@ def purge_data(cutoff=None, verbose=False):
     responses_to_update.update(objs.values_list('opinion_id', flat=True))
     count = objs.count()
     objs.delete()
+    msg += 'feedback_responsetroubleshootinginfo: %d' % (count, )
 
-    if verbose:
-        print 'Purged %d feedback_responsetroubleshootinginfo records' % count
+    j_info(app='feedback',
+           src='purge_data',
+           action='purge_data',
+           msg=msg)
 
     if responses_to_update:
-        if verbose:
-            print '%d responses to re-index' % len(responses_to_update)
         index_chunk(ResponseMappingType, list(responses_to_update))
