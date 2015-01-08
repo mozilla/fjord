@@ -72,7 +72,7 @@ def update_assets(ctx):
 def update_db(ctx):
     """Update the database schema, if necessary.
 
-    Uses schematic by default. Change to south if you need to.
+    Uses south.
 
     """
     with ctx.lcd(settings.SRC_DIR):
