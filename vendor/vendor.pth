@@ -36,7 +36,6 @@ src/django-adminplus
 src/django-appconf
 src/django-arecibo
 src/django-browserid
-src/django-cache-machine
 src/django-celery
 src/django_compressor
 src/django-cronjobs

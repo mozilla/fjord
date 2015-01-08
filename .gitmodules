@@ -7,9 +7,6 @@
 [submodule "vendor/src/django-browserid"]
 	path = vendor/src/django-browserid
 	url = https://github.com/mozilla/django-browserid.git
-[submodule "vendor/src/django-cache-machine"]
-	path = vendor/src/django-cache-machine
-	url = https://github.com/jbalogh/django-cache-machine.git
 [submodule "vendor/src/django-eadred"]
 	path = vendor/src/django-eadred
 	url = https://github.com/willkg/django-eadred.git
