@@ -26,8 +26,8 @@ ln -sf /usr/bin/nodejs /usr/local/bin/node
 sudo -H -u vagrant npm install
 
 # Install Python development-related things:
-apt-get install -y -q libapache2-mod-wsgi python-pip libpython-dev
-pip install virtualenv nose Sphinx
+apt-get install -y -q libapache2-mod-wsgi python-pip python-virtualenv libpython-dev
+pip install nose Sphinx
 
 # Install git:
 apt-get install -y -q git
@@ -53,12 +53,6 @@ VENV=/home/vagrant/.virtualenvs/fjordvagrant
 
 # Build virtual environment and activate it
 sudo -H -u vagrant virtualenv $VENV
-
-# FIXME: This is here to deal with the fact that our version of peep
-# doesn't work so hot with recent versions of pip. We can remove this
-# when peep is fixed.
-# Install a version of pip that works with peep.
-sudo -H -u vagrant $VENV/bin/pip install pip==1.5.6
 
 # Install Fjord requirements
 sudo -H -u vagrant $VENV/bin/python ./peep install -r requirements/requirements.txt
