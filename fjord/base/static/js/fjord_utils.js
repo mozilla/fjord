@@ -106,13 +106,18 @@ window.fjord = window.fjord || {};
     * @returns {boolean}
     */
     fjord.validateUrl = function(url) {
-        var urlRegExp = /^((ftp|http|https):\/\/)?(\w+:{0,1}\w*@)?(\S+\.\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
-        if (url.length > 0 && !url.match(urlRegExp)) {
-            return false;
+        if (url.length > 0) {
+            var aboutUrlRegExp = /^about:/;
+            var chromeUrlRegExp = /^chrome:\/\//;
+            var urlRegExp = /^((ftp|http|https):\/\/)?(\w+:{0,1}\w*@)?(\S+\.\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
+
+            if (urlRegExp.test(url) ||
+                    aboutUrlRegExp.test(url) ||
+                    chromeUrlRegExp.test(url)) {
+                return true;
+            }
         }
-        else {
-            return true;
-        }
+        return false;
     };
 
     /**
