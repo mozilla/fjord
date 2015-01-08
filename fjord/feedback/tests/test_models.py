@@ -8,13 +8,15 @@ from fjord.feedback.models import (
     Response,
     ResponseEmail,
     ResponseContext,
+    ResponseTroubleshootingInfo,
     ResponseMappingType,
     purge_data
 )
 from fjord.feedback.tests import (
     ResponseFactory,
     ResponseEmailFactory,
-    ResponseContextFactory
+    ResponseContextFactory,
+    ResponseTroubleshootingInfoFactory
 )
 from fjord.feedback.utils import compute_grams
 from fjord.search.tests import ElasticTestCase
@@ -280,7 +282,7 @@ class TestParseData(ElasticTestCase):
         now = datetime.datetime.now()
         cutoff = now - datetime.timedelta(days=5)
 
-        # Create 10 ResponseEmail objs--one for each day for the last
+        # Create 10 objs of each type--one for each day for the last
         # 10 days.
         for i in range(10):
             ResponseEmailFactory(
@@ -289,6 +291,11 @@ class TestParseData(ElasticTestCase):
             ResponseContextFactory(
                 opinion__created=(now - datetime.timedelta(days=i))
             )
+            ResponseTroubleshootingInfoFactory(
+                opinion__created=(now - datetime.timedelta(days=i))
+            )
+
+        # Note that this creates 30 Response objects.
 
         # Since creating the objects and indexing them happens very
         # quickly in tests, we hit a race condition and the has_email
@@ -297,13 +304,14 @@ class TestParseData(ElasticTestCase):
         self.setup_indexes()
 
         # Make sure everything is in the db
-        eq_(Response.objects.count(), 20)
+        eq_(Response.objects.count(), 30)
         eq_(ResponseEmail.objects.count(), 10)
         eq_(ResponseContext.objects.count(), 10)
+        eq_(ResponseTroubleshootingInfo.objects.count(), 10)
 
         # Make sure everything is in the index
         resp_s = ResponseMappingType.search()
-        eq_(resp_s.count(), 20)
+        eq_(resp_s.count(), 30)
         eq_(resp_s.filter(has_email=True).count(), 10)
 
         # Now purge everything older than 5 days and make sure things
@@ -314,7 +322,7 @@ class TestParseData(ElasticTestCase):
 
         self.refresh()
 
-        eq_(Response.objects.count(), 20)
+        eq_(Response.objects.count(), 30)
         eq_(ResponseEmail.objects.count(), 5)
         eq_(ResponseEmail.objects.filter(
             opinion__created__gte=cutoff).count(),
@@ -323,16 +331,20 @@ class TestParseData(ElasticTestCase):
         eq_(ResponseContext.objects.filter(
             opinion__created__gte=cutoff).count(),
             5)
+        eq_(ResponseTroubleshootingInfo.objects.count(), 5)
+        eq_(ResponseTroubleshootingInfo.objects.filter(
+            opinion__created__gte=cutoff).count(),
+            5)
         eq_(1,
             Record.objects.filter(action='purge_data').count())
         expected_msg = ('feedback_responseemail: 5, '
                         'feedback_responsecontext: 5, '
-                        'feedback_responsetroubleshootinginfo: 0')
+                        'feedback_responsetroubleshootinginfo: 5')
         eq_(expected_msg,
            Record.objects.get(action='purge_data').msg)
 
         # Everything should still be in the index, but the number of
         # things with has_email=True should go down
         resp_s = ResponseMappingType.search()
-        eq_(resp_s.count(), 20)
+        eq_(resp_s.count(), 30)
         eq_(resp_s.filter(has_email=True).count(), 5)
