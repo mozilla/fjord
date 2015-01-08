@@ -19,7 +19,7 @@ from fjord.feedback.tests import (
 from fjord.feedback.utils import compute_grams
 from fjord.search.tests import ElasticTestCase
 from fjord.feedback.config import TRUNCATE_LENGTH
-
+from fjord.journal.models import Record
 
 class TestResponseModel(TestCase):
     def test_description_truncate_on_save(self):
@@ -307,7 +307,8 @@ class TestParseData(ElasticTestCase):
         eq_(resp_s.filter(has_email=True).count(), 10)
 
         # Now purge everything older than 5 days and make sure things
-        # got removed that should have gotten removed
+        # got removed that should have gotten removed. Also check if
+        # there is a journal entry for the purge operation.
         cutoff = now - datetime.timedelta(days=5)
         purge_data(cutoff=cutoff)
 
@@ -322,6 +323,13 @@ class TestParseData(ElasticTestCase):
         eq_(ResponseContext.objects.filter(
             opinion__created__gte=cutoff).count(),
             5)
+        eq_(1,
+            Record.objects.filter(action='purge_data').count())
+        expected_msg = ('feedback_responseemail: 5, '
+                        'feedback_responsecontext: 5, '
+                        'feedback_responsetroubleshootinginfo: 0')
+        eq_(expected_msg,
+           Record.objects.get(action='purge_data').msg)
 
         # Everything should still be in the index, but the number of
         # things with has_email=True should go down
