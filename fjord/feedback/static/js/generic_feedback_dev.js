@@ -40,10 +40,10 @@
         function toggleSubmitButton() {
             var isValid = true;
 
-            if ($('#description').val().replace(/^\s+/, '') === ''
-                    || $('#description').hasClass('invalid')
-                    || $('#id_url').hasClass('invalid')
-                    || $('#id_email').hasClass('invalid')) {
+            if ($('#description').val().replace(/^\s+/, '') === '' ||
+                    $('#description').hasClass('invalid') ||
+                    $('#id_url').hasClass('invalid') ||
+                    $('#id_email').hasClass('invalid')) {
                 isValid = false;
             }
 
@@ -63,7 +63,8 @@
         });
 
         $('#id_url').on('input', function() {
-            if (fjord.validateUrl($(this).val())) {
+            var url = $.trim($(this).val());
+            if (fjord.validateUrl(url) || !url.length) {
                 $(this).removeClass('invalid');
             } else {
                 $(this).addClass('invalid');

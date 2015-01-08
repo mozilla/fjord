@@ -62,7 +62,10 @@ class TestValidation(TestCase):
         ]
         for url in valid:
             feedback_pg.set_url(url)
-            Assert.true(feedback_pg.is_url_valid)
+            Assert.true(
+                feedback_pg.is_url_valid,
+                msg=('failed url "%s"' % url)
+            )
 
         invalid = [
             'a',
@@ -70,7 +73,10 @@ class TestValidation(TestCase):
         ]
         for url in invalid:
             feedback_pg.set_url(url)
-            Assert.false(feedback_pg.is_url_valid)
+            Assert.false(
+                feedback_pg.is_url_valid,
+                msg=('failed url "%s"' % url)
+            )
 
     @pytest.mark.nondestructive
     def test_email_verification(self, mozwebqa):
@@ -89,7 +95,10 @@ class TestValidation(TestCase):
         ]
         for email in valid:
             feedback_pg.set_email(email)
-            Assert.true(feedback_pg.is_email_valid)
+            Assert.true(
+                feedback_pg.is_email_valid,
+                msg=('failed email "%s"' % email)
+            )
 
         invalid = [
             'foo@',
@@ -97,4 +106,7 @@ class TestValidation(TestCase):
         ]
         for email in invalid:
             feedback_pg.set_email(email)
-            Assert.false(feedback_pg.is_email_valid)
+            Assert.false(
+                feedback_pg.is_email_valid,
+                msg=('failed email "%s"' % email)
+            )
