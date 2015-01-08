@@ -87,7 +87,7 @@ class TestAutoTranslation(TestCase):
         super(TestAutoTranslation, self).tearDown()
 
     def test_auto_translation(self):
-        prod = Product.uncached.get(db_name='firefox')
+        prod = Product.objects.get(db_name='firefox')
         prod.translation_system = u'dennis'
         prod.save()
 
@@ -98,7 +98,7 @@ class TestAutoTranslation(TestCase):
         )
 
         # Fetch it from the db again
-        resp = Response.uncached.get(id=resp.id)
+        resp = Response.objects.get(id=resp.id)
         eq_(resp.translated_description, u'\xabHOLA\xbb')
 
 
@@ -128,7 +128,7 @@ class TestGenerateTranslationJobs(TestCase):
         eq_(len(resp.generate_translation_jobs()), 0)
 
         # Re-fetch from the db and make sure the description was copied over
-        resp = Response.uncached.get(id=resp.id)
+        resp = Response.objects.get(id=resp.id)
         eq_(resp.description, resp.translated_description)
 
     def test_english_gb_no_translation(self):
@@ -143,7 +143,7 @@ class TestGenerateTranslationJobs(TestCase):
         eq_(len(resp.generate_translation_jobs()), 0)
 
         # Re-fetch from the db and make sure the description was copied over
-        resp = Response.uncached.get(id=resp.id)
+        resp = Response.objects.get(id=resp.id)
         eq_(resp.description, resp.translated_description)
 
     def test_english_with_dennis(self):
@@ -158,7 +158,7 @@ class TestGenerateTranslationJobs(TestCase):
         # Set the product up for translation *after* creating the response
         # so that it doesn't get auto-translated because Response is set up
         # for auto-translation.
-        prod = Product.uncached.get(db_name='firefox')
+        prod = Product.objects.get(db_name='firefox')
         prod.translation_system = u'dennis'
         prod.save()
 
@@ -166,7 +166,7 @@ class TestGenerateTranslationJobs(TestCase):
         eq_(len(resp.generate_translation_jobs()), 0)
 
         # Re-fetch from the db and make sure the description was copied over
-        resp = Response.uncached.get(id=resp.id)
+        resp = Response.objects.get(id=resp.id)
         eq_(resp.description, resp.translated_description)
 
     def test_spanish_no_translation(self):
@@ -196,7 +196,7 @@ class TestGenerateTranslationJobs(TestCase):
         # Set the product up for translation *after* creating the response
         # so that it doesn't get auto-translated because Response is set up
         # for auto-translation.
-        prod = Product.uncached.get(db_name='firefox')
+        prod = Product.objects.get(db_name='firefox')
         prod.translation_system = u'dennis'
         prod.save()
 
@@ -228,7 +228,7 @@ class TestGenerateTranslationJobs(TestCase):
         # Set the product up for translation *after* creating the response
         # so that it doesn't get auto-translated because Response is set up
         # for auto-translation.
-        prod = Product.uncached.get(db_name='firefox')
+        prod = Product.objects.get(db_name='firefox')
         prod.translation_system = u'dennis'
         prod.save()
 

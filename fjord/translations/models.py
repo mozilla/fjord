@@ -671,7 +671,7 @@ class GengoHumanTranslator(TranslationSystem):
 
             # Check to see if there are still outstanding jobs for
             # this order. If there aren't, close the order out.
-            outstanding = (GengoJob.uncached
+            outstanding = (GengoJob.objects
                            .filter(order=order, status=STATUS_IN_PROGRESS)
                            .count())
 

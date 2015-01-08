@@ -80,9 +80,6 @@ class Record(models.Model):
     # is stored as a JSON object
     metadata = JSONObjectField()
 
-    # Note: This doesn't use django-cache-machine. These objects are
-    # mostly for site maintenance purposes and thus we don't really
-    # want to be dealing with cache.
     objects = RecordManager()
 
     def __unicode__(self):

@@ -54,11 +54,6 @@ class ResponseFeedbackAdmin(admin.ModelAdmin):
         self.message_user(request, '%s responses updated.' % ret)
     nix_product.short_description = u'Remove product for selected responses'
 
-    def queryset(self, request):
-        # Note: This ignores the super() queryset and uses the
-        # uncached manager.
-        return Response.uncached.all()
-
 
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Response, ResponseFeedbackAdmin)

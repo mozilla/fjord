@@ -780,11 +780,11 @@ class CompletedJobsForOrderTestCase(BaseGengoTestCase):
 
             ght.pull_translations()
 
-            jobs = GengoJob.uncached.all()
+            jobs = GengoJob.objects.all()
             eq_(len(jobs), 1)
             eq_(jobs[0].status, 'complete')
 
-            orders = GengoOrder.uncached.all()
+            orders = GengoOrder.objects.all()
             eq_(len(orders), 1)
             eq_(orders[0].status, 'complete')
 

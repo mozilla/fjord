@@ -302,7 +302,7 @@ def index_chunk(cls, id_list, es=None):
 
     for ids in chunked(id_list, 200):
         documents = []
-        obj_list = cls.get_model().uncached.filter(id__in=ids)
+        obj_list = cls.get_model().objects.filter(id__in=ids)
         documents = [cls.extract_document(obj_id=obj.id, obj=obj)
                      for obj in obj_list]
 
