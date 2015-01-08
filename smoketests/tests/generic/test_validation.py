@@ -55,7 +55,10 @@ class TestValidation(TestCase):
             'https://foo.example.com:8000/blah/blah/?foo=bar#baz',
             u'http://mozilla.org/\u2713',
             'about:config',
-            'chrome://foo'
+            'chrome://foo',
+            '    example.com',
+            'example.com    ',
+            '    example.com    '
         ]
         for url in valid:
             feedback_pg.set_url(url)
