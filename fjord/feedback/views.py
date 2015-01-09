@@ -333,6 +333,7 @@ PRODUCT_OVERRIDE = {
 
 def persist_feedbackdev(fun):
     """Persists a feedbackdev flag set via querystring in the cookies"""
+    @wraps(fun)
     def _persist_feedbackdev(request, *args, **kwargs):
         qs_feedbackdev = request.GET.get('feedbackdev', None)
         resp = fun(request, *args, **kwargs)
