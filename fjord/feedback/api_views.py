@@ -88,7 +88,7 @@ class PublicFeedbackAPI(rest_framework.views.APIView):
         search = search.order_by('-created')
 
         # Explicitly include only publicly visible fields
-        search = search.values_dict(models.ResponseMappingType.public_fields())
+        search = search.values_dict(*models.ResponseMappingType.public_fields())
 
         maximum = smart_int(request.GET.get('max', None))
         maximum = maximum or 1000
