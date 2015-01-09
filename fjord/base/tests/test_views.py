@@ -50,7 +50,7 @@ class MonitorViewTest(ElasticTestCase):
                 SHOW_STAGE_NOTICE=True,
                 CACHES={
                     'default': {
-                        'BACKEND': 'caching.backends.memcached.CacheClass',
+                        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
                         'LOCATION': ['localhost:11211', 'localhost2:11211']
                         }
                     }):

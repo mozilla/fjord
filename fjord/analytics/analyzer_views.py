@@ -751,7 +751,7 @@ class ProductsUpdateView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductsUpdateView, self).get_context_data(**kwargs)
-        context['products'] = Product.uncached.all()
+        context['products'] = Product.objects.all()
         return context
 
     def get_form_kwargs(self):

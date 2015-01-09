@@ -2,11 +2,10 @@ import datetime
 
 from django.db import models
 
+from fjord.base.models import ModelBase
 
-# Note: This doesn't extend our caching ModelBase because we
-# explicitly want the livest data possible and not cached data.
 
-class Record(models.Model):
+class Record(ModelBase):
     """Indexing record."""
     STATUS_NEW = 0
     STATUS_IN_PROGRESS = 1

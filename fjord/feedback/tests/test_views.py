@@ -116,7 +116,7 @@ class TestFeedback(TestCase):
     def test_urls_locale(self):
         """Test setting locale from the locale part of the url"""
         try:
-            count = models.Response.uncached.count()
+            count = models.Response.objects.count()
 
             # Hard-coded url so we're guaranteed to get /es/.
             url = '/es/feedback/firefox'
@@ -127,7 +127,7 @@ class TestFeedback(TestCase):
             })
 
             self.assertRedirects(resp, reverse('thanks'))
-            eq_(count + 1, models.Response.uncached.count())
+            eq_(count + 1, models.Response.objects.count())
             feedback = models.Response.objects.latest(field_name='id')
             eq_(u'es', feedback.locale)
             eq_(u'Firefox', feedback.product)
@@ -500,7 +500,7 @@ class TestFeedback(TestCase):
             })
 
             self.assertRedirects(r, reverse('thanks'))
-            latest = models.Response.uncached.latest('pk')
+            latest = models.Response.objects.latest('pk')
             eq_(latest.url, expected)
 
     def test_url_cleaning(self):

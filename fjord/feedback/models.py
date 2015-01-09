@@ -4,7 +4,6 @@ from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from caching.base import CachingManager
 from elasticutils.contrib.django import Indexable, MLT
 from product_details import product_details
 from rest_framework import serializers
@@ -35,7 +34,7 @@ from fjord.translations.tasks import register_auto_translation
 
 
 
-class ProductManager(CachingManager):
+class ProductManager(models.Manager):
     def public(self):
         """Returns publicly visible products"""
         return self.filter(on_dashboard=True)

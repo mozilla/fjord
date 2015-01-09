@@ -3,21 +3,14 @@ import json
 from django.contrib.auth.models import User
 from django.db import models
 
-import caching.base
 from tower import ugettext_lazy as _lazy
 
 from fjord.base import forms
 from fjord.base.validators import EnhancedURLValidator
 
 
-class ModelBase(caching.base.CachingMixin, models.Model):
-    """Common base model for all models: Implements caching."""
-
-    objects = caching.base.CachingManager()
-    uncached = models.Manager()
-
-    class Meta:
-        abstract = True
+# Common base model for all fjord models
+ModelBase = models.Model
 
 
 class Profile(models.Model):
