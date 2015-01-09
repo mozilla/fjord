@@ -1,9 +1,14 @@
 # These requirements are helpful, but not required, for working on fjord
 
-# For lint
+# sha256: KF6L1zDAtv374jwy0pNr_7pAHyPKsTLocixovoDW8YI
 flake8==2.2.5
 
-# This is a commit in the master branch after 1.5.9 that has
+# Note: This is a commit in the master branch after 1.5.9 that has
 # the multi-line exclude in it. Calling it 1.5.9.1 so it updates
 # correctly next time.
+# sha256: wOLNjD7Lkcqd7nnvFkXJoRv-14HbZ9OW5uTbrM17I_k
 https://github.com/jcrocholl/pep8/archive/510003502b5e067b927e9a62b69937cd9b0eff6e.tar.gz#egg=pep8==1.5.9.1
+
+# For testing remote-troubleshooting capture.
+# sha256: Y6KG6ssDzV9kPX60WMbGK3DBEbRjT9jVnyfMrKS3yDo
+django-sslserver==0.14
