@@ -18,6 +18,19 @@ def path(*a):
     return os.path.join(ROOT, *a)
 
 
+# Taken from peep
+class EmptyOptions(object):
+    """Fake optparse options for compatibility with pip<1.2
+
+    pip<1.2 had a bug in parse_requirments() in which the ``options`` kwarg
+    was required. We work around that by passing it a mock object.
+
+    """
+    default_vcs = None
+    skip_requirements_regex = None
+    isolated_mode = False
+
+
 def check_dependencies():
     """Check installed requirements vs. specified requirements
 
@@ -43,11 +56,14 @@ def check_dependencies():
     """
     # Import this here because not all environments have pip.
     from pip.req import parse_requirements
+    from pip.download import PipSession
 
     req_path = path('requirements')
     req_files = [os.path.join(req_path, fn) for fn in os.listdir(req_path)]
 
-    reqs = list(chain(*(parse_requirements(path)
+    reqs = list(chain(*(parse_requirements(path,
+                                           options=EmptyOptions(),
+                                           session=PipSession())
                         for path in req_files)))
 
     unsatisfied_reqs = []
