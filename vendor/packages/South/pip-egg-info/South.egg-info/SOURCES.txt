@@ -11,6 +11,7 @@ south/models.py
 south/modelsinspector.py
 south/orm.py
 south/signals.py
+south/test_shim.py
 south/v2.py
 south/creator/__init__.py
 south/creator/actions.py
@@ -54,6 +55,7 @@ south/migration/utils.py
 south/tests/__init__.py
 south/tests/autodetection.py
 south/tests/db.py
+south/tests/db_firebird.py
 south/tests/db_mysql.py
 south/tests/freezer.py
 south/tests/inspector.py
@@ -118,3 +120,4 @@ south/tests/otherfakeapp/migrations/0003_third.py
 south/tests/otherfakeapp/migrations/__init__.py
 south/utils/__init__.py
 south/utils/datetime_utils.py
+south/utils/py3.py
