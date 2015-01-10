@@ -149,27 +149,14 @@
               {# NOTE: "Firefox" only until we figure out how to deal with browser/product mismatches. #}
               <div id="browser-ask" class="private">
                 <div class="ask">
-                  <input id="browser-ok" name="browser_ok" type="checkbox">
+                  <input id="browser-ok" name="browser_ok" type="checkbox" checked>
                   <label class="browser-ok" for="browser-ok">
-                    <span class="happy">
-                      {% trans %}
-                        (Optional)
-                        Check here to provide technical information
-                        about your browser. This information helps us
-                        better understand our users and create better
-                        products.
-                        This data will be kept private.
-                      {% endtrans %}
-                    </span>
-                    <span class="sad">
-                      {% trans %}
-                        (Optional)
-                        Check here to provide technical information
-                        about your browser. This will help us diagnose
-                        problems more quickly.
-                        This data will be kept private.
-                      {% endtrans %}
-                    </span>
+                    {% trans %}
+                      Check here to provide technical information about your browser.
+                      This information helps us better understand our users and create better
+                      products. This information will be kept in accordance with our Privacy
+                      policy.
+                    {% endtrans %}
                   </label>
                   <input id="browser-data" name="browser_data" type="hidden" value="{}" />
                 </div>
@@ -193,7 +180,14 @@
               </div>
             </div>
             <div class="input-box">
-              <button id="form-submit-btn" class="complete btn submit" disabled>{{ _('Submit feedback') }}</button>
+              <button id="form-submit-btn" class="complete btn submit" disabled>
+                {% if LANG == 'en-US' %}
+                  {# NOTE: Changing this to Submit, but have to wait for translations to be done. #}
+                  {{ _('Submit') }}
+                {% else %}
+                  {{ _('Submit feedback') }}
+                {% endif %}
+              </button>
             </div>
           </section>
         </div>
