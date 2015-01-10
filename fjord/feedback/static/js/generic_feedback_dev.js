@@ -139,6 +139,9 @@
                 $('#browser-ask').show();
                 remoteTroubleshooting.getData(function (data) {
                     browserData = data;
+                    if ($('#browser-ok').is(':checked')) {
+                        $('#browser-data').val(JSON.stringify(browserData));
+                    }
                 });
             }
         });
