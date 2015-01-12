@@ -419,6 +419,19 @@ We use memcached for caching. to flush the cache, do::
     echo "flush_all" | nc localhost 11211
 
 
+Issues with commit timestamps
+-----------------------------
+
+The Ubuntu image that we are using, has UTC as the configured timezone.
+Due to this, if you are in a different timezone and make commits from
+the VM, the commit timestamps will have a different timezone when
+compared to the timezone on the host computer. To have matching
+timezone on the host and the VM, run::
+
+    sudo dpkg-reconfigure tzdata
+
+and select your current timezone as the timezone for the VM.
+
 Where to go from here?
 ======================
 
