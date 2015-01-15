@@ -4,7 +4,7 @@ from .models import Survey
 
 
 class SurveyAdmin(admin.ModelAdmin):
-    list_display = ('name', 'enabled', 'created')
+    list_display = ('name', 'enabled', 'created', 'description')
     list_filter = ('name', 'enabled', 'created')
 
 

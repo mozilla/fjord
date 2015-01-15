@@ -19,6 +19,7 @@ class Survey(ModelBase):
     name = models.CharField(max_length=100, unique=True)
     enabled = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
+    description = models.TextField(blank=True, default='')
 
     def __unicode__(self):
         return '%s: %s' % (
