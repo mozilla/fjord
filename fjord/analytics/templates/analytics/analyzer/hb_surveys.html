@@ -37,6 +37,7 @@
       <table class="summarytable">
         <tr>
           <th>name</th>
+          <th>description</th>
           <th>enabled?</th>
           <th>created</th>
         </tr>
@@ -44,6 +45,7 @@
         {% for sur in surveys %}
           <tr>
             <td><pre>{{ sur.name }}</pre></td>
+            <td>{{ sur.description }}</td>
             <td>{{ sur.enabled }}</td>
             <td>{{ sur.created }}</td>
           </tr>
