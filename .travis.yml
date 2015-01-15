@@ -1,0 +1,26 @@
+sudo: no
+language: python
+python: "2.7"
+node: "0.10"
+
+env:
+  globals:
+    - PIP_DOWNLOAD_CACHE="pip_cache"
+  matrix:
+    - TEST_SUITE=django
+
+cache:
+  directories:
+    - pip_cache
+
+install: bin/travis/install.sh
+before_script: bin/travis/setup.sh
+script: bin/travis/dispatch.sh $TEST_SUITE
+
+notifications:
+    email: false
+    irc:
+        channels:
+            - "irc.mozilla.org#input"
+        on_success: always
+        on_failure: always
