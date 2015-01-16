@@ -12,3 +12,6 @@ https://github.com/jcrocholl/pep8/archive/510003502b5e067b927e9a62b69937cd9b0eff
 # For testing remote-troubleshooting capture.
 # sha256: Y6KG6ssDzV9kPX60WMbGK3DBEbRjT9jVnyfMrKS3yDo
 django-sslserver==0.14
+
+# sha256: ku47hrXBkhwtnawhe--JkMX4Usi8TZAYyv4PPzuBzTo
+nosenicedots==0.5

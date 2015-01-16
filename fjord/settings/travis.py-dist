@@ -1,0 +1,33 @@
+from fjord.settings.base import *
+
+
+DEBUG = True
+
+ROOT_URLCONF = '%s.urls' % PROJECT_MODULE
+
+LOG_LEVEL = logging.ERROR
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'fjord',
+        'USER': 'travis',
+        'HOST': 'localhost',
+        'OPTIONS': {
+            'init_command': 'SET storage_engine=InnoDB',
+            'charset' : 'utf8',
+            'use_unicode' : True,
+        },
+        'TEST_CHARSET': 'utf8',
+        'TEST_COLLATION': 'utf8_general_ci',
+    },
+}
+
+CELERY_ALWAYS_EAGER = True
+
+CACHE_BACKEND = 'caching.backends.locmem://'
+
+ES_INDEX_PREFIX = 'input'
+ES_URLS = ['http://localhost:9200']
+
+SECRET_KEY = 'TravisShhhhhhhhh'
