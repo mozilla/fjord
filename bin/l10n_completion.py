@@ -80,29 +80,30 @@ def get_completion_data_for_file(fn):
 
     all_total = 0
     all_translated = 0
-    untranslated_words = 0
+    all_untranslated_words = 0
 
     data = {}
     for app, tr_list in app_to_translations.items():
         total = len(tr_list)
         translated = len([tr for tr in tr_list if tr.translated()])
-
+        untranslated_words = sum(
+            [len(tr.msgid.split()) for tr in tr_list if tr.translated()]
+        )
         data[app] = {
             'total': total,
             'translated': translated,
+            'untranslated_words': untranslated_words
         }
 
         all_total += total
         all_translated += translated
-        untranslated_words += sum(
-            [len(tr.msgid.split()) for tr in tr_list if tr.translated()]
-        )
+        untranslated_words += untranslated_words
 
     return {
         lang: {
             'total': all_total,
             'translated': all_translated,
-            'untranslated_words': untranslated_words,
+            'untranslated_words': all_untranslated_words,
             'apps': data
         }
     }
