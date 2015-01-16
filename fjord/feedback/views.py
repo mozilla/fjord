@@ -1,6 +1,7 @@
 import json
 from functools import wraps
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import translation
@@ -23,6 +24,7 @@ from fjord.base.utils import (
 from fjord.feedback import config
 from fjord.feedback import models
 from fjord.feedback.forms import ResponseForm
+from fjord.feedback.models import Response
 from fjord.feedback.utils import clean_url
 from fjord.feedback.config import TRUNCATE_LENGTH
 
@@ -45,7 +47,22 @@ def download_firefox(request, template):
 
 
 def thanks(request):
-    template = 'feedback/thanks.html'
+    if waffle.flag_is_active(request, 'thankyou'):
+        template = 'feedback/thanks.html'
+        try:
+            opinion_id = request.session.get('opinion_id')
+            user_opinion = Response.objects.get(id=opinion_id)
+        except Response.ObjectDoesNotExist:
+            pass
+        else:
+            word_count = len(user_opinion.description.split())
+            if (user_opinion.locale == 'en-US' and
+                    not user_opinion.happy and
+                    word_count >= 7):
+                template = 'feedback/thanks_sad.html'
+    else:
+        template = 'feedback/thanks.html'
+
     return render(request, template)
 
 
