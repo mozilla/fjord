@@ -30,13 +30,13 @@ https://github.com/andymckay/django-statsd/archive/bb601976056d0f922c5a613d2a978
 # sha256: tLy18AIevr3_Rd7saf4cKuq_W1M3zpKFVOLBmggiCck
 https://github.com/mozilla/django-product-details/archive/d168ab2e689a1b54a30a923386fe7948a74ff334.tar.gz#egg=django-product-details
 
-# celery: tags/v3.0.24
-# sha256: _ac6RdnCKQYtOWzlu9JE-TNp1GBNPe_6gO2wft0dTAQ
-https://github.com/celery/celery/archive/53aac9e633302af2aeb8fd8089ed95b6d1e0c9d6.tar.gz#egg=celery
+# celery: tags/v3.1.17
+# sha256: j-caPcm7jTVr_BSOPaM1MLF7EBtlmH_no2IeVKCwKKg
+https://github.com/celery/celery/archive/a4acff48ef1f98e822f5b09b5bf389179fec5049.tar.gz#egg=celery
 
-# kombu: tags/v2.5.15
-# sha256: q7LQnb_YEdLVBSbXyqK6p5foIFShJ_v0jeL-r0fPyb8
-https://github.com/celery/kombu/archive/00efce7d9f9b8740e8df889987caf55700fd1b77.tar.gz#egg=kombu
+# kombu: tags/v3.0.24
+# sha256: cwj3G8RrlHtkLMohfObd2NqKEcLWyfnFKNaOt6bdGu4
+https://github.com/celery/kombu/archive/161d87b1ea4496b449941c3af07f9b63880e962f.tar.gz#egg=kombu
 
 # commonware: master
 # sha256: k9gjEUXUPKAuHsPO41UzOvqOcq25z4FXZ-F1lXSXdNQ
@@ -70,9 +70,9 @@ https://github.com/jsocol/pystatsd/archive/da0005cb30fac365c7bc3a9ab9a4824e1a9c3
 # sha256: oEiCqdyUMgocSPT2W6xNnQj_MoJgNTkCQK1JnBPLfsc
 https://github.com/django-extensions/django-extensions/archive/47a531c996c92a369755a4a9e0857e51afd25cab.tar.gz#egg=django-extensions
 
-# billiard: tags/v2.7.3.34
-# sha256: YKE9uzfN1UL1JUZXDT451i6erJQVPRDdfCT_poTAVy0
-https://github.com/celery/billiard/archive/f24a943cb4b6992717fa8d1db7e220d576377631.tar.gz#egg=billiard
+# billiard: tags/v3.3.0.9
+# sha256: JHw2XY75uDAZW1znrmH9ufpEYQJalYhyMNKpcPEmrpM
+https://github.com/celery/billiard/archive/5652fe69e0a0623cea8f9f0c2810e001d4ad53df.tar.gz#egg=billiard
 
 # bleach: tags/v1.4
 # sha256: sSXkx6LhIZfZHt_5TesMpf_19yRaU11j8jH6P4mLWYw
@@ -98,9 +98,9 @@ https://github.com/jsocol/django-ratelimit/archive/e7ec3ded4ffe86afdcd39bc2ee665
 # sha256: eeq_z415NQPBF3j59fmy6JGjtnpDgVQxwwvFKxnDQx0
 https://github.com/mozilla/nuggets/archive/ce506882b6943ea45ea4f98290fc4ef23e09a083.tar.gz#egg=nuggets
 
-# django-celery: tags/v3.0.23
-# sha256: ESLN3T2iyCrFz0i2k9G1Um7goYVPgRaii1DpoxwqmOg
-https://github.com/celery/django-celery/archive/b11b358cbc0d7b3ca15575d27332d4ae37beca27.tar.gz#egg=django-celery
+# django-celery: master
+# sha256: fv5_GlUdCxO2Ads3OkhBwbJs-yIir3I4yxmiXIi4JQo
+https://github.com/celery/django-celery/archive/9f8738e43251c2b42e4f68b4a65a8bc215aec149.tar.gz#egg=django-celery
 
 # tower: remotes/origin/HEAD
 # sha256: qm0q7z3NpXlebil6MCUbfIAahKy4h2MwiBjXscUjCdA
