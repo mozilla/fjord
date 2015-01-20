@@ -110,8 +110,8 @@ https://github.com/clouserw/tower/archive/ade9804345eb49dd1b626fd276cd9572fd15d1
 # sha256: MVtqowQF3_m7mBNAa0lxcjVkSN4NuKurVFDvAZgzFPA
 https://github.com/jbalogh/django-nose/archive/b81f8471e74b9dd95581c39a17eac2657dbb72fe.tar.gz#egg=django-nose
 
-# sha256: qGhcH7WwvK2QB9lByBSTZo-WE1eK3WMfQG0_lbhM9tA
-Django==1.6.8
+# sha256: VOtZznhUAcfR_e7SRe_OWX6Q-BHWog9rXGkxwASdY6Y
+Django==1.6.10
 
 # sha256: JL4TJtBHNh5HWbqZkqyoPtZd9Vg3UN_ovoEOscEx2HY
 django-adminplus==0.3
