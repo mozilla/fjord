@@ -67,7 +67,7 @@ def get_completion_data_for_file(fn):
         return 1
 
     for poentry in pofile:
-        if poentry.obsolete:
+        if poentry.obsolete or 'fuzzy' in poentry.flags:
             continue
 
         for occ in poentry.occurrences:
@@ -87,7 +87,7 @@ def get_completion_data_for_file(fn):
         total = len(tr_list)
         translated = len([tr for tr in tr_list if tr.translated()])
         untranslated_words = sum(
-            [len(tr.msgid.split()) for tr in tr_list if tr.translated()]
+            [len(tr.msgid.split()) for tr in tr_list if not tr.translated()]
         )
         data[app] = {
             'total': total,
@@ -135,7 +135,7 @@ def calculate_percents(data):
     if 'translated' in data and 'total' in data:
         total = float(data['total'])
         translated = float(data['translated'])
-        data['percent'] = float((100.00 / total) * translated)
+        data['percent'] = float(100.0 * translated / total)
 
     # traverse the tree to calculate additional percents
     for key, val in data.items():
