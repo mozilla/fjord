@@ -218,7 +218,7 @@ def _handle_feedback_post(request, locale=None, product=None,
         else:
             # If browser_data isn't an empty dict, then save it.
             if browser_data:
-                rti = models.ResponseTroubleshootingInfo(
+                rti = models.ResponsePI(
                     data=browser_data, opinion=opinion)
                 rti.save()
                 statsd.incr('feedback.browserdata.optin')

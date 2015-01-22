@@ -6,7 +6,7 @@ from fjord.feedback.models import (
     Response,
     ResponseContext,
     ResponseEmail,
-    ResponseTroubleshootingInfo
+    ResponsePI
 )
 
 
@@ -68,9 +68,9 @@ class ResponseContextFactory(factory.DjangoModelFactory):
     data = '{}'
 
 
-class ResponseTroubleshootingInfoFactory(factory.DjangoModelFactory):
+class ResponsePIFactory(factory.DjangoModelFactory):
     class Meta:
-        model = ResponseTroubleshootingInfo
+        model = ResponsePI
 
     opinion = factory.SubFactory(ResponseFactory)
     data = '{}'
