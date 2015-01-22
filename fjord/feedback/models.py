@@ -586,6 +586,15 @@ class ResponseTroubleshootingInfo(ModelBase):
         return unicode(self.id)
 
 
+class ResponsePI(ModelBase):
+    """Holds remote-troubleshooting and other product data."""
+    opinion = models.ForeignKey(Response)
+    data = JSONObjectField()
+
+    def __unicode__(self):
+        return unicode(self.id)
+
+
 class NoNullsCharField(serializers.CharField):
     """Further restricts CharField so it doesn't accept nulls
 
