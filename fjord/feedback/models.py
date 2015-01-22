@@ -576,16 +576,6 @@ class ResponseContext(ModelBase):
         return unicode(self.id)
 
 
-class ResponseTroubleshootingInfo(ModelBase):
-    """Holds remote-troubleshooting data."""
-
-    opinion = models.ForeignKey(Response)
-    data = JSONObjectField()
-
-    def __unicode__(self):
-        return unicode(self.id)
-
-
 class ResponsePI(ModelBase):
     """Holds remote-troubleshooting and other product data."""
     opinion = models.ForeignKey(Response)
