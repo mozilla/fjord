@@ -193,6 +193,7 @@ def _handle_feedback_post(request, locale=None, product=None,
     if data.get('email_ok') and data.get('email'):
         e = models.ResponseEmail(email=data['email'], opinion=opinion)
         e.save()
+        statsd.incr('feedback.emaildata.optin')
 
     # If there's browser data, save that separately.
     if data.get('browser_ok'):
@@ -222,9 +223,6 @@ def _handle_feedback_post(request, locale=None, product=None,
                 rti.save()
                 statsd.incr('feedback.browserdata.optin')
 
-    else:
-        statsd.incr('feedback.browserdata.optout')
-
     if get_data:
         # There was extra context in the query string, so we grab that
         # with some restrictions and save it separately.
@@ -245,6 +243,7 @@ def _handle_feedback_post(request, locale=None, product=None,
 
         context = models.ResponseContext(data=slop, opinion=opinion)
         context.save()
+        statsd.incr('feedback.contextdata.optin')
 
     if data['happy']:
         statsd.incr('feedback.happy')
