@@ -97,7 +97,7 @@ def get_completion_data_for_file(fn):
 
         all_total += total
         all_translated += translated
-        untranslated_words += untranslated_words
+        all_untranslated_words += untranslated_words
 
     return {
         lang: {
