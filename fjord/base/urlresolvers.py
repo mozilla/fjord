@@ -1,6 +1,7 @@
 from threading import local
 
 from django.conf import settings
+from django.core.handlers.wsgi import WSGIRequest
 from django.core.urlresolvers import reverse as django_reverse
 from django.utils.encoding import iri_to_uri
 from django.utils.functional import lazy
@@ -21,9 +22,17 @@ def get_url_prefix():
     return getattr(_local, 'prefix', None)
 
 
-def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None):
-    """Wraps Django's reverse to prepend the correct locale."""
-    prefixer = get_url_prefix()
+def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None,
+            locale=None):
+    """Wraps Django's reverse to prepend the correct locale.
+
+    :arg locale: Locale to prefix the url with.
+
+    """
+    if locale:
+        prefixer = Prefixer(locale=locale)
+    else:
+        prefixer = get_url_prefix()
 
     if prefixer:
         prefix = prefix or '/'
@@ -67,10 +76,15 @@ def split_path(path_):
 
 
 class Prefixer(object):
-    def __init__(self, request):
-        self.request = request
-        split = split_path(request.path_info)
+    """URL prefixer for generating urls prefixed with the locale"""
+    def __init__(self, request=None, locale=None):
+        self.request = request or WSGIRequest(
+            {'REQUEST_METHOD': 'bogus', 'wsgi.input': None})
+
+        split = split_path(self.request.path_info)
         self.locale, self.shortened_path = split
+        if locale:
+            self.locale = locale
 
     def get_language(self):
         """
