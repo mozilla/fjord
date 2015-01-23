@@ -134,7 +134,7 @@ class TestFeedback(TestCase):
             count = models.Response.objects.count()
 
             # Hard-coded url so we're guaranteed to get /es/.
-            url = '/es/feedback/firefox'
+            url = reverse('feedback', args=(u'firefox',), locale='es')
             resp = self.client.post(url, {
                 'happy': 1,
                 'description': u'Firefox rocks for es!',
