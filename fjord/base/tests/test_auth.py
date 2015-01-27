@@ -1,3 +1,5 @@
+import json
+
 from django.test.client import RequestFactory
 
 from nose.tools import eq_
@@ -20,17 +22,18 @@ class TestAuth(BaseTestCase):
         # FIXME - this can go away post django-browserid 0.9
         new_user.backend = 'django_browserid.auth.BrowserIDBackend'
 
-        get_request = RequestFactory().get(reverse('dashboard'))
-        get_request.user = new_user
-        get_request.session = self.client.session
+        post_request = RequestFactory().post(reverse('browserid.login'))
+        post_request.user = new_user
+        post_request.session = self.client.session
 
         fv = FjordVerify()
         fv.user = new_user
-        fv.request = get_request
+        fv.request = post_request
 
         resp = fv.login_success()
-        eq_(302, resp.status_code)
-        eq_(resp.get('location'), reverse('new-user-view'))
+        eq_(200, resp.status_code)
+        body = json.loads(resp.content)
+        eq_(body['redirect'], reverse('new-user-view'))
 
     def test_existing_user(self):
         """Tests that existing users get redirected to right place"""
@@ -44,27 +47,31 @@ class TestAuth(BaseTestCase):
         new_user.backend = 'django_browserid.auth.BrowserIDBackend'
 
         # First, do it RAW!
-        get_request = RequestFactory().get(reverse('dashboard'))
-        get_request.user = new_user
-        get_request.session = self.client.session
+        post_request = RequestFactory().post(reverse('browserid.login'))
+        post_request.user = new_user
+        post_request.session = self.client.session
 
         fv = FjordVerify()
         fv.user = new_user
-        fv.request = get_request
+        fv.request = post_request
 
         resp = fv.login_success()
-        eq_(302, resp.status_code)
-        eq_(resp.get('location'), '/')
+        eq_(200, resp.status_code)
+        body = json.loads(resp.content)
+        eq_(body['redirect'], '/')
 
         # Now do it with next!
-        get_request = RequestFactory().get(reverse('dashboard') + '?next=/foo')
-        get_request.user = new_user
-        get_request.session = self.client.session
+        post_request = RequestFactory().post(
+            reverse('browserid.login'),
+            {'next': '/foo'})
+        post_request.user = new_user
+        post_request.session = self.client.session
 
         fv = FjordVerify()
         fv.user = new_user
-        fv.request = get_request
+        fv.request = post_request
 
         resp = fv.login_success()
-        eq_(302, resp.status_code)
-        eq_(resp.get('location'), '/foo')
+        eq_(200, resp.status_code)
+        body = json.loads(resp.content)
+        eq_(body['redirect'], '/foo')

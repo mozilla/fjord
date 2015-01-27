@@ -408,6 +408,7 @@ MINIFY_BUNDLES = {
     'js': {
         'base': (
             'js/lib/jquery.min.js',
+            'browserid/api.js',
             'browserid/browserid.js',
             'js/init.js',
             'js/ga.js',
@@ -422,6 +423,7 @@ MINIFY_BUNDLES = {
             'js/lib/jquery.flot.time.js',
             'js/lib/jquery.flot.resize.js',
             'js/dashboard.js',
+            'browserid/api.js',
             'browserid/browserid.js',
             'js/ga.js',
         ),
@@ -435,6 +437,7 @@ MINIFY_BUNDLES = {
             'js/lib/jquery.flot.time.js',
             'js/lib/jquery.flot.resize.js',
             'js/hourly_dashboard.js',
+            'browserid/api.js',
             'browserid/browserid.js',
             'js/ga.js',
         ),
@@ -448,6 +451,7 @@ MINIFY_BUNDLES = {
             'js/lib/jquery.flot.time.js',
             'js/lib/jquery.flot.resize.js',
             'js/product_dashboard.js',
+            'browserid/api.js',
             'browserid/browserid.js',
             'js/ga.js',
         ),
@@ -461,6 +465,7 @@ MINIFY_BUNDLES = {
             'js/lib/jquery.flot.time.js',
             'js/lib/jquery.flot.resize.js',
             'js/product_dashboard_firefox.js',
+            'browserid/api.js',
             'browserid/browserid.js',
             'js/ga.js',
         ),
@@ -556,7 +561,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     'fjord.base.context_processors.i18n',
     'fjord.base.context_processors.globals',
-    'django_browserid.context_processors.browserid',
 )
 
 TEMPLATE_DIRS = (

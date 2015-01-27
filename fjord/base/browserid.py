@@ -2,6 +2,7 @@ import urlparse
 
 from django.http import HttpResponseRedirect
 
+from django_browserid.http import JSONResponse
 from django_browserid.views import Verify
 
 from fjord.base.models import Profile
@@ -32,4 +33,7 @@ class FjordVerify(Verify):
             if redirect_to:
                 url = url + '?next=' + redirect_to
 
-            return HttpResponseRedirect(url)
+            return JSONResponse({
+                'email': self.user.email,
+                'redirect': url,
+            })

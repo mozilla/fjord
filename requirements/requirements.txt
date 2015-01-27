@@ -78,9 +78,8 @@ https://github.com/celery/billiard/archive/5652fe69e0a0623cea8f9f0c2810e001d4ad5
 # sha256: sSXkx6LhIZfZHt_5TesMpf_19yRaU11j8jH6P4mLWYw
 https://github.com/jsocol/bleach/archive/90a79d24fcce8f6404d9b636936e7886558495fb.tar.gz#egg=bleach
 
-# django-browserid: master~19
-# sha256: ENf2_W8JACouw1VJ96Nxl3ZX7Wox3ySOo4V0WocTXBc
-https://github.com/mozilla/django-browserid/archive/79ba1d01e742dfe95c08bb7517b9353e6c1d0050.tar.gz#egg=django-browserid
+# sha256: EXGi39Bz0MuXOkgtic_AweW52n1VHcCgAkEoZ-z1KT4
+django-browserid==0.11.1
 
 # django-cronjobs: tags/v0.2.3
 # sha256: lVao25u2Xj98ofZHQZPM_szNLaqxhWljy7ugRNt4_ug

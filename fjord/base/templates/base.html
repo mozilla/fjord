@@ -61,7 +61,7 @@
               {% endif %}
               <li>{{ browserid_logout(text=_('Sign out')) }}</li>
             {% else %}
-              <li>{{ browserid_login(text=_('Sign in')) }}</li>
+              <li>{{ browserid_login(text=_('Sign in'), next=request.get_full_path()) }}</li>
             {% endif %}
           </ul>
         </header>
