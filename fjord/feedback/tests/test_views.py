@@ -621,8 +621,8 @@ class TestFeedback(TestCase):
             'browser_data': json.dumps(browser_data)
         })
         eq_(r.status_code, 302)
-        eq_(models.ResponseTroubleshootingInfo.objects.count(), 1)
-        rti = models.ResponseTroubleshootingInfo.objects.latest('id')
+        eq_(models.ResponsePI.objects.count(), 1)
+        rti = models.ResponsePI.objects.latest('id')
         eq_(rti.data, browser_data)
 
     def test_browser_data_not_ok(self):
@@ -641,7 +641,7 @@ class TestFeedback(TestCase):
             'browser_data': json.dumps(browser_data)
         })
         eq_(r.status_code, 302)
-        eq_(models.ResponseTroubleshootingInfo.objects.count(), 0)
+        eq_(models.ResponsePI.objects.count(), 0)
 
     def test_browser_data_invalid(self):
         """If browser_data is not valid json, don't collect it."""
@@ -654,7 +654,7 @@ class TestFeedback(TestCase):
             'browser_data': 'invalid json'
         })
         eq_(r.status_code, 302)
-        eq_(models.ResponseTroubleshootingInfo.objects.count(), 0)
+        eq_(models.ResponsePI.objects.count(), 0)
 
     @with_waffle('feedbackdev', True)
     def test_browser_data_is_in_en_US(self):

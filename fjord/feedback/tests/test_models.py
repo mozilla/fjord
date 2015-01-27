@@ -8,7 +8,7 @@ from fjord.feedback.models import (
     Response,
     ResponseEmail,
     ResponseContext,
-    ResponseTroubleshootingInfo,
+    ResponsePI,
     ResponseMappingType,
     purge_data
 )
@@ -16,7 +16,7 @@ from fjord.feedback.tests import (
     ResponseFactory,
     ResponseEmailFactory,
     ResponseContextFactory,
-    ResponseTroubleshootingInfoFactory
+    ResponsePIFactory
 )
 from fjord.feedback.utils import compute_grams
 from fjord.search.tests import ElasticTestCase
@@ -291,7 +291,7 @@ class TestParseData(ElasticTestCase):
             ResponseContextFactory(
                 opinion__created=(now - datetime.timedelta(days=i))
             )
-            ResponseTroubleshootingInfoFactory(
+            ResponsePIFactory(
                 opinion__created=(now - datetime.timedelta(days=i))
             )
 
@@ -307,7 +307,7 @@ class TestParseData(ElasticTestCase):
         eq_(Response.objects.count(), 30)
         eq_(ResponseEmail.objects.count(), 10)
         eq_(ResponseContext.objects.count(), 10)
-        eq_(ResponseTroubleshootingInfo.objects.count(), 10)
+        eq_(ResponsePI.objects.count(), 10)
 
         # Make sure everything is in the index
         resp_s = ResponseMappingType.search()
@@ -331,15 +331,15 @@ class TestParseData(ElasticTestCase):
         eq_(ResponseContext.objects.filter(
             opinion__created__gte=cutoff).count(),
             5)
-        eq_(ResponseTroubleshootingInfo.objects.count(), 5)
-        eq_(ResponseTroubleshootingInfo.objects.filter(
+        eq_(ResponsePI.objects.count(), 5)
+        eq_(ResponsePI.objects.filter(
             opinion__created__gte=cutoff).count(),
             5)
         eq_(1,
             Record.objects.filter(action='purge_data').count())
         expected_msg = ('feedback_responseemail: 5, '
                         'feedback_responsecontext: 5, '
-                        'feedback_responsetroubleshootinginfo: 5')
+                        'feedback_responsepi: 5')
         eq_(expected_msg,
            Record.objects.get(action='purge_data').msg)
 

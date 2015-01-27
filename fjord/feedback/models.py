@@ -304,7 +304,7 @@ class Response(ModelBase):
 
     @property
     def has_browserdata(self):
-        if self.responsetroubleshootinginfo_set.exists():
+        if self.responsepi_set.exists():
             return True
         return False
 
@@ -576,9 +576,8 @@ class ResponseContext(ModelBase):
         return unicode(self.id)
 
 
-class ResponseTroubleshootingInfo(ModelBase):
-    """Holds remote-troubleshooting data."""
-
+class ResponsePI(ModelBase):
+    """Holds remote-troubleshooting and other product data."""
     opinion = models.ForeignKey(Response)
     data = JSONObjectField()
 
@@ -759,13 +758,13 @@ def purge_data(cutoff=None, verbose=False):
     objs.delete()
     msg += 'feedback_responsecontext: %d, ' % (count, )
 
-    # Third, ResponseTroubleshootingInfo.
-    objs = ResponseTroubleshootingInfo.objects.filter(
+    # Third, ResponsePI.
+    objs = ResponsePI.objects.filter(
         opinion__created__lte=cutoff)
     responses_to_update.update(objs.values_list('opinion_id', flat=True))
     count = objs.count()
     objs.delete()
-    msg += 'feedback_responsetroubleshootinginfo: %d' % (count, )
+    msg += 'feedback_responsepi: %d' % (count, )
 
     j_info(app='feedback',
            src='purge_data',
