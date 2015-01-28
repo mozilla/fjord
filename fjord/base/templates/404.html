@@ -1,16 +1,96 @@
 {% extends "base.html" %}
 
 {% block page_title %}{{ _('Not Found') }}{% endblock %}
-
+{% block site_js %}
+      {{ js('base') }}
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+    <script type="text/javascript" src="static/js/plax.js"></script>
+    {% endblock %}
+{% block site_css %}
+    {{ super() }}
+    <style type="text/css">
+      * {
+        margin: 0px;
+        padding: 0px;
+      }
+      body {
+              }
+      div#shell {
+        display: block;
+        position: relative;
+        margin: 100px auto;
+        width: 318px;
+        height: 318px;
+      }
+      div#shell{
+        z-index: 1;
+      }
+      img#background1 {
+        position: absolute;
+        top: -100px;
+        left: -600px;
+        overflow: hidden;
+        z-index: 1;
+      }
+      img#background2 {
+        position: relative;
+        top: -100px;
+        left: -600px;
+        overflow: hidden;
+        z-index: 2;
+      }
+      img#dino {
+        position: absolute;
+        z-index: 3;
+        top: 120px;
+        left: 61px;
+      }
+      img#chest {
+        position: absolute;
+        z-index: 3;
+        top: 180px;
+        left: 190px;
+      }
+      img#text {
+        position: absolute;
+        top: -110px;
+        left: -20px;
+        z-index: 4;
+      }
+      img#chair-front {
+        position: absolute;
+        top: 10px;
+        left: -390px;
+        z-index: 4;
+      }
+      img#chair-back {
+        position: absolute;
+        top: 120px;
+        left: 500px;
+        z-index: 4;
+      }
+    </style>
+    {% endblock %}
+    {% block extra_headers %}
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $('#shell img').plaxify()
+        $.plax.enable()
+      })
+    </script>
+    {% endblock %}
 {% block content %}
-  <div class="col"></div>
-  <div class="col wide">
-    <div class="block">
-      <h1>{{ _('Not Found') }}</h1>
-      <p>
-        {{ _('The document could not be found.') }}
-      </p>
-      <p>
+    <div id="shell">
+    {% raw %}
+      <img src="static/css/images/chairf.png" width="340" height="260" data-xrange="75" data-yrange="20" data-invert="true" id="chair-front"/>
+       <img src="static/css/images/chairb.png" width="90" height="60" data-xrange="25" data-yrange="10" data-invert="true" id="chair-back"/>
+       <img src="static/css/images/text.png" width="450" height="260" data-xrange="35" data-yrange="13" data-invert="true" id="text"/>
+       <img src="static/css/images/bg2.png" width="1450" height="420" data-xrange="0" data-invert="true" data-yrange="12" id="background2"/>
+       <img src="static/css/images/bg1.png" width="1450" height="410" data-xrange="0" data-invert="true" data-yrange="0" id="background1"/>
+       <img src="static/css/images/dino.png" width="190" height="190" data-xrange="35" data-yrange="13" data-invert="true" id="dino"/>
+      {% endraw %}
+          </div>
+            <p>
         <a href="/">{{ _('Return to the dashboard.') }}</a>
       </p>
     </div>
