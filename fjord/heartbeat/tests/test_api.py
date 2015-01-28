@@ -380,5 +380,14 @@ class HeartbeatPostAPITest(TestCase):
         eq_(resp_data['errors']['updated_ts'],
             'updated timestamp is same or older than existing data')
 
+    def test_cors(self):
+        """Verify the CORS headers in the OPTIONS response."""
+        resp = self.client.options(
+            reverse('heartbeat-api'),
+            HTTP_ACCESS_CONTROL_REQUEST_METHOD='',
+            HTTP_ACCESS_CONTROL_REQUEST_HEADERS='')
+        eq_(resp['Access-Control-Allow-Methods'], 'POST')
+        eq_(resp['Access-Control-Allow-Origin'], '*')
+
     # FIXME: test bad types and validation so we can suss out
     # exception handling issues
