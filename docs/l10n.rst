@@ -9,7 +9,7 @@ Things to know about l10n
 =========================
 
 1. translations are done in `Verbatim
-   <https://localize.mozilla.org/>`_ 
+   <https://localize.mozilla.org/>`_
 
 2. translators are looking at our -dev environment to see the strings
    in use
@@ -31,7 +31,6 @@ subversion repository.
 
 To get the localizations, do::
 
-    cd locale
     svn checkout https://svn.mozilla.org/projects/l10n-misc/trunk/input/locale locale
 
 To see the translated strings, you need to first compile the .po files to
@@ -39,6 +38,8 @@ To see the translated strings, you need to first compile the .po files to
 
     ./bin/compile-mo.sh locale/
 
+Then you need to comment out the ``DEV_LANGUAGES`` option from your local
+settings file, ``./fjord/settings/local.py``.
 
 .. _l10n-update-strings:
 
@@ -95,7 +96,7 @@ After that, send an email to the `dev-l10n-web mailing list
 
 
 Sometimes we have to create bugs for each individual locale to update the
-translations. It's nice to copy/paste the specific strings that need to be 
+translations. It's nice to copy/paste the specific strings that need to be
 translated.
 
 Sometimes the translator says they've finished, but the string updates aren't

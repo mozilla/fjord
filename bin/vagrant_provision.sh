@@ -78,6 +78,12 @@ update-rc.d elasticsearch defaults 95 10
 # Install memcached
 apt-get install -y -q memcached
 
+# Install subversion (used to download locales)
+apt-get install -y -q subversion
+
+# Install gettext (used to compile locales)
+apt-get install -y -q gettext
+
 # Create local settings file if it doesn't exist
 [ -f fjord/settings/local.py ] || cp fjord/settings/local.py-dist fjord/settings/local.py
 
