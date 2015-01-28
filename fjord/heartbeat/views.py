@@ -3,10 +3,18 @@ import rest_framework.response
 from statsd import statsd
 
 from .models import Answer, AnswerSerializer
+from fjord.base.utils import cors_enabled
 from fjord.journal.utils import j_error
 
 
 class HeartbeatV2API(rest_framework.views.APIView):
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        # Enable CORS
+        view = super(HeartbeatV2API, cls).as_view(**initkwargs)
+        return cors_enabled('*', methods=['POST'])(view)
+
     def rest_error(self, post_data, errors):
         statsd.incr('heartbeat.error')
         j_error('heartbeat', 'HeartbeatV2API', 'post', 'packet errors',
