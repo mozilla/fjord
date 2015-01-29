@@ -1,6 +1,5 @@
-# django-rest-framework: tags/2.3.6^0
-# sha256: lszAzEZmJb4L6IMHyB-XenxBEcziV9Oka9IZCD_fZZc
-https://github.com/tomchristie/django-rest-framework/archive/7ba2f44a0f0e5ed7bac0fbdbb0112bbfe43f6d24.tar.gz#egg=django-rest-framework
+# sha256: fYceArb4_uLrfscU2TcfaFncApjxyHcmJl-BNe6Z-xk
+djangorestframework==2.4.4
 
 # django-appconf: develop~19
 # sha256: PoDkmCCdclPizBpPmwLn2oGReakQySddW8Iy3kjmfDM
