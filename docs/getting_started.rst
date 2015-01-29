@@ -432,6 +432,35 @@ timezone on the host and the VM, run::
 
 and select your current timezone as the timezone for the VM.
 
+Keeping up with changes to Fjord
+================================
+
+Fjord is in active development and there may be changes made everyday.
+So if you have an existing fjord development environment and want to
+keep up with the new changes, here are some tips.
+
+* Use the appropriate git commands to update the fjord repository
+  depending on which git workflow you use. For example, if you are
+  tracking the main repository on the master branch of your fork,
+  you will have to run ``git pull`` when on the master branch.
+* If there are database changes in the updates to the repository, those
+  have to be applied. See the section on ``migrate`` command above.
+* If any of the fjord dependencies have changed, you will see an error
+  message like the one below when you run any ``manage.py`` command::
+
+    (fjordvagrant)vagrant@vagrant-ubuntu-trusty-64:~/fjord$ ./manage.py runserver 0.0.0.0:8000
+    There are 28 requirements that cannot be checked.
+    The following requirements are not satsifed:
+    UNSATISFIED: nosenicedots==0.5
+
+  In such a scenario, you have to find out the requirements files in which
+  the unsatisfied requirements are listed and the use ``peep`` to install them.
+  For example you might have to run::
+
+    ./peep install -r requirements/dev.txt
+
+  if there are unsatisfied requirements in ``requirements/dev.txt``.
+
 Where to go from here?
 ======================
 
