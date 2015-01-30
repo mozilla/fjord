@@ -17,9 +17,9 @@ https://github.com/jbalogh/django-mobility/archive/e2b60a1f96e4c4aed736395c01bf7
 # sha256: Ga_VbM9tkW8d2infJZwMIlx1LuJmAji1G02zH2YFToI
 https://github.com/gengo/gengo-python/archive/8388e35e6ef1ae946a39268763e741d82650f190.tar.gz#egg=gengo-python
 
-# jingo: remotes/origin/unpin-tox~1
-# sha256: Orqipd_IL9e7ZWjQsG0DDHclCBmuCITl4Iv0kQAlnxE
-https://github.com/jbalogh/jingo/archive/5e985a5c16e343a30482cc526127a856b1cb45ed.tar.gz#egg=jingo
+# jingo: master
+# sha256: 5Yt-sicAUr_gY1Y-SwW6W_mvvxyBuUe2gzPpoB-3VbQ
+https://github.com/jbalogh/jingo/archive/fce09043542e71d972cc97d2ae703740741f80d0.tar.gz#egg=jingo
 
 # django-statsd: tags/0.3.8.5
 # sha256: LTn7BrZL1DKwIiETzYeOHlosfAnsk7K7V3zw4Kq_GNk
