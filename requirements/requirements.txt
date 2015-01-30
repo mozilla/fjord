@@ -201,8 +201,8 @@ anyjson==0.3.3
 # sha256: 8ZZPc_Xum34DCQmLlRLVh_u6bdXR83l7HJVSnlJBvwk
 chardet==2.2.1
 
-# sha256: 10erSV9JDXxVts9yHGpBn-OoNK2uOfyLelW8rf6v8mk
-django-waffle==0.10
+# sha256: dEJWIK08Kh8FFR8MyFGrfiYYbaOfsDma_Aqo7uu9IBs
+django-waffle==0.10.1
 
 # sha256: jJPInHivVIpiMsS_9Yh9GUbNqKs-CCzBo-b7GgIzXUc
 elasticutils==0.10.2
