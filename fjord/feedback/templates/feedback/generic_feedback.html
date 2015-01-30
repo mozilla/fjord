@@ -144,8 +144,7 @@
               <input class="url" id="id_url" name="url" placeholder="http://" type="text">
             </div>
 
-            {% if waffle.flag('feedbackdev') and LANG == 'en-US' and product.display_name == 'Firefox' %}
-              {# NOTE: en-US only until we're sure it's good and translations are done. #}
+            {% if waffle.flag('feedbackdev') and product.display_name == 'Firefox' %}
               {# NOTE: "Firefox" only until we figure out how to deal with browser/product mismatches. #}
               <div id="browser-ask" class="private">
                 <div class="ask">
