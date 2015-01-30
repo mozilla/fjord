@@ -54,6 +54,7 @@ def hb_data(request, answerid=None):
     sortby = 'id'
     answer = None
     answers = []
+    survey = None
 
     if answerid is not None:
         answer = Answer.objects.get(id=answerid)
@@ -61,7 +62,16 @@ def hb_data(request, answerid=None):
     else:
         sortby = request.GET.get('sortby', sortby)
         page = request.GET.get('page')
-        paginator = Paginator(Answer.objects.order_by('-' + sortby), 100)
+        answers = Answer.objects.order_by('-' + sortby)
+        survey = request.GET.get('survey', survey)
+        if survey:
+            try:
+                survey = Survey.objects.get(id=survey)
+                answers = answers.filter(survey_id=survey)
+            except Survey.DoesNotExist:
+                survey = None
+
+        paginator = Paginator(answers, 100)
         try:
             answers = paginator.page(page)
         except PageNotAnInteger:
@@ -78,7 +88,9 @@ def hb_data(request, answerid=None):
         'answer': answer,
         'answers': answers,
         'fix_ts': fix_ts,
-        'pformat': pformat
+        'pformat': pformat,
+        'survey': survey,
+        'surveys': Survey.objects.all(),
     })
 
 

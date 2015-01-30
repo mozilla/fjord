@@ -1,7 +1,7 @@
 {% extends "analytics/analyzer/dashboard.html" %}
 {# Note: This is not l10n-ized since it's only available to analyzers for now. #}
 
-{% macro page_links(request, sortby, answers) %}
+{% macro page_links(request, sortby, answers, survey, surveys) %}
   <div class="pager">
     {% if answers.has_previous() %}
       <a class="prev-link" href="{{ request.get_full_path()|urlparams(sortby=sortby, page=answers.previous_page_number()) }}">
@@ -22,6 +22,19 @@
     <a class="first-link" href="{{ request.get_full_path()|urlparams(sortby=sortby, page=1) }}">First</a>
     |
     <a class="last-link" href="{{ request.get_full_path()|urlparams(sortby=sortby, page=answers.paginator.num_pages) }}">Last</a>
+
+    &mdash;
+
+    <form method="GET" class="inline-form" action="{{ request.get_full_path() }}">
+      <select name="survey">
+        <option value=""{% if not survey %} selected{% endif %}>ALL</option>
+        {% for obj in surveys %}
+          <option value="{{ obj.id }}"{% if survey and survey.id == obj.id %} selected{% endif %} >{{ obj.name }}</option>
+        {% endfor %}
+      </select>
+      <input type="hidden" name="sortby" value="{{ sortby }}">
+      <input type="submit" value="Filter">
+    </form>
   </div>
 {% endmacro %}
 
@@ -128,7 +141,7 @@
       {% else %}
         <h2>Total answers: {{ answers.paginator.count }}</h2>
 
-        {{ page_links(request, sortby, answers) }}
+        {{ page_links(request, sortby, answers, survey, surveys) }}
 
         <table class="summarytable">
           <tr>
@@ -182,7 +195,7 @@
           {% endfor %}
         </table>
 
-        {{ page_links(request, sortby, answers) }}
+        {{ page_links(request, sortby, answers, survey, surveys) }}
       {% endif %}
     </div>
   </div>
