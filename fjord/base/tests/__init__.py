@@ -94,12 +94,14 @@ def with_waffle(flagname, flagvalue=True):
             @wraps(func)
             def _give_me_waffles(*args, **kwargs):
                 origvalue = None
+                # Avoid circular imports
+                from waffle.models import Flag
                 try:
-                    flag = waffle.Flag.objects.filter(name=flagname)[0]
+                    flag = Flag.objects.filter(name=flagname)[0]
                     origvalue = flag.everyone
                     flag.everyone = flagvalue
                 except waffle.Flag.DoesNotExist:
-                    flag = waffle.Flag(name=flagname, everyone=True)
+                    flag = Flag(name=flagname, everyone=True)
                 flag.save()
 
                 try:
