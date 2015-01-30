@@ -192,8 +192,8 @@ nose==1.3.0
 # sha256: ZrvGLZUZ-dUxsfd-aH2fL15SHLkG8f1yMfQDmX4BEMQ
 python-memcached==1.48
 
-# sha256: Iagd3xo8L5VlJFOJZq4Zw4yuJR9WKYIViM3IJGoTNfc
-requests==1.1.0
+# sha256: e3c179Ox4jI9yfzvBgs4DQX18YvQ8kf16edKYoJ53mY
+requests==2.5.1
 
 # sha256: N4Ethjya0-NcBzTELgvwMgzow77YLNIK1UyzTRWBV7o
 anyjson==0.3.3
