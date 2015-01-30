@@ -432,6 +432,7 @@ timezone on the host and the VM, run::
 
 and select your current timezone as the timezone for the VM.
 
+
 Keeping up with changes to Fjord
 ================================
 
@@ -454,13 +455,14 @@ keep up with the new changes, here are some tips.
     UNSATISFIED: nosenicedots==0.5
 
   In such a scenario, you have to find out the requirements files in which
-  the unsatisfied requirements are listed and the use ``peep`` to install them.
+  the unsatisfied requirements are listed and the use ``peep.sh`` to install them.
   For example you might have to run::
 
-    ./peep install -r requirements/dev.txt
+    ./peep.sh install -r requirements/dev.txt
 
   if there are unsatisfied requirements in ``requirements/dev.txt``.
 
+  
 Where to go from here?
 ======================
 

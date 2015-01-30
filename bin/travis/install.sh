@@ -3,7 +3,7 @@
 set -e
 
 echo "Install Python dependencies"
-python peep install \
+./peep.sh install \
     -r requirements/compiled.txt \
     -r requirements/requirements.txt \
     -r requirements/dev.txt

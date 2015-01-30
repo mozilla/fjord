@@ -1,10 +1,4 @@
 #!/usr/bin/env python
-
-# FJORD NOTES:
-#
-# * Peep version: 5aa3a2ec
-# * Added --no-use-wheel argument to pip calls so we don't download wheels
-
 """peep ("prudently examine every package") verifies that packages conform to a
 trusted, locally stored hash and only then installs them::
 
@@ -85,11 +79,8 @@ except ImportError:
     from pip import logger  # 6.0
 from pip.req import parse_requirements
 
-# START FJORD
-pip_version = tuple([int(num) for num in pip.__version__.split('.')])
-# END FJORD
 
-__version__ = 2, 1, 0
+__version__ = 2, 1, 1
 
 
 ITS_FINE_ITS_FINE = 0
@@ -136,18 +127,6 @@ def encoded_hash(sha):
 def run_pip(initial_args):
     """Delegate to pip the given args (starting with the subcommand), and raise
     ``PipException`` if something goes wrong."""
-    # START FJORD FIX
-    # pip 1.4 through 1.5.6 support wheels, but the support is broken
-    # in regards to upgrading: https://github.com/pypa/pip/issues/1825
-    #
-    # pip 1.5 and later haves a ``--no-use-wheel`` argument, so we
-    # insert that if it's not there.
-    #
-    # This prevents pip from using wheels.
-    if initial_args[0] == 'install' and pip_version >= (1, 5, 0):
-        initial_args = list(initial_args)
-        initial_args.insert(1, '--no-use-wheel')
-    # END FJORD FIX
     status_code = pip.main(initial_args)
 
     # Clear out the registrations in the pip "logger" singleton. Otherwise,
@@ -251,7 +230,7 @@ def peep_hash(argv):
 class EmptyOptions(object):
     """Fake optparse options for compatibility with pip<1.2
 
-    pip<1.2 had a bug in parse_requirments() in which the ``options`` kwarg
+    pip<1.2 had a bug in parse_requirements() in which the ``options`` kwarg
     was required. We work around that by passing it a mock object.
 
     """
@@ -402,9 +381,9 @@ class DownloadedReq(object):
             raise RuntimeError("The archive '%s' didn't start with the package name '%s', so I couldn't figure out the version number. My bad; improve me." %
                                (filename, package_name))
 
-        get_version =  (version_of_wheel
-                        if self._downloaded_filename().endswith('.whl')
-                        else version_of_archive)
+        get_version = (version_of_wheel
+                       if self._downloaded_filename().endswith('.whl')
+                       else version_of_archive)
         return get_version(self._downloaded_filename(), self._project_name())
 
     def _is_always_unsatisfied(self):
@@ -593,7 +572,10 @@ class DownloadedReq(object):
         """
         other_args = list(requirement_args(self._argv, want_other=True))
         archive_path = join(self._temp_path, self._downloaded_filename())
-        run_pip(['install'] + other_args + ['--no-deps', archive_path])
+        # -U so it installs whether pip deems the requirement "satisfied" or
+        # not. This is necessary for GitHub-sourced zips, which change without
+        # their version numbers changing.
+        run_pip(['install'] + other_args + ['--no-deps', '-U', archive_path])
 
     @memoize
     def _actual_hash(self):
@@ -754,18 +736,20 @@ def downloaded_reqs_from_path(path, argv):
     :arg argv: The commandline args, starting after the subcommand
 
     """
+    def downloaded_reqs(parsed_reqs):
+        """Just avoid repeating this list comp."""
+        return [DownloadedReq(req, argv) for req in parsed_reqs]
+
     try:
-        return [DownloadedReq(req, argv) for req in
-                parse_requirements(path, options=EmptyOptions())]
+        return downloaded_reqs(parse_requirements(path, options=EmptyOptions()))
     except TypeError:
         # session is a required kwarg as of pip 6.0 and will raise
         # a TypeError if missing. It needs to be a PipSession instance,
         # but in older versions we can't import it from pip.download
         # (nor do we need it at all) so we only import it in this except block
         from pip.download import PipSession
-        return [DownloadedReq(req, argv) for req in
-                parse_requirements(path, options=EmptyOptions(),
-                                   session=PipSession())]
+        return downloaded_reqs(parse_requirements(
+                path, options=EmptyOptions(), session=PipSession()))
 
 
 def peep_install(argv):
@@ -829,10 +813,6 @@ def main():
                 'install': peep_install}
     try:
         if len(argv) >= 2 and argv[1] in commands:
-            # START FJORD FIX
-            if argv[1] == 'install' and pip_version >= (1, 5, 0):
-                argv.insert(2, '--no-use-wheel')
-            # END FJORD FIX
             return commands[argv[1]](argv[2:])
         else:
             # Fall through to top-level pip main() for everything else:
@@ -864,4 +844,4 @@ if __name__ == '__main__':
         exit(main())
     except Exception:
         exception_handler(*sys.exc_info())
-        exit(1)
+        exit(SOMETHING_WENT_WRONG)
