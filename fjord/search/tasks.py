@@ -84,10 +84,10 @@ def index_item_task(cls_path, item_id, **kwargs):
             raise
         retry_time = RETRY_TIMES[retries]
 
-        args = (mapping_type, item_id)
+        args = (cls_path, item_id)
         if not kwargs:
-            # Celery is lame. It requires that kwargs be non empty, but when
-            # EAGER is true, it provides empty kwargs.
+            # Celery requires that kwargs be non empty, but when EAGER
+            # is true, it provides empty kwargs. Yay.
             kwargs['_dummy'] = True
         index_item_task.retry(args, kwargs, exc, countdown=retry_time)
 
