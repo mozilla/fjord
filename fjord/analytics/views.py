@@ -12,6 +12,7 @@ from django.http import (
 )
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
+from django import forms
 
 from elasticsearch import ElasticsearchException
 from elasticutils.contrib.django import F, es_required_or_50x
@@ -37,6 +38,7 @@ from fjord.journal.models import Record
 from fjord.search.utils import es_error_statsd
 from fjord.translations.models import GengoJob, get_translation_systems
 from fjord.translations.tasks import create_translation_tasks
+from fjord.analytics.forms import  LeftDashboard
 
 
 @check_new_user
@@ -191,19 +193,33 @@ def dashboard(request):
 
     # Note: If we add additional querystring fields, we need to add
     # them to generate_dashboard_url.
-    search_happy = request.GET.get('happy', None)
-    search_platform = request.GET.get('platform', None)
-    search_locale = request.GET.get('locale', None)
-    search_product = request.GET.get('product', None)
-    search_version = request.GET.get('version', None)
-    search_query = request.GET.get('q', None)
-    search_date_start = smart_date(
-        request.GET.get('date_start', None), fallback=None)
-    search_date_end = smart_date(
-        request.GET.get('date_end', None), fallback=None)
-    search_bigram = request.GET.get('bigram', None)
-    selected = request.GET.get('selected', None)
+    if request.GET:
+        form = LeftDashboard(request.GET)
+        if form.is_valid():
+            search_happy = form.get('happy')
+            search_platform = form.get('platform')
+            search_locale = form.get('locale')
+            search_product = form.get('product')
+            search_version = form.get('version')
+            search_date_start = smart_date(form.get('date_start'), fallback=None)
+            search_date_end = smart_date(form.get('date_end'), fallback=None)
+    else:
+        form = LeftDashboard(auto_id = False)
+        search_happy = search_platform = search_locale = search_product = search_version = search_date_start = search_date_end = None
 
+    # search_happy = request.GET.get('happy', None)
+    # search_platform = request.GET.get('platform', None)
+    # search_locale = request.GET.get('locale', None)
+    # search_product = request.GET.get('product', None)
+    # search_version = request.GET.get('version', None)
+    # search_date_start = smart_date(
+    #     request.GET.get('date_start', None), fallback=None)
+    # search_date_end = smart_date(
+    #     request.GET.get('date_end', None), fallback=None)
+    search_query = request.GET.get('q', None)
+    search_bigram = request.GET.get('bigram', None)
+    selected = request.GET.get('selected', None)   
+    
     filter_data = []
     current_search = {'page': page}
 
@@ -416,7 +432,6 @@ def dashboard(request):
         {'label': _('Sad'), 'name': 'sad',
          'data': sorted(sad_data.items())},
     ]
-
     return render(request, template, {
         'opinions': opinion_page,
         'opinion_count': search_count,
@@ -428,6 +443,7 @@ def dashboard(request):
         'current_search': current_search,
         'selected': selected,
         'atom_url': generate_dashboard_url(request),
+        'form': LeftDashboard(auto_id = False),
     })
 
 

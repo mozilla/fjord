@@ -46,3 +46,13 @@ class ProductsUpdateForm(forms.ModelForm):
             'on_picker',
             'notes'
         ]
+
+class LeftDashboard(forms.Form):
+    """filters on the left side of dashboard page"""
+    date_start = forms.DateField(required = False,widget = forms.DateInput())
+    date_end = forms.DateField(required=False,widget = forms.DateInput())
+    happy = forms.BooleanField(required=False)
+    platform = forms.BooleanField(required=False)
+    locale = forms.BooleanField(required=False)
+    product  = forms.BooleanField(required=False)
+    version  = forms.BooleanField(required=False)
