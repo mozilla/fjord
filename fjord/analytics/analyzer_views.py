@@ -150,17 +150,6 @@ def analytics_dashboard(request):
 
 @check_new_user
 @analyzer_required
-def analytics_products(request):
-    """Products list view"""
-    template = 'analytics/analyzer/products.html'
-    products = Product.objects.all()
-    return render(request, template, {
-        'products': products
-    })
-
-
-@check_new_user
-@analyzer_required
 @es_required_or_50x(error_template='analytics/es_down.html')
 @es_error_statsd
 def analytics_occurrences(request):
