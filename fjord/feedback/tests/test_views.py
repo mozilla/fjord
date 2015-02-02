@@ -656,6 +656,62 @@ class TestFeedback(TestCase):
         eq_(r.status_code, 302)
         eq_(models.ResponsePI.objects.count(), 0)
 
+    @with_waffle('feedbackdev', True)
+    def test_browser_data_there_for_product_as_firefox(self):
+        # Feedback for ProductFoo should collect browser data if the browser
+        # being used is "Firefox".
+        prod = ProductFactory(
+            display_name=u'ProductFoo',
+            slug=u'productfoo',
+            enabled=True,
+            browser_data_browser=u'Firefox'
+        )
+
+        ua = 'Mozilla/5.0 (X11; Linux i686; rv:17.0) Gecko/17.0 Firefox/17.0'
+        resp = self.client.get(
+            reverse('feedback', args=(prod.slug,)),
+            HTTP_USER_AGENT=ua
+        )
+        assert 'browser-ask' in resp.content
+
+    @with_waffle('feedbackdev', True)
+    def test_browser_data_not_there_for_product_no_collection(self):
+        # Feedback for ProductFoo should not collect browser data
+        # because the product doesn't collect browser data for any
+        # browser since the default for browser_data_browser is empty
+        # string.
+        prod = ProductFactory(
+            display_name=u'ProductFoo',
+            slug=u'productfoo',
+            enabled=True
+        )
+
+        ua = 'Mozilla/5.0 (X11; Linux i686; rv:17.0) Gecko/17.0 Firefox/17.0'
+        resp = self.client.get(
+            reverse('feedback', args=(prod.slug,)),
+            HTTP_USER_AGENT=ua
+        )
+        assert 'browser-ask' not in resp.content
+
+    @with_waffle('feedbackdev', True)
+    def test_browser_data_not_there_for_product_wrong_browser(self):
+        # Feedback for ProductFoo should not collect browser data if
+        # the browser being used doesn't match the browser it should
+        # collect browser data for.
+        prod = ProductFactory(
+            display_name=u'ProductFoo',
+            slug=u'productfoo',
+            enabled=True,
+            browser_data_browser=u'Android'
+        )
+
+        ua = 'Mozilla/5.0 (X11; Linux i686; rv:17.0) Gecko/17.0 Firefox/17.0'
+        resp = self.client.get(
+            reverse('feedback', args=(prod.slug,)),
+            HTTP_USER_AGENT=ua
+        )
+        assert 'browser-ask' not in resp.content
+
     @with_waffle('feedbackdev', False)
     def test_browser_data_not_there_when_feedbackdev_is_false(self):
         """Doesn't show if feedbackdev flag is false"""

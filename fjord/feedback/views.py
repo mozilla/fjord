@@ -265,9 +265,19 @@ def generic_feedback(request, locale=None, product=None, version=None,
         return _handle_feedback_post(request, locale, product,
                                      version, channel)
 
+    # If the feedbackdev waffle flag is enabled and the product says
+    # we should collect browser data, then try to collect it.
+    # FIXME: Remove the feedbackdev flag (bug #1119813).
+    if (waffle.flag_is_active(request, 'feedbackdev') and
+            product.collect_browser_data_for(request.BROWSER.browser)):
+        collect_browser_data = True
+    else:
+        collect_browser_data = False
+
     return render(request, 'feedback/generic_feedback.html', {
         'form': form,
         'product': product,
+        'collect_browser_data': collect_browser_data,
         'TRUNCATE_LENGTH': TRUNCATE_LENGTH,
     })
 

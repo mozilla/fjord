@@ -85,6 +85,13 @@ class Product(ModelBase):
         max_length=20,
     )
 
+    # If this product should grab browser data, which browsers should
+    # it grab browser data for. Note, this value should match what
+    # we're inferring from the user agent.
+    browser_data_browser = models.CharField(
+        max_length=100, blank=True, default=u'',
+        help_text=u'Grab browser data for browser product')
+
     objects = ProductManager()
 
     @classmethod
@@ -93,12 +100,16 @@ class Product(ModelBase):
 
     @classmethod
     def get_product_map(cls):
-        """Returns map of product slug -> db_name for enabled products"""
+        """Return map of product slug -> db_name for enabled products"""
         products = (cls.objects
                     .filter(enabled=True)
                     .values_list('slug', 'db_name'))
         return dict(prod for prod in products)
 
+    def collect_browser_data_for(self, browser):
+        """Return whether we should collect browser data from this browser"""
+        return browser and browser == self.browser_data_browser
+        
     def __unicode__(self):
         return self.display_name
 
