@@ -13,6 +13,7 @@
         <th>slug</th>
         <th>automatic translations?</th>
         <th>feedback product url</th>
+        <th>browser data browser</th>
         <th>notes</th>
       </tr>
       {% for prod in products %}
@@ -30,6 +31,7 @@
           <td>{{ prod.translation_system }}</td>
           {# FIXME - URL is hard-coded so it doesn't include the locale. Need better way to do this. #}
           <td><a href="https://input.mozilla.org/feedback/{{ prod.slug }}">https://input.mozilla.org/feedback/{{ prod.slug }}</a></td>
+          <td>{{ prod.browser_data_browser }}</td>
           <td>{{ prod.notes }}</td>
         </tr>
       {% endfor %}
