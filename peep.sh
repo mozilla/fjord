@@ -20,6 +20,6 @@ esac
 
 # Execute peep with the command line args plus the additional args
 # if any.
-python ./bin/peep-2.1.1.py "$@" $ARGS
+python ./bin/peep-2.2.py "$@" $ARGS
 
 echo "peep.sh: Done!"

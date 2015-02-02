@@ -92,7 +92,7 @@ def check_dependencies():
         print ''
         print 'Update your virtual environment by doing:'
         print ''
-        print '    ./peep install -r requirements/requirements.txt'
+        print '    ./peep.sh install -r requirements/requirements.txt'
         print ''
         print 'or run with SKIP_CHECK=1 .'
         sys.exit(1)
