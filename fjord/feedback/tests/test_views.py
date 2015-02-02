@@ -656,7 +656,6 @@ class TestFeedback(TestCase):
         eq_(r.status_code, 302)
         eq_(models.ResponsePI.objects.count(), 0)
 
-    @with_waffle('feedbackdev', True)
     def test_browser_data_there_for_product_as_firefox(self):
         # Feedback for ProductFoo should collect browser data if the browser
         # being used is "Firefox".
@@ -674,7 +673,6 @@ class TestFeedback(TestCase):
         )
         assert 'browser-ask' in resp.content
 
-    @with_waffle('feedbackdev', True)
     def test_browser_data_not_there_for_product_no_collection(self):
         # Feedback for ProductFoo should not collect browser data
         # because the product doesn't collect browser data for any
@@ -693,7 +691,6 @@ class TestFeedback(TestCase):
         )
         assert 'browser-ask' not in resp.content
 
-    @with_waffle('feedbackdev', True)
     def test_browser_data_not_there_for_product_wrong_browser(self):
         # Feedback for ProductFoo should not collect browser data if
         # the browser being used doesn't match the browser it should
@@ -711,13 +708,6 @@ class TestFeedback(TestCase):
             HTTP_USER_AGENT=ua
         )
         assert 'browser-ask' not in resp.content
-
-    @with_waffle('feedbackdev', False)
-    def test_browser_data_not_there_when_feedbackdev_is_false(self):
-        """Doesn't show if feedbackdev flag is false"""
-        url = reverse('feedback', args=(u'firefox',))
-        resp = self.client.get(url)
-        assert 'browser-data' not in resp.content
 
     def test_src_to_source(self):
         """We capture the src querystring arg in the source column"""
