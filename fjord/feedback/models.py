@@ -14,7 +14,11 @@ from fjord.base.browsers import parse_ua
 from fjord.base.domain import get_domain
 from fjord.base.models import ModelBase, JSONObjectField, EnhancedURLField
 from fjord.base.utils import smart_truncate, instance_to_key, is_url
-from fjord.feedback.config import CODE_TO_COUNTRY, ANALYSIS_STOPWORDS, TRUNCATE_LENGTH
+from fjord.feedback.config import (
+    CODE_TO_COUNTRY,
+    ANALYSIS_STOPWORDS,
+    TRUNCATE_LENGTH
+)
 from fjord.feedback.utils import compute_grams
 from fjord.journal.utils import j_info
 from fjord.search.index import (
@@ -31,7 +35,6 @@ from fjord.search.index import (
 from fjord.search.tasks import register_live_index
 from fjord.translations.models import get_translation_system_choices
 from fjord.translations.tasks import register_auto_translation
-
 
 
 class ProductManager(models.Manager):
