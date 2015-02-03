@@ -9,11 +9,7 @@
 {% endblock %}
 
 {% block site_js %}
-  {% if waffle.flag('feedbackdev') %}
-    {{ js('generic_feedback_dev') }}
-  {% else %}
-    {{ js('generic_feedback') }}
-  {% endif %}
+  {{ js('generic_feedback') }}
 {% endblock %}
 
 {% block page_title %}{{ _('Submit Your Feedback') }}{% endblock %}
@@ -179,13 +175,7 @@
             </div>
             <div class="input-box">
               <button id="form-submit-btn" class="complete btn submit" disabled>
-                {% if LANG == 'en-US' %}
-                  {# NOTE: Changing this to Submit, but have to wait for translations to be done. #}
-                  {# L10N: Label on the submit button of the feedback form. #}
-                  {{ _('Submit') }}
-                {% else %}
-                  {{ _('Submit feedback') }}
-                {% endif %}
+                {{ _('Submit') }}
               </button>
             </div>
           </section>

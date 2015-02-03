@@ -1,4 +1,4 @@
-(function($, fjord, document, window) {
+(function($, fjord, remoteTroubleshooting, document, window) {
     'use strict';
 
     $(document).ready(function() {
@@ -72,8 +72,6 @@
             toggleSubmitButton();
         });
 
-        $('email-details').hide();
-
         $('#id_email').on('input', function() {
             if (fjord.validateEmail($(this).val())) {
                 $(this).removeClass('invalid');
@@ -130,6 +128,33 @@
             window.history.replaceState('', '', '#');
         }
 
+        var browserData;
+
+        // Hide the "browser-ask" section by default. Only show it if
+        // the api is there and there's data.
+        $('#browser-ask').hide();
+
+        remoteTroubleshooting.available(function (yesno) {
+            if (yesno) {
+                $('#browser-ask').show();
+                remoteTroubleshooting.getData(function (data) {
+                    browserData = data;
+                    if ($('#browser-ok').is(':checked')) {
+                        $('#browser-data').val(JSON.stringify(browserData));
+                    }
+                });
+            }
+        });
+
+        $('#browser-ok').on('change', function() {
+            var checked = $(this).is(':checked');
+            if (checked && browserData) {
+                $('#browser-data').val(JSON.stringify(browserData));
+            } else {
+                $('#browser-data').val('{}');
+            }
+        });
+
         changeCard('intro', true);
     });
-}(jQuery, fjord, document, window));
+}(jQuery, fjord, remoteTroubleshooting, document, window));
