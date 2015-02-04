@@ -129,6 +129,8 @@ def parse_ua(ua):
                 break
         if platform_version:
             platform_version = platform_version.replace('_', '.')
+    elif browser == 'Firefox' and platform == 'Android':
+        browser = 'Firefox for Android'
 
     # Firefox OS doesn't list a platform because "The web is the
     # platform."  It is the only platform to do this, so we can still

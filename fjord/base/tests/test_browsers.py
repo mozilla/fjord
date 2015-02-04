@@ -52,7 +52,7 @@ class TestUserAgentDetection(object):
         assert ret is None
 
         checks = {
-            'browser': 'Firefox',
+            'browser': 'Firefox for Android',
             'browser_version': '14.0.2',
             'platform': 'Android',
             'platform_version': '',
