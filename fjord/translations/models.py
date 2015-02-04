@@ -91,6 +91,9 @@ class TranslationSystem(object):
     # Whether or not this system uses push and pull translations
     use_push_and_pull = False
 
+    # Whether or not this system has daily activities
+    use_daily = False
+
     def translate(self, instance, src_lang, src_field, dst_lang, dst_field):
         """Implement this to translation fields on an instance
 
@@ -119,6 +122,19 @@ class TranslationSystem(object):
 
         This is for asynchronous systems that take a batch of translations,
         perform some work, and then return results some time later.
+
+        Print any status text to stdout.
+
+        """
+        raise NotImplementedError()
+
+    def run_daily_activities(self):
+        """Implement this to do any work that needs to happen once per day
+
+        Examples:
+
+        1. sending out daily reminders
+        2. sending out a warning about low balance
 
         Print any status text to stdout.
 
@@ -430,6 +446,7 @@ class GengoHumanTranslator(TranslationSystem):
     """
     name = 'gengo_human'
     use_push_and_pull = True
+    use_daily = True
 
     def translate(self, instance, src_lang, src_field, dst_lang, dst_field):
         # If gengosystem is disabled, we just return immediately. We
@@ -538,28 +555,6 @@ class GengoHumanTranslator(TranslationSystem):
 
         return True
 
-    def balance_check(self, balance, threshold):
-        """Checks the balance and emails a warning if we're getting low
-
-        This doesn't halt translation--just issues a warning via email.
-
-        """
-        if balance > threshold and balance < (2 * threshold):
-            mail_admins(
-                subject='Warning: Gengo account balance {0} < {1}'.format(
-                    balance, 2 * threshold),
-                message=wrap_with_paragraphs(
-                    'Dear mom,'
-                    '\n\n'
-                    'Translations are the fab. Running low on funds. Send '
-                    'more money when you get a chance.'
-                    '\n\n'
-                    'Love,'
-                    '\n\n'
-                    'Fjord McGengo'
-                )
-            )
-
     def push_translations(self):
         # If gengosystem is disabled, we just return immediately. We
         # can backfill later.
@@ -582,8 +577,6 @@ class GengoHumanTranslator(TranslationSystem):
         if not self.balance_good_to_continue(balance, threshold):
             # If we don't have enough balance, stop.
             return
-
-        self.balance_check(balance, threshold)
 
         # Create language buckets for the jobs
         jobs = GengoJob.objects.filter(status=STATUS_CREATED)
@@ -677,3 +670,34 @@ class GengoHumanTranslator(TranslationSystem):
 
             if outstanding == 0:
                 order.mark_complete()
+
+    def run_daily_activities(self):
+        # If gengosystem is disabled, we don't want to do anything.
+        if not waffle.switch_is_active('gengosystem'):
+            return
+
+        gengo_api = FjordGengo()
+
+        if not gengo_api.is_configured():
+            # If Gengo isn't configured, then we drop out here rather
+            # than raise a GengoConfig error.
+            return
+
+        balance = gengo_api.get_balance()
+        threshold = settings.GENGO_ACCOUNT_BALANCE_THRESHOLD
+
+        if threshold < balance < (2 * threshold):
+            mail_admins(
+                subject='Warning: Gengo account balance {0} < {1}'.format(
+                    balance, 2 * threshold),
+                message=wrap_with_paragraphs(
+                    'Dear mom,'
+                    '\n\n'
+                    'Translations are the fab. Running low on funds. Send '
+                    'more money when you get a chance.'
+                    '\n\n'
+                    'Love,'
+                    '\n\n'
+                    'Fjord McGengo'
+                )
+            )

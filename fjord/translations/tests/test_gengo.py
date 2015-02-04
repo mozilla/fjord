@@ -582,9 +582,8 @@ class HumanTranslationTestCase(BaseGengoTestCase):
             ght.push_translations()
 
             eq_(GengoOrder.objects.count(), 1)
-            # There are two emails: one warning that it's getting low
-            # and one "it's too low".
-            eq_(len(mail.outbox), 2)
+            # The "it's too low" email only.
+            eq_(len(mail.outbox), 1)
 
         with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
             # FIXME: This returns the same thing both times, but to
@@ -615,7 +614,35 @@ class HumanTranslationTestCase(BaseGengoTestCase):
 
             eq_(GengoOrder.objects.count(), 1)
             # This generates one more email.
-            eq_(len(mail.outbox), 3)
+            eq_(len(mail.outbox), 2)
+
+    @override_settings(
+        ADMINS=(('Jimmy Discotheque', 'jimmy@example.com'),),
+        GENGO_ACCOUNT_BALANCE_THRESHOLD=20.0
+    )
+    def test_gengo_daily_activities_warning(self):
+        """Tests warning email is sent"""
+        ght = GengoHumanTranslator()
+
+        with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
+            # FIXME: This returns the same thing both times, but to
+            # make the test "more kosher" we'd have this return two
+            # different order_id values.
+            mocker = GengoMock.return_value
+            mocker.getAccountBalance.return_value = {
+                u'opstat': u'ok',
+                u'response': {
+                    # Enough for one order, but dips below threshold
+                    # for the second one.
+                    u'credits': '30.00',
+                    u'currency': u'USD'
+                }
+            }
+
+            ght.run_daily_activities()
+
+            # The "balance is low warning" email only.
+            eq_(len(mail.outbox), 1)
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
