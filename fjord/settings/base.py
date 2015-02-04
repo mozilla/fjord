@@ -250,11 +250,7 @@ INSTALLED_APPS = (
     'session_csrf',
     'waffle',
 
-    # L10n
     'product_details',
-
-    # south has to come early, otherwise tests fail.
-    'south',
 
     'adminplus',
 

@@ -176,9 +176,6 @@ python-dateutil==1.5
 # sha256: akF58qKszaKyc7_Ybeb3AkzuIDBDzJp8BA_nswa74SA
 fancy-tag==0.2.0
 
-# sha256: 02C9MYmPnfWfb6p4ZVEGW7pFs15-48ObOBtPv-9zkvQ
-South==1.0.2
-
 # sha256: fLtRSjUvghxpuOi9qmsuWXKFR6iWVQPHWGUsKCbRV7U
 importlib==1.0.3
 

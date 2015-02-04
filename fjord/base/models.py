@@ -44,10 +44,6 @@ class EnhancedURLField(models.CharField):
         return name, path, args, kwargs
 
 
-from south.modelsinspector import add_introspection_rules
-add_introspection_rules([], ["^fjord\.base\.models\.EnhancedURLField"])
-
-
 class JSONObjectField(models.Field):
     """Represents a JSON object.
 
@@ -67,7 +63,7 @@ class JSONObjectField(models.Field):
         # get_default/has_default Field machinery since this makes it
         # easier to subclass.
         kwargs['default'] = kwargs.get('default', {})
-        super(JSONObjectField, self).__init__(self, *args, **kwargs)
+        super(JSONObjectField, self).__init__(*args, **kwargs)
 
     def get_internal_type(self):
         return 'TextField'
