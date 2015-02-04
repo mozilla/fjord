@@ -96,9 +96,9 @@ https://github.com/jsocol/django-ratelimit/archive/e7ec3ded4ffe86afdcd39bc2ee665
 # sha256: eeq_z415NQPBF3j59fmy6JGjtnpDgVQxwwvFKxnDQx0
 https://github.com/mozilla/nuggets/archive/ce506882b6943ea45ea4f98290fc4ef23e09a083.tar.gz#egg=nuggets
 
-# django-celery: master
-# sha256: fv5_GlUdCxO2Ads3OkhBwbJs-yIir3I4yxmiXIi4JQo
-https://github.com/celery/django-celery/archive/9f8738e43251c2b42e4f68b4a65a8bc215aec149.tar.gz#egg=django-celery
+# django-celery: master~1
+# sha256: dmqn4o32-wsXoiX4O6IFfsRPcLOZVrEhtByqvQs81Ms
+https://github.com/celery/django-celery/archive/da0b98caf9dc96c4d9ec91c09e00c5e19dcb0da3.tar.gz#egg=django-celery
 
 # tower: remotes/origin/HEAD
 # sha256: qm0q7z3NpXlebil6MCUbfIAahKy4h2MwiBjXscUjCdA
