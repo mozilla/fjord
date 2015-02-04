@@ -104,9 +104,8 @@ https://github.com/celery/django-celery/archive/9f8738e43251c2b42e4f68b4a65a8bc2
 # sha256: qm0q7z3NpXlebil6MCUbfIAahKy4h2MwiBjXscUjCdA
 https://github.com/clouserw/tower/archive/ade9804345eb49dd1b626fd276cd9572fd15d1b3.tar.gz#egg=tower
 
-# django-nose: master
-# sha256: MVtqowQF3_m7mBNAa0lxcjVkSN4NuKurVFDvAZgzFPA
-https://github.com/jbalogh/django-nose/archive/b81f8471e74b9dd95581c39a17eac2657dbb72fe.tar.gz#egg=django-nose
+# sha256: NmfSakH-wwNkoO9yWAgyylMogC1VP21ucq9awhyzY2U
+django-nose==1.3
 
 # sha256: VOtZznhUAcfR_e7SRe_OWX6Q-BHWog9rXGkxwASdY6Y
 Django==1.6.10
