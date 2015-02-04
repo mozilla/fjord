@@ -11,6 +11,9 @@ HOME=/tmp
 # to do an svn up.
 10 2 * * * root cd {{ source }} && (./bin/run_l10n_completion.sh {{ source }} {{ python }} > /dev/null)
 
+# Once a day at 3:00am run the translation daily activites.
+0 3 * * * {{ user }} cd {{ source }} && {{ python }} manage.py translation_daily -v 0 --traceback
+
 # Every hour, sync translations. This pulls and pushes to the various
 # translation systems.
 0 * * * * {{ user }} cd {{ source }} && {{ python }} manage.py translation_sync -v 0 --traceback
