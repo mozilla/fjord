@@ -20,6 +20,7 @@ class ProductAdmin(admin.ModelAdmin):
         'db_name',
         'translation_system',
         'browser_data_browser',
+        'browser',
         'image_file',
         'notes',
         'slug')

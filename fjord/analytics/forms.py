@@ -44,6 +44,7 @@ class ProductsUpdateForm(forms.ModelForm):
             'slug',
             'on_dashboard',
             'on_picker',
+            'browser',
             'browser_data_browser',
             'notes'
         ]

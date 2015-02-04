@@ -152,10 +152,10 @@ def _handle_feedback_post(request, locale=None, product=None,
         # If we have a product at this point, then it came from the
         # url and it's a Product instance and we need to turn it into
         # the product.db_name which is a string.
-        product = product.db_name
+        product_db_name = product.db_name
     else:
         # Check the POST data for the product.
-        product = data.get('product', '')
+        product_db_name = data.get('product', '')
 
     # For the version, we try the url data, then the POST data.
     version = version or data.get('version', '')
@@ -166,23 +166,24 @@ def _handle_feedback_post(request, locale=None, product=None,
     # to do so.
     if request.BROWSER != UNKNOWN:
         # If we don't have a product, try to infer that from the user
-        # agent.
-        if not product:
-            product = models.Response.infer_product(request.BROWSER)
+        # agent information.
+        if not product_db_name:
+            product_db_name = models.Response.infer_product(request.BROWSER)
 
-        # If we have a product and it matches the user agent product,
+        # If we have a product and it matches the user agent browser,
         # then we can infer the version and platform from the user
         # agent if they're missing.
-        if (product and product == models.Response.infer_product(
-                request.BROWSER)):
-            if not version:
-                version = request.BROWSER.browser_version
-            if not platform:
-                platform = models.Response.infer_platform(
-                    product, request.BROWSER)
+        if product_db_name:
+            product = models.Product.objects.get(db_name=product_db_name)
+            if product.browser and product.browser == request.BROWSER.browser:
+                if not version:
+                    version = request.BROWSER.browser_version
+                if not platform:
+                    platform = models.Response.infer_platform(
+                        product_db_name, request.BROWSER)
 
     # Make sure values are at least empty strings--no Nones.
-    opinion.product = product or u''
+    opinion.product = product_db_name or u''
     opinion.version = version or u''
     opinion.channel = channel or u''
     opinion.platform = platform or u''

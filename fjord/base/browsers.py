@@ -41,7 +41,8 @@ def parse_ua(ua):
 
     :returns: Browser namedtuple with attributes:
 
-        - browser: "Unknown" or a browser like "Firefox", "Iceweasel", etc.
+        - browser: "Unknown" or a browser like "Firefox", "Iceweasel",
+          "Firefox for Android", etc.
         - browser_version: "Unknown" or a 3 dotted section like "14.0.1",
           "4.0.0", etc.
         - platform: "Unknown" or a platform like "Windows", "OS X",
