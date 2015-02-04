@@ -109,7 +109,7 @@ class Product(ModelBase):
     def collect_browser_data_for(self, browser):
         """Return whether we should collect browser data from this browser"""
         return browser and browser == self.browser_data_browser
-        
+
     def __unicode__(self):
         return self.display_name
 
@@ -359,16 +359,14 @@ class Response(ModelBase):
 
     @classmethod
     def infer_product(cls, browser):
-        platform = browser.platform
-
         # FIXME: This is hard-coded.
-        if platform == u'Firefox OS':
-            return u'Firefox OS'
-
-        elif platform == u'Android':
+        if browser.browser == u'Firefox for Android':
             return u'Firefox for Android'
 
-        elif platform in (u'', u'Unknown'):
+        elif browser.platform == u'Firefox OS':
+            return u'Firefox OS'
+
+        elif browser.platform in (u'', u'Unknown'):
             return u''
 
         return u'Firefox'
