@@ -325,6 +325,22 @@ def dashboard(request):
         'product': {},
         'version': {}
     }
+
+    if request.GET.get('happy', None):
+        counts['happy'] = {True: 0}
+
+    if search_platform:
+        counts['platform'] = {search_platform: 0}
+
+    if search_locale:
+        counts['locale'] = {search_locale: 0}
+
+    if search_product:
+        counts['product'] = {search_product: 0}
+
+    if search_version:
+        counts['version'] = {search_version: 0}
+
     for param, terms in facets.facet_counts().items():
         for term in terms:
             name = term['term']
