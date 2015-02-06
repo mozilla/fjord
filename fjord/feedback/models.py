@@ -92,6 +92,10 @@ class Product(ModelBase):
         max_length=100, blank=True, default=u'',
         help_text=u'Grab browser data for browser product')
 
+    browser = models.CharField(
+        max_length=30, blank=True, default=u'',
+        help_text=u'User agent inferred browser for this product if any')
+
     objects = ProductManager()
 
     @classmethod
@@ -369,6 +373,9 @@ class Response(ModelBase):
         elif browser.platform in (u'', u'Unknown'):
             return u''
 
+        # FIXME: We can do this because our user agent parser only
+        # knows about Mozilla browsers. If we ever change user agent
+        # parsers, we'll need to rethink this.
         return u'Firefox'
 
     @classmethod
