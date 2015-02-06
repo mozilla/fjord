@@ -56,7 +56,11 @@ $(function() {
             var $li = $(this);
             var value = $li.data('value');
             var bar_width = (value / max_value * 100).toString() + '%';
-            var percent = (value / total * 100).toFixed(0).toString() + '%';
+            var percent = "0%";
+            if (total !== 0) {
+                percent = (value / total * 100).toFixed(0).toString() + '%';
+            }
+
             var $label = $li.children('label');
 
             // Draw bars
