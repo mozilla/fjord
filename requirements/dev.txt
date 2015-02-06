@@ -3,6 +3,12 @@
 # sha256: KF6L1zDAtv374jwy0pNr_7pAHyPKsTLocixovoDW8YI
 flake8==2.2.5
 
+# sha256: PYypv2XFAU9GkYBUTR3Vu1ud9wmq1jBPnC5DcK4Ke3w
+mccabe==0.3
+
+# sha256: P6gKELNtUWhr93RPXcmWIs1cmM6O1kAi5imGiq_Bd2k
+pyflakes==0.8.1
+
 # Note: This is a commit in the master branch after 1.5.9 that has
 # the multi-line exclude in it. Calling it 1.5.9.1 so it updates
 # correctly next time.
