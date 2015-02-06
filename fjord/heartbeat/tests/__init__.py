@@ -20,7 +20,7 @@ class AnswerFactory(factory.DjangoModelFactory):
     experiment_version = '1'
     response_version = 1
     updated_ts = int(time.time())
-    survey = factory.SubFactory(SurveyFactory)
+    survey_id = factory.SubFactory(SurveyFactory)
     flow_id = 'flowabc'
     question_id = 'questionabc'
 
