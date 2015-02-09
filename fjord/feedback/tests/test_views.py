@@ -102,6 +102,70 @@ class TestFeedback(TestCase):
         eq_(u'Firefox', feedback.product)
         eq_(u'14.0.1', feedback.version)
 
+    @with_waffle('thankyou', True)
+    def test_use_thank_you_sad(self):
+        """Thanks_sad template is used when appropriate"""
+        url = reverse('feedback', args=(u'firefox',), locale='en-US')
+        r = self.client.post(url, {
+            'happy': 0,
+            'description': u"I want to know why Firefox doesn't make me sandwiches!",
+        }, follow=True)
+
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(u"I want to know why Firefox doesn't make me sandwiches!", feedback.description)
+        eq_(u'', feedback.url)
+        eq_(False, feedback.happy)
+        eq_(u'en-US', feedback.locale)
+        eq_(r.status_code, 200)
+        self.assertTemplateUsed(r, 'feedback/thanks_sad.html')
+
+    @with_waffle('thankyou', True)
+    def test_use_default_thank_you_words(self):
+        """Default thank you page is used when descirption is under 7 words"""
+        url = reverse('feedback', args=(u'firefox',), locale='en-US')
+        r = self.client.post(url, {
+            'happy': 0,
+            'description': u"Why doesn't it load?",
+        }, follow=True)
+
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(u'', feedback.url)
+        eq_(r.status_code, 200)
+        self.assertTemplateUsed(r, 'feedback/thanks.html')
+
+    @with_waffle('thankyou', True)
+    def test_use_default_thank_you_happy(self):
+        """Default thank you page is used when the feedback is happy."""
+        url = reverse('feedback', args=(u'firefox',), locale='en-US')
+        r = self.client.post(url, {
+            'happy': 1,
+            'description': u"Firefox is the best browser I've ever used!",
+        }, follow=True)
+
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(True, feedback.happy)
+        eq_(r.status_code, 200)
+        self.assertTemplateUsed(r, 'feedback/thanks.html')
+
+    @override_settings(DEV_LANGUAGES=('en-US', 'es'))
+    @with_waffle('thankyou', True)
+    def test_use_default_thank_you_locale(self):
+        """Default thank you page is used when the locale is not en-US"""
+        try:
+            url = reverse('feedback', args=(u'firefox',), locale='es')
+            r = self.client.post(url, {
+                'happy': 0,
+                'description': u'Tell me why Firefox is not making lunch.',
+            }, follow=True)
+
+            self.assertRedirects(r, reverse('thanks'))
+            feedback = models.Response.objects.latest(field_name='id')
+            eq_(u'es', feedback.locale)
+            self.assertTemplateUsed(r, 'feedback/thanks.html')
+
+        finally:
+            r = self.client.get('/en-US/feedback/')
+
     def test_firefox_os_view(self):
         """Firefox OS returns correct view"""
         # Firefox OS is the user agent
