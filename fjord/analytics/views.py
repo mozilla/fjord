@@ -326,8 +326,13 @@ def dashboard(request):
         'version': {}
     }
 
-    if request.GET.get('happy', None):
-        counts['happy'] = {True: 0}
+    happy_sad_filter = request.GET.get('happy', None)
+
+    if happy_sad_filter:
+        if happy_sad_filter == '1':
+            counts['happy'] = {True: 0}
+        elif happy_sad_filter == '0':
+            counts['happy'] = {False: 0}
 
     if search_platform:
         counts['platform'] = {search_platform: 0}
