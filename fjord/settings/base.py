@@ -649,6 +649,9 @@ GRAPPELLI_ADMIN_TITLE = 'Input admin and diabolical dashboard'
 # Always allow for override via querystring
 WAFFLE_OVERRIDE = True
 
+# Switch the test runner to django-nose
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
 # For absolute urls
 try:
     DOMAIN = socket.gethostname()
