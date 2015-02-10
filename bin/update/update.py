@@ -70,13 +70,9 @@ def update_assets(ctx):
 
 @task
 def update_db(ctx):
-    """Update the database schema, if necessary.
-
-    Uses south.
-
-    """
+    """Update the database schema, if necessary."""
     with ctx.lcd(settings.SRC_DIR):
-        ctx.local(PYTHON + " manage.py migrate --all --noinput")
+        ctx.local(PYTHON + " manage.py migrate --noinput")
 
 
 @task

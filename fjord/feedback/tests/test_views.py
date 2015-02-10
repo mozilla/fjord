@@ -348,19 +348,12 @@ class TestFeedback(TestCase):
 
     def test_urls_product_inferred_platform_firefoxdev(self):
         """Test firefoxdev platform gets inferred"""
-        prod = ProductFactory(
-            display_name=u'Firefox dev',
-            db_name=u'Firefox dev',
-            slug=u'firefoxdev',
-            enabled=True,
-        )
-
         amount = models.Response.objects.count()
 
         # Test that we infer the platform if the products are the
         # same.
         ua = 'Mozilla/5.0 (Windows NT 6.0; rv:14.0) Gecko/20100101 Firefox/14.0.1'  # noqa
-        url = reverse('feedback', args=(prod.slug,))
+        url = reverse('feedback', args=('firefoxdev',))
         resp = self.client.post(
             url,
             {
@@ -379,18 +372,11 @@ class TestFeedback(TestCase):
 
     def test_urls_product_not_inferred_platform_firefoxdev(self):
         """Test firefoxdev platform doesn't get inferred if not Firefox"""
-        prod = ProductFactory(
-            display_name=u'Firefox dev',
-            db_name=u'Firefox dev',
-            slug=u'firefoxdev',
-            enabled=True,
-        )
-
         amount = models.Response.objects.count()
 
         # If the user agent is IE, then don't infer the platform.
         ua = 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0)'  # noqa
-        url = reverse('feedback', args=(prod.slug,))
+        url = reverse('feedback', args=('firefoxdev',))
         resp = self.client.post(
             url,
             {

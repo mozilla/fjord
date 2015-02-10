@@ -1,6 +1,5 @@
 packages/Babel
 packages/GitPython/lib
-packages/South
 packages/amqp
 packages/anyjson
 packages/carrot

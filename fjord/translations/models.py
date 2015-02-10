@@ -320,7 +320,7 @@ class GengoJob(ModelBase):
     order = models.ForeignKey('translations.GengoOrder', null=True)
 
     # When this job instance was created
-    created = models.DateTimeField(default=datetime.now())
+    created = models.DateTimeField(default=datetime.now)
 
     # When this job instance was completed
     completed = models.DateTimeField(blank=True, null=True)
@@ -396,7 +396,7 @@ class GengoOrder(ModelBase):
 
     # When this instance was created which should also line up with
     # the time the order was submitted to Gengo
-    created = models.DateTimeField(default=datetime.now())
+    created = models.DateTimeField(default=datetime.now)
 
     # When this order was completed
     completed = models.DateTimeField(blank=True, null=True)

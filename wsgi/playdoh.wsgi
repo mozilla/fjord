@@ -23,11 +23,17 @@ os.environ.setdefault('CELERY_LOADER', 'django')
 wsgidir = os.path.dirname(__file__)
 site.addsitedir(os.path.abspath(os.path.join(wsgidir, '../')))
 
-# manage adds /apps, /lib, and /vendor to the Python path.
+# Explicitly set these so that fjord.manage_utils does the right
+# thing.
+os.environ['USING_VENDOR'] = '1'
+os.environ['SKIP_CHECK'] = '1'
+
+# manage adds vendor to the Python path and otherwise sets up the
+# environment.
 import manage
 
-import django.core.handlers.wsgi
-application = django.core.handlers.wsgi.WSGIHandler()
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()
 
 if newrelic:
     application = newrelic.agent.wsgi_application()(application)

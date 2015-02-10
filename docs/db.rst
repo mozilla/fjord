@@ -10,21 +10,18 @@ Updating the db
 If someone pushes changes that change the db, you'll need to apply the
 new migrations to your db. Do this::
 
-    ./manage.py syncdb
     ./manage.py migrate
 
 
 Creating a schema migration
 ===========================
 
-We use `South <http://south.aeracode.org/>`_ for database migrations.
-
 To create a new migration the automatic way:
 
 1. make your model changes
 2. run::
 
-       ./manage.py schemamigration <app> --auto
+       ./manage.py makemigrations <app>
 
 
    where ``<app>`` is the app name (base, feedback, analytics, ...).
@@ -40,8 +37,8 @@ To create a new migration the automatic way:
 
 .. seealso::
 
-   http://south.readthedocs.org/en/latest/tutorial/index.html
-     South tutorial
+   https://docs.djangoproject.com/en/1.7/topics/migrations/#adding-migrations-to-apps
+     Django documentation: Adding migrations to apps
 
 
 Creating a data migration
@@ -53,10 +50,9 @@ To create a data migration the automatic way:
 
 1. run::
 
-       ./manage.py datamigration <app> <name>
+       ./manage.py makemigrations --empty <app>
 
-   where ``<app>`` is the app name (base, feedback, analytics, ...) and
-   ``<name>`` is the name of the migration
+   where ``<app>`` is the app name (base, feedback, analytics, ...)
 
 2. edit the data migration you just created to do what you need it to
    do
@@ -65,18 +61,8 @@ To create a data migration the automatic way:
 
 .. seealso::
 
-   http://south.readthedocs.org/en/latest/tutorial/part3.html#data-migrations
-     South tutorial: data migrations
-
-
-Backwards migrations
---------------------
-
-Make sure to write backwards code if you can. If there's no way to undo
-the migration, then do this::
-
-    def backwards(self, orm):
-        raise RuntimeError("Cannot reverse this migration.")
+   https://docs.djangoproject.com/en/1.7/topics/migrations/#data-migrations
+     Django documentation: Data Migrations
 
 
 Data migrations for data in non-Fjord apps
@@ -84,9 +70,30 @@ Data migrations for data in non-Fjord apps
 
 If you're doing a data migration that adds data to an app that's not
 part of Fjord, but is instead a library (e.g. django-waffle), then
-create the data migration in the base app and make sure to freeze the
-library app so that it's available.
+create the data migration in the base app and add a dependency to
+the latest migration in the library app.
 
-For example, this creates a waffle flag::
+For example, this adds a dependency to django-waffle's initial migration::
 
-    ./manage.py datamigration base create_gengo_switch --freeze waffle
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ...
+            ('waffle', '0001_initial'),
+            ...
+        ]
+
+
+Backwards migrations
+====================
+
+Schema migrations automatically have backwards migrations. No need to do
+anything special here.
+
+Data migrations that use `RunPython` need to pass a `reverse_code` argument
+with the function that handles undoing the migration. If none is provided,
+then the migration cannot be backed out.
+
+.. seealso::
+
+   https://docs.djangoproject.com/en/1.7/ref/migration-operations/#runpython

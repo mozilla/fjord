@@ -33,9 +33,15 @@ class EnhancedURLField(models.CharField):
         defaults.update(kwargs)
         return super(EnhancedURLField, self).formfield(**defaults)
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(EnhancedURLField, self).deconstruct()
 
-from south.modelsinspector import add_introspection_rules
-add_introspection_rules([], ["^fjord\.base\.models\.EnhancedURLField"])
+        # Don't serialize the default value which allows us to change
+        # default values later without the serialized form changing.
+        if kwargs.get('max_length', None) == 200:
+            del kwargs['max_length']
+
+        return name, path, args, kwargs
 
 
 class JSONObjectField(models.Field):
@@ -57,7 +63,7 @@ class JSONObjectField(models.Field):
         # get_default/has_default Field machinery since this makes it
         # easier to subclass.
         kwargs['default'] = kwargs.get('default', {})
-        super(JSONObjectField, self).__init__(self, *args, **kwargs)
+        super(JSONObjectField, self).__init__(*args, **kwargs)
 
     def get_internal_type(self):
         return 'TextField'
@@ -98,6 +104,12 @@ class JSONObjectField(models.Field):
             return None
         return {}
 
+    def deconstruct(self):
+        name, path, args, kwargs = super(JSONObjectField, self).deconstruct()
 
-from south.modelsinspector import add_introspection_rules
-add_introspection_rules([], ["^fjord\.base\.models\.JSONObjectField"])
+        # Don't serialize the default value which allows us to change
+        # default values later without the serialized form changing.
+        if kwargs.get('default', None) == {}:
+            del kwargs['default']
+
+        return name, path, args, kwargs
