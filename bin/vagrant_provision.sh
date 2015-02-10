@@ -61,7 +61,9 @@ apt-get install -y -q libxml2 libxml2-dev libxslt1.1 libxslt1-dev
 sudo -H -u vagrant -s -- <<EOF
 source $VENV/bin/activate
 cd ~/fjord
-./peep.sh install -r requirements/requirements.txt -r requirements/compiled.txt -r requirements/dev.txt
+./peep.sh install -r requirements/requirements.txt
+./peep.sh install -r requirements/compiled.txt
+./peep.sh install -r requirements/dev.txt
 EOF
 
 # Install Elasticsearch 0.90.10
