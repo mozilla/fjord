@@ -267,6 +267,7 @@ INSTALLED_APPS = (
     'jingo_minify',
     'dennis.django_dennis',
 
+    'fjord.alerts',
     'fjord.analytics',
     'fjord.base',
     'fjord.events',
