@@ -32,6 +32,11 @@
           <option value="{{ obj.id }}"{% if survey and survey.id == obj.id %} selected{% endif %} >{{ obj.name }}</option>
         {% endfor %}
       </select>
+      <select name="showdata">
+        <option value="all" {% if showdata == 'all' %} selected {% endif %}>ALL</option>
+        <option value="test" {% if showdata == 'test' %} selected {% endif %}>Only test data</option>
+        <option value="notest" {% if showdata == 'notest' %} selected {% endif %}>Only non-test data</option>
+      </select>
       <input type="hidden" name="sortby" value="{{ sortby }}">
       <input type="submit" value="Filter">
     </form>
@@ -169,7 +174,7 @@
           </tr>
 
           {% for ans in answers %}
-            <tr>
+            <tr {% if ans.is_test %} class="test-answer" {% endif %}>
               <td><a href="{{ url('hb_data', answerid=ans.id) }}">{{ ans.id }}</a></td>
               <td><span class="nowrap" title="{{ ans.updated_ts }}">{{ fix_ts(ans.updated_ts) }}</span></td>
               <td>{{ ans.experiment_version }}</td>

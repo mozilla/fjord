@@ -64,6 +64,18 @@ def hb_data(request, answerid=None):
         page = request.GET.get('page')
         answers = Answer.objects.order_by('-' + sortby)
         survey = request.GET.get('survey', survey)
+        showdata = request.GET.get('showdata', None)
+
+        if showdata:
+            if showdata == 'test':
+                answers = answers.filter(is_test=True)
+            elif showdata == 'notest':
+                answers = answers.exclude(is_test=True)
+            else:
+                showdata = 'all'
+        else:
+            showdata = 'all'
+
         if survey:
             try:
                 survey = Survey.objects.get(id=survey)
@@ -91,6 +103,7 @@ def hb_data(request, answerid=None):
         'pformat': pformat,
         'survey': survey,
         'surveys': Survey.objects.all(),
+        'showdata': showdata,
     })
 
 
