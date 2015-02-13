@@ -22,13 +22,18 @@ import csv
 from elasticutils.contrib.django import F, es_required_or_50x
 
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.encoding import force_bytes
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, CreateView
 from django.utils.decorators import method_decorator
 
-from fjord.analytics.forms import OccurrencesComparisonForm, ProductsUpdateForm
+from fjord.analytics.forms import (
+    OccurrencesComparisonForm,
+    ProductsUpdateForm,
+    SurveyCreateForm
+)
 from fjord.analytics.utils import (
     counts_to_options,
     zero_fill)
@@ -106,23 +111,6 @@ def hb_data(request, answerid=None):
         'showdata': showdata,
     })
 
-
-@check_new_user
-@analyzer_required
-def hb_surveys(request, answerid=None):
-    """View for hb that shows Survey objects"""
-    page = request.GET.get('page')
-    paginator = Paginator(Survey.objects.order_by('-created'), 25)
-    try:
-        surveys = paginator.page(page)
-    except PageNotAnInteger:
-        surveys = paginator.page(1)
-    except EmptyPage:
-        surveys = paginator.page(paginator.num_pages)
-
-    return render(request, 'analytics/analyzer/hb_surveys.html', {
-        'surveys': surveys
-    })
 
 
 @check_new_user
@@ -790,3 +778,28 @@ class ProductsUpdateView(FormView):
         except Product.DoesNotExist:
             self.object = form.save()
         return super(ProductsUpdateView, self).form_valid(form)
+
+class SurveyCreateView(CreateView):
+    model = Survey
+    template_name = 'analytics/analyzer/hb_surveys.html'
+    success_url = reverse_lazy('hb_surveys')
+    form_class = SurveyCreateForm
+
+    @method_decorator(check_new_user)
+    @method_decorator(analyzer_required)
+    def dispatch(self, *args, **kwargs):
+        return super(SurveyCreateView, self).dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(SurveyCreateView, self).get_context_data(**kwargs)
+        page = self.request.GET.get('page')
+        paginator = Paginator(Survey.objects.order_by('-created'), 25)
+        try:
+            surveys = paginator.page(page)
+        except PageNotAnInteger:
+            surveys = paginator.page(1)
+        except EmptyPage:
+            surveys = paginator.page(paginator.num_pages)
+
+        context['surveys'] = surveys
+        return context

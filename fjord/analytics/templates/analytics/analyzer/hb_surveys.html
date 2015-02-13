@@ -1,74 +1,91 @@
 {% extends "analytics/analyzer/dashboard.html" %}
 {# Note: This is not l10n-ized since it's only available to analyzers for now. #}
 
-{% block content %}
-  <div class="col full">
-    <div class="block feedback">
-      <h2>Heartbeat v2 surveys</h2>
-      <p class="secret">
-        Do not tweet!
-      </p>
-      <p>
-        Note: If you need to create a new survey, ask Will. At some
-        point, we'll write a view that lets you add/edit
-        surveys. Sorry about the inconvenience.
-      </p>
+{% block content_middle %}
+  <div class="block feedback">
+    <h2>Heartbeat v2 surveys</h2>
+    <p class="secret">
+      Do not tweet!
+    </p>
+    <p>
+      Note: If you need to update a survey, ask Will. At some
+      point, we'll write a view that lets you edit
+      surveys. Sorry about the inconvenience.
+    </p>
 
-      <h2>Total surveys: {{ surveys.paginator.count }}</h2>
+    <h2>Total surveys: {{ surveys.paginator.count }}</h2>
 
-      <div class="pager">
-        {% if next_page %}
-          <a class="older" href="{{ request.get_full_path()|urlparams(page=surveys.previous_page_number) }}">
-            Older
-          </a>
-        {% else %}
+    <div class="pager">
+      {% if next_page %}
+        <a class="older" href="{{ request.get_full_path()|urlparams(page=surveys.previous_page_number) }}">
           Older
-        {% endif %}
-        | Page {{ surveys.number }} of {{ surveys.paginator.num_pages }} |
-        {% if prev_page %}
-          <a class="newer" href="{{ request.get_full_path()|urlparams(page=surveys.next_page_number) }}">
-            Newer
-          </a>
-        {% else %}
+        </a>
+      {% else %}
+        Older
+      {% endif %}
+      | Page {{ surveys.number }} of {{ surveys.paginator.num_pages }} |
+      {% if prev_page %}
+        <a class="newer" href="{{ request.get_full_path()|urlparams(page=surveys.next_page_number) }}">
           Newer
-        {% endif %}
-      </div>
-
-      <table class="summarytable">
-        <tr>
-          <th>name</th>
-          <th>description</th>
-          <th>enabled?</th>
-          <th>created</th>
-        </tr>
-
-        {% for sur in surveys %}
-          <tr>
-            <td><pre>{{ sur.name }}</pre></td>
-            <td>{{ sur.description }}</td>
-            <td>{{ sur.enabled }}</td>
-            <td>{{ sur.created }}</td>
-          </tr>
-        {% endfor %}
-      </table>
-
-      <div class="pager">
-        {% if next_page %}
-          <a class="older" href="{{ request.get_full_path()|urlparams(page=surveys.previous_page_number) }}">
-            Older
-          </a>
-        {% else %}
-          Older
-        {% endif %}
-        | Page {{ surveys.number }} of {{ surveys.paginator.num_pages }} |
-        {% if prev_page %}
-          <a class="newer" href="{{ request.get_full_path()|urlparams(page=surveys.next_page_number) }}">
-            Newer
-          </a>
-        {% else %}
-          Newer
-        {% endif %}
-      </div>
+        </a>
+      {% else %}
+        Newer
+      {% endif %}
     </div>
+
+    <table class="summarytable">
+      <tr>
+        <th>name</th>
+        <th>description</th>
+        <th>enabled?</th>
+        <th>created</th>
+      </tr>
+
+      {% for sur in surveys %}
+        <tr>
+          <td><pre>{{ sur.name }}</pre></td>
+          <td>{{ sur.description }}</td>
+          <td>{{ sur.enabled }}</td>
+          <td>{{ sur.created }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+
+    <div class="pager">
+      {% if next_page %}
+        <a class="older" href="{{ request.get_full_path()|urlparams(page=surveys.previous_page_number) }}">
+          Older
+        </a>
+      {% else %}
+        Older
+      {% endif %}
+      | Page {{ surveys.number }} of {{ surveys.paginator.num_pages }} |
+      {% if prev_page %}
+        <a class="newer" href="{{ request.get_full_path()|urlparams(page=surveys.next_page_number) }}">
+          Newer
+        </a>
+      {% else %}
+        Newer
+      {% endif %}
+    </div>
+    <h2>Create survey</h2>
+    <form action='' method='POST'>
+      {{ csrf() }}
+      {% for field in form %}
+        <p>
+          {{ field.label_tag() }}
+          {{ field }}
+          {{ field.help_text }}
+        </p>
+        {% if field.errors %}
+          <ul class="errorlist">
+            {% for error in field.errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endfor %}
+      <input type="submit">
+    </form>
   </div>
 {% endblock %}
