@@ -1,5 +1,8 @@
 from django.db import models
 
+from rest_framework import serializers
+
+from fjord.api_auth.models import Token
 from fjord.base.models import ModelBase
 
 
@@ -16,10 +19,21 @@ class AlertFlavor(ModelBase):
     default_severity = models.IntegerField(
         help_text=(u'Default severity for alerts of this flavor '
                    '(0: low, 10: high)'))
+
+    allowed_tokens = models.ManyToManyField(
+        Token,
+        blank=True,
+        help_text=u'Tokens that are permitted to emit this flavor'
+    )
+
     enabled = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.name
+
+    def is_permitted(self, token):
+        """Return whether given token is permitted to emit to this flavor"""
+        return token.enabled and token in self.allowed_tokens.all()
 
 
 class Alert(ModelBase):
@@ -53,3 +67,19 @@ class Link(ModelBase):
 
     def __unicode__(self):
         return self.url
+
+
+class LinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Link
+        fields = ('name', 'url')
+
+
+class AlertSerializer(serializers.ModelSerializer):
+    flavor = serializers.SlugRelatedField(slug_field='slug')
+    # Note: This is read-only because we handle the POST side
+    # manually.
+    links = LinkSerializer(source='link_set', many=True, read_only=True)
+
+    class Meta:
+        model = Alert

@@ -1,6 +1,6 @@
 import inspect
 import os
-from functools import wraps
+from functools import total_ordering, wraps
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -134,6 +134,18 @@ def with_waffle(flagname, flagvalue=True):
             return give_me_waffles(cls_or_func)
 
     return with_waffle_cls_or_fun
+
+
+@total_ordering
+class EqualAnything(object):
+    def __eq__(self, other):
+        return True
+
+    def __lt__(self, other):
+        return True
+
+
+WHATEVER = EqualAnything()
 
 
 class LocalizingClient(Client):
