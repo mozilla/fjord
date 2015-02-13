@@ -16,10 +16,18 @@ class Survey(ModelBase):
     disabled.
 
     """
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(
+        max_length=100, unique=True,
+        help_text=u'Unique name for the survey. e.g. heartbeat-question-1'
+    )
+    description = models.TextField(
+        blank=True, default='',
+        help_text=(
+            u'Informal description of the survey so we can tell them apart'
+        )
+    )
     enabled = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
-    description = models.TextField(blank=True, default='')
 
     def __unicode__(self):
         return '%s: %s' % (
