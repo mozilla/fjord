@@ -113,8 +113,8 @@ Django==1.7.4
 # sha256: JL4TJtBHNh5HWbqZkqyoPtZd9Vg3UN_ovoEOscEx2HY
 django-adminplus==0.3
 
-# sha256: Vh8l3OA57P9ngqJpP0BRw9oh2mbZMuItZvePIAmDf4o
-django-grappelli==2.5.6
+# sha256: KBZYpZ2o6Kzqe_nK0TriNgqazbM-NGzwILCUknI-h10
+django-grappelli==2.6.3
 
 # sha256: Sje0ncwClfVGz2spT9gNcc_ttQT-YhDNq3n5xx5Ocn8
 dennis==0.4.3
