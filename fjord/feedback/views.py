@@ -360,7 +360,9 @@ def persist_feedbackdev(fun):
         qs_feedbackdev = request.GET.get('feedbackdev', None)
         resp = fun(request, *args, **kwargs)
         if resp is not None and qs_feedbackdev is not None:
-            resp.set_cookie(waffle.COOKIE_NAME % 'feedbackdev', qs_feedbackdev)
+            resp.set_cookie(
+                waffle.settings.COOKIE_NAME % 'feedbackdev',
+                qs_feedbackdev)
 
         return resp
     return _persist_feedbackdev
