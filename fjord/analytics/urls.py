@@ -1,6 +1,9 @@
 from django.conf.urls import patterns, url
 
-from fjord.analytics.analyzer_views import ProductsUpdateView
+from fjord.analytics.analyzer_views import (
+    ProductsUpdateView,
+    SurveyCreateView
+)
 
 
 urlpatterns = patterns(
@@ -43,5 +46,5 @@ urlpatterns += patterns(
         name='hb_data'),
     url(r'^analytics/hberrorlog(?:/(?P<errorid>\d+))?/?$', 'hb_errorlog',
         name='hb_errorlog'),
-    url(r'^analytics/hbsurveys/?$', 'hb_surveys', name='hb_surveys'),
+    url(r'^analytics/hbsurveys/?$', SurveyCreateView.as_view(), name='hb_surveys'),
 )

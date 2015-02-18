@@ -1,7 +1,7 @@
 from django import forms
 
 from fjord.feedback.models import Product
-
+from fjord.heartbeat.models import Survey
 
 class OccurrencesComparisonForm(forms.Form):
     """Form for denoting parameters for the Occurrences Comparison report"""
@@ -47,4 +47,13 @@ class ProductsUpdateForm(forms.ModelForm):
             'browser',
             'browser_data_browser',
             'notes'
+        ]
+
+class SurveyCreateForm(forms.ModelForm):
+    class Meta:
+        model = Survey
+        fields = [
+            'name',
+            'description',
+            'enabled',
         ]
