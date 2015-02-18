@@ -517,3 +517,25 @@ table.flagged {
     }
   }
 }
+.horizontal-form {
+  label {
+    display: block;
+    width: 10em;
+    clear: left;
+  }
+  label, input {
+    float: left;
+  }
+  input[type=submit] {
+    margin-top: 1em;
+    clear: both;
+  }
+}
+.horizontal-form:after {
+  content: ".";
+  display: block;
+  height: 0;
+  font-size: 0;
+  clear: both;
+  visibility: hidden;
+}
