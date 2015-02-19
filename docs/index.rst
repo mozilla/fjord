@@ -62,6 +62,7 @@ Are you an Input user? This is the section for you!
    feedback_urls
    api
    hb_api
+   alerts_api
 
 
 Part 3: Maintaining The Site

@@ -8,11 +8,12 @@ from django.http import HttpResponse
 from fjord.base.monkeypatches import patch
 patch()
 
-from django.contrib import admin
+from django.contrib import admin  # noqa
 
 urlpatterns = patterns(
     '',
 
+    (r'', include('fjord.alerts.urls')),
     (r'', include('fjord.analytics.urls')),
     (r'', include('fjord.base.urls')),
     (r'', include('fjord.events.urls')),

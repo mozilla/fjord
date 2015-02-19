@@ -5,7 +5,7 @@ from fjord.alerts.models import Alert, AlertFlavor, Link
 
 class AlertFlavorAdmin(admin.ModelAdmin):
     list_display = (
-        'enabled', 'name', 'slug', 'description', 'more_info',
+        'name', 'slug', 'enabled', 'description', 'more_info',
         'default_severity'
     )
     list_filter = ('enabled',)
