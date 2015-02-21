@@ -122,7 +122,13 @@ class AlertsAPI(rest_framework.views.APIView):
     def post(self, request):
         data = request.DATA
 
-        flavorslug = request.DATA.get('flavor')
+        try:
+            flavorslug = request.DATA['flavor']
+        except KeyError:
+            return self.rest_error(
+                status=404,
+                errors='Flavor not specified in payload.'
+            )
 
         try:
             flavor = AlertFlavor.objects.get(slug=flavorslug)
