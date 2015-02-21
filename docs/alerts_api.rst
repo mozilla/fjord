@@ -27,9 +27,9 @@ the token for.
 
 To use a token, include the following HTTP header in your HTTP POST::
 
-    Authentication: token TOKEN
+    Authorization: Token <TOKEN>
 
-where ``TOKEN`` is replaced by the 32-character token you received.
+where ``<TOKEN>`` is replaced by the token you received.
 
 .. Note::
 
@@ -71,7 +71,7 @@ Using curl on the command line::
     curl -v -XPOST 'https://input.mozilla.org/api/v1/alerts/alert/` \
          -H 'Accept: application/json; indent=4' \
          -H 'Content-Type: application/json' \
-         -H 'Authorization: token cd64de0e6c4c491f90fe1d362104c1e5' \
+         -H 'Authorization: Token cd64de0e6c4c491f90fe1d362104c1e5' \
          -d '
     {
         "severity": 5,
@@ -94,7 +94,7 @@ Using Python requests:
    headers = {
        'content-type': 'application/json',
        'accept': 'application/json; indent=4',
-       'authorization': 'token cd64de0e6c4c491f90fe1d362104c1e5',
+       'authorization': 'Token cd64de0e6c4c491f90fe1d362104c1e5',
    }
    payload = {
        'severity': 5,
@@ -256,12 +256,12 @@ Using curl on the command line::
     curl -v -XGET 'https://input.mozilla.org/api/v1/alerts/alert/?flavors=mfbt' \
          -H 'Accept: application/json; indent=4' \
          -H 'Content-Type: application/json' \
-         -H 'Authorization: token cd64de0e6c4c491f90fe1d362104c1e5'
+         -H 'Authorization: Token cd64de0e6c4c491f90fe1d362104c1e5'
 
     curl -v -XGET 'https://input.mozilla.org/api/v1/alerts/alert/?flavors=mfbt,cantina' \
          -H 'Accept: application/json; indent=4' \
          -H 'Content-Type: application/json' \
-         -H 'Authorization: token cd64de0e6c4c491f90fe1d362104c1e5'
+         -H 'Authorization: Token cd64de0e6c4c491f90fe1d362104c1e5'
 
 
 Using Python requests:
@@ -275,7 +275,7 @@ Using Python requests:
    headers = {
        'content-type': 'application/json',
        'accept': 'application/json; indent=4',
-       'authorization': 'token cd64de0e6c4c491f90fe1d362104c1e5',
+       'authorization': 'Token cd64de0e6c4c491f90fe1d362104c1e5',
    }
    qs_params = {
        'flavors': 'mfbt'
