@@ -172,6 +172,27 @@ class AlertsGetAPIAuthTest(TestCase):
             {'detail': 'Flavor "fooflavor" is disabled.'}
         )
 
+    def test_fjord_authorization_token(self):
+        """Verify auth will use Fjord-Authorization header if Authorization
+        isn't there
+
+        """
+        token = TokenFactory()
+        flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
+        flavor.allowed_tokens.add(token)
+
+        qs = {
+            'flavors': flavor.slug
+        }
+        resp = self.client.get(
+            reverse('alerts-api') + '?' + urllib.urlencode(qs),
+            HTTP_FJORD_AUTHORIZATION='token ' + token.token
+        )
+
+        eq_(resp.status_code, 200)
+        eq_(json.loads(resp.content),
+            {u'count': 0, u'total': 0, u'alerts': []})
+
 
 class AlertsGetAPITest(TestCase):
     def test_get_one_flavor(self):
