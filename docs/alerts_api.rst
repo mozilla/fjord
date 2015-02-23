@@ -94,7 +94,7 @@ Using Python requests:
    headers = {
        'content-type': 'application/json',
        'accept': 'application/json; indent=4',
-       'authorization': 'Token cd64de0e6c4c491f90fe1d362104c1e5',
+       'fjord-authorization': 'Token cd64de0e6c4c491f90fe1d362104c1e5',
    }
    payload = {
        'severity': 5,
@@ -196,8 +196,8 @@ HTTP 401: Unauthorized
 
 The request is invalid or malformed in some way.
 
-* the authorization header was missing
-* the authorization header is malformed or missing something
+* the Fjord-Authorization header was missing
+* the Fjord-Authorization header is malformed or missing something
 
 
 HTTP 403: Forbidden
@@ -275,7 +275,7 @@ Using Python requests:
    headers = {
        'content-type': 'application/json',
        'accept': 'application/json; indent=4',
-       'authorization': 'Token cd64de0e6c4c491f90fe1d362104c1e5',
+       'fjord-authorization': 'Token cd64de0e6c4c491f90fe1d362104c1e5',
    }
    qs_params = {
        'flavors': 'mfbt'
