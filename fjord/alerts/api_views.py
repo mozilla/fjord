@@ -21,7 +21,17 @@ class TokenAuthentication(authentication.BaseAuthentication):
 
     """
     def authenticate(self, request):
-        auth = request.META.get('HTTP_AUTHORIZATION', '').split()
+        auth = request.META.get('HTTP_AUTHORIZATION', '')
+        if not auth:
+            # FIXME: ZLB isn't passing along the Authorization header,
+            # so we never see it in Django land. This adds support for
+            # an additional header. Why support an additional one?
+            # Because when we switch to AWS, we can alleviate this
+            # silliness.
+            auth = request.META.get('HTTP_FJORD_AUTHORIZATION', '')
+
+        auth = auth.split()
+
         if not auth or auth[0].lower() != 'token':
             return None
 
@@ -122,7 +132,13 @@ class AlertsAPI(rest_framework.views.APIView):
     def post(self, request):
         data = request.DATA
 
-        flavorslug = request.DATA.get('flavor')
+        try:
+            flavorslug = request.DATA['flavor']
+        except KeyError:
+            return self.rest_error(
+                status=404,
+                errors='Flavor not specified in payload.'
+            )
 
         try:
             flavor = AlertFlavor.objects.get(slug=flavorslug)
