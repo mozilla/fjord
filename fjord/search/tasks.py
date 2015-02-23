@@ -1,8 +1,10 @@
 import datetime
 import logging
 import sys
+import traceback
 
 from django.conf import settings
+from django.core.mail import mail_admins
 from django.db.models.signals import post_save, pre_delete
 
 from celery import task
@@ -123,13 +125,51 @@ def _live_index_handler(sender, **kwargs):
 
     instance = kwargs['instance']
 
-    if kwargs['signal'] == post_save:
-        cls_path = to_class_path(instance.get_mapping_type())
-        index_item_task.delay(cls_path, instance.id)
+    try:
+        if kwargs['signal'] == post_save:
+            cls_path = to_class_path(instance.get_mapping_type())
+            index_item_task.delay(cls_path, instance.id)
 
-    elif kwargs['signal'] == pre_delete:
-        cls_path = to_class_path(instance.get_mapping_type())
-        unindex_item_task.delay(cls_path, instance.id)
+        elif kwargs['signal'] == pre_delete:
+            cls_path = to_class_path(instance.get_mapping_type())
+            unindex_item_task.delay(cls_path, instance.id)
+
+    except Exception:
+        # At this point, we're trying to create an indexing task for
+        # some response that's changed. When an indexing task is
+        # created, it uses amqp to connect to rabbitmq to put the
+        # new task in the queue. If a user is leaving feadback and
+        # this fails (which it does with some regularity), the user
+        # gets an HTTP 500 which stinks.
+        #
+        # The problem is exacerbated by the fact I don't know the full
+        # list of exceptions that can get kicked up here. So what
+        # we're going to do is catch them all, look for "amqp" in the
+        # frames and if it's there, we'll ignore the exception and
+        # send an email. We can collect reasons and narrow this down
+        # at some point if that makes sense to do. If "amqp" is not in
+        # the frames, then it's some other kind of error that we want
+        # to show up, so we'll re-raise it. Sorry, user!
+        #
+        # In this way, users will stop seeing HTTP 500 errors during
+        # rabbitmq outages.
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        frames = traceback.extract_tb(exc_tb)
+        for fn, ln, fun, text in frames:
+            if 'amqp' in fn:
+                # This is an amqp frame which indicates that we
+                # should ignore this and send an email.
+                mail_admins(
+                    subject='amqp error',
+                    message=(
+                        'amqp error:\n\n' +
+                        traceback.format_exc()
+                    )
+                )
+                return
+
+        # No amqp frames, so re-raise it.
+        raise
 
 
 def register_live_index(model_cls):
