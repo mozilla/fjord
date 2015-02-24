@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 
-from .views import HeartbeatV2API
+from .api_views import HeartbeatV2API
 
 
 urlpatterns = patterns(
