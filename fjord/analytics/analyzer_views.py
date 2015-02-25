@@ -60,6 +60,7 @@ def hb_data(request, answerid=None):
     answer = None
     answers = []
     survey = None
+    showdata = None
 
     if answerid is not None:
         answer = Answer.objects.get(id=answerid)
