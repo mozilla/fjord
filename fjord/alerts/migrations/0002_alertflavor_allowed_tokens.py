@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='alertflavor',
             name='allowed_tokens',
-            field=models.ManyToManyField(help_text='Tokens that are permitted to emit this flavor', to='api_auth.Token'),
+            field=models.ManyToManyField(help_text='Tokens that are permitted to emit this flavor', to='api_auth.Token', blank=True),
             preserve_default=True,
         ),
     ]
