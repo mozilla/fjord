@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from rest_framework import serializers
@@ -110,6 +111,15 @@ class Answer(ModelBase):
     # Whether or not this is test data.
     is_test = models.BooleanField(default=False, blank=True)
 
+
+    class Meta:
+        unique_together = (
+            ('person_id', 'survey_id', 'flow_id'),
+        )
+        index_together = [
+            ('person_id', 'survey_id', 'flow_id'),
+        ]
+
     def __unicode__(self):
         return '%s: %s %s %s' % (
             self.id, self.survey_id, self.flow_id, self.updated_ts)
@@ -129,3 +139,19 @@ class AnswerSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'survey "%s" is not enabled' % survey.name)
         return attrs
+
+    def full_clean(self, instance):
+        # Based on DRF Serializer.full_clean
+        #
+        # This one ignores the unique fields check on the model
+        # instance because if we do that we can't do the "update on
+        # POST" thing we do.
+        try:
+            instance.full_clean(
+                exclude=self.get_validation_exclusions(instance),
+                validate_unique=False
+            )
+        except ValidationError as err:
+            self._errors = err.message_dict
+            return None
+        return instance
