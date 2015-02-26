@@ -26,13 +26,18 @@ To create a new migration the automatic way:
 
    where ``<app>`` is the app name (base, feedback, analytics, ...).
 
-3. run the migration on your machine::
+3. add a module-level docstring to the new migration file specifying
+   what it's doing since we can't easily infer that from the code
+   because the code shows the new state and not the differences
+   between the old state and the new stage
+
+4. run the migration on your machine::
 
        ./manage.py migrate
 
-4. run the tests to make sure everything works
-5. add the new migration files to git
-6. commit
+5. run the tests to make sure everything works
+6. add the new migration files to git
+7. commit
 
 
 .. seealso::
@@ -56,13 +61,22 @@ To create a data migration the automatic way:
 
 2. edit the data migration you just created to do what you need it to
    do
-3. add the new migration file to git
-4. commit
+3. make sure to add `reverse_code` arguments to all `RunPython` operations
+   which undoes the changes
+4. add a module-level docstring explaining what this migration is doing
+5. run the migration forwards and backwards to make sure it works
+   correctly
+6. add the new migration file to git
+7. commit
 
 .. seealso::
 
    https://docs.djangoproject.com/en/1.7/topics/migrations/#data-migrations
      Django documentation: Data Migrations
+
+.. seealso::
+
+   https://docs.djangoproject.com/en/1.7/ref/migration-operations/#runpython
 
 
 Data migrations for data in non-Fjord apps
@@ -82,18 +96,3 @@ For example, this adds a dependency to django-waffle's initial migration::
             ('waffle', '0001_initial'),
             ...
         ]
-
-
-Backwards migrations
-====================
-
-Schema migrations automatically have backwards migrations. No need to do
-anything special here.
-
-Data migrations that use `RunPython` need to pass a `reverse_code` argument
-with the function that handles undoing the migration. If none is provided,
-then the migration cannot be backed out.
-
-.. seealso::
-
-   https://docs.djangoproject.com/en/1.7/ref/migration-operations/#runpython
