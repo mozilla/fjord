@@ -127,15 +127,14 @@ First we download all the product detail data::
 
 Then we set up the database::
 
-    # Create the database and a superuser
-    ./manage.py syncdb
-
-    # Run the db migrations
+    # Create the database and run migrations
     ./manage.py migrate
 
 
-It will ask if you want to create a superuser. You totally do! Create
-a superuser that you'll use to log into Fjord.
+Then we create a superuser to log into Fjord::
+
+    ./manage.py createsuperuser
+
 
 The username and password don't matter, but the email address
 does. You must choose an email address that is your Persona
@@ -144,12 +143,7 @@ identity. If you don't have a Persona identity, you can create one at
 
 .. Note::
 
-   You can create a superuser at any time by doing::
-
-       ./manage.py createsuperuser
-
-   Additionally, you can convert any account into a superuser account
-   by doing::
+   You can convert any account into a superuser account by doing::
 
        ./manage.py ihavepower <email-address>
 
