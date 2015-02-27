@@ -56,6 +56,8 @@ from fjord.search.utils import es_error_statsd
 @analyzer_required
 def hb_data(request, answerid=None):
     """View for hb data that shows one or all of the answers"""
+    VALID_SORTBY_FIELDS = ('id', 'updated_ts')
+
     sortby = 'id'
     answer = None
     answers = []
@@ -67,6 +69,9 @@ def hb_data(request, answerid=None):
 
     else:
         sortby = request.GET.get('sortby', sortby)
+        if sortby not in VALID_SORTBY_FIELDS:
+            sortby = 'id'
+
         page = request.GET.get('page')
         answers = Answer.objects.order_by('-' + sortby)
         survey = request.GET.get('survey', survey)
