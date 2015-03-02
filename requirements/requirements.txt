@@ -107,8 +107,8 @@ https://github.com/clouserw/tower/archive/ade9804345eb49dd1b626fd276cd9572fd15d1
 # sha256: NmfSakH-wwNkoO9yWAgyylMogC1VP21ucq9awhyzY2U
 django-nose==1.3
 
-# sha256: 8zJVr7ue4Jd9kJWrC1D94fjd_0IgtX6NGcZiCz4xYXA
-Django==1.7.4
+# sha256: HDkfk0nJffUD2sNGFZnyQjXk0EOTSY5gYOdN0nIUYLw
+Django==1.7.5
 
 # sha256: JL4TJtBHNh5HWbqZkqyoPtZd9Vg3UN_ovoEOscEx2HY
 django-adminplus==0.3
