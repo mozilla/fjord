@@ -52,6 +52,12 @@ asking for a flavor to be created. Please state exactly what you'll be
 using the flavor for. You should probably have a token first since
 without the token you can't emit any alerts.
 
+.. Note::
+
+   A single token can GET/POST for multiple flavors, so you can write
+   a single emitter that has a single token and have it generate
+   alerts of multiple flavors.
+
 
 POSTing alerts
 ==============
