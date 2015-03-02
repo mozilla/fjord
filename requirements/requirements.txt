@@ -5,9 +5,8 @@ djangorestframework==2.4.4
 # sha256: PoDkmCCdclPizBpPmwLn2oGReakQySddW8Iy3kjmfDM
 https://github.com/jezdez/django-appconf/archive/d7ff3bb0c35a0c2ec83afdb31f7bb79e0f1b222c.tar.gz#egg=django-appconf
 
-# django-eadred: tags/v0.2
-# sha256: 6fg4iT7EfIPsCuOQtsP2nqjLzhX6v3nR-3-JIbWbssI
-https://github.com/willkg/django-eadred/archive/f77ebbeea7e6802771b91a1748faec002ce83bd6.tar.gz#egg=django-eadred
+# sha256: l2KMyLgsDC-pUegX6DgRPSlB_wfc9sU-5QM566yTf5M
+eadred==0.2
 
 # django-mobility: master
 # sha256: vWKlBersFicnz_K9LUwnYlm1HhXt9bgxvWKB915vfog
@@ -21,21 +20,18 @@ https://github.com/gengo/gengo-python/archive/8388e35e6ef1ae946a39268763e741d826
 # sha256: 5Yt-sicAUr_gY1Y-SwW6W_mvvxyBuUe2gzPpoB-3VbQ
 https://github.com/jbalogh/jingo/archive/fce09043542e71d972cc97d2ae703740741f80d0.tar.gz#egg=jingo==0.7
 
-# django-statsd: tags/0.3.8.5
-# sha256: LTn7BrZL1DKwIiETzYeOHlosfAnsk7K7V3zw4Kq_GNk
-https://github.com/andymckay/django-statsd/archive/bb601976056d0f922c5a613d2a9786b81d179b06.tar.gz#egg=django-statsd
+# sha256: 1_LzcE9lU8uG-6xLw0Z9LJp_xEkYgYxyNckQAK8rqYU
+django-statsd-mozilla==0.3.8.5
 
 # django-product-details: master
 # sha256: tLy18AIevr3_Rd7saf4cKuq_W1M3zpKFVOLBmggiCck
 https://github.com/mozilla/django-product-details/archive/d168ab2e689a1b54a30a923386fe7948a74ff334.tar.gz#egg=django-product-details
 
-# celery: tags/v3.1.17
-# sha256: j-caPcm7jTVr_BSOPaM1MLF7EBtlmH_no2IeVKCwKKg
-https://github.com/celery/celery/archive/a4acff48ef1f98e822f5b09b5bf389179fec5049.tar.gz#egg=celery
+# sha256: z-K2UyaL1Ybi0Ip16Ib3vjvlW6Ny9y4vV0eut2xHA2I
+celery==3.1.17
 
-# kombu: tags/v3.0.24
-# sha256: cwj3G8RrlHtkLMohfObd2NqKEcLWyfnFKNaOt6bdGu4
-https://github.com/celery/kombu/archive/161d87b1ea4496b449941c3af07f9b63880e962f.tar.gz#egg=kombu
+# sha256: uf8EN2BxE66nAf1RIsKvpAwF3_bx2k9YsvHqGNnyv40
+kombu==3.0.24
 
 # commonware: master
 # sha256: k9gjEUXUPKAuHsPO41UzOvqOcq25z4FXZ-F1lXSXdNQ
@@ -61,36 +57,30 @@ https://github.com/rbarrois/factory_boy/archive/87f8cc0cc0d2f48f489c81b8c93e8ab6
 # sha256: TBUJueJfjaBHp4GeUtY0o_IaGHk4DOUf0ZbJZ4YXPPM
 https://github.com/fwenzel/django-sha2/archive/3ba2b4771056fb722bc9fe52cf26918a3f0388bb.tar.gz#egg=django-sha2
 
-# pystatsd: tags/v2.0.3
-# sha256: ozq2VrtflIfyjLk4v8huZPbbX8jDRf8cirZxZfP6eNI
-https://github.com/jsocol/pystatsd/archive/da0005cb30fac365c7bc3a9ab9a4824e1a9c3a49.tar.gz#egg=pystatsd
+# sha256: HhLNQXx94_wcl9EUouRNXDA8OuXMnS_YihiktArLd5o
+statsd==2.0.3
 
-# django-extensions: tags/1.3.3
-# sha256: oEiCqdyUMgocSPT2W6xNnQj_MoJgNTkCQK1JnBPLfsc
-https://github.com/django-extensions/django-extensions/archive/47a531c996c92a369755a4a9e0857e51afd25cab.tar.gz#egg=django-extensions
+# sha256: Xq3Xc16Qo9r3fzPFVMWo4pMCdDKQIWk2QedPlXqvnfw
+django-extensions==1.3.3
 
-# billiard: tags/v3.3.0.9
-# sha256: JHw2XY75uDAZW1znrmH9ufpEYQJalYhyMNKpcPEmrpM
-https://github.com/celery/billiard/archive/5652fe69e0a0623cea8f9f0c2810e001d4ad53df.tar.gz#egg=billiard
+# sha256: czbsWbjQoTKh7p8WagY9RKXn8tL-FfefvO3aWDu9YcE
+billiard==3.3.0.9
 
-# bleach: tags/v1.4
-# sha256: sSXkx6LhIZfZHt_5TesMpf_19yRaU11j8jH6P4mLWYw
-https://github.com/jsocol/bleach/archive/90a79d24fcce8f6404d9b636936e7886558495fb.tar.gz#egg=bleach
+# sha256: q2lHUVrCzC-4lOcYy6sb7rNChD_YFtTCondZndvvuns
+bleach==1.4
 
 # sha256: EXGi39Bz0MuXOkgtic_AweW52n1VHcCgAkEoZ-z1KT4
 django-browserid==0.11.1
 
-# django-cronjobs: tags/v0.2.3
-# sha256: lVao25u2Xj98ofZHQZPM_szNLaqxhWljy7ugRNt4_ug
-https://github.com/jsocol/django-cronjobs/archive/cfda8176c5c3a50d1b58fcf57e87e23c467789bd.tar.gz#egg=django-cronjobs
+# sha256: F3KVsUQkAMks22fo4Y-f9ZRvtEL4WBO50IN4I3IuoI0
+django-cronjobs==0.2.3
 
 # django-session-csrf: master
 # sha256: 4buoVNpBPIKO5ziwNqu6xu46TkzWhMgNxNQeA8Mq0h0
 https://github.com/mozilla/django-session-csrf/archive/f00ad913c62e139d36078e8a7e07dab65a021386.tar.gz#egg=django-session-csrf
 
-# django-ratelimit: tags/v0.4.0
-# sha256: 1puIiyzkiFYjCAemvTakxuIrbY3PRtTmvXOaY__Xy8I
-https://github.com/jsocol/django-ratelimit/archive/e7ec3ded4ffe86afdcd39bc2ee6650ee738c9e10.tar.gz#egg=django-ratelimit
+# sha256: -thF7ifqqSii7RbAEh4rtd0TzN6V0cAUTSP5pCUMGmw
+django-ratelimit==0.4.0
 
 # nuggets: master~7
 # sha256: eeq_z415NQPBF3j59fmy6JGjtnpDgVQxwwvFKxnDQx0
