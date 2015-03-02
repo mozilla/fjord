@@ -1,5 +1,9 @@
+from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 
+import pytz
+from rest_framework import fields
 from rest_framework import serializers
 
 from fjord.api_auth.models import Token
@@ -50,6 +54,12 @@ class Alert(ModelBase):
         help_text=u'Unique name for the emitter that created this')
     emitter_version = models.IntegerField(
         help_text=u'Integer version number for the emitter')
+    start_time = models.DateTimeField(
+        null=True, blank=True,
+        help_text=u'Timestamp for the beginning of this event')
+    end_time = models.DateTimeField(
+        null=True, blank=True,
+        help_text=u'Timestamp for the end of this event')
     created = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
@@ -69,6 +79,49 @@ class Link(ModelBase):
         return self.url
 
 
+class UTCDateTimeField(fields.DateTimeField):
+    """Like DateTimeField, except it is always in UTC in the API"""
+    def to_native(self, value):
+        """Convert outgoing datetimes into UTC
+
+        Input currently saves everything in Pacific time, so this
+        takes the datetimes and converts them from Pacific time to
+        UTC.
+
+        If this situation ever changes, then we'd change
+        settings.TIME_ZONE and this should continue to work.
+
+        """
+        if value is not None and value.tzinfo is None:
+            default_tzinfo = pytz.timezone(settings.TIME_ZONE)
+            value = default_tzinfo.localize(value)
+            value = value.astimezone(pytz.utc)
+        return super(UTCDateTimeField, self).to_native(value)
+
+    def from_native(self, value):
+        """Converts incoming strings to localtime
+
+        Input currently saves everything in Pacific time, so this
+        takes the datetime that super().from_native() produces,
+        converts it to localtime and if USE_TZ=False, drops the timezone.
+
+        If this situation ever changes, this should continue to work.
+
+        """
+        result = super(UTCDateTimeField, self).from_native(value)
+
+        if result is not None and result.tzinfo is not None:
+            # Convert from whatever timezone it's in to local
+            # time.
+            local_tzinfo = pytz.timezone(settings.TIME_ZONE)
+            result = result.astimezone(local_tzinfo)
+
+            # If USE_TZ = False, drop the timezone
+            if not settings.USE_TZ:
+                result = result.replace(tzinfo=None)
+        return result
+
+
 class LinkSerializer(serializers.ModelSerializer):
     class Meta:
         model = Link
@@ -80,6 +133,9 @@ class AlertSerializer(serializers.ModelSerializer):
     # Note: This is read-only because we handle the POST side
     # manually.
     links = LinkSerializer(source='link_set', many=True, read_only=True)
+
+    start_time = UTCDateTimeField(required=False)
+    end_time = UTCDateTimeField(required=False)
 
     class Meta:
         model = Alert
