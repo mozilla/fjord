@@ -7,7 +7,7 @@ import requests
 from requests.exceptions import (
     ConnectionError,
     Timeout
-    )
+)
 
 BUG_PREFIX_REGEX = r'\[bug (\d+)\]'
 
@@ -17,7 +17,7 @@ def are_lines_not_more_than_79_chars(contents):
     if long_lines:
         print('Error:')
         print('The commit message should not have more than '
-              '79 characters per line')
+              '79 characters per line.')
         return False
     return True
 
@@ -31,7 +31,7 @@ def is_bug_number_in_right_format(contents):
         valid_bug_format = bug_format_regex.match(summary)
         if not valid_bug_format:
             print('Specify the bug number in the format '
-                  '[bug xxxxxxx] at the beginning of the commit summary')
+                  '[bug xxxxxxx] at the beginning of the commit summary.')
             return False
     return True
 
@@ -45,24 +45,28 @@ def print_bug_info(contents):
         bug_id = is_a_bug.group(1)
         url = 'https://bugzilla.mozilla.org/rest/bug/{}'.format(bug_id)
         try:
+            print('Looking up bug {}...'.format(bug_id))
             response = requests.get(url, timeout=60.0)
             response_dict = response.json()
             if ('error' in response_dict and response_dict['error']):
-                print('Bug with id {} not found.'.format(bug_id))
+                print('Bug not found!'.format(bug_id))
                 return False
+            print('Found!')
             bug_info = response_dict['bugs'][0]
-            print('{} - {}'.format(bug_id,
-                                   bug_info['summary']))
-            print('Assigned to: {}'.format(bug_info['assigned_to']))
+            print('    Summary: {}'.format(bug_info['summary']))
+            print('    Assigned to: {}'.format(bug_info['assigned_to']))
         except ValueError:
             print('Error parsing response from Bugzilla REST API')
         except (ConnectionError, Timeout):
             print('Unable to contact Mozilla Bugzilla')
     return True
 
-LINT_FUNCTIONS = [is_bug_number_in_right_format,
-                  are_lines_not_more_than_79_chars,
-                  print_bug_info]
+
+LINT_FUNCTIONS = [
+    is_bug_number_in_right_format,
+    are_lines_not_more_than_79_chars,
+    print_bug_info
+]
 
 
 def lint_commit_msg(commit_msg_file):
@@ -73,7 +77,9 @@ def lint_commit_msg(commit_msg_file):
             return_values = map(lambda x: x(commit_msg), LINT_FUNCTIONS)
             if not all(return_values):
                 return 1
+
     return 0
+
 
 if __name__ == '__main__':
     commit_msg_file = sys.argv[1]
