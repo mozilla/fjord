@@ -26,7 +26,7 @@ from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils.encoding import force_bytes
-from django.views.generic.edit import FormView, CreateView
+from django.views.generic.edit import FormView, CreateView, UpdateView
 from django.utils.decorators import method_decorator
 
 from fjord.analytics.forms import (
@@ -808,4 +808,32 @@ class SurveyCreateView(CreateView):
             surveys = paginator.page(paginator.num_pages)
 
         context['surveys'] = surveys
+        context['update'] = False
+        return context
+
+
+class SurveyUpdateView(UpdateView):
+    model = Survey
+    template_name = 'analytics/analyzer/hb_surveys.html'
+    success_url = reverse_lazy('hb_surveys')
+    form_class = SurveyCreateForm
+
+    @method_decorator(check_new_user)
+    @method_decorator(analyzer_required)
+    def dispatch(self, *args, **kwargs):
+        return super(SurveyUpdateView, self).dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(SurveyUpdateView, self).get_context_data(**kwargs)
+        page = self.request.GET.get('page')
+        paginator = Paginator(Survey.objects.order_by('-created'), 25)
+        try:
+            surveys = paginator.page(page)
+        except PageNotAnInteger:
+            surveys = paginator.page(1)
+        except EmptyPage:
+            surveys = paginator.page(paginator.num_pages)
+
+        context['surveys'] = surveys
+        context['update'] = True
         return context
