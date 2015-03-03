@@ -237,7 +237,7 @@ class AlertsGetAPITest(TestCase):
                         u'id': WHATEVER,
                         u'summary': u'alert 2',
                         u'description': u'the account balance is at $5.',
-                        u'flavor': u'fooflavor',
+                        u'flavor': flavor.slug,
                         u'emitter_version': 0,
                         u'emitter_name': u'balance-checker',
                         u'start_time': None,
@@ -249,7 +249,7 @@ class AlertsGetAPITest(TestCase):
                         u'id': WHATEVER,
                         u'summary': u'alert 3',
                         u'description': u'the account balance is at $5.',
-                        u'flavor': u'fooflavor',
+                        u'flavor': flavor.slug,
                         u'emitter_version': 0,
                         u'emitter_name': u'balance-checker',
                         u'start_time': None,
@@ -292,7 +292,7 @@ class AlertsGetAPITest(TestCase):
                         u'id': WHATEVER,
                         u'summary': u'alert 1',
                         u'description': u'the account balance is at $5.',
-                        u'flavor': u'fooflavor',
+                        u'flavor': flavor.slug,
                         u'emitter_version': 0,
                         u'emitter_name': u'balance-checker',
                         u'start_time': None,
@@ -304,7 +304,7 @@ class AlertsGetAPITest(TestCase):
                         u'id': WHATEVER,
                         u'summary': u'alert 2',
                         u'description': u'the account balance is at $5.',
-                        u'flavor': u'barflavor',
+                        u'flavor': flavor2.slug,
                         u'emitter_version': 0,
                         u'emitter_name': u'balance-checker',
                         u'start_time': None,
@@ -350,7 +350,7 @@ class AlertsGetAPITest(TestCase):
                         u'id': WHATEVER,
                         u'summary': u'alert 2',
                         u'description': u'the account balance is at $5.',
-                        u'flavor': u'fooflavor',
+                        u'flavor': flavor.slug,
                         u'emitter_version': 0,
                         u'emitter_name': u'balance-checker',
                         u'start_time': None,
@@ -390,7 +390,7 @@ class AlertsGetAPITest(TestCase):
                         u'id': WHATEVER,
                         u'summary': u'alert 1',
                         u'description': u'the account balance is at $5.',
-                        u'flavor': u'fooflavor',
+                        u'flavor': flavor.slug,
                         u'emitter_version': 0,
                         u'emitter_name': u'balance-checker',
                         u'start_time': None,
@@ -468,11 +468,6 @@ class AlertsPostAPITest(TestCase):
         eq_(resp.status_code, 201)
         alert = Alert.objects.latest('id')
         eq_(json.loads(resp.content), {'detail': {'id': alert.id}})
-        eq_(alert.flavor.slug, flavor.slug)
-        eq_(alert.severity, data['severity'])
-        eq_(alert.summary, data['summary'])
-        eq_(alert.emitter_name, data['emitter_name'])
-        eq_(alert.emitter_version, data['emitter_version'])
         eq_(alert.start_time, datetime.datetime(2015, 3, 2, 8, 22, 0))
         eq_(alert.end_time, datetime.datetime(2015, 3, 2, 9, 23, 0))
 
@@ -541,11 +536,6 @@ class AlertsPostAPITest(TestCase):
         eq_(resp.status_code, 201)
         alert = Alert.objects.latest('id')
         eq_(json.loads(resp.content), {'detail': {'id': alert.id}})
-        eq_(alert.flavor.slug, flavor.slug)
-        eq_(alert.severity, data['severity'])
-        eq_(alert.summary, data['summary'])
-        eq_(alert.emitter_name, data['emitter_name'])
-        eq_(alert.emitter_version, data['emitter_version'])
         eq_(alert.start_time, datetime.datetime(2015, 3, 2, 14, 22, 0))
         eq_(alert.end_time, datetime.datetime(2015, 3, 2, 15, 23, 0))
 
@@ -580,11 +570,6 @@ class AlertsPostAPITest(TestCase):
         eq_(resp.status_code, 201)
         alert = Alert.objects.latest('id')
         eq_(json.loads(resp.content), {'detail': {'id': alert.id}})
-        eq_(alert.flavor.slug, flavor.slug)
-        eq_(alert.severity, data['severity'])
-        eq_(alert.summary, data['summary'])
-        eq_(alert.emitter_name, data['emitter_name'])
-        eq_(alert.emitter_version, data['emitter_version'])
         eq_(alert.start_time, datetime.datetime(2015, 3, 2, 8, 22, 0))
 
         qs = {
@@ -646,11 +631,6 @@ class AlertsPostAPITest(TestCase):
         eq_(resp.status_code, 201)
         alert = Alert.objects.latest('id')
         eq_(json.loads(resp.content), {'detail': {'id': alert.id}})
-        eq_(alert.flavor.slug, flavor.slug)
-        eq_(alert.severity, data['severity'])
-        eq_(alert.summary, data['summary'])
-        eq_(alert.emitter_name, data['emitter_name'])
-        eq_(alert.emitter_version, data['emitter_version'])
 
         links = Link.objects.filter(alert=alert)
         eq_(len(links), 1)
