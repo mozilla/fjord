@@ -52,6 +52,12 @@ asking for a flavor to be created. Please state exactly what you'll be
 using the flavor for. You should probably have a token first since
 without the token you can't emit any alerts.
 
+.. Note::
+
+   A single token can GET/POST for multiple flavors, so you can write
+   a single emitter that has a single token and have it generate
+   alerts of multiple flavors.
+
 
 POSTing alerts
 ==============
@@ -103,6 +109,7 @@ Using Python requests:
        'flavor': 'mfbt',
        'emitter_name': 'mfbt-watcher',
        'emitter_version': 1,
+       'start_time': '2015-02-28T07:22:48Z',
        'links': [
            {'name': 'example', 'url': 'http://example.com'}
        ]
@@ -160,12 +167,41 @@ missed a required field.
 |                   |        |you can parse them differently when you're setting up   |
 |                   |        |dashboards or reports about your alerts.                |
 +-------------------+--------+--------------------------------------------------------+
-|links              |array of|This is a list of links that are associated with the    |
-|                   |objects |alert.                                                  |
-|                   |        |                                                        |
-|                   |        |The value is an array of ``{'name': NAME, 'url': URL}`` |
-|                   |        |JSON objects.                                           |
-+-------------------+--------+--------------------------------------------------------+
+
+Optional fields
+---------------
+
+These fields are optional.
+
++-------------------+---------+--------------------------------------------------------+
+|field              |type     |notes                                                   |
++===================+=========+========================================================+
+|links              |array of |This is a list of links that are associated with the    |
+|                   |objects  |alert.                                                  |
+|                   |         |                                                        |
+|                   |         |The value is an array of ``{'name': NAME, 'url': URL}`` |
+|                   |         |JSON objects.                                           |
++-------------------+---------+--------------------------------------------------------+
+|start_time         |iso8601  |The start time of the event this alert is for.          |
+|                   |timestamp|                                                        |
+|                   |         |Examples:                                               |
+|                   |         |                                                        |
+|                   |         |* ``'2015-03-02T16:22:10Z'`` - timestamp in UTC         |
+|                   |         |* ``'2015-03-02T16:22:10'`` - timezoneless timestamp    |
+|                   |         |  which is treated as UTC                               |
+|                   |         |* ``'2015-03-02T16:22:10.102Z'`` - timestamp with       |
+|                   |         |  milliseconds                                          |
++-------------------+---------+--------------------------------------------------------+
+|end_time           |iso8601  |The end time of the event this alert is for.            |
+|                   |timestamp|                                                        |
+|                   |         |Examples:                                               |
+|                   |         |                                                        |
+|                   |         |* ``'2015-03-02T16:22:10Z'`` - timestamp in UTC         |
+|                   |         |* ``'2015-03-02T16:22:10'`` - timezoneless timestamp    |
+|                   |         |  which is treated as UTC                               |
+|                   |         |* ``'2015-03-02T16:22:10.102Z'`` - timestamp with       |
+|                   |         |  milliseconds                                          |
++-------------------+---------+--------------------------------------------------------+
 
 
 Responses

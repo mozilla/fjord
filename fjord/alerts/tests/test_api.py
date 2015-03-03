@@ -3,6 +3,8 @@ import json
 import urllib
 from uuid import uuid4
 
+from django.test.utils import override_settings
+
 from nose.tools import eq_
 
 from . import AlertFlavorFactory, AlertFactory, LinkFactory
@@ -223,9 +225,11 @@ class AlertsGetAPITest(TestCase):
                         u'id': WHATEVER,
                         u'summary': u'alert 1',
                         u'description': u'the account balance is at $5.',
-                        u'flavor': u'fooflavor',
+                        u'flavor': flavor.slug,
                         u'emitter_version': 0,
                         u'emitter_name': u'balance-checker',
+                        u'start_time': None,
+                        u'end_time': None,
                         u'created': WHATEVER,
                         u'severity': 0,
                         u'links': []
@@ -233,9 +237,11 @@ class AlertsGetAPITest(TestCase):
                         u'id': WHATEVER,
                         u'summary': u'alert 2',
                         u'description': u'the account balance is at $5.',
-                        u'flavor': u'fooflavor',
+                        u'flavor': flavor.slug,
                         u'emitter_version': 0,
                         u'emitter_name': u'balance-checker',
+                        u'start_time': None,
+                        u'end_time': None,
                         u'created': WHATEVER,
                         u'severity': 0,
                         u'links': []
@@ -243,9 +249,11 @@ class AlertsGetAPITest(TestCase):
                         u'id': WHATEVER,
                         u'summary': u'alert 3',
                         u'description': u'the account balance is at $5.',
-                        u'flavor': u'fooflavor',
+                        u'flavor': flavor.slug,
                         u'emitter_version': 0,
                         u'emitter_name': u'balance-checker',
+                        u'start_time': None,
+                        u'end_time': None,
                         u'created': WHATEVER,
                         u'severity': 0,
                         u'links': []
@@ -284,9 +292,11 @@ class AlertsGetAPITest(TestCase):
                         u'id': WHATEVER,
                         u'summary': u'alert 1',
                         u'description': u'the account balance is at $5.',
-                        u'flavor': u'fooflavor',
+                        u'flavor': flavor.slug,
                         u'emitter_version': 0,
                         u'emitter_name': u'balance-checker',
+                        u'start_time': None,
+                        u'end_time': None,
                         u'created': WHATEVER,
                         u'severity': 0,
                         u'links': []
@@ -294,9 +304,11 @@ class AlertsGetAPITest(TestCase):
                         u'id': WHATEVER,
                         u'summary': u'alert 2',
                         u'description': u'the account balance is at $5.',
-                        u'flavor': u'barflavor',
+                        u'flavor': flavor2.slug,
                         u'emitter_version': 0,
                         u'emitter_name': u'balance-checker',
+                        u'start_time': None,
+                        u'end_time': None,
                         u'created': WHATEVER,
                         u'severity': 0,
                         u'links': []
@@ -338,9 +350,11 @@ class AlertsGetAPITest(TestCase):
                         u'id': WHATEVER,
                         u'summary': u'alert 2',
                         u'description': u'the account balance is at $5.',
-                        u'flavor': u'fooflavor',
+                        u'flavor': flavor.slug,
                         u'emitter_version': 0,
                         u'emitter_name': u'balance-checker',
+                        u'start_time': None,
+                        u'end_time': None,
                         u'created': WHATEVER,
                         u'severity': 0,
                         u'links': []
@@ -376,9 +390,11 @@ class AlertsGetAPITest(TestCase):
                         u'id': WHATEVER,
                         u'summary': u'alert 1',
                         u'description': u'the account balance is at $5.',
-                        u'flavor': u'fooflavor',
+                        u'flavor': flavor.slug,
                         u'emitter_version': 0,
                         u'emitter_name': u'balance-checker',
+                        u'start_time': None,
+                        u'end_time': None,
                         u'created': WHATEVER,
                         u'severity': 0,
                         u'links': [
@@ -423,6 +439,171 @@ class AlertsPostAPITest(TestCase):
         eq_(alert.emitter_name, data['emitter_name'])
         eq_(alert.emitter_version, data['emitter_version'])
 
+    @override_settings(TIME_ZONE='America/Los_Angeles')
+    def test_post_with_dates(self):
+        token = TokenFactory()
+        flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
+        flavor.allowed_tokens.add(token)
+
+        data = {
+            'severity': 5,
+            'summary': 'test alert',
+            'description': (
+                'All we ever see of stars are their old photographs.'
+            ),
+            'flavor': flavor.slug,
+            'emitter_name': 'testemitter',
+            'emitter_version': 0,
+            'start_time': '2015-03-02T16:22:00Z',
+            'end_time': '2015-03-02T17:23:00Z'
+        }
+
+        resp = self.client.post(
+            reverse('alerts-api'),
+            data=json.dumps(data),
+            content_type='application/json',
+            HTTP_AUTHORIZATION='token ' + token.token
+        )
+
+        eq_(resp.status_code, 201)
+        alert = Alert.objects.latest('id')
+        eq_(json.loads(resp.content), {'detail': {'id': alert.id}})
+        eq_(alert.start_time, datetime.datetime(2015, 3, 2, 8, 22, 0))
+        eq_(alert.end_time, datetime.datetime(2015, 3, 2, 9, 23, 0))
+
+    def test_post_invalid_start_time(self):
+        token = TokenFactory()
+        flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
+        flavor.allowed_tokens.add(token)
+
+        data = {
+            'severity': 5,
+            'summary': 'test alert',
+            'description': (
+                'All we ever see of stars are their old photographs.'
+            ),
+            'flavor': flavor.slug,
+            'emitter_name': 'testemitter',
+            'emitter_version': 0,
+            'start_time': '2015'
+        }
+
+        resp = self.client.post(
+            reverse('alerts-api'),
+            data=json.dumps(data),
+            content_type='application/json',
+            HTTP_AUTHORIZATION='token ' + token.token
+        )
+        eq_(resp.status_code, 400)
+        eq_(json.loads(resp.content),
+            {
+                u'detail': {
+                    u'start_time': [
+                        u'Datetime has wrong format. Use one of these formats '
+                        u'instead: '
+                        u'YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z]'
+                    ]
+                }
+            }
+        )
+
+    @override_settings(TIME_ZONE='America/Los_Angeles')
+    def test_post_start_time_timezone_change(self):
+        token = TokenFactory()
+        flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
+        flavor.allowed_tokens.add(token)
+
+        data = {
+            'severity': 5,
+            'summary': 'test alert',
+            'description': (
+                'All we ever see of stars are their old photographs.'
+            ),
+            'flavor': flavor.slug,
+            'emitter_name': 'testemitter',
+            'emitter_version': 0,
+            'start_time': '2015-03-02T16:22:00-0600',
+            'end_time': '2015-03-02T17:23:00-0600'
+        }
+
+        resp = self.client.post(
+            reverse('alerts-api'),
+            data=json.dumps(data),
+            content_type='application/json',
+            HTTP_AUTHORIZATION='token ' + token.token
+        )
+
+        eq_(resp.status_code, 201)
+        alert = Alert.objects.latest('id')
+        eq_(json.loads(resp.content), {'detail': {'id': alert.id}})
+        eq_(alert.start_time, datetime.datetime(2015, 3, 2, 14, 22, 0))
+        eq_(alert.end_time, datetime.datetime(2015, 3, 2, 15, 23, 0))
+
+    @override_settings(TIME_ZONE='America/Los_Angeles')
+    def test_post_date_roundtrip(self):
+        """Test we can POST a date and then GET the same date back"""
+        token = TokenFactory()
+        flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
+        flavor.allowed_tokens.add(token)
+
+        start_time = '2015-03-02T16:22:00Z'
+
+        data = {
+            'severity': 5,
+            'summary': 'test alert',
+            'description': (
+                'One if by land.'
+            ),
+            'flavor': flavor.slug,
+            'emitter_name': 'testemitter',
+            'emitter_version': 0,
+            'start_time': start_time
+        }
+
+        resp = self.client.post(
+            reverse('alerts-api'),
+            data=json.dumps(data),
+            content_type='application/json',
+            HTTP_AUTHORIZATION='token ' + token.token
+        )
+
+        eq_(resp.status_code, 201)
+        alert = Alert.objects.latest('id')
+        eq_(json.loads(resp.content), {'detail': {'id': alert.id}})
+        eq_(alert.start_time, datetime.datetime(2015, 3, 2, 8, 22, 0))
+
+        qs = {
+            'flavors': flavor.slug
+        }
+        resp = self.client.get(
+            reverse('alerts-api') + '?' + urllib.urlencode(qs),
+            HTTP_AUTHORIZATION='token ' + token.token
+        )
+
+        eq_(resp.status_code, 200)
+        eq_(
+            json.loads(resp.content),
+            {
+                u'count': 1,
+                u'total': 1,
+                u'alerts': [
+                    {
+                        u'id': WHATEVER,
+                        u'summary': u'test alert',
+                        u'description': u'One if by land.',
+                        u'flavor': flavor.slug,
+                        u'emitter_version': 0,
+                        u'emitter_name': u'testemitter',
+                        u'start_time': start_time,
+                        u'end_time': None,
+                        u'created': WHATEVER,
+                        u'severity': 5,
+                        u'links': [],
+                    }
+                ]
+            }
+        )
+        
     def test_post_with_link(self):
         token = TokenFactory()
         flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
@@ -450,11 +631,6 @@ class AlertsPostAPITest(TestCase):
         eq_(resp.status_code, 201)
         alert = Alert.objects.latest('id')
         eq_(json.loads(resp.content), {'detail': {'id': alert.id}})
-        eq_(alert.flavor.slug, flavor.slug)
-        eq_(alert.severity, data['severity'])
-        eq_(alert.summary, data['summary'])
-        eq_(alert.emitter_name, data['emitter_name'])
-        eq_(alert.emitter_version, data['emitter_version'])
 
         links = Link.objects.filter(alert=alert)
         eq_(len(links), 1)

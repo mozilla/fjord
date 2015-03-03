@@ -1,5 +1,3 @@
-from functools import wraps
-
 from rest_framework import authentication
 from rest_framework import exceptions
 from rest_framework import permissions
