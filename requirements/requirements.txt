@@ -1,31 +1,75 @@
-# sha256: fYceArb4_uLrfscU2TcfaFncApjxyHcmJl-BNe6Z-xk
-djangorestframework==2.4.4
+# Requirements from github urls because we're using non-reelased things
 
-# django-appconf: develop~19
-# sha256: PoDkmCCdclPizBpPmwLn2oGReakQySddW8Iy3kjmfDM
-https://github.com/jezdez/django-appconf/archive/d7ff3bb0c35a0c2ec83afdb31f7bb79e0f1b222c.tar.gz#egg=django-appconf
-
-# sha256: l2KMyLgsDC-pUegX6DgRPSlB_wfc9sU-5QM566yTf5M
-eadred==0.2
-
+# Note: no releases
 # django-mobility: master
 # sha256: vWKlBersFicnz_K9LUwnYlm1HhXt9bgxvWKB915vfog
 https://github.com/jbalogh/django-mobility/archive/e2b60a1f96e4c4aed736395c01bf707e969d8e83.tar.gz#egg=django-mobility
 
+# We should upgrade this to 0.1.19
 # gengo-python: master
 # sha256: Ga_VbM9tkW8d2infJZwMIlx1LuJmAji1G02zH2YFToI
 https://github.com/gengo/gengo-python/archive/8388e35e6ef1ae946a39268763e741d82650f190.tar.gz#egg=gengo-python
 
+# We're using something post-0.7
 # jingo: master
 # sha256: 5Yt-sicAUr_gY1Y-SwW6W_mvvxyBuUe2gzPpoB-3VbQ
 https://github.com/jbalogh/jingo/archive/fce09043542e71d972cc97d2ae703740741f80d0.tar.gz#egg=jingo==0.7
 
-# sha256: 1_LzcE9lU8uG-6xLw0Z9LJp_xEkYgYxyNckQAK8rqYU
-django-statsd-mozilla==0.3.8.5
-
+# We're using something post-0.6
 # django-product-details: master
 # sha256: tLy18AIevr3_Rd7saf4cKuq_W1M3zpKFVOLBmggiCck
 https://github.com/mozilla/django-product-details/archive/d168ab2e689a1b54a30a923386fe7948a74ff334.tar.gz#egg=django-product-details
+
+# Something post 0.6.0
+# jingo-minify: master~16
+# sha256: YC0TzKkqNb0FtwYn_JjRFeZIhKiVBW86zAdTo_N5v0E
+https://github.com/jsocol/jingo-minify/archive/d2ffefbd31e5035873083107e86893be302ce452.tar.gz#egg=jingo-minify
+
+# Look into updating to something recent and/or getting rid of this because
+# we don't use it.
+# django_compressor: tags/1.2~14
+# sha256: VuDVB_ltoRQj0ejxvwdU05H7OKlyU56Yon2zTmUr_nA
+https://github.com/jezdez/django_compressor/archive/90966edf9777a1c0b5f6389b15f5559a89081d39.tar.gz#egg=django_compressor
+
+# Something post 0.5
+# django-multidb-router: tags/v0.5.1~4
+# sha256: I0E4DVGgHJ6DNZiKaPGiZ1s59QAG7iRC9GP_sTDG_Vg
+https://github.com/jbalogh/django-multidb-router/archive/4f78662026b21cfff1ecfddc487fa0f0c31a0215.tar.gz#egg=django-multidb-router
+
+# Do we use this? We have no passwords.
+# django-sha2: master~1
+# sha256: TBUJueJfjaBHp4GeUtY0o_IaGHk4DOUf0ZbJZ4YXPPM
+https://github.com/fwenzel/django-sha2/archive/3ba2b4771056fb722bc9fe52cf26918a3f0388bb.tar.gz#egg=django-sha2
+
+# Something post 0.5
+# django-session-csrf: master
+# sha256: 4buoVNpBPIKO5ziwNqu6xu46TkzWhMgNxNQeA8Mq0h0
+https://github.com/mozilla/django-session-csrf/archive/f00ad913c62e139d36078e8a7e07dab65a021386.tar.gz#egg=django-session-csrf
+
+# Do we use this?
+# nuggets: master~7
+# sha256: eeq_z415NQPBF3j59fmy6JGjtnpDgVQxwwvFKxnDQx0
+https://github.com/mozilla/nuggets/archive/ce506882b6943ea45ea4f98290fc4ef23e09a083.tar.gz#egg=nuggets
+
+# Something post 3.1.10
+# django-celery: master~1
+# sha256: dmqn4o32-wsXoiX4O6IFfsRPcLOZVrEhtByqvQs81Ms
+https://github.com/celery/django-celery/archive/da0b98caf9dc96c4d9ec91c09e00c5e19dcb0da3.tar.gz#egg=django-celery
+
+# Something post 0.4.1
+# tower: remotes/origin/HEAD
+# sha256: qm0q7z3NpXlebil6MCUbfIAahKy4h2MwiBjXscUjCdA
+https://github.com/clouserw/tower/archive/ade9804345eb49dd1b626fd276cd9572fd15d1b3.tar.gz#egg=tower
+
+
+# Requirements from PyPI
+
+# Do we use this?
+# sha256: vYDtkF00OzZ4WioB9VkuBKdX7xUY2Q25FQ6e2uiBIDo
+django-appconf==0.5
+
+# sha256: 1_LzcE9lU8uG-6xLw0Z9LJp_xEkYgYxyNckQAK8rqYU
+django-statsd-mozilla==0.3.8.5
 
 # sha256: z-K2UyaL1Ybi0Ip16Ib3vjvlW6Ny9y4vV0eut2xHA2I
 celery==3.1.17
@@ -33,32 +77,14 @@ celery==3.1.17
 # sha256: uf8EN2BxE66nAf1RIsKvpAwF3_bx2k9YsvHqGNnyv40
 kombu==3.0.24
 
-# commonware: master
-# sha256: k9gjEUXUPKAuHsPO41UzOvqOcq25z4FXZ-F1lXSXdNQ
-https://github.com/jsocol/commonware/archive/b5544185b2d24adc1eb512735990752400ce9cbd.tar.gz#egg=commonware
-
-# jingo-minify: master~16
-# sha256: YC0TzKkqNb0FtwYn_JjRFeZIhKiVBW86zAdTo_N5v0E
-https://github.com/jsocol/jingo-minify/archive/d2ffefbd31e5035873083107e86893be302ce452.tar.gz#egg=jingo-minify
-
-# django_compressor: tags/1.2~14
-# sha256: VuDVB_ltoRQj0ejxvwdU05H7OKlyU56Yon2zTmUr_nA
-https://github.com/jezdez/django_compressor/archive/90966edf9777a1c0b5f6389b15f5559a89081d39.tar.gz#egg=django_compressor
-
-# django-multidb-router: tags/v0.5.1~4
-# sha256: I0E4DVGgHJ6DNZiKaPGiZ1s59QAG7iRC9GP_sTDG_Vg
-https://github.com/jbalogh/django-multidb-router/archive/4f78662026b21cfff1ecfddc487fa0f0c31a0215.tar.gz#egg=django-multidb-router
-
-# factory_boy: master
-# sha256: _F36SEeU3jjs3nGYBej7dufeE_C2cxmWZXWcWFdRW1A
-https://github.com/rbarrois/factory_boy/archive/87f8cc0cc0d2f48f489c81b8c93e8ab6de6cff26.tar.gz#egg=factory_boy
-
-# django-sha2: master~1
-# sha256: TBUJueJfjaBHp4GeUtY0o_IaGHk4DOUf0ZbJZ4YXPPM
-https://github.com/fwenzel/django-sha2/archive/3ba2b4771056fb722bc9fe52cf26918a3f0388bb.tar.gz#egg=django-sha2
+# sha256: OxNQQo3tQ4uqhTRD9zfPOTHrRggCTveBe2Dl3bp0nT8
+commonware==0.4.2
 
 # sha256: HhLNQXx94_wcl9EUouRNXDA8OuXMnS_YihiktArLd5o
 statsd==2.0.3
+
+# sha256: 1wEkmeUt5aRBPiKu1R34lIUzaFRS3-FrQQAfKPnOWxw
+factory_boy==2.4.1
 
 # sha256: Xq3Xc16Qo9r3fzPFVMWo4pMCdDKQIWk2QedPlXqvnfw
 django-extensions==1.3.3
@@ -75,24 +101,14 @@ django-browserid==0.11.1
 # sha256: F3KVsUQkAMks22fo4Y-f9ZRvtEL4WBO50IN4I3IuoI0
 django-cronjobs==0.2.3
 
-# django-session-csrf: master
-# sha256: 4buoVNpBPIKO5ziwNqu6xu46TkzWhMgNxNQeA8Mq0h0
-https://github.com/mozilla/django-session-csrf/archive/f00ad913c62e139d36078e8a7e07dab65a021386.tar.gz#egg=django-session-csrf
-
 # sha256: -thF7ifqqSii7RbAEh4rtd0TzN6V0cAUTSP5pCUMGmw
 django-ratelimit==0.4.0
 
-# nuggets: master~7
-# sha256: eeq_z415NQPBF3j59fmy6JGjtnpDgVQxwwvFKxnDQx0
-https://github.com/mozilla/nuggets/archive/ce506882b6943ea45ea4f98290fc4ef23e09a083.tar.gz#egg=nuggets
+# sha256: fYceArb4_uLrfscU2TcfaFncApjxyHcmJl-BNe6Z-xk
+djangorestframework==2.4.4
 
-# django-celery: master~1
-# sha256: dmqn4o32-wsXoiX4O6IFfsRPcLOZVrEhtByqvQs81Ms
-https://github.com/celery/django-celery/archive/da0b98caf9dc96c4d9ec91c09e00c5e19dcb0da3.tar.gz#egg=django-celery
-
-# tower: remotes/origin/HEAD
-# sha256: qm0q7z3NpXlebil6MCUbfIAahKy4h2MwiBjXscUjCdA
-https://github.com/clouserw/tower/archive/ade9804345eb49dd1b626fd276cd9572fd15d1b3.tar.gz#egg=tower
+# sha256: l2KMyLgsDC-pUegX6DgRPSlB_wfc9sU-5QM566yTf5M
+eadred==0.2
 
 # sha256: NmfSakH-wwNkoO9yWAgyylMogC1VP21ucq9awhyzY2U
 django-nose==1.3
