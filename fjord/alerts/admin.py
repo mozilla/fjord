@@ -21,7 +21,7 @@ class LinkInline(admin.TabularInline):
 class AlertAdmin(admin.ModelAdmin):
     list_display = (
         'severity', 'summary', 'flavor', 'emitter_name', 'emitter_version',
-        'created'
+        'start_time', 'end_time', 'created'
     )
     list_filter = ('flavor', 'severity', 'emitter_name')
     inlines = [LinkInline]
