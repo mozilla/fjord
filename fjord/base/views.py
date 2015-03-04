@@ -12,6 +12,7 @@ from django.http import (
 from django.shortcuts import render
 from django.utils.http import is_safe_url
 from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_exempt
 
 from celery.messaging import establish_connection
 from elasticsearch.exceptions import ConnectionError, NotFoundError
@@ -228,6 +229,7 @@ class IntentionalException(Exception):
 
 
 @dev_or_authorized
+@csrf_exempt
 def throw_error(request):
     """Throw an error for testing purposes."""
     raise IntentionalException("Error raised for testing purposes.")
