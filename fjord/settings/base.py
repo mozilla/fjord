@@ -581,6 +581,7 @@ DOMAIN_METHODS = {
     ]
 }
 
+WSGI_APPLICATION = 'fjord.wsgi.application'
 
 # When set to True, this will cause a message to be displayed on all
 # pages that this is not production.
