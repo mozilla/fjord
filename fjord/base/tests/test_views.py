@@ -79,21 +79,23 @@ class MonitorViewTest(ElasticTestCase):
         finally:
             views.test_memcached = test_memcached
 
-    @override_settings(SHOW_STAGE_NOTICE=True)
-    def test_500(self):
-        with self.assertRaises(IntentionalException) as cm:
-            self.client.get('/services/throw-error')
 
-        eq_(type(cm.exception), IntentionalException)
-
-
-class ErrorTesting(ElasticTestCase):
+class FileNotFoundTesting(TestCase):
     client_class = LocalizingClient
 
     def test_404(self):
         request = self.client.get('/a/path/that/should/never/exist')
         eq_(request.status_code, 404)
         self.assertTemplateUsed(request, '404.html')
+
+
+class ServerErrorTesting(TestCase):
+    @override_settings(SHOW_STAGE_NOTICE=True)
+    def test_500(self):
+        with self.assertRaises(IntentionalException) as cm:
+            self.client.get('/services/throw-error')
+
+        eq_(type(cm.exception), IntentionalException)
 
 
 class TestRobots(TestCase):
