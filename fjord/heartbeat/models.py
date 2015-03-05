@@ -3,6 +3,7 @@ from django.db import models
 
 from rest_framework import serializers
 
+from fjord.base.api_utils import UTCDateTimeField
 from fjord.base.models import ModelBase, JSONObjectField
 
 
@@ -111,6 +112,9 @@ class Answer(ModelBase):
     # Whether or not this is test data.
     is_test = models.BooleanField(default=False, blank=True)
 
+    received_ts = models.DateTimeField(
+        auto_now=True,
+        help_text=u'Time the server received the last update packet')
 
     class Meta:
         unique_together = (
@@ -128,6 +132,8 @@ class Answer(ModelBase):
 class AnswerSerializer(serializers.ModelSerializer):
     updated_ts = serializers.IntegerField(source='updated_ts', required=True)
     survey_id = serializers.SlugRelatedField(slug_field='name')
+
+    received_ts = UTCDateTimeField(read_only=True)
 
     class Meta:
         model = Answer
