@@ -1,24 +1,20 @@
 # Requirements from github urls because we're using non-reelased things
 
-# Note: no releases
-# django-mobility: master
+# django-mobility: no releases
 # sha256: vWKlBersFicnz_K9LUwnYlm1HhXt9bgxvWKB915vfog
-https://github.com/jbalogh/django-mobility/archive/e2b60a1f96e4c4aed736395c01bf707e969d8e83.tar.gz#egg=django-mobility
+https://github.com/jbalogh/django-mobility/archive/e2b60a1f96e4c4aed736395c01bf707e969d8e83.tar.gz#egg=django-mobility==0.1.0.1
 
-# We're using something post-0.7
-# jingo: master
+# jingo: something post 0.7
 # sha256: 5Yt-sicAUr_gY1Y-SwW6W_mvvxyBuUe2gzPpoB-3VbQ
-https://github.com/jbalogh/jingo/archive/fce09043542e71d972cc97d2ae703740741f80d0.tar.gz#egg=jingo==0.7
+https://github.com/jbalogh/jingo/archive/fce09043542e71d972cc97d2ae703740741f80d0.tar.gz#egg=jingo==0.7.0.1
 
-# We're using something post-0.6
-# django-product-details: master
+# django-product-details: no releases
 # sha256: tLy18AIevr3_Rd7saf4cKuq_W1M3zpKFVOLBmggiCck
-https://github.com/mozilla/django-product-details/archive/d168ab2e689a1b54a30a923386fe7948a74ff334.tar.gz#egg=django-product-details
+https://github.com/mozilla/django-product-details/archive/d168ab2e689a1b54a30a923386fe7948a74ff334.tar.gz#egg=django-product-details==0.6.0.1
 
-# Something post 0.6.0
-# jingo-minify: master~16
+# jingo-minify: soemthing post 0.6
 # sha256: YC0TzKkqNb0FtwYn_JjRFeZIhKiVBW86zAdTo_N5v0E
-https://github.com/jsocol/jingo-minify/archive/d2ffefbd31e5035873083107e86893be302ce452.tar.gz#egg=jingo-minify
+https://github.com/jsocol/jingo-minify/archive/d2ffefbd31e5035873083107e86893be302ce452.tar.gz#egg=jingo-minify==0.6.0.1
 
 # Look into updating to something recent and/or getting rid of this because
 # we don't use it.
@@ -26,33 +22,28 @@ https://github.com/jsocol/jingo-minify/archive/d2ffefbd31e5035873083107e86893be3
 # sha256: VuDVB_ltoRQj0ejxvwdU05H7OKlyU56Yon2zTmUr_nA
 https://github.com/jezdez/django_compressor/archive/90966edf9777a1c0b5f6389b15f5559a89081d39.tar.gz#egg=django_compressor
 
-# Something post 0.5
-# django-multidb-router: tags/v0.5.1~4
-# sha256: I0E4DVGgHJ6DNZiKaPGiZ1s59QAG7iRC9GP_sTDG_Vg
-https://github.com/jbalogh/django-multidb-router/archive/4f78662026b21cfff1ecfddc487fa0f0c31a0215.tar.gz#egg=django-multidb-router
-
 # Do we use this? We have no passwords.
 # django-sha2: master~1
 # sha256: TBUJueJfjaBHp4GeUtY0o_IaGHk4DOUf0ZbJZ4YXPPM
 https://github.com/fwenzel/django-sha2/archive/3ba2b4771056fb722bc9fe52cf26918a3f0388bb.tar.gz#egg=django-sha2
 
-# Something post 0.5
-# django-session-csrf: master
+# django-session-csrf: something post-0.5
 # sha256: 4buoVNpBPIKO5ziwNqu6xu46TkzWhMgNxNQeA8Mq0h0
-https://github.com/mozilla/django-session-csrf/archive/f00ad913c62e139d36078e8a7e07dab65a021386.tar.gz#egg=django-session-csrf
+https://github.com/mozilla/django-session-csrf/archive/f00ad913c62e139d36078e8a7e07dab65a021386.tar.gz#egg=django-session-csrf==0.5.0.1
 
-# Something post 3.1.10, but they don't do releases anymore.
-# django-celery: master~1
+# django-celery: no new releases
 # sha256: dmqn4o32-wsXoiX4O6IFfsRPcLOZVrEhtByqvQs81Ms
 https://github.com/celery/django-celery/archive/da0b98caf9dc96c4d9ec91c09e00c5e19dcb0da3.tar.gz#egg=django-celery==3.1.10.1
 
-# Something post 0.4.1
-# tower: remotes/origin/HEAD
+# tower: no new releases
 # sha256: qm0q7z3NpXlebil6MCUbfIAahKy4h2MwiBjXscUjCdA
 https://github.com/clouserw/tower/archive/ade9804345eb49dd1b626fd276cd9572fd15d1b3.tar.gz#egg=tower==0.4.1.1
 
 
 # Requirements from PyPI
+
+# sha256: TEiNy4TP_Yi80rFlGWK3Z_m7JFIGQHyOpngEPNOdPKg
+django-multidb-router==0.6
 
 # sha256: QD1vswdD9scqnh9UG5xiOZiyI50PcALy-ZqyKn53UEo
 gengo==0.1.19
