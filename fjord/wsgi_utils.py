@@ -64,6 +64,8 @@ class BetterDebugMixin(object):
         except (UnicodeDecodeError, UnicodeEncodeError):
             # For binary, we say, 'BINARY CONTENT'
             postbody = 'BINARY OR NON-UTF-8 CONTENT'
+        except Exception as exc:
+            postbody = 'Error figuring out postbody %r' % exc
 
         # The logger.error generates a record which can get handled by
         # the AdminEmailHandler. Overriding all that machinery is
