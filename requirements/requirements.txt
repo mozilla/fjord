@@ -5,11 +5,6 @@
 # sha256: vWKlBersFicnz_K9LUwnYlm1HhXt9bgxvWKB915vfog
 https://github.com/jbalogh/django-mobility/archive/e2b60a1f96e4c4aed736395c01bf707e969d8e83.tar.gz#egg=django-mobility
 
-# We should upgrade this to 0.1.19
-# gengo-python: master
-# sha256: Ga_VbM9tkW8d2infJZwMIlx1LuJmAji1G02zH2YFToI
-https://github.com/gengo/gengo-python/archive/8388e35e6ef1ae946a39268763e741d82650f190.tar.gz#egg=gengo-python
-
 # We're using something post-0.7
 # jingo: master
 # sha256: 5Yt-sicAUr_gY1Y-SwW6W_mvvxyBuUe2gzPpoB-3VbQ
@@ -63,6 +58,9 @@ https://github.com/clouserw/tower/archive/ade9804345eb49dd1b626fd276cd9572fd15d1
 
 
 # Requirements from PyPI
+
+# sha256: QD1vswdD9scqnh9UG5xiOZiyI50PcALy-ZqyKn53UEo
+gengo==0.1.19
 
 # Do we use this?
 # sha256: vYDtkF00OzZ4WioB9VkuBKdX7xUY2Q25FQ6e2uiBIDo
