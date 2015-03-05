@@ -41,20 +41,15 @@ https://github.com/fwenzel/django-sha2/archive/3ba2b4771056fb722bc9fe52cf26918a3
 # sha256: 4buoVNpBPIKO5ziwNqu6xu46TkzWhMgNxNQeA8Mq0h0
 https://github.com/mozilla/django-session-csrf/archive/f00ad913c62e139d36078e8a7e07dab65a021386.tar.gz#egg=django-session-csrf
 
-# Do we use this?
-# nuggets: master~7
-# sha256: eeq_z415NQPBF3j59fmy6JGjtnpDgVQxwwvFKxnDQx0
-https://github.com/mozilla/nuggets/archive/ce506882b6943ea45ea4f98290fc4ef23e09a083.tar.gz#egg=nuggets
-
-# Something post 3.1.10
+# Something post 3.1.10, but they don't do releases anymore.
 # django-celery: master~1
 # sha256: dmqn4o32-wsXoiX4O6IFfsRPcLOZVrEhtByqvQs81Ms
-https://github.com/celery/django-celery/archive/da0b98caf9dc96c4d9ec91c09e00c5e19dcb0da3.tar.gz#egg=django-celery
+https://github.com/celery/django-celery/archive/da0b98caf9dc96c4d9ec91c09e00c5e19dcb0da3.tar.gz#egg=django-celery==3.1.10.1
 
 # Something post 0.4.1
 # tower: remotes/origin/HEAD
 # sha256: qm0q7z3NpXlebil6MCUbfIAahKy4h2MwiBjXscUjCdA
-https://github.com/clouserw/tower/archive/ade9804345eb49dd1b626fd276cd9572fd15d1b3.tar.gz#egg=tower
+https://github.com/clouserw/tower/archive/ade9804345eb49dd1b626fd276cd9572fd15d1b3.tar.gz#egg=tower==0.4.1.1
 
 
 # Requirements from PyPI
