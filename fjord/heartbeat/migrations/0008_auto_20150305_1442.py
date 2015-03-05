@@ -3,6 +3,9 @@
 thing, but it's "close enough" for an initial value where we don't
 have anything better to base it on.
 
+This is just like 0007, but since I screwed that one up, we have to
+do it again.
+
 """
 from __future__ import unicode_literals
 
@@ -43,7 +46,7 @@ def set_received_ts(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('heartbeat', '0006_answer_received_ts'),
+        ('heartbeat', '0007_auto_20150305_1119'),
     ]
 
     operations = [
