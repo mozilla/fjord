@@ -66,6 +66,9 @@
           <dt>id</dt>
           <dd>{{ answer.id }}</dd>
 
+          <dt>received_ts</dt>
+          <dd>{{ answer.received_ts }}</dd>
+
           <dt>updated_ts</dt>
           <dd>{{ answer.updated_ts }}</dd>
 
@@ -151,6 +154,7 @@
         <table class="summarytable">
           <tr>
             <th><a href="{{ request.get_full_path()|urlparams(sortby='id') }}">id</a>{% if sortby == 'id' %} v{% endif %}</th>
+            <th><a href="{{ request.get_full_path()|urlparams(sortby='received_ts') }}">received</a>{% if sortby == 'received_ts' %} v{% endif %}</th>
             <th><a href="{{ request.get_full_path()|urlparams(sortby='updated_ts') }}">updated</a>{% if sortby == 'updated_ts' %} v{% endif %}</th>
             <th>experiment ver</th>
             <th>response ver</th>
@@ -176,6 +180,7 @@
           {% for ans in answers %}
             <tr {% if ans.is_test %} class="test-answer" {% endif %}>
               <td><a href="{{ url('hb_data', answerid=ans.id) }}">{{ ans.id }}</a></td>
+              <td><span class="nowrap" title="{{ ans.received_ts }}">{{ ans.received_ts }}</span></td>
               <td><span class="nowrap" title="{{ ans.updated_ts }}">{{ fix_ts(ans.updated_ts) }}</span></td>
               <td>{{ ans.experiment_version }}</td>
               <td>{{ ans.response_version }}</td>

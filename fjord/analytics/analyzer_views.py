@@ -56,7 +56,7 @@ from fjord.search.utils import es_error_statsd
 @analyzer_required
 def hb_data(request, answerid=None):
     """View for hb data that shows one or all of the answers"""
-    VALID_SORTBY_FIELDS = ('id', 'updated_ts')
+    VALID_SORTBY_FIELDS = ('id', 'received_ts', 'updated_ts')
 
     sortby = 'id'
     answer = None
