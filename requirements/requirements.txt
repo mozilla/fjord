@@ -16,12 +16,6 @@ https://github.com/mozilla/django-product-details/archive/d168ab2e689a1b54a30a92
 # sha256: YC0TzKkqNb0FtwYn_JjRFeZIhKiVBW86zAdTo_N5v0E
 https://github.com/jsocol/jingo-minify/archive/d2ffefbd31e5035873083107e86893be302ce452.tar.gz#egg=jingo-minify==0.6.0.1
 
-# Look into updating to something recent and/or getting rid of this because
-# we don't use it.
-# django_compressor: tags/1.2~14
-# sha256: VuDVB_ltoRQj0ejxvwdU05H7OKlyU56Yon2zTmUr_nA
-https://github.com/jezdez/django_compressor/archive/90966edf9777a1c0b5f6389b15f5559a89081d39.tar.gz#egg=django_compressor
-
 # Do we use this? We have no passwords.
 # django-sha2: master~1
 # sha256: TBUJueJfjaBHp4GeUtY0o_IaGHk4DOUf0ZbJZ4YXPPM

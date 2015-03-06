@@ -596,7 +596,7 @@ GENGO_ACCOUNT_BALANCE_THRESHOLD = 100.0
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'compressor.finders.CompressorFinder'
+    'fjord.base.static_utils.WTFinder',
 )
 
 # ElasticSearch settings.
