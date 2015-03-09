@@ -36,14 +36,8 @@ os.environ['SKIP_CHECK'] = '1'
 # doing other environment setup.
 import manage
 
-
-# This is the original Django WSGIHandler preserved here in case
-# we ever have to back out the debuggable one.
-from django.core.wsgi import get_wsgi_application
+from fjord.wsgi import get_wsgi_application
 application = get_wsgi_application()
-
-# from fjord.wsgi import get_debuggable_wsgi_application
-# application = get_debuggable_wsgi_application()
 
 
 if newrelic:
