@@ -1,3 +1,5 @@
+from django.db import IntegrityError
+
 import rest_framework.views
 import rest_framework.response
 from statsd import statsd
@@ -60,8 +62,19 @@ class HeartbeatV2API(rest_framework.views.APIView):
         except Answer.DoesNotExist:
             # If the answer doesn't exist yet, then we take the one
             # from the serializer and save it and we're done.
-            serializer.save()
-            return self.rest_success()
+            try:
+                serializer.save()
+                return self.rest_success()
+            except IntegrityError as exc:
+                # 2015-03-09: We're having this problem in production,
+                # but I can't see what's going on, so I'm adding this
+                # error logging.  We're going to use
+                # self.rest_error(), but ignore the HttpResponse it
+                # returns because we want to re-raise the exception so
+                # it goes through regular uncaught exception handler
+                # paths.
+                self.rest_error(post_data, {'db': 'integrityerror %s' % exc})
+                raise
 
         # We're updating an existing answer.
 
