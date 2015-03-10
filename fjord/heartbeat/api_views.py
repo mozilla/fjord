@@ -1,4 +1,4 @@
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 
 import rest_framework.views
 import rest_framework.response
@@ -47,39 +47,30 @@ class HeartbeatV2API(rest_framework.views.APIView):
 
         valid_data = serializer.object
 
-        # Check to see if there's an Answer for this already. If so,
-        # fetch it so we can update it. If not, create a new one.
+        # Try to save it and if it kicks up an integrity error, then
+        # we already have this object and we should update it with the
+        # existing stuff.
         #
-        # FIXME: It's possible we can do this (reuse an object or
-        # create a new one) inside the AnswerSerializerDRF, too,
-        # but I don't have more time to investigate.
+        # Note: This is like get_or_create(), but does it in the
+        # reverse order so as to eliminate the race condition by
+        # having the db enforce integrity.
         try:
-            ans = Answer.objects.get(
-                person_id=valid_data.person_id,
-                survey_id=valid_data.survey_id,
-                flow_id=valid_data.flow_id
-            )
-        except Answer.DoesNotExist:
-            # If the answer doesn't exist yet, then we take the one
-            # from the serializer and save it and we're done.
-            try:
+            with transaction.atomic():
                 serializer.save()
                 return self.rest_success()
-            except IntegrityError as exc:
-                # 2015-03-09: We're having this problem in production,
-                # but I can't see what's going on, so I'm adding this
-                # error logging.  We're going to use
-                # self.rest_error(), but ignore the HttpResponse it
-                # returns because we want to re-raise the exception so
-                # it goes through regular uncaught exception handler
-                # paths.
-                self.rest_error(post_data, {'db': 'integrityerror %s' % exc})
-                raise
+        except IntegrityError:
+            pass
 
-        # We're updating an existing answer.
+        # Failing the save() above means there's an existing Answer,
+        # so we fetch the existing answer to update.
+        ans = Answer.objects.get(
+            person_id=valid_data.person_id,
+            survey_id=valid_data.survey_id,
+            flow_id=valid_data.flow_id
+        )
 
-        # Check the updated timestamp. If it's the same or older, we throw
-        # an error and skip it.
+        # Check the updated timestamp. If it's the same or older, we
+        # throw an error and skip it.
         if post_data['updated_ts'] <= ans.updated_ts:
             # FIXME: statsd, errorlog
             return self.rest_error(
