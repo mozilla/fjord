@@ -658,8 +658,9 @@ class PostResponseSerializer(serializers.Serializer):
         value = attrs[source]
         if value:
             if not is_url(value):
-                raise serializers.ValidationError(
-                    '{0} is not a valid url'.format(value))
+                msg = u'{0} is not a valid url'.format(value)
+                raise serializers.ValidationError(msg)
+
 
         return attrs
 
