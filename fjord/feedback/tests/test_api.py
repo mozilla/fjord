@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 import time
 from datetime import date, datetime, timedelta
@@ -5,7 +6,7 @@ from datetime import date, datetime, timedelta
 from django.core.cache import get_cache
 from django.test.client import Client
 
-from nose.tools import eq_
+from nose.tools import eq_, ok_
 
 from fjord.base.tests import TestCase, reverse
 from fjord.feedback import models
@@ -365,6 +366,33 @@ class PostFeedbackAPITest(TestCase):
                 eq_(email.email, data['email'])
             else:
                 eq_(getattr(feedback, field), data[field])
+
+    def test_invalid_unicode_url(self):
+        """Tests an API call with invalid unicode URL"""
+        data = {
+            'happy': True,
+            'description': u'Great!',
+            'category': u'ui',
+            'product': u'Firefox OS',
+            'channel': u'stable',
+            'version': u'1.1',
+            'platform': u'Firefox OS',
+            'locale': 'en-US',
+            'email': 'foo@example.com',
+            'url': 'தமிழகம்',
+            'manufacturer': 'OmniCorp',
+            'device': 'OmniCorp',
+            'country': 'US',
+            'user_agent': (
+                'Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0'
+            ),
+            'source': 'email',
+            'campaign': 'email_test',
+        }
+        r = self.client.post(reverse('feedback-api'), data)
+        ok_(r.rendered_content.startswith('{"url": ["'))
+        ok_(r.rendered_content.endswith('is not a valid url"]}'))
+        eq_(r.status_code, 400)
 
     def test_with_email(self):
         data = {
