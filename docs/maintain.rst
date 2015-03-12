@@ -185,7 +185,6 @@ should be an exceedingly rare occurrence.
 If ``.po`` files have errors, then those errors are noted in the
 postatus.txt files:
 
-* dev: https://input-dev.allizom.org/media/postatus.txt
 * stage: https://input.allizom.org/media/postatus.txt
 * prod: https://input.mozilla.org/media/postatus.txt
 

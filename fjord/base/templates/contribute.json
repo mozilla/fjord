@@ -22,8 +22,7 @@
     },
     "urls": {
         "prod": "https://input.mozilla.org/",
-        "stage": "https://input.allizom.org/",
-        "dev": "https://input-dev.allizom.org/"
+        "stage": "https://input.allizom.org/"
     },
     "keywords": [
         "python",
