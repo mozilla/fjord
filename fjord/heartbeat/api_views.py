@@ -17,13 +17,14 @@ class HeartbeatV2API(rest_framework.views.APIView):
         view = super(HeartbeatV2API, cls).as_view(**initkwargs)
         return cors_enabled('*', methods=['POST'])(view)
 
-    def rest_error(self, post_data, errors):
+    def rest_error(self, post_data, errors, log_errors=True):
         statsd.incr('heartbeat.error')
-        j_error('heartbeat', 'HeartbeatV2API', 'post', 'packet errors',
-                metadata={
-                    'post_data': post_data,
-                    'errors': errors
-                })
+        if log_errors:
+            j_error('heartbeat', 'HeartbeatV2API', 'post', 'packet errors',
+                    metadata={
+                        'post_data': post_data,
+                        'errors': errors
+                    })
         return rest_framework.response.Response(
             status=400,
             data={
@@ -76,7 +77,9 @@ class HeartbeatV2API(rest_framework.views.APIView):
             return self.rest_error(
                 post_data,
                 {'updated_ts': ('updated timestamp is same or older than '
-                                'existing data')})
+                                'existing data')},
+                log_errors=False
+            )
 
         # Everything is valid, so we update the Answer and save it.
 
