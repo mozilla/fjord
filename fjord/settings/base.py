@@ -379,9 +379,6 @@ MINIFY_BUNDLES = {
             'css/fjord.less',
             'css/monitor.less',
         ),
-        'stage': (
-            'css/stage.less',
-        ),
         'mobile/base': (
             'css/lib/normalize.css',
             'css/mobile/base.less',
@@ -556,12 +553,6 @@ TEMPLATE_DIRS = (
     path('templates'),
 )
 
-# Should robots.txt deny everything or disallow a calculated list of
-# URLs we don't want to be crawled?  Default is false, disallow
-# everything.  Also see
-# http://www.google.com/support/webmasters/bin/answer.py?answer=93710
-ENGAGE_ROBOTS = False
-
 # Always generate a CSRF token for anonymous users.
 ANON_ALWAYS = True
 
@@ -582,10 +573,6 @@ DOMAIN_METHODS = {
 }
 
 WSGI_APPLICATION = 'fjord.wsgi.application'
-
-# When set to True, this will cause a message to be displayed on all
-# pages that this is not production.
-SHOW_STAGE_NOTICE = False
 
 # Gengo settings
 GENGO_PUBLIC_KEY = None
@@ -669,11 +656,6 @@ HAS_SYSLOG = True
 SYSLOG_TAG = "http_app_playdoh"  # Change this after you fork.
 LOGGING_CONFIG = None
 LOGGING = {}
-
-try:
-    len(LOGGING)
-except AttributeError:
-    LOGGING = {}
 
 LOGGING.setdefault('loggers', {})['elasticsearch'] = {
     'level': logging.ERROR
