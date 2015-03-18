@@ -63,6 +63,7 @@ Are you an Input user? This is the section for you!
    api
    hb_api
    alerts_api
+   events_api
 
 
 Part 3: Maintaining The Site

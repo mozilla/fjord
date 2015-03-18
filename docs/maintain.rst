@@ -91,7 +91,7 @@ Adding support for a new product
 ================================
 
 To add support for a new product via product urls for the feedback form or the
-Input API, add a new entry to the Products table.
+Feedback API, add a new entry to the Products table.
 
 
 Adding a new locale

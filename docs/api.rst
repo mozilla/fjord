@@ -1,13 +1,13 @@
 .. _api-chapter:
 
-=====
- API
-=====
+============
+Feedback API
+============
 
 .. contents::
    :local:
 
-Fjord has several POST APIs and one GET API for data.
+The Feedback API is for getting/posting product feedback data.
 
 
 Getting product feedback: GET /api/v1/feedback/
@@ -156,7 +156,7 @@ Show sad responses for Windows platforms for the last day::
 
 
 Posting product feedback: POST /api/v1/feedback/
-================================================
+================--------========================
 
 :URL:            ``/api/v1/feedback/``
 :Method:         HTTP POST
@@ -417,219 +417,3 @@ HTTP 400
 HTTP 429
     There has been too many feedback postings from this IP address and
     the throttle trigger was hit. Try again later.
-
-
-Getting event data: /api/v1/events/
-===================================
-
-:URL:             ``/api/v1/events/``
-:Method:          HTTP GET
-:Payload format:  No payload--everything is done in the querystring
-:Response:        JSON
-
-Doing a GET without any querystring arguments will return all the event
-data.
-
-.. Note::
-
-   This API endpoint is still in flux. The documentation is
-   rudimentary at best. Amongst other things, it's difficult to
-   discover valid values for things.
-
-   If you're using this API endpoint and have issues, please
-   `open a bug
-   <https://bugzilla.mozilla.org/enter_bug.cgi?product=Input&rep_platform=all&op_sys=all&component=General>`_.
-
-.. Note::
-
-   The event data is pretty sparse at the moment and only contains
-   releases for Firefox and Firefox for Android. We plan to add to
-   this data.
-
-
-Filters
--------
-
-**products**
-    Strings. Comma separated list of products. For valid products, see
-    `<https://input.mozilla.org/>`_.
-
-    Examples::
-
-        ?products=Firefox
-        ?products=Firefox,Firefox for Android
-
-**date_start**
-    Date in YYYY-MM-DD format. Specifies the start for the date range you're
-    querying for.
-
-    Example::
-
-        ?date_start=2014-08-12
-
-**date_end**
-    Date in YYYY-MM-DD format. Specifies the end for the date range you're
-    querying for.
-
-    Defaults to today.
-
-    Example::
-
-        ?date_end=2014-08-12
-
-
-Curl example
-------------
-
-Minimal example:
-
-::
-
-    curl -v https://input.mozilla.org/api/v1/events/?products=Firefox
-
-
-Posting heartbeat feedback: /api/v1/hb/
-=======================================
-
-:URL:            ``/api/v1/hb/``
-:Method:         HTTP POST
-:Payload format: JSON--make sure to have ``Content-type: application/json``
-                 header
-
-
-Testing clients using the API
------------------------------
-
-.. Warning::
-
-   **DO NOT TEST YOUR CLIENT AGAINST OUR PRODUCTION SERVER. IT WILL
-   MAKE CHENG, MATT, TYLER AND I CROSS.**
-
-
-Seriously. Please don't test your client against our production
-server.
-
-Test your client against our stage server which runs the same code
-that our production server does. The url for the our stage server is::
-
-    https://input.allizom.org/
-                  ^^^^^^^
-
-
-Please make sure to use the correct domain!
-
-
-Required fields
----------------
-
-**locale**
-    String. Max length: 8. The locale of the user interface that the
-    user is using
-
-    Examples:``"en-US"``, ``"fr"``, ``"de"``
-
-**platform**
-    String. Max length: 30. The name of the operating system/platform
-    the product is running on.
-
-    Examples: ``"OS X"``, ``"Windows 8"``, ``"Firefox OS"``,
-    ``"Android"``, ``"Linux"``
-
-**product**
-    String. Max length: 30. The name of the product the user is giving
-    feedback on.
-
-    Examples:``"Firefox for Android"``, ``"Firefox OS"``
-
-    .. Note::
-
-       This must be a valid product in the system. Before you start
-       posting to Input, please talk to the User Advocacy folks or an
-       Input admin to have your product added.
-
-**channel**
-    String. Max length: 30. The channel of the product the user is
-    giving feedback on.
-
-    Examples:``"stable"``, ``"beta"``
-
-**version**
-    String. Max length: 30. The version of the product the user is
-    giving feedback on as a string.
-
-    Examples:``"22b2"``, ``"1.1"``
-
-
-    String. The operating system the user is using
-
-**poll**
-    String. Max length: 50. Alpha-numeric characters and ``-`` only. The
-    slug of the poll this heartbeat response is for.
-
-    Examples:``"is-firefox-fast"``
-
-    .. Note::
-
-       The poll must be created on the Input system you're testing
-       against and enabled. Otherwise you'll get errors.
-
-       Before you start posting to Input, please talk to the User
-       Advocacy folks or an Input admin to have your product added.
-
-**answer**
-    String. Max length: 10. The answer value.
-
-    Examples: ``"true"``, ``"false"``, ``"4"``
-
-
-Extra data
-    Any additional fields you provide in the POST data will get
-    glommed into a JSON object and stuck in the db.
-
-
-Curl examples
--------------
-
-Minimal example:
-
-::
-
-    curl -v -XPOST $URL \
-        -H 'Accept: application/json; indent=4' \
-        -H 'Content-type: application/json' \
-        -d '
-    {
-        "locale": "en-US",
-        "platform": "Linux",
-        "product": "Firefox",
-        "version": "30.0",
-        "channel": "stable",
-        "poll": "ou812",
-        "answer": "42"
-    }'
-
-
-Here's an example providing "extra" data:
-
-::
-
-    curl -v -XPOST $URL \
-        -H 'Accept: application/json; indent=4' \
-        -H 'Content-type: application/json' \
-        -d '
-    {
-        "locale": "en-US",
-        "platform": "Linux",
-        "product": "Firefox",
-        "version": "30.0",
-        "channel": "stable",
-        "poll": "ou812",
-        "answer": "42",
-        "favoritepie": "cherry",
-        "favoriteUAperson": "tyler"
-    }'
-
-The extra fields are plucked out and put in a JSON object and stored
-in the db like this::
-
-    {"favoritepie": "cherry", "favoriteUAperson": "tyler"}
