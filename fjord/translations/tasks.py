@@ -1,4 +1,5 @@
 from django.db.models.signals import post_save
+from django.utils.module_loading import import_by_path
 
 from celery import task
 
@@ -33,6 +34,16 @@ def translate_task(instance_key, system, src_lang, src_field,
     """
     instance = key_to_instance(instance_key)
     translate(instance, system, src_lang, src_field, dst_lang, dst_field)
+
+
+@task
+def translate_tasks_by_id_list(model_path, id_list):
+    """Takes a model path and a list of ids and generates translation tasks"""
+    model_cls = import_by_path(model_path)
+
+    objs = list(model_cls.objects.filter(id__in=id_list))
+    for obj in objs:
+        create_translation_tasks(obj)
 
 
 def create_translation_tasks(instance, system=None):

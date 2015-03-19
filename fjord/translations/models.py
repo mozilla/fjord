@@ -19,7 +19,7 @@ from .gengo_utils import (
 )
 from .utils import locale_equals_language
 from fjord.base.models import ModelBase
-from fjord.base.utils import wrap_with_paragraphs
+from fjord.base.utils import instance_to_key, wrap_with_paragraphs
 from fjord.journal.models import Record
 from fjord.journal.utils import j_error, j_info
 
@@ -36,6 +36,13 @@ class SuperModel(models.Model):
     locale = models.CharField(max_length=5)
     desc = models.CharField(blank=True, default=u'', max_length=100)
     trans_desc = models.CharField(blank=True, default=u'', max_length=100)
+
+    def generate_translation_jobs(self, system=None):
+        """This always returns a fake translation job"""
+        return [
+            (instance_to_key(self), u'fake', self.locale, u'desc',
+             u'en', u'trans_desc')
+        ]
 
 
 _translation_systems = {}

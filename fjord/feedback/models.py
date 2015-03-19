@@ -121,6 +121,22 @@ class Product(ModelBase):
         return self.__unicode__().encode('ascii', 'ignore')
 
 
+class ResponseManager(models.Manager):
+    def need_translations(self, date_start=None, date_end=None):
+        """Returns responses that are translationless
+
+        Allows for optional timeframe so we can use this for
+        identifying instances that need to be backfilled.
+
+        """
+        objs = self.filter(translated_description='')
+        if date_start:
+            objs = objs.filter(created__gte=date_start)
+        if date_end:
+            objs = objs.filter(created__lte=date_end)
+        return objs
+
+
 @register_auto_translation
 @register_live_index
 class Response(ModelBase):
@@ -184,6 +200,8 @@ class Response(ModelBase):
                                 default=u'')
 
     created = models.DateTimeField(default=datetime.now)
+
+    objects = ResponseManager()
 
     class Meta:
         ordering = ['-created']
