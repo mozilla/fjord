@@ -31,61 +31,69 @@ class PublicFeedbackAPI(rest_framework.views.APIView):
         search = models.ResponseMappingType.search()
         f = F()
 
-        if 'happy' in request.GET:
-            happy = {'0': False, '1': True}.get(request.GET['happy'], None)
-            if happy is not None:
-                f &= F(happy=happy)
+        if 'id' in request.GET:
+            id_list = request.GET['id'].split(',')
+            id_list = [smart_int(id_, fallback=None) for id_ in id_list]
+            id_list = [id_ for id_ in id_list if id_]
 
-        if 'platforms' in request.GET:
-            platforms = request.GET['platforms'].split(',')
-            if platforms:
-                f &= F(platform__in=platforms)
+            f &= F(id__in=id_list)
 
-        if 'locales' in request.GET:
-            locales = request.GET['locales'].split(',')
-            if locales:
-                f &= F(locale__in=locales)
+        else:
+            if 'happy' in request.GET:
+                happy = {'0': False, '1': True}.get(request.GET['happy'], None)
+                if happy is not None:
+                    f &= F(happy=happy)
 
-        if 'products' in request.GET:
-            products = request.GET['products'].split(',')
-            if products:
-                f &= F(product__in=products)
+            if 'platforms' in request.GET:
+                platforms = request.GET['platforms'].split(',')
+                if platforms:
+                    f &= F(platform__in=platforms)
 
-                if 'versions' in request.GET:
-                    versions = request.GET['versions'].split(',')
-                    if versions:
-                        f &= F(version__in=versions)
+            if 'locales' in request.GET:
+                locales = request.GET['locales'].split(',')
+                if locales:
+                    f &= F(locale__in=locales)
 
-        date_start = smart_date(request.GET.get('date_start', None))
-        date_end = smart_date(request.GET.get('date_end', None))
-        delta = smart_timedelta(request.GET.get('date_delta', None))
+            if 'products' in request.GET:
+                products = request.GET['products'].split(',')
+                if products:
+                    f &= F(product__in=products)
 
-        if delta is not None:
-            if date_end is not None:
-                date_start = date_end - delta
-            elif date_start is not None:
-                date_end = date_start + delta
-            else:
-                date_end = date.today()
-                date_start = date_end - delta
+                    if 'versions' in request.GET:
+                        versions = request.GET['versions'].split(',')
+                        if versions:
+                            f &= F(version__in=versions)
 
-        # We restrict public API access to the last 6 months.
-        six_months_ago = date.today() - timedelta(days=180)
-        if date_start:
-            date_start = max(six_months_ago, date_start)
-            f &= F(created__gte=date_start)
-        if date_end:
-            date_end = max(six_months_ago, date_end)
-            f &= F(created__lte=date_end)
+            date_start = smart_date(request.GET.get('date_start', None))
+            date_end = smart_date(request.GET.get('date_end', None))
+            delta = smart_timedelta(request.GET.get('date_delta', None))
+
+            if delta is not None:
+                if date_end is not None:
+                    date_start = date_end - delta
+                elif date_start is not None:
+                    date_end = date_start + delta
+                else:
+                    date_end = date.today()
+                    date_start = date_end - delta
+
+            # We restrict public API access to the last 6 months.
+            six_months_ago = date.today() - timedelta(days=180)
+            if date_start:
+                date_start = max(six_months_ago, date_start)
+                f &= F(created__gte=date_start)
+            if date_end:
+                date_end = max(six_months_ago, date_end)
+                f &= F(created__lte=date_end)
+
+            search_query = request.GET.get('q', None)
+            if search_query is not None:
+                search = search.query(description__sqs=search_query)
+
+            # FIXME: Probably want to make this specifyable
+            search = search.order_by('-created')
 
         search = search.filter(f)
-
-        search_query = request.GET.get('q', None)
-        if search_query is not None:
-            search = search.query(description__sqs=search_query)
-
-        # FIXME: Probably want to make this specifyable
-        search = search.order_by('-created')
 
         # Explicitly include only publicly visible fields
         search = search.values_dict(*models.ResponseMappingType.public_fields())
