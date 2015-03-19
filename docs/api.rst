@@ -41,6 +41,18 @@ recent 1,000 publicly visible responses for all products.
 Filters
 -------
 
+**id**
+    String. Comma-separated list of feedback response ids.
+
+    Example::
+
+        ?id=1
+        ?id=1,2,3,4
+
+    .. Note::
+
+       If you specify this, all other filters will be ignored.
+
 **q**
     String. Text query.
 

@@ -37,6 +37,54 @@ class PublicFeedbackAPITest(ElasticTestCase):
         eq_(json_data['count'], 3)
         eq_(len(json_data['results']), 3)
 
+    def test_id(self):
+        feedback = ResponseFactory()
+        self.refresh()
+
+        resp = self.client.get(reverse('feedback-api'), {'id': feedback.id})
+        json_data = json.loads(resp.content)
+        eq_(json_data['count'], 1)
+        eq_(len(json_data['results']), 1)
+        eq_(json_data['results'][0]['id'], feedback.id)
+
+    def test_multiple_ids(self):
+        # Create some responses that we won't ask for
+        for i in range(5):
+            feedback = ResponseFactory()
+
+        resps = []
+        for i in range(5):
+            feedback = ResponseFactory()
+            resps.append(feedback)
+
+        self.refresh()
+
+        resp = self.client.get(
+            reverse('feedback-api'),
+            {'id': ','.join([str(int(f.id)) for f in resps])}
+        )
+        json_data = json.loads(resp.content)
+        eq_(json_data['count'], 5)
+        eq_(len(json_data['results']), 5)
+        eq_(
+            sorted([item['id'] for item in json_data['results']]),
+            sorted([feedback.id for feedback in resps])
+        )
+
+    def test_junk_ids(self):
+        """Junk ids should just get ignored"""
+        feedback = ResponseFactory()
+        self.refresh()
+
+        resp = self.client.get(
+            reverse('feedback-api'),
+            {'id': str(feedback.id) + ',foo'}
+        )
+        json_data = json.loads(resp.content)
+        eq_(json_data['count'], 1)
+        eq_(len(json_data['results']), 1)
+        eq_(json_data['results'][0]['id'], feedback.id)
+
     def test_happy(self):
         self.create_basic_data()
 
