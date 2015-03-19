@@ -25,7 +25,7 @@ class RecordManager(models.Manager):
             msg=msg,
             metadata=metadata
         )
-        if instance:
+        if instance and isinstance(instance, models.Model):
             rec.content_object = instance
         rec.save()
         return rec
