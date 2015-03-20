@@ -202,7 +202,6 @@ class DennisTranslator(TranslationSystem):
             translated = Translator([], pipeline).translate_string(text)
             setattr(instance, dst_field, translated)
             instance.save()
-            self.log_info(instance=instance, action='translate', msg='success')
 
 
 # ---------------------------------------------------------
