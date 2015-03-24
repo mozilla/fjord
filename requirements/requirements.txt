@@ -1,4 +1,4 @@
-# Requirements from github urls because we're using non-reelased things
+# Requirements from github urls because we're using non-released things
 
 # django-mobility: no releases
 # sha256: vWKlBersFicnz_K9LUwnYlm1HhXt9bgxvWKB915vfog

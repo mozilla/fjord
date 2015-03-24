@@ -642,14 +642,6 @@ WAFFLE_OVERRIDE = True
 # Switch the test runner to django-nose
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-# For absolute urls
-try:
-    DOMAIN = socket.gethostname()
-except socket.error:
-    DOMAIN = 'localhost'
-PROTOCOL = "http://"
-PORT = 80
-
 ## Logging
 LOG_LEVEL = logging.INFO
 HAS_SYSLOG = True
