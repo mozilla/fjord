@@ -7,8 +7,6 @@ from fjord import manage_utils
 if __name__ == "__main__":
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fjord.settings')
 
-    print 'Using %s' % os.environ['DJANGO_SETTINGS_MODULE']
-
     # This has to get called after DJANGO_SETTINGS_MODULE stuff has
     # been sorted out.
     manage_utils.setup_environ()
