@@ -4,7 +4,7 @@ python: "2.7"
 node: "0.10"
 
 env:
-  globals:
+  global:
     - PIP_DOWNLOAD_CACHE="pip_cache"
   matrix:
     - TEST_SUITE=django
