@@ -1,4 +1,9 @@
-#!/usr/bin/env python
+"""This module holds all the functions that deal with starting up
+Fjord for both the developer and server environments.
+
+These functions shouldn't be used after startup is completed.
+
+"""
 import logging
 import os
 import site
@@ -6,15 +11,18 @@ import sys
 from itertools import chain
 
 
-current_settings = None
-execute_from_command_line = None
 log = logging.getLogger(__name__)
-ROOT = None
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Denotes that setup_environ has been run.
+_has_setup_environ = False
+
+# Prevent from patching twice.
+_has_patched = False
 
 
 def path(*a):
-    if ROOT is None:
-        _not_setup()
     return os.path.join(ROOT, *a)
 
 
@@ -22,8 +30,9 @@ def path(*a):
 class EmptyOptions(object):
     """Fake optparse options for compatibility with pip<1.2
 
-    pip<1.2 had a bug in parse_requirments() in which the ``options`` kwarg
-    was required. We work around that by passing it a mock object.
+    pip<1.2 had a bug in parse_requirments() in which the ``options``
+    kwarg was required. We work around that by passing it a mock
+    object.
 
     """
     default_vcs = None
@@ -98,12 +107,18 @@ def check_dependencies():
         sys.exit(1)
 
 
-def setup_environ(manage_file):
-    """Sets up a Django app within a manage.py file"""
-    # sys is global to avoid undefined local
-    global sys, current_settings, execute_from_command_line, ROOT
+def setup_environ():
+    """Sets up the Django environment
 
-    ROOT = os.path.dirname(os.path.abspath(manage_file))
+    1. sets up path and vendor/ stuff
+    2. validates settings
+    3. sets up django-celery
+
+    """
+    global _has_setup_environ
+
+    if _has_setup_environ:
+        return
 
     # Adjust the python path and put local packages in front.
     prev_sys_path = list(sys.path)
@@ -130,46 +145,90 @@ def setup_environ(manage_file):
                 sys.path.remove(item)
         sys.path[:0] = new_sys_path
 
-    from django.core.management import execute_from_command_line  # noqa
-
-    from fjord.settings import local as settings
-    current_settings = settings
+    from django.conf import settings
     validate_settings(settings)
+
+    import djcelery
+    djcelery.setup_loader()
+
+    _has_setup_environ = True
 
 
 def validate_settings(settings):
-    """
-    Raise an error in prod if we see any insecure settings.
-
-    This used to warn during development but that was changed in
-    71718bec324c2561da6cc3990c927ee87362f0f7
-    """
+    """Raise an error if we see insecure or missing settings"""
     from django.core.exceptions import ImproperlyConfigured
-    if settings.SECRET_KEY == '':
-        msg = 'settings.SECRET_KEY cannot be blank! Check your local settings'
-        if not settings.DEBUG:
+
+    if not settings.DATABASES['default']:
+        msg = 'DATABASES["default"] needs to be set.'
+        raise ImproperlyConfigured(msg)
+
+    if not getattr(settings, 'SECRET_KEY', None):
+        msg = 'settings.SECRET_KEY needs to be set.'
+        raise ImproperlyConfigured(msg)
+
+    if not settings.DEBUG:
+        if not getattr(settings, 'SECRET_KEY', 'notsecret'):
+            msg = 'settings.SECRET_KEY is set to "notsecret". please change.'
             raise ImproperlyConfigured(msg)
 
-    if getattr(settings, 'SESSION_COOKIE_SECURE', None) is None:
-        msg = ('settings.SESSION_COOKIE_SECURE should be set to True; '
-               'otherwise, your session ids can be intercepted over HTTP!')
-        if not settings.DEBUG:
+        if getattr(settings, 'SESSION_COOKIE_SECURE', None) is None:
+            msg = (
+                'settings.SESSION_COOKIE_SECURE should be set to True; '
+                'otherwise, your session ids can be intercepted over HTTP!'
+            )
             raise ImproperlyConfigured(msg)
 
-    hmac = getattr(settings, 'HMAC_KEYS', {})
-    if not len(hmac.keys()):
-        msg = 'settings.HMAC_KEYS cannot be empty! Check your local settings'
-        if not settings.DEBUG:
+        hmac = getattr(settings, 'HMAC_KEYS', {})
+        if not len(hmac.keys()):
+            msg = 'settings.HMAC_KEYS cannot be empty.'
             raise ImproperlyConfigured(msg)
 
 
-def _not_setup():
-    raise EnvironmentError(
-        'setup_environ() has not been called for this process')
+def monkeypatch():
+    """All the monkeypatching we have to do to get things running"""
+    global _has_patched
+    if _has_patched:
+        return
+
+    # Import for side-effect: configures logging handlers.
+    from fjord.settings.log_settings import noop
+    noop()
+
+    # Monkey-patch admin site.
+    from django.contrib import admin
+    from django.contrib.auth.decorators import login_required
+    from session_csrf import anonymous_csrf
+    from adminplus.sites import AdminSitePlus
+
+    # Patch the admin
+    admin.site = AdminSitePlus()
+    admin.site.login = login_required(anonymous_csrf(admin.site.login))
+
+    # Monkey-patch django forms to avoid having to use Jinja2's |safe
+    # everywhere.
+    import jingo.monkey
+    jingo.monkey.patch()
+
+    # Monkey-patch Django's csrf_protect decorator to use
+    # session-based CSRF tokens.
+    import session_csrf
+    session_csrf.monkeypatch()
+
+    from jingo import load_helpers
+    load_helpers()
+
+    logging.debug("Note: monkeypatches executed in %s" % __file__)
+
+    # Prevent it from being run again later.
+    _has_patched = True
 
 
 def main(argv=None):
-    if current_settings is None:
-        _not_setup()
+    if not _has_setup_environ:
+        raise EnvironmentError(
+            'setup_environ() has not been called for this process')
+
+    from django.core.management import execute_from_command_line
+
     argv = argv or sys.argv
     execute_from_command_line(argv)

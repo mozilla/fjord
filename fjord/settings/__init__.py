@@ -20,7 +20,3 @@ TEST = len(sys.argv) > 1 and sys.argv[1] == 'test'
 if TEST:
     print 'Using test configuration'
     from fjord.settings.test import *
-
-# Note: this is required since we are using the old celery API still.
-import djcelery
-djcelery.setup_loader()

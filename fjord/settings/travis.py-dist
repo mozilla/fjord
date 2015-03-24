@@ -30,4 +30,4 @@ CACHE_BACKEND = 'caching.backends.locmem://'
 ES_INDEX_PREFIX = 'input'
 ES_URLS = ['http://localhost:9200']
 
-SECRET_KEY = 'TravisShhhhhhhhh'
+SECRET_KEY = 'notsecret'

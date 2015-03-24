@@ -8,6 +8,8 @@ import socket
 
 from django.utils.functional import lazy
 
+from fjord.settings_utils import config
+
 
 ROOT = os.path.abspath(
     os.path.join(
@@ -31,11 +33,13 @@ ADMINS = ()
 MANAGERS = ADMINS
 DEV = False
 
-DATABASES = {}  # See settings_local.
+DATABASES = {'default': config('DATABASE_URL', type_='database_url')}
 
 SLAVE_DATABASES = []
 
 DATABASE_ROUTERS = ('multidb.PinningMasterSlaveRouter',)
+
+CACHES = {'default': config('CACHE_URL', type_='str')}
 
 # Site ID is used by Django's Sites framework.
 SITE_ID = 1
@@ -589,7 +593,9 @@ STATICFILES_FINDERS = (
 # ElasticSearch settings.
 
 # List of host urls for the ES hosts we should connect to.
-ES_URLS = ['http://localhost:9200']
+ES_URLS = config(
+    'ES_URLS', default='http://localhost:9200', type_='list_of_str'
+)
 
 # Dict of mapping-type-name -> index-name to use. Input pretty much
 # uses one index, so this should be some variation of:
@@ -598,7 +604,7 @@ ES_INDEXES = {'default': 'inputindex'}
 
 # Prefix for the index. This allows -dev and -stage to share the same
 # ES cluster, but not bump into each other.
-ES_INDEX_PREFIX = 'input'
+ES_INDEX_PREFIX = config('ES_INDEX_PREFIX', default='input', type_='str')
 
 # When True, objects that belong in the index will get automatically
 # indexed and deindexed when created and destroyed.

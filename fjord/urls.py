@@ -4,8 +4,8 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 # Note: This must come before importing admin because it patches the
 # admin.
-from fjord.base.monkeypatches import patch
-patch()
+from fjord.manage_utils import monkeypatch
+monkeypatch()
 
 from django.contrib import admin  # noqa
 
