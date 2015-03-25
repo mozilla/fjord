@@ -1,3 +1,6 @@
+from fjord.settings_utils import config
+
+
 DEBUG = TEMPLATE_DEBUG = True
 CELERY_ALWAYS_EAGER = True
 SESSION_COOKIE_SECURE = False
@@ -11,3 +14,9 @@ NOSE_ARGS = [
     '--nocapture',              # Don't capture stdout
     '--logging-clear-handlers'  # Clear all other logging handlers
 ]
+
+CACHES = {
+    'default': config(
+        'CACHE_URL', default='locmem://', type_='cache_url'
+    )
+}
