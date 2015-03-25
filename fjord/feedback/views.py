@@ -386,7 +386,17 @@ def feedback_router(request, product=None, version=None, channel=None,
     This also handles backwards-compatability with the old Firefox for
     Android form which can't have a CSRF token.
 
-    Note: We never want to cache this view.
+    .. Note::
+
+       1. We never want to cache this view
+
+       2. Pages returned from this view will get an::
+
+              X-Frame-Options: DENY
+
+          HTTP header. That's important because these pages have magic
+          powers and should never be used in frames. Please do not
+          change this!
 
     """
     view = None
