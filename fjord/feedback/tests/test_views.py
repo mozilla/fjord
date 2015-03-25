@@ -26,6 +26,18 @@ class TestRedirectFeedback(TestCase):
 class TestFeedback(TestCase):
     client_class = LocalizingClient
 
+    def test_xframe_header(self):
+        """Feedback form should *always* have X-FRAME-OPTIONS: DENY
+
+        This is because the feedback form can do various magic things
+        that shouldn't ever be framed.
+
+        """
+        url = reverse('feedback', args=(u'firefox',))
+        resp = self.client.get(url)
+        eq_(resp.status_code, 200)
+        eq_(resp['X-Frame-Options'], 'DENY')
+
     def test_valid_happy(self):
         """Submitting a valid happy form creates an item in the DB.
 
