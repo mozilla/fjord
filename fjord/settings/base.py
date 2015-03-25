@@ -4,7 +4,6 @@
 
 import logging
 import os
-import socket
 
 from django.utils.functional import lazy
 
@@ -39,7 +38,7 @@ SLAVE_DATABASES = []
 
 DATABASE_ROUTERS = ('multidb.PinningMasterSlaveRouter',)
 
-CACHES = {'default': config('CACHE_URL', type_='str')}
+CACHES = {'default': config('CACHE_URL', type_='cache_url')}
 
 # Site ID is used by Django's Sites framework.
 SITE_ID = 1
