@@ -358,7 +358,10 @@ class PostFeedbackAPITest(TestCase):
             'product': u'Firefox OS'
         }
 
-        r = self.client.post(reverse('feedback-api'), data)
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
         eq_(r.status_code, 201)
 
         feedback = models.Response.objects.latest(field_name='id')
@@ -404,7 +407,10 @@ class PostFeedbackAPITest(TestCase):
         # resulting Response. In most cases, the field names line up
         # between PostResponseSerializer and Response with the
         # exception of 'email' which is stored in a different table.
-        r = self.client.post(reverse('feedback-api'), data)
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
         eq_(r.status_code, 201)
 
         feedback = models.Response.objects.latest(field_name='id')
@@ -437,7 +443,10 @@ class PostFeedbackAPITest(TestCase):
             'source': 'email',
             'campaign': 'email_test',
         }
-        r = self.client.post(reverse('feedback-api'), data)
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
         ok_(r.rendered_content.startswith('{"url": ["'))
         ok_(r.rendered_content.endswith('is not a valid url"]}'))
         eq_(r.status_code, 400)
@@ -454,7 +463,10 @@ class PostFeedbackAPITest(TestCase):
             'email': 'foo@example.com'
         }
 
-        r = self.client.post(reverse('feedback-api'), data)
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
         eq_(r.status_code, 201)
 
         feedback = models.Response.objects.latest(field_name='id')
@@ -486,7 +498,10 @@ class PostFeedbackAPITest(TestCase):
             'slopmenow': 'bar'
         }
 
-        r = self.client.post(reverse('feedback-api'), data)
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
         eq_(r.status_code, 201)
 
         context = models.ResponseContext.objects.latest(field_name='id')
@@ -505,7 +520,10 @@ class PostFeedbackAPITest(TestCase):
             'foo012345678901234567890': 'bar'
         }
 
-        r = self.client.post(reverse('feedback-api'), data)
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
         eq_(r.status_code, 201)
 
         context = models.ResponseContext.objects.latest(field_name='id')
@@ -524,7 +542,10 @@ class PostFeedbackAPITest(TestCase):
             'foo': ('a' * 100) + 'b'
         }
 
-        r = self.client.post(reverse('feedback-api'), data)
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
         eq_(r.status_code, 201)
 
         context = models.ResponseContext.objects.latest(field_name='id')
@@ -545,7 +566,10 @@ class PostFeedbackAPITest(TestCase):
         for i in range(25):
             data['foo%02d' % i] = str(i)
 
-        r = self.client.post(reverse('feedback-api'), data)
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
         eq_(r.status_code, 201)
 
         context = models.ResponseContext.objects.latest(field_name='id')
@@ -562,9 +586,10 @@ class PostFeedbackAPITest(TestCase):
             'device': None
         }
 
-        r = self.client.post(reverse('feedback-api'),
-                             json.dumps(data),
-                             content_type='application/json')
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
         eq_(r.status_code, 400)
         assert 'device' in r.content
 
@@ -580,26 +605,28 @@ class PostFeedbackAPITest(TestCase):
             'email': 'foo@example'
         }
 
-        r = self.client.post(reverse('feedback-api'), data)
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
         eq_(r.status_code, 400)
         assert 'email' in r.content
 
-    # TODO: django-rest-framework 2.3.6 has a bug where BooleanField
-    # has a default value of False, so "required=True" has no
-    # effect. We really want to require that, so we'll have to wait
-    # for a bug fix or something.
-    #
-    # def test_missing_happy_returns_400(self):
-    #     data = {
-    #         'description': u'Great!',
-    #         'version': u'1.1',
-    #         'platform': u'Firefox OS',
-    #         'locale': 'en-US',
-    #     }
-    #
-    #     r = self.client.post(reverse('feedback-api'), data)
-    #     eq_(r.status_code, 400)
-    #     assert 'happy' in r.content
+    def test_missing_happy_returns_400(self):
+        data = {
+            'description': u'Great!',
+            'version': u'1.1',
+            'platform': u'Firefox OS',
+            'product': u'Firefox OS',
+            'locale': 'en-US',
+        }
+
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
+        eq_(r.status_code, 400)
+        assert 'happy' in r.content
 
     def test_missing_description_returns_400(self):
         data = {
@@ -611,7 +638,10 @@ class PostFeedbackAPITest(TestCase):
             'locale': 'en-US',
         }
 
-        r = self.client.post(reverse('feedback-api'), data)
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
         eq_(r.status_code, 400)
         assert 'description' in r.content
 
@@ -625,7 +655,10 @@ class PostFeedbackAPITest(TestCase):
             'locale': 'en-US',
         }
 
-        r = self.client.post(reverse('feedback-api'), data)
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
         eq_(r.status_code, 400)
         assert 'product' in r.content
 
@@ -640,7 +673,10 @@ class PostFeedbackAPITest(TestCase):
             'locale': 'en-US',
         }
 
-        r = self.client.post(reverse('feedback-api'), data)
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
         eq_(r.status_code, 400)
         assert 'product' in r.content
 
@@ -659,7 +695,10 @@ class PostFeedbackAPITest(TestCase):
             'locale': 'en-US',
         }
 
-        r = self.client.post(reverse('feedback-api'), data)
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
         eq_(r.status_code, 201)
 
         # 200th character is not fine.
@@ -674,7 +713,10 @@ class PostFeedbackAPITest(TestCase):
             'locale': 'en-US',
         }
 
-        r = self.client.post(reverse('feedback-api'), data)
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
         eq_(r.status_code, 400)
 
     def test_valid_urls(self):
@@ -706,7 +748,10 @@ class PostFeedbackAPITest(TestCase):
                 'locale': 'en-US',
             }
 
-            r = self.client.post(reverse('feedback-api'), data)
+            r = self.client.post(
+                reverse('feedback-api'),
+                content_type='application/json',
+                data=json.dumps(data))
             eq_(r.status_code, 201,
                 msg=('%s != 201 (%s)' % (r.status_code, url)))
 
@@ -735,7 +780,10 @@ class PostFeedbackAPITest(TestCase):
             'campaign': 'email_test',
         }
 
-        r = self.client.post(reverse('feedback-api'), data)
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
         eq_(r.status_code, 201)
 
         feedback = models.Response.objects.latest(field_name='id')
@@ -778,11 +826,17 @@ class PostFeedbackAPIThrottleTest(TestCase):
             # a sleep which means this test takes 5 seconds now.
             # FIXME: Look into this more for a better solution.
             time.sleep(0.05)
-            r = self.client.post(reverse('feedback-api'), data.next())
+            r = self.client.post(
+                reverse('feedback-api'),
+                content_type='application/json',
+                data=json.dumps(data.next()))
             eq_(r.status_code, 201)
 
         # This one should trip the throttle trigger
-        r = self.client.post(reverse('feedback-api'), data.next())
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data.next()))
         eq_(r.status_code, 429)
 
     def test_double_submit_throttle(self):
@@ -799,9 +853,15 @@ class PostFeedbackAPIThrottleTest(TestCase):
         }
 
         # First time is fine
-        r = self.client.post(reverse('feedback-api'), data)
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
         eq_(r.status_code, 201)
 
         # Second time and back off!
-        r = self.client.post(reverse('feedback-api'), data)
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
         eq_(r.status_code, 429)
