@@ -51,6 +51,7 @@ class ResponseFactory(factory.DjangoModelFactory):
     version = factory.LazyAttribute(
         lambda a: browsers.parse_ua(a.user_agent).browser_version)
     locale = u'en-US'
+    api = None
 
 
 class ResponseEmailFactory(factory.DjangoModelFactory):

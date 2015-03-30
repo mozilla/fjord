@@ -48,55 +48,48 @@ URLS = (
     u'http://mozilla.org/',
 )
 
-PRODUCTS = (
-    (u'Firefox', u'29.0'),
-    (u'Firefox', u'28.0'),
-    (u'Firefox', u'27.0'),
-    (u'Firefox for Android', u'29.0'),
-    (u'Firefox for Android', u'28.0'),
-    (u'Firefox for Android', u'27.0'),
-    (u'Firefox OS', u'1.2'),
-    (u'Firefox OS', u'1.1'),
-    (u'Firefox OS', u'1.0'),
+ALWAYS_API = ['Firefox OS']
+
+NEVER_API = ['Firefox']
+
+PRODUCT_TUPLES = (
+    # product, version, platform, user_agent, api?
+    (u'Firefox', u'17.0', u'Linux', u'Mozilla/5.0 (X11; Linux i686; rv:17.0) Gecko/17.0 Firefox/17.0'),  # noqa
+    (u'Firefox', u'22.0', u'Linux', u'Mozilla/5.0 (X11; Linux i686; rv:22.0) Gecko/20130306 Firefox/22.0'),  # noqa
+
+    (u'Firefox', u'18.0', u'Mac OSX', u'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:18.0) Gecko/20100101 Firefox/18.0'),  # noqa
+    (u'Firefox', u'20.0', u'Mac OSX', u'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:20.0) Gecko/20130208 Firefox/20.0'),  # noqa
+
+    (u'Firefox', u'10.0', u'Windows', u'Mozilla/5.0 (Windows NT 5.1; rv:10.0) Gecko/20100101 Firefox/10.0'),  # noqa
+    (u'Firefox', u'13.0.1', u'Windows', u'Mozilla/5.0 (Windows NT 5.1; rv:13.0) Gecko/20100101 Firefox/13.0.1'),  # noqa
+    (u'Firefox', u'19.0', u'Windows', u'Mozilla/5.0 (Windows NT 5.1; rv:19.0) Gecko/20100101 Firefox/19.0'),  # noqa
+
+    (u'Firefox for Android', u'14.0.2', u'Android', u'Mozilla/5.0 (Android; Mobile; rv:14.0) Gecko/14.0 Firefox/14.0.2'),  # noqa
+
+    (u'Firefox OS', u'1.0', u'Firefox OS', u'Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0'),  # noqa
+    (u'Firefox OS', u'1.1', u'Firefox OS', u'Mozilla/5.0 (Mobile; rv:18.1) Gecko/18.1 Firefox/18.1'),  # noqa
 )
 
-PLATFORMS = (
-    u'Linux',
-    u'Windows 8',
-    u'Mac OSX',
-)
 
-USER_AGENTS = (
-    # Linux
-    'Mozilla/5.0 (X11; Linux i686; rv:17.0) Gecko/17.0 Firefox/17.0',
-    'Mozilla/5.0 (X11; Linux i686; rv:22.0) Gecko/20130306 Firefox/22.0',
-
-    # OS X
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:18.0) Gecko/20100101 '
-    'Firefox/18.0',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:20.0) Gecko/20130208 '
-    'Firefox/20.0',
-
-    # Windows
-    'Mozilla/5.0 (Windows NT 5.1; rv:10.0) Gecko/20100101 Firefox/10.0',
-    'Mozilla/5.0 (Windows NT 5.1; rv:13.0) Gecko/20100101 Firefox/13.0.1',
-    'Mozilla/5.0 (Windows NT 5.1; rv:19.0) Gecko/20100101 Firefox/19.0',
-
-    # Android
-    'Mozilla/5.0 (Android; Mobile; rv:14.0) Gecko/14.0 Firefox/14.0.2',
-
-    # Firefox OS
-    'Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0',
-)
+def locale_generator():
+    while True:
+        if random.choice((True, False)):
+            yield 'en-US'
+        elif random.choice((True, False)):
+            yield random.choice(('es', 'de', 'fr', 'pt-BR'))
+        else:
+            yield random.choice(settings.PROD_LANGUAGES)
 
 
 def create_basic_sampledata():
+    print 'Generating 100 happy and 100 sad responses...'
     happy_feedback = sentence_generator(HAPPY_FEEDBACK)
     sad_feedback = sentence_generator(SAD_FEEDBACK)
 
-    products = sentence_generator(PRODUCTS)
-    platforms = sentence_generator(PLATFORMS)
-    locales = sentence_generator(settings.DEV_LANGUAGES)
+    # Note: We're abusing sentence_generator to just return random
+    # choice from a tuple of things.
+    products = sentence_generator(PRODUCT_TUPLES)
+    locales = locale_generator()
     urls = sentence_generator(URLS)
 
     # Create 100 happy responses.
@@ -105,15 +98,24 @@ def create_basic_sampledata():
     for i in range(100):
         product = products.next()
         now = now - random.randint(500, 2000)
+        if product[0] in ALWAYS_API:
+            api = '1'
+        elif product[0] in NEVER_API:
+            api = None
+        else:
+            api = random.choice(('1', None))
+
         objs.append(
             ResponseFactory.build(
                 happy=True,
                 description=happy_feedback.next(),
                 product=product[0],
                 version=product[1],
-                platform=platforms.next(),
+                platform=product[2],
+                user_agent=product[3],
                 locale=locales.next(),
-                created=datetime.datetime.fromtimestamp(now)
+                created=datetime.datetime.fromtimestamp(now),
+                api=api
             )
         )
 
@@ -122,34 +124,40 @@ def create_basic_sampledata():
     for i in range(100):
         product = products.next()
         now = now - random.randint(500, 2000)
+        if product[0] in ALWAYS_API:
+            api = '1'
+        elif product[0] in NEVER_API:
+            api = None
+        else:
+            api = random.choice(('1', None))
         objs.append(
             ResponseFactory.build(
                 happy=False,
                 description=sad_feedback.next(),
                 product=product[0],
                 version=product[1],
-                platform=platforms.next(),
+                platform=product[2],
                 locale=locales.next(),
+                user_agent=product[3],
                 url=urls.next(),
-                created=datetime.datetime.fromtimestamp(now)
+                created=datetime.datetime.fromtimestamp(now),
+                api=api
             )
         )
 
     Response.objects.bulk_create(objs)
 
 
-def create_additional_sampledata(samplesize):
+def create_additional_sampledata(samplesize='1000'):
     samplesize = int(samplesize)
 
-    print 'Working on generating {0} feedback responses....'.format(
-        samplesize)
+    print 'Generating {0} feedback responses...'.format(samplesize)
 
     happy_feedback = sentence_generator(HAPPY_FEEDBACK)
     sad_feedback = sentence_generator(SAD_FEEDBACK)
-    products = sentence_generator(PRODUCTS)
+    products = sentence_generator(PRODUCT_TUPLES)
     urls = sentence_generator(URLS)
-    user_agents = sentence_generator(USER_AGENTS)
-    locales = sentence_generator(settings.DEV_LANGUAGES)
+    locales = locale_generator()
 
     objs = []
 
@@ -166,16 +174,24 @@ def create_additional_sampledata(samplesize):
             url = urls.next()
 
         product = products.next()
+        if product[0] in ALWAYS_API:
+            api = '1'
+        elif product[0] in NEVER_API:
+            api = None
+        else:
+            api = random.choice(('1', None))
         objs.append(
             ResponseFactory.build(
                 happy=happy,
                 description=description,
                 product=product[0],
                 version=product[1],
+                platform=product[2],
                 url=url,
-                user_agent=user_agents.next(),
+                user_agent=product[3],
                 locale=locales.next(),
-                created=datetime.datetime.fromtimestamp(now)
+                created=datetime.datetime.fromtimestamp(now),
+                api=api
             )
         )
 
@@ -200,14 +216,12 @@ def generate_sampledata(options):
     If you specify a samplesize, then it randomly generates that
     many responses.
 
-    Otherwise it generates 5 happy and 5 sad responses.
+    Generates 50 happy and 50 sad and 1000 additional responses.
 
     """
-    samplesize = options.get('samplesize')
+    samplesize = options.get('samplesize', '1000')
 
-    if samplesize not in (None, True):
-        create_additional_sampledata(samplesize)
-    else:
-        create_basic_sampledata()
+    create_basic_sampledata()
+    create_additional_sampledata(samplesize)
 
-    print 'Done!  Please reindex to pick up db changes.'
+    print 'Done! Please run "./manage.py esreindex" to pick up db changes.'
