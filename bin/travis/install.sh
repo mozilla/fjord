@@ -18,4 +18,9 @@ npm list
 echo
 
 echo "Installing ElasticSearch"
-tar xzvf vendor/tarballs/elasticsearch-0.90.10.tar.gz > /dev/null
+ES_TARBALL="vendor/tarballs/elasticsearch-${ELASTICSEARCH_VERSION}.tar.gz"
+if [[ ! -f "${ES_TARBALL}" ]]; then
+    echo "Invalid version of Elasticsearch. Can't find ${ES_TARBALL}."
+    exit 1
+fi
+tar xzvf "${ES_TARBALL}" > /dev/null
