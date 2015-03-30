@@ -12,9 +12,14 @@ echo "Updating product details"
 python manage.py update_product_details
 
 echo "Starting ElasticSearch"
-pushd elasticsearch-0.90.10
-  # This will daemonize
-  ./bin/elasticsearch
+pushd "elasticsearch-${ELASTICSEARCH_VERSION}"
+# Elasticsearch 0.90.10 daemonizes by default. Other versions require
+# -d to be passed.
+if [[ "${ELASTICSEARCH_VERSION}" == "0.90.10" ]]; then
+    ./bin/elasticsearch
+else
+    ./bin/elasticsearch -d
+fi
 popd
 
 echo "Doing static dance."
