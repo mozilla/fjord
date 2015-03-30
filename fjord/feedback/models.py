@@ -42,6 +42,13 @@ class ProductManager(models.Manager):
         """Returns publicly visible products"""
         return self.filter(on_dashboard=True)
 
+    def from_slug(self, slug):
+        return self.get(slug=slug)
+
+    def get_product_map(self):
+        products = self.filter(enabled=True).values_list('slug', 'db_name')
+        return dict(list(products))
+
 
 class Product(ModelBase):
     """Represents a product we capture feedback for"""
@@ -97,18 +104,6 @@ class Product(ModelBase):
         help_text=u'User agent inferred browser for this product if any')
 
     objects = ProductManager()
-
-    @classmethod
-    def from_slug(cls, slug):
-        return cls.objects.get(slug=slug)
-
-    @classmethod
-    def get_product_map(cls):
-        """Return map of product slug -> db_name for enabled products"""
-        products = (cls.objects
-                    .filter(enabled=True)
-                    .values_list('slug', 'db_name'))
-        return dict(prod for prod in products)
 
     def collect_browser_data_for(self, browser):
         """Return whether we should collect browser data from this browser"""

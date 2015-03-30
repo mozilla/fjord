@@ -443,7 +443,7 @@ def feedback_router(request, product=None, version=None, channel=None,
         product = None
 
     elif (product is None
-          or product not in models.Product.get_product_map()):
+          or product not in models.Product.objects.get_product_map()):
 
         picker_products = models.Product.objects.filter(
             enabled=True, on_picker=True)
@@ -451,7 +451,7 @@ def feedback_router(request, product=None, version=None, channel=None,
             'products': picker_products
         })
 
-    product = models.Product.from_slug(product)
+    product = models.Product.objects.from_slug(product)
 
     if view is None:
         view = generic_feedback
