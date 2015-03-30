@@ -81,11 +81,24 @@
             toggleSubmitButton();
         });
 
-        $('#happy-button').click(function(ev) {
-            $('.happy').show();
-            $('.sad').hide();
-            $('#id_happy').val(1);
+        /**
+         * Selects happy/sad value and switches to the next card.
+         *
+         * @param {integer} val: 1 if happy, 0 if sad
+         */
+        function selectHappySad(val) {
+            if (val === 1) {
+                $('.happy').show();
+                $('.sad').hide();
+            } else {
+                $('.sad').show();
+                $('.happy').hide();
+            }
+            $('#id_happy').val(val);
             changeCard('moreinfo');
+        }
+        $('#happy-button').click(function(ev) {
+            selectHappySad(1);
             return false;
         });
         $('#happy-button').keypress(function(ev) {
@@ -94,10 +107,7 @@
             }
         });
         $('#sad-button').click(function(ev) {
-            $('.happy').hide();
-            $('.sad').show();
-            $('#id_happy').val(0);
-            changeCard('moreinfo');
+            selectHappySad(0);
             return false;
         });
         $('#sad-button').keypress(function(ev) {
@@ -155,6 +165,18 @@
             }
         });
 
+        // Switch to the intro card
         changeCard('intro', true);
+
+        // Handle pre-filled variables which could have the
+        // side-effect of switching cards, so we should do this last
+        var qs = fjord.getQuerystring();
+        if (qs.happy) {
+            if (qs.happy === '0') {
+                selectHappySad(0);
+            } else if (qs.happy === '1') {
+                selectHappySad(1);
+            }
+        }
     });
 }(jQuery, fjord, remoteTroubleshooting, document, window));

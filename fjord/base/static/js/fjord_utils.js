@@ -52,8 +52,6 @@ window.fjord = window.fjord || {};
             var opts = qs.split('&');
             for (i=0; i < opts.length; i++) {
                 var opt = opts[i].split('=');
-                console.log(opts[i]);
-                console.log(opt);
                 parsed[opt[0]] = opt[1];
             }
         }

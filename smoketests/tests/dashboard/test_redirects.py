@@ -54,11 +54,11 @@ class TestFeedbackRedirects(RedirectsBase):
     @pytest.mark.skip_selenium
     @pytest.mark.nondestructive
     def test_happy_backwards_compatibility(self, mozwebqa):
-        self._check_redirect(mozwebqa, '/happy', '/en-US/feedback#happy')
-        self._check_redirect(mozwebqa, '/happy/', '/en-US/feedback#happy')
+        self._check_redirect(mozwebqa, '/happy', '/en-US/feedback?happy=1')
+        self._check_redirect(mozwebqa, '/happy/', '/en-US/feedback?happy=1')
 
     @pytest.mark.skip_selenium
     @pytest.mark.nondestructive
     def test_sad_backwards_compatibility(self, mozwebqa):
-        self._check_redirect(mozwebqa, '/sad', '/en-US/feedback#sad')
-        self._check_redirect(mozwebqa, '/sad/', '/en-US/feedback#sad')
+        self._check_redirect(mozwebqa, '/sad', '/en-US/feedback?happy=0')
+        self._check_redirect(mozwebqa, '/sad/', '/en-US/feedback?happy=0')

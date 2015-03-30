@@ -30,15 +30,13 @@ from fjord.feedback.config import TRUNCATE_LENGTH
 
 
 def happy_redirect(request):
-    # TODO: Remove this when the addon gets fixed and is pointing to
-    # the correct urls.
-    return HttpResponseRedirect(reverse('feedback') + '#happy')
+    """Support older redirects from Input v1 era"""
+    return HttpResponseRedirect(reverse('feedback') + '?happy=1')
 
 
 def sad_redirect(request):
-    # TODO: Remove this when the addon gets fixed and is pointing to
-    # the correct urls.
-    return HttpResponseRedirect(reverse('feedback') + '#sad')
+    """Support older redirects from Input v1 era"""
+    return HttpResponseRedirect(reverse('feedback') + '?happy=0')
 
 
 @mobile_template('feedback/{mobile/}download_firefox.html')
@@ -162,6 +160,11 @@ def _handle_feedback_post(request, locale=None, product=None,
     campaign = get_data.pop('utm_campaign', [u''])[0]
     if campaign:
         opinion.campaign = campaign[:100]
+
+    # If they sent "happy=1"/"happy=0" in the querystring, it will get
+    # picked up by the javascript in the form and we can just drop it
+    # here.
+    get_data.pop('happy', None)
 
     platform = u''
 
