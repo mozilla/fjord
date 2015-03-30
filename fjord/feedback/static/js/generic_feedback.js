@@ -30,7 +30,7 @@
         window.onpopstate = function(ev) {
             // Switches the the appropriate card
             var pageId = ev.state ? ev.state.page : 'intro';
-            changeCard(pageId);
+            changeCard(pageId, true);
         };
 
         /**
