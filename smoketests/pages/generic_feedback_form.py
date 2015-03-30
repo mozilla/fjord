@@ -34,8 +34,11 @@ class GenericFeedbackFormPage(Page):
 
     _support_page_locator = (By.LINK_TEXT, 'Firefox Support')
 
-    def go_to_feedback_page(self, product_name):
-        self.selenium.get(self.base_url + '/feedback/' + product_name + '/')
+    def go_to_feedback_page(self, product_name, querystring=None):
+        url = self.base_url + '/feedback/' + product_name + '/'
+        if querystring:
+            url = url + '?' + querystring
+        self.selenium.get(url)
         self.is_the_current_page
 
     def is_product(self, product_name):

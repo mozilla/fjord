@@ -16,11 +16,11 @@ class TestRedirectFeedback(TestCase):
 
     def test_happy_redirect(self):
         r = self.client.get(reverse('happy-redirect'))
-        self.assertRedirects(r, reverse('feedback') + '#happy')
+        self.assertRedirects(r, reverse('feedback') + '?happy=1')
 
     def test_sad_redirect(self):
         r = self.client.get(reverse('sad-redirect'))
-        self.assertRedirects(r, reverse('feedback') + '#sad')
+        self.assertRedirects(r, reverse('feedback') + '?happy=0')
 
 
 class TestFeedback(TestCase):
@@ -177,6 +177,26 @@ class TestFeedback(TestCase):
 
         finally:
             r = self.client.get('/en-US/feedback/')
+
+    def test_happy_prefill_in_querystring_is_ignored(self):
+        url = reverse('feedback', args=(u'firefox',), locale='en-US')
+        url = url + '?happy=0&foo=bar'
+        resp = self.client.post(url, {
+            'happy': 1,
+            'description': u"Firefox is the best browser I've ever used!",
+        })
+
+        eq_(resp.status_code, 302)
+
+        # The url has 0, but the form data is 1, so it should end up as 1.
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(feedback.happy, 1)
+
+        # "happy=0" should be removed from the querystring before
+        # figuring out the context. So "foo=bar" should be in the
+        # context, but not "happy=0".
+        context = models.ResponseContext.objects.latest(field_name='id')
+        eq_(context.data, {'foo': 'bar'})
 
     def test_firefox_os_view(self):
         """Firefox OS returns correct view"""

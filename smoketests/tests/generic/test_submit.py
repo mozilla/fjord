@@ -77,6 +77,30 @@ class TestSubmit(object):
         Assert.equal(resp.locale.strip(), 'English (US)')
         Assert.equal(resp.site.strip(), 'example.com')
 
+    def test_submit_sad_feedback_using_prefill(self, mozwebqa):
+        timestamp = str(time.time())
+        desc = 'input-tests testing sad feedback ' + timestamp
+
+        # 1. go to the feedback form with sad prefill
+        feedback_pg = GenericFeedbackFormPage(mozwebqa)
+        feedback_pg.go_to_feedback_page('firefox', querystring='happy=0')
+
+        # 2. fill out description
+        feedback_pg.set_description(desc)
+
+        # 3. submit
+        thanks_pg = feedback_pg.submit(expect_success=True)
+        Assert.true(thanks_pg.is_the_current_page)
+
+        # 4. verify
+        dashboard_pg = DashboardPage(mozwebqa)
+        dashboard_pg.go_to_dashboard_page()
+        dashboard_pg.search_for(desc)
+        resp = dashboard_pg.messages[0]
+        Assert.equal(resp.type.strip(), 'Sad')
+        Assert.equal(resp.body.strip(), desc.strip())
+        Assert.equal(resp.locale.strip(), 'English (US)')
+
     def test_submitting_same_feedback_twice(self, mozwebqa):
         """Submitting the same feedback twice ignores the second"""
         timestamp = str(time.time())
