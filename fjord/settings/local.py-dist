@@ -5,23 +5,23 @@
 #    and fjord/settings/base.py for documentation.
 
 from fjord.settings.base import *
+from fjord.settings_utils import parse_cache_url, parse_database_url
 
+# Note: This assumes the user is "root", the password is "password" and the db
+# name is "fjord". If not, then adjust this accordingly.
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'fjord',
-        'USER': 'root',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'OPTIONS': {
-            'init_command': 'SET storage_engine=InnoDB',
-            'charset': 'utf8',
-            'use_unicode': True,
-        },
-        'TEST_CHARSET': 'utf8',
-        'TEST_COLLATION': 'utf8_general_ci',
-    },
+    'default': parse_database_url('mysql://root:password@localhost:54321/fjord')
 }
+
+# Note: This uses locmem for caching. If you want to use memcache, delete this
+# and uncomment the memcache version.
+CACHES = {
+    'default': parse_cache_url('locmem://')
+}
+
+# If you're using memcache, you can uncomment this and use it.
+# CACHES = {'default': parse_cache_url('memcached://localhost:11211/fjord')}
+
 
 # To extend any settings from settings/base.py here's an example:
 #INSTALLED_APPS = base.INSTALLED_APPS + ['debug_toolbar']
