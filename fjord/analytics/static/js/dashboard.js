@@ -133,8 +133,18 @@ $(function() {
         var options = {
             series: {
                 hover: true,
-                lines: { show: true, fill: false },
-                points: { show: true }
+                lines: {
+                    show: true,
+                    fill: false
+                },
+                points: {
+                    show: true,
+                    radius: 1,
+                    linewidth: 2,
+                    fill: false,
+                    symbol: 'circle'
+                },
+                shadowSize: 1
             },
             grid: {
                 markings: weekends

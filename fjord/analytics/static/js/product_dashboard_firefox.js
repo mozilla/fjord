@@ -66,7 +66,15 @@ $(function() {
         var data = $histogram.data('histogram');
         var options = {
             series: {
-                hover: true
+                points: {
+                    hover: true,
+                    show: false,
+                    radius: 1,
+                    linewidth: 2,
+                    fill: false,
+                    symbol: 'circle'
+                },
+                shadowSize: 1
             },
             grid: {
                 hoverable: true,
@@ -123,7 +131,15 @@ $(function() {
         var data = $histogram.data('histogram');
         var options = {
             series: {
-                hover: true
+                points: {
+                    hover: true,
+                    show: false,
+                    radius: 1,
+                    linewidth: 2,
+                    fill: false,
+                    symbol: 'circle'
+                },
+                shadowSize: 1
             },
             grid: {
                 hoverable: true,
@@ -174,7 +190,15 @@ $(function() {
         var data = $histogram.data('histogram');
         var options = {
             series: {
-                hover: true
+                points: {
+                    hover: true,
+                    show: false,
+                    radius: 1,
+                    linewidth: 2,
+                    fill: false,
+                    symbol: 'circle'
+                },
+                shadowSize: 1
             },
             grid: {
                 hoverable: true,
