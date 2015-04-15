@@ -306,12 +306,12 @@ footer {
   .contents {
     text-align: left;
     margin: auto;
-    max-width: 940px;
+    max-width: 700px;
 
     clear: both;
     background: url(../img/footer-logo.png) top left no-repeat;
     line-height: 140%;
-    padding-left: 60px;
+    padding: 0 30px 0 60px;
 
     p {
       margin-bottom: 0.5em;
@@ -340,8 +340,15 @@ footer {
     }
   }
 
-  #footer-links {
+  ul#footer-links {
     font-size: 85%;
+    padding: 0;
+    li {
+      display: inline;
+      &:not(:last-child):after {
+        content: " | ";
+      }
+    }
   }
 }
 

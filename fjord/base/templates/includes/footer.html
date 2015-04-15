@@ -3,17 +3,17 @@
     {% block lang_switcher %}
       {% include 'includes/lang_switcher.html' %}
     {% endblock %}
-    <p id="footer-links">
-      <a href="http://www.mozilla.org/privacy/websites">{{ _('Privacy Policy') }}</a> &nbsp;|&nbsp;
-      <a href="http://www.mozilla.org/about/legal.html">{{ _('Legal Notices') }}</a> &nbsp;|&nbsp;
-      <a href="http://www.mozilla.org/legal/fraud-report/">{{ _('Report Trademark Abuse') }}</a><br/>
-      <a href="{{ url('about-view') }}">{{ _('About Firefox Input') }}</a>
-    </p>
+    <ul id="footer-links">
+      <li><a href="http://www.mozilla.org/privacy/websites">{{ _('Privacy Policy') }}</a></li>
+      <li><a href="http://www.mozilla.org/about/legal.html">{{ _('Legal Notices') }}</a></li>
+      <li><a href="http://www.mozilla.org/legal/fraud-report/">{{ _('Report Trademark Abuse') }}</a></li>
+      <li><a href="{{ url('about-view') }}">{{ _('About Firefox Input') }}</a></li>
+    </ul>
     <p>
       {% trans legal_url='http://www.mozilla.com/en-US/about/legal.html#site',
            license_url='http://creativecommons.org/licenses/by-sa/3.0/' %}
         Except where otherwise <a href="{{ legal_url }}">noted</a>,
-        content on this site is licensed under the <br/>
+        content on this site is licensed under the
         <a href="{{ license_url }}">Creative Commons Attribution Share-Alike License v3.0</a>
         or any later version.
       {% endtrans %}

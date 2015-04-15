@@ -347,6 +347,103 @@ aside {
   }
 }
 
+#thanks {
+  .content {
+    padding: 0 0 200px;
+
+    h2 {
+      color: #6d7581;
+      font-family: Georgia, "Times New Roman", Times, serif;
+      font-size: 1.3rem;
+      font-style: italic;
+      margin-bottom: .25em;
+      margin-bottom: .375em;
+    }
+
+    .part {
+      margin: 0 auto;
+      padding: 0 1.8em;
+      text-align: left;
+    }
+
+    #thanks-news ul {
+      padding: 0;
+
+      li {
+        list-style: none;
+        padding: 5px;
+
+        a {
+          text-decoration: none;
+        }
+        a:hover span {
+          text-decoration: underline;
+        }
+        a:before {
+          background: url(../img/sharing.png) no-repeat 0 0;
+          content: " ";
+          display: inline-block;
+          height: 20px;
+          margin-right: .40em;
+          text-decoration: none;
+          width: 30px;
+        }
+
+        #twitter:before { background-position: 0 0; }
+        #facebook:before { background-position: -40px 0; }
+        #planet:before { background-position: -80px 0; }
+
+        #twitter:hover:before { background-position: 0 -40px; }
+        #facebook:hover:before { background-position: -40px -40px; }
+        #planet:hover:before { background-position: -80px -40px; }
+      }
+    }
+  }
+
+  footer {
+    background: #F8F8F8;
+    border-top: 1px solid #e0e0e0;
+    bottom: 0px;
+    color: #909090;
+    font-size: 11px;
+    height: 190px;
+    padding: 0 20px;
+    position: absolute;
+
+    &:hover {
+      color: #606060;
+    }
+
+    a {
+      color: inherit;
+      font-weight: bold;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .contents {
+      background: url(../img/footer-logo.png) no-repeat 0 0;
+      margin: 0 auto;
+      padding: 0 0 0 60px;
+      position: relative;
+    }
+
+    ul#footer-links {
+      padding: 0;
+
+      li {
+        list-style: none;
+      }
+    }
+
+    p {
+      line-height: 1.25;
+      margin-bottom: .25em;
+    }
+  }
+}
 
 /* media-query based overrides */
 @media only screen and (min-width: 768px) {
@@ -386,6 +483,34 @@ aside {
   .product-picker {
     .product-card {
         background-position: 50% 100%;
+    }
+  }
+  #thanks {
+    .content {
+      padding: 0 0 110px;
+      .part {
+        padding: 0.3em 1.8em;
+      }
+    }
+
+    #thanks-news ul {
+      li {
+        display: inline;
+      }
+    }
+
+    footer {
+      height: 100px;
+
+      ul#footer-links {
+        padding: 0;
+        li {
+          display: inline;
+          &:not(:last-child):after {
+            content: " | ";
+          }
+        }
+      }
     }
   }
 }
