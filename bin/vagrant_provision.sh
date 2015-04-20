@@ -55,7 +55,7 @@ VENV=/home/vagrant/.virtualenvs/fjordvagrant
 sudo -H -u vagrant virtualenv $VENV
 
 # Install bits we need for compiled requirements
-apt-get install -y -q libxml2 libxml2-dev libxslt1.1 libxslt1-dev
+apt-get install -y -q libxml2 libxml2-dev libxslt1.1 libxslt1-dev libyaml-dev
 
 # Install Fjord requirements
 sudo -H -u vagrant -s -- <<EOF
@@ -64,6 +64,7 @@ cd ~/fjord
 ./peep.sh install -r requirements/requirements.txt
 ./peep.sh install -r requirements/compiled.txt
 ./peep.sh install -r requirements/dev.txt
+pre-commit install -f
 EOF
 
 # Install Elasticsearch 0.90.10

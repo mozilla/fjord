@@ -18,3 +18,33 @@ django-sslserver==0.14
 
 # sha256: ku47hrXBkhwtnawhe--JkMX4Usi8TZAYyv4PPzuBzTo
 nosenicedots==0.5
+
+# sha256: jnbbT3Kv6QCHxHRntYjQ3j2_hvbj7nYqok7KqmyhuwM
+pre-commit==0.4.4
+
+# sha256: qRNwGDrqY8h9hIfns5ntLZmnwvFLEI0nwLyK2e9ZXZo
+aspy.yaml==0.2.1
+
+# sha256: 6gYn4M8e_0ZftBZrbt3sQW4dq48w1kucWz_6uJgHJmE
+cached-property==1.1.0
+
+# sha256: Epii8bL0xKe5IczNFZ5OQvbXsPt1yGwM3s_HHwYYM_o
+jsonschema==2.4.0
+
+# sha256: z-plZ1KzlnhB98MAocl1ZSYBPuGfOsR9srdxNP84tQk
+nodeenv==0.13.1
+
+# sha256: w2yTiocuX_SUk4szsUqqFWy0OexnVI_Ks1Nbt4sIRug
+pyyaml==3.11
+
+# sha256: PIjPffEUwyzwZR0S-Xm421VtmS1kdJPlvbvigovkAAc
+virtualenv==12.1.1
+
+# sha256: PkWmgeXnnrMfCUsxhDNG7Zo95Of2682hDHSLPEXFWX4
+simplejson==3.0.7
+
+# sha256: HDW0rCBs7y0kgWyJ-Jzyid09OM98RJuz-re_bUPwGx8
+ordereddict==1.1
+
+# sha256: s6eaI9N7WgL6pVC5LLu-vrSqHXfmScPrOcGav1Ji2gQ
+argparse==1.3.0
