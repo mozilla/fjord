@@ -14,6 +14,14 @@ for, etc.
 Coding conventions
 ==================
 
+Editor configuration
+--------------------
+
+We use .editorconfig to codify and enforce editor settings using
+editorconfig (http://editorconfig.org/). Install the editorconfig
+plugin for your editor to make use of the recommended settings.
+
+
 Git pre-commit hook
 -------------------
 
