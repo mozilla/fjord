@@ -4,6 +4,7 @@ import os
 import re
 import subprocess
 import sys
+import textwrap
 
 import requests
 from requests.exceptions import (
@@ -12,6 +13,14 @@ from requests.exceptions import (
 )
 
 BUG_PREFIX_REGEX = r'\[bug (\d+)\]'
+
+
+def wrap_paragraphs(text):
+    paragraphs = [
+        '\n'.join(textwrap.wrap(paragraph))
+        for paragraph in text.split('\n')
+    ]
+    return '\n'.join(paragraphs)
 
 
 def are_lines_not_more_than_79_chars(contents):
@@ -104,12 +113,27 @@ def lint_commit_msg(commit_msg_file, editor):
         print ''
         print '\n'.join(errors)
         print ''
+        if not editor:
+            print (
+                wrap_paragraphs(
+                    'You do not have EDITOR set in your environment. Please '
+                    'set EDITOR in your environment if you want to edit the '
+                    'commit message when there are errors. In the meantime '
+                    'you can do:\n'
+                    '\n'
+                    'git commit --amend\n'
+                    '\n'
+                    'to fix the issues listed above.'
+                )
+            )
+            return 0
+
         print (
             'Would you like to edit the message?\n'
-            '* y (yes): edit commit with $EDITOR\n'
+            '* y (yes): edit commit with %s\n'
             '* n (no): the commit will fail\n'
             '* i (ignore): the commit will succeed as is'
-        )
+        ) % editor
         print ''
         ret = raw_input('Edit commit message? [Y/n/i] ')
 
@@ -139,7 +163,7 @@ def lint_commit_msg(commit_msg_file, editor):
 
 if __name__ == '__main__':
     commit_msg_file = sys.argv[1]
-    editor = os.environ['EDITOR']
+    editor = os.environ.get('EDITOR', '')
     errors_found = lint_commit_msg(commit_msg_file, editor)
 
     if errors_found:
