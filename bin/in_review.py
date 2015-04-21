@@ -234,26 +234,24 @@ def print_git_stats(from_date, to_date):
     changes = {}
 
     for commit in all_commits:
-        author = git('git', 'log', '--format=%an',
-                     '{0}~..{1}'.format(commit, commit))
-
+        author = git('git', 'show', '-s', '--format=%an', commit)
         author = author.strip()
-        # FIXME - this is lame. what's going on is that there are
-        # merge commits which have multiple authors, so we just grab
-        # the second one.
-        if '\n' in author:
-            author = author.splitlines()[1]
 
         committers[author] = committers.get(author, 0) + 1
         all_people.add(author)
 
-        diff_data = git('git', 'diff', '--numstat', '--find-copies-harder',
-                        '{0}~..{1}'.format(commit, commit))
+        diff_data = git('git', 'show', '--numstat', '--format=oneline',
+                        '--find-copies-harder', commit)
         total_added = 0
         total_deleted = 0
         total_files = 0
 
-        for line in diff_data.splitlines():
+        # Skip the first line because it's the oneline summary and that's
+        # not part of the numstat data we want.
+        lines = diff_data.splitlines()[1:]
+        for line in lines:
+            if not line:
+                continue
             added, deleted, fn = line.split('\t')
             if fn.startswith('vendor/'):
                 continue
