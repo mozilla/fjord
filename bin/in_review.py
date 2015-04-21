@@ -321,6 +321,10 @@ def main(argv):
     if len(argv) == 1:
         from_date = datetime.date(year, 1, 1)
         to_date = datetime.date(year, 12, 31)
+
+        # Add 1 day because we do less-than.
+        to_date = to_date + datetime.timedelta(days=1)
+
         print_header('Year %s (%s -> %s)' % (year, from_date, to_date))
 
     else:
@@ -331,6 +335,9 @@ def main(argv):
             year, quarter_dates[0][0], quarter_dates[0][1])
         to_date = datetime.date(
             year, quarter_dates[1][0], quarter_dates[1][1])
+
+        # Add 1 day because we do less-than.
+        to_date = to_date + datetime.timedelta(days=1)
 
         print_header('Quarter %sq%s (%s -> %s)' % (
             year, quarter, from_date, to_date))
