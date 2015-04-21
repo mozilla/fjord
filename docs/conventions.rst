@@ -26,14 +26,15 @@ Git pre-commit hook
 -------------------
 
 We have a Git pre-commit hook that makes it easier to make sure you're
-checking in linted code. To set it up, run::
+checking in linted code. To set it up, run this command in the VM::
 
-    $ ./bin/hooks/lint.pre-commit
+    $ pre-commit install
 
 That'll set up the pre-commit hook. After that, every time you commit
 something in Git, it'll run the hook first and if everything is fine
 continue with the commit. If things are not fine, it'll notify you and
-stop.
+stop. In case, you had already installed the previous pre-commit hook
+overwrite it by using the -f flag with the above command.
 
 
 Python conventions
@@ -45,10 +46,7 @@ Follow `PEP-8 <http://python.org/dev/peps/pep-0008/>`_ for code and
 If you don't have an editor that checks PEP-8 issues and runs pyflakes
 for you, it's worth setting it up.
 
-You can also use the linting script ``bin/flake8_lint.sh``::
-
-    $ ./bin/flake8_lint.sh <files-to-lint>
-
+The pre-commit hook uses the ``flake8`` tool to lint the code to be committed.
 
 JavaScript
 ----------
