@@ -390,10 +390,6 @@ MINIFY_BUNDLES = {
             'css/lib/normalize.css',
             'css/feedback.less',
         ),
-        'thanks': (
-            'css/lib/normalize.css',
-            'css/thanks.less',
-        ),
     },
     'js': {
         'base': (
@@ -470,11 +466,6 @@ MINIFY_BUNDLES = {
             'js/cards.js',
             'js/common_feedback.js',
             'js/generic_feedback.js',
-            'js/ga.js',
-        ),
-        'thanks': (
-            'js/lib/jquery.min.js',
-            'js/init.js',
             'js/ga.js',
         ),
         'fxos_feedback': (
