@@ -1,13 +1,5 @@
 {% extends "feedback/base.html" %}
 
-{% block extra_headers %}
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-{% endblock %}
-
-{% block site_css %}
-  {{ css('generic_feedback') }}
-{% endblock %}
-
 {% block site_js %}
   {{ js('generic_feedback') }}
 {% endblock %}
@@ -37,7 +29,7 @@
       </header>
 
       <div class="deck">
-        <div class="card" id="intro" data-title="{{ _('{product} feedback')|fe(product=product.display_name) }}">
+        <div class="card no-back" id="intro" data-title="{{ _('{product} feedback')|fe(product=product.display_name) }}">
           <section>
             <div class="ask">
               <noscript>
@@ -47,7 +39,7 @@
                   {% endtrans %}
                 </p>
               </noscript>
-              
+
               {% trans product=product.display_name %}
                 How does {{product}} make you feel?
               {% endtrans %}

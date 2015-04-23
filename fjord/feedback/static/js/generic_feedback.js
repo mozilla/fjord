@@ -1,36 +1,11 @@
-(function($, fjord, remoteTroubleshooting, document, window) {
+(function($, fjord, cards, remoteTroubleshooting, document, window) {
     'use strict';
 
     $(document).ready(function() {
-        /**
-         * Switches to the card with id #cardId. This also updates the
-         * window history via pushState.
-         */
-        function changeCard(cardId, firstCard) {
-            // Make active card inactive
-            $('.card:not(.inactive)').addClass('inactive');
-
-            // Set title, add back-button, make new card active
-            var $card = $('#' + cardId);
-            $('header h1').text($card.attr('data-title'));
-            if ($card.attr('data-back-id') !== undefined) {
-                $('#back-button-container').show();
-            } else {
-                $('#back-button-container').hide();
-            }
-            $card.removeClass('inactive');
-            if ($card.attr('data-focus') !== undefined) {
-                $($card.attr('data-focus')).focus();
-            }
-            if (!firstCard) {
-                window.history.pushState({page: cardId}, '', '#' + cardId);
-            }
-        }
-
         window.onpopstate = function(ev) {
             // Switches the the appropriate card
             var pageId = ev.state ? ev.state.page : 'intro';
-            changeCard(pageId, true);
+            cards.changeCard(pageId, false);
         };
 
         /**
@@ -95,7 +70,9 @@
                 $('.happy').hide();
             }
             $('#id_happy').val(val);
-            changeCard('moreinfo');
+            // The happy/sad card is the intro card. This changes to
+            // the next card in the sequence.
+            cards.changeCard('forward');
         }
         $('#happy-button').click(function(ev) {
             selectHappySad(1);
@@ -127,6 +104,11 @@
                 $('#back-button-container').click();
             }
         });
+        $('button.next').click(function(ev) {
+            cards.changeCard('forward');
+            return false;
+        });
+
         $('#email-ok').on('change', function() {
             var checked = $(this).is(':checked');
             $('#id_email').prop('disabled', !checked);
@@ -166,7 +148,7 @@
         });
 
         // Switch to the intro card
-        changeCard('intro', true);
+        cards.changeCard('intro', false);
 
         // Handle pre-filled variables which could have the
         // side-effect of switching cards, so we should do this last
@@ -179,4 +161,4 @@
             }
         }
     });
-}(jQuery, fjord, remoteTroubleshooting, document, window));
+}(jQuery, fjord, cards, remoteTroubleshooting, document, window));

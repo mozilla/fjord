@@ -386,19 +386,13 @@ MINIFY_BUNDLES = {
             'css/lib/normalize.css',
             'css/mobile/base.less',
         ),
-        'generic_feedback': (
+        'feedback': (
             'css/lib/normalize.css',
-            'css/generic_feedback.less',
+            'css/feedback.less',
         ),
         'thanks': (
             'css/lib/normalize.css',
             'css/thanks.less',
-        ),
-        'fxos_feedback': (
-            'css/lib/normalize.css',
-            'css/lib/brick-1.0.0.byob.min.css',
-            'css/feedback_base.less',
-            'css/fxos_feedback.less',
         ),
     },
     'js': {
@@ -473,6 +467,7 @@ MINIFY_BUNDLES = {
             'js/lib/jquery.min.js',
             'js/fjord_utils.js',
             'js/remote.js',
+            'js/cards.js',
             'js/common_feedback.js',
             'js/generic_feedback.js',
             'js/ga.js',
@@ -485,6 +480,7 @@ MINIFY_BUNDLES = {
         'fxos_feedback': (
             'js/lib/jquery.min.js',
             'js/fjord_utils.js',
+            'js/cards.js',
             'js/common_feedback.js',
             'js/fxos_feedback.js',
             'js/ga.js',
@@ -650,7 +646,7 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 ## Logging
 LOG_LEVEL = logging.INFO
 HAS_SYSLOG = True
-SYSLOG_TAG = "http_app_playdoh"  # Change this after you fork.
+SYSLOG_TAG = 'http_app_playdoh'  # Change this after you fork.
 LOGGING_CONFIG = None
 LOGGING = {}
 
