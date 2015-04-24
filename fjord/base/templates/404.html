@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 
 {% block page_title %}{{ _('Not Found') }}{% endblock %}
-
+{% block site_css %}
+      {{ css('base') }}
+      <link rel="stylesheet" href="{{ settings.STATIC_URL }}css/style.css"/>
+    {% endblock %}
 {% block content %}
-  <div class="col"></div>
+ <div class="col"></div>
   <div class="col wide">
     <div class="block">
-      <h1>{{ _('Not Found') }}</h1>
-      <p>
-        {{ _('The document could not be found.') }}
-      </p>
-      <p>
+      <img id="image" src="{{ settings.STATIC_URL }}img/fjord404.jpg"/>
+      <p id="text">{{ _('The document could not be found.') }}</p>
+
+            <p>
         <a href="/">{{ _('Return to the dashboard.') }}</a>
       </p>
     </div>

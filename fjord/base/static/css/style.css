@@ -1,0 +1,16 @@
+#image
+{    
+    position:relative;
+    left:0;
+    top:0;
+}
+#text
+{
+    z-index:100;
+    position:absolute;    
+    color:#73D6D6;
+    font-size:24px;
+    font-weight:bold;
+    left:610px;
+    top:95px;
+}
