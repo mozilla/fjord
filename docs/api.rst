@@ -168,7 +168,7 @@ Show sad responses for Windows platforms for the last day::
 
 
 Posting product feedback: POST /api/v1/feedback/
-================--------========================
+================================================
 
 :URL:            ``/api/v1/feedback/``
 :Method:         HTTP POST
