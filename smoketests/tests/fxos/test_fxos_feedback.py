@@ -31,23 +31,25 @@ class TestFeedback(TestCase):
         feedback_pg.click_device_next()
 
         # 5. fill in description
-        Assert.false(feedback_pg.is_moreinfo_next_enabled)
+        Assert.false(feedback_pg.is_submit_enabled)
         feedback_pg.set_description(desc)
-        Assert.true(feedback_pg.is_moreinfo_next_enabled)
-        feedback_pg.click_moreinfo_next()
+        Assert.true(feedback_pg.is_submit_enabled)
 
-        self.take_a_breather()
+        # 6. fill in url
+        # FIXME: set url
 
-        # 6. fill in email address
+        # 7. fill in email address
+        # FIXME: check email input disabled
         feedback_pg.check_email_checkbox()
+        # FIXME: check email input enabled
         feedback_pg.set_email('foo@example.com')
 
-        # 7. submit
+        # 8. submit
         feedback_pg.submit(expect_success=True)
         self.take_a_breather()
         Assert.equal(feedback_pg.current_card, 'thanks')
 
-        # 8. verify
+        # 9. verify
         dashboard_pg = DashboardPage(mozwebqa)
         dashboard_pg.go_to_dashboard_page()
         dashboard_pg.search_for(desc)
@@ -55,8 +57,42 @@ class TestFeedback(TestCase):
         Assert.equal(resp.type.strip(), 'Happy')
         Assert.equal(resp.body.strip(), desc.strip())
         Assert.equal(resp.locale.strip(), 'English (US)')
+        # FIXME: test email (can't because it's hidden when not authenticated)
+        # FIXME: test url (can't because it's hidden when not authenticated)
 
-    # FIXME: Test sad submit
+    def test_submit_sad_feedback(self, mozwebqa):
+        timestamp = str(time.time())
+        desc = 'input-tests testing sad fxos feedback ' + timestamp
+
+        # 1. go to the feedback form
+        feedback_pg = FxOSFeedbackFormPage(mozwebqa)
+        feedback_pg.go_to_feedback_page()
+
+        # 2. click on happy
+        feedback_pg.click_sad_feedback()
+
+        # 3. pick default country
+        feedback_pg.click_country_next()
+
+        # 4. pick default device
+        feedback_pg.click_device_next()
+
+        # 5. fill in description
+        feedback_pg.set_description(desc)
+
+        # 6. submit
+        feedback_pg.submit(expect_success=True)
+        self.take_a_breather()
+        Assert.equal(feedback_pg.current_card, 'thanks')
+
+        # 7. verify
+        dashboard_pg = DashboardPage(mozwebqa)
+        dashboard_pg.go_to_dashboard_page()
+        dashboard_pg.search_for(desc)
+        resp = dashboard_pg.messages[0]
+        Assert.equal(resp.type.strip(), 'Sad')
+        Assert.equal(resp.body.strip(), desc.strip())
+        Assert.equal(resp.locale.strip(), 'English (US)')
 
     # FIXME: Test back and forth
 

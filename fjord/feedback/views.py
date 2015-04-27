@@ -1,7 +1,6 @@
 import json
 from functools import wraps
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils import translation
@@ -315,6 +314,7 @@ def firefox_os_stable_feedback(request, locale=None, product=None,
         'countries': countries,
         'devices': config.FIREFOX_OS_DEVICES,
         'TRUNCATE_LENGTH': TRUNCATE_LENGTH,
+        'product': product
     })
 
 

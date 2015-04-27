@@ -1,11 +1,6 @@
-{% extends "mobile/base.html" %}
-
-{% block site_css %}
-  {{ css('fxos_feedback') }}
-{% endblock %}
+{% extends "feedback/base.html" %}
 
 {% block site_js %}
-  <script src="{{ settings.STATIC_URL }}js/lib/brick-1.0.0.byob.min.js"></script>
   {{ js('fxos_feedback') }}
 {% endblock %}
 
@@ -13,221 +8,264 @@
 
 {% set extra_body_attrs = {'data-form-name': 'fxos'} %}
 
-{% block site_header %}{% endblock %}
-
-{% block content_block %}
-<x-deck transition-type="slide-left">
-  <x-card id="intro">
-    <x-appbar heading="{{ _('Submit feedback') }}" subheading=""></x-appbar>
-
-    <section class="cf">
-      <div>
-        <p>{{ _('Your feedback helps us improve Firefox OS.') }}</p>
-
-        <div class="emotions">
-          <div>
-            <button class="happy">{{ _('Firefox OS made me happy') }}</button>
-            <button class="sad">{{ _('Firefox OS made me sad') }}</button>
+{% block body %}
+  {# FIXME: form id="responseform" #}
+  <div class="main">
+    <header>
+      <div class="header-content">
+        <div class="left-side">
+          <div id="back-button-container" tabindex=0>
+            <svg id="back-button" viewBox="0 0 55 100">
+              <g>
+                <path d="M 45 13 L 0 50 L 45 87" stroke-width="7" fill="none"/>
+              </g>
+            </svg>
           </div>
         </div>
+        <div class="middle">
+          <h1>&nbsp;</h1>
+        </div>
+      </div>
+    </header>
 
-        <aside>
-          <span>
-          {% trans support_url='http://support.mozilla.org/' %}
-          If you need help or have a problem
-          with Firefox OS, please visit <a href="{{ support_url }}">Mozilla Support</a>.
-          {% endtrans %}
-          </span>
-        </aside>
+    <div class="deck">
+      <div class="card no-back" id="intro" data-title="{{ _('{product} feedback')|fe(product=product.display_name) }}">
+        <section>
+          <div class="ask">
+            <noscript>
+              <p class="error">
+                {% trans %}
+                  JavaScript is required to leave feedback. Please enable JavaScript in your browser and refresh this page.
+                {% endtrans %}
+              </p>
+            </noscript>
 
+            {# FIXME: hard-coded product name here #}
+            {{ _('Your feedback helps us improve Firefox OS.') }}
+          </div>
+
+          <div id="sentiment">
+            <div id="happy-button" class="sentiment-button" tabindex=0>
+              <svg class="face happy-face" viewBox="0 0 100 100">
+                <g>
+                  <!-- 100 by 100 -->
+                  <circle cx="50" cy="50" r="43" stroke-width="7" fill="none"/>
+                  <circle cx="33" cy="37" r="7" stroke-width="0" />
+                  <circle cx="67" cy="37" r="7" stroke-width="0" />
+                  <path d="M22 58 C 35 85, 65 85, 78 58" stroke-width="6" fill="none"/>
+                </g>
+              </svg>
+              <div class="face-description">
+                {% trans product=product.display_name %}
+                  {{product}} makes me happy
+                {% endtrans %}
+              </div>
+            </div>
+
+            <div id="sad-button" class="sentiment-button" tabindex=0>
+              <svg class="face sad-face" viewBox="0 0 100 100">
+                <g>
+                  <!-- 100 by 100 -->
+                  <circle cx="50" cy="50" r="43" stroke-width="7" fill="none"/>
+                  <circle cx="33" cy="37" r="7" stroke-width="0" />
+                  <circle cx="67" cy="37" r="7" stroke-width="0" />
+                  <path d="M24 72 C 35 55, 65 55, 76 72" stroke-width="6" fill="none"/>
+                </g>
+              </svg>
+              <div class="face-description">
+                {% trans product=product.display_name %}
+                  {{product}} makes me sad
+                {% endtrans %}
+              </div>
+            </div>
+          </div>
+
+          <aside>
+            <div id="back-to-picker">
+              {% trans product=product.display_name, url=url('feedback') + '?' + request.GET.urlencode() %}
+                Is {{product}} not the product you want to give feedback on?<br />
+                <a href="{{url}}">Pick a different product</a>.
+              {% endtrans %}
+            </div>
+          </aside>
+        </section>
         <input type="hidden" name="happy" id="happy" value="0"/>
       </div>
-    </section>
-  </x-card>
 
-  <x-card id="country">
-    <x-appbar>
-      <button class="back"></button>
-      <header>{{ _('Country') }}</header>
-    </x-appbar>
-
-    <section class="cf">
-      <div>
-        <p>
-          {{ _('In what country did you purchase your Firefox OS device?') }}
-        </p>
-        <select name="country">
-          {% for value, display in countries %}
-            <option value="{{ value }}">{{ display }}</option>
-          {% endfor %}
-          <option value="">{{ _('Other') }}</option>
-        </select>
-        <button class="next btn submit">{{ _('Next') }}</button>
-        <input type="hidden" id="locale" name="locale" value="{{ request.locale }}"/>
+      {# FIXME: should data-focus get set? #}
+      <div class="card inactive" id="country" data-focus="" data-title="{{ _('Country') }}">
+        <section>
+          <div class="ask">
+            {# FIXME: for="xxx" #}
+            <label>
+              {{ _('In what country did you purchase your Firefox OS device?') }}
+            </label>
+          </div>
+          <div class="input-box">
+            <select name="country">
+              {% for value, display in countries %}
+                <option value="{{ value }}">{{ display }}</option>
+              {% endfor %}
+              <option value="">{{ _('Other') }}</option>
+            </select>
+          </div>
+          <div class="input-box">
+            {# FIXME: id="form-submit-btn" #}
+            <button class="btn next">{{ _('Next') }}</button>
+          </div>
+          <input type="hidden" id="locale" name="locale" value="{{ request.locale }}"/>
+        </section>
       </div>
-    </section>
-  </x-card>
 
-  <x-card id="device">
-    <x-appbar>
-      <button class="back"></button>
-      <header>{{ _('Device') }}</header>
-    </x-appbar>
-
-    <section class="cf">
-      <div>
-        <p>
-          {{ _('What Firefox OS device are you using?') }}
-        </p>
-        <select name="device">
-          {% for value in devices %}
-            <option value="{{ value }}">{{ value }}</option>
-          {% endfor %}
-          <option value="">{{ _('Other') }}</option>
-        </select>
-        <button class="next btn submit">{{ _('Next') }}</button>
+      {# FIXME: should data-focus get set? #}
+      <div class="card inactive" id="device" data-focus="" data-title="{{ _('Device') }}">
+        <section>
+          <div class="ask">
+            {# FIXME: for="xxx" #}
+            <label>
+              {{ _('What Firefox OS device are you using?') }}
+            </label>
+          </div>
+          <div class="input-box">
+            <select name="device">
+              {% for value in devices %}
+                <option value="{{ value }}">{{ value }}</option>
+              {% endfor %}
+              <option value="">{{ _('Other') }}</option>
+            </select>
+          </div>
+          <div class="input-box">
+            {# FIXME: id="form-submit-btn" #}
+            <button class="btn next">{{ _('Next') }}</button>
+          </div>
+        </section>
       </div>
-    </section>
-  </x-card>
 
-  <x-card id="moreinfo">
-    <x-appbar>
-      <button class="back"></button>
-      <header>{{ _('Details') }}</header>
-    </x-appbar>
+      <div class="card inactive" id="moreinfo" data-focus="#description" data-title="{{ _('Details') }}">
+        <section>
+          <div class="ask">
+            <label for="description">
+              <span class="happy">
+                {% trans %}
+                  Please describe what you like.
+                  The content of your feedback will be public, so please be
+                  sure not to include personal information such as email
+                  address, passwords or phone number.
+                {% endtrans %}
+              </span>
+              <span class="sad">
+                {% trans %}
+                  Please describe your problem below and be as specific as
+                  you can.
+                  The content of your feedback will be public, so please be
+                  sure not to include personal information such as email
+                  address, passwords or phone number.
+                {% endtrans %}
+              </span>
+            </label>
+          </div>
+          <div class="input-box">
+            <div id="description-counter">{{ TRUNCATE_LENGTH }}</div>
+            <textarea data-max-length="{{ TRUNCATE_LENGTH }}" id="description" name="description"></textarea>
+          </div>
 
-    <section class="cf">
-      <div>
-        <label class="happy" for="description">
-          {{ _('Please describe what you liked.') }}
-        </label>
-        <label class="sad" for="description">
-          {{ _('Please describe your problem below and be as specific as you can.') }}
-        </label>
+          <div class="ask">
+            <label for="id_url">
+              {% trans %}
+                If your feedback is related to a website, you can include it here:
+              {% endtrans %}
+            </label>
+          </div>
 
-        <p class="cf">
-          <textarea data-max-length="{{ TRUNCATE_LENGTH }}" id="description" name="description" cols="40" rows="4"></textarea>
-          <span id="description-counter" class="characters-remaining"></span>
-        </p>
+          <div class="input-box">
+            <input class="url" id="id_url" name="url" placeholder="http://" type="text">
+          </div>
 
-        <p>
-          {% trans %}
-          The content of your feedback will be public, so please be
-          sure not to include any personal information.
-          {% endtrans %}
-        </p>
-        <button id="description-next-btn" class="next btn submit">{{ _('Next') }}</button>
+          <div class="private">
+            <div class="ask">
+              <input id="email-ok" name="email_ok" type="checkbox">
+              <label class="email-ok" for="email-ok">
+                {% trans %}
+                  (Optional) Check here to let us contact you to follow
+                  up on your feedback. Your email address will be kept
+                  private.
+                {% endtrans %}
+              </label>
+            </div>
+
+            <div id="email-details" class="input-box">
+              <input id="id_email" name="email" type="text" placeholder="username@example.com" disabled/>
+              <p id="email-error" class="error">
+                {{ _('Please enter a valid email address.') }}
+              </p>
+            </div>
+          </div>
+          <div class="input-box">
+            <button id="form-submit-btn" class="complete btn submit" disabled>
+              {{ _('Submit') }}
+            </button>
+          </div>
+        </section>
       </div>
-    </section>
-  </x-card>
 
-  <x-card id="email">
-    <x-appbar>
-      <button class="back"></button>
-      <header>{{ _('Can we contact you?') }}</header>
-    </x-appbar>
-
-    <section class="cf">
-      <div>
-        <p>
-          <label class="email-ok">
-            <input id="email-ok" type="checkbox" name="email_ok"/>
-            {{ _('Check here to let us contact you to follow up on your feedback.') }}
-          </label>
-        </p>
-
-        <div class="email">
-          <label for="id_email">
-            {{ _('Email address (optional):') }}
-          </label>
-          <input type="text" id="email-input" name="email"/>
-          <p id="email-error" class="error">
-            {{ _('Please enter a valid email address.') }}
-          </p>
-        </div>
-
-        <p>
-          <span id="privacy-email">
-            {{ _("Don't worry, your email will always be kept private.") }}
-          </span>
-        </p>
-
-        <button class="complete btn submit">{{ _('Send Feedback') }}</button>
+      <div class="card inactive no-back" id="submitting" data-title="{{ _('Submitting....') }}">
+        <section>
+          <div>
+            <img class="in-progress" src="{{ settings.STATIC_URL }}img/wait-trans.gif"/>
+          </div>
+        </section>
       </div>
-    </section>
-  </x-card>
 
-  <x-card id="submitting" transition-override="none">
-    <x-appbar>
-      <header>{{ _('Submitting....') }}</header>
-    </x-appbar>
-
-    <section class="cf">
-      <div>
-        <img class="in-progress" src="{{ settings.STATIC_URL }}img/wait-trans.gif"/>
+      <div class="card inactive no-back" id="thanks" data-title="{{ _('Success!') }}">
+        <section>
+          <div class="ask">
+            <p>
+              {% trans %}
+                Thank you for your feedback! We will use it to help us create a better
+                experience in future versions of Firefox OS.
+              {% endtrans %}
+            </p>
+            <p>
+              {% trans url='http://www.mozilla.org/contribute' %}
+                Learn how you can <a href="{{ url }}">make Firefox OS and Mozilla
+                better</a>.
+              {% endtrans %}
+            </p>
+          </div>
+        </section>
       </div>
-    </section>
-  </x-card>
 
-  <x-card id="thanks" transition-override="none">
-    <x-appbar>
-      <header>{{ _('Success!') }}</header>
-    </x-appbar>
-
-    <section class="cf">
-      <div>
-        <p>
-          {% trans %}
-          Thank you for your feedback! We will use it to help us create a better
-          experience in future versions of Firefox OS.
-          {% endtrans %}
-        </p>
-        <p>
-          {% trans url='http://www.mozilla.org/contribute' %}
-          Learn how you can <a href="{{ url }}">make Firefox OS and Mozilla
-          better</a>.
-          {% endtrans %}
-        </p>
+      {# FIXME: #}
+      <div class="card inactive no-back" id="failure" data-title="{{ _('We\'re sorry!') }}">
+        <section>
+          <div class="ask">
+            {% trans %}
+              Something has happened and we can't submit your feedback. Feedback will
+              be saved on your device so you can try sending it again later.
+            {% endtrans %}
+          </div>
+          <div class="input-box">
+            <button class="complete btn submit">{{ _('Try again') }}</button>
+            <button class="cancel btn submit">{{ _('Cancel') }}</button>
+          </div>
+        </section>
       </div>
-    </section>
-  </x-card>
 
-  <x-card id="failure" transition-override="none">
-    <x-appbar>
-      <header>{{ _('We\'re sorry!') }}</header>
-    </x-appbar>
-
-    <section class="cf">
-      <div>
-        <p>
-          {% trans %}
-          Something has happened and we can't submit your feedback. Feedback will
-          be saved on your device so you can try sending it again later.
-          {% endtrans %}
-        </p>
-        <button class="complete btn submit">{{ _('Try again') }}</button>
-        <button class="cancel btn submit">{{ _('Cancel') }}</button>
+      {# FIXME: #}
+      <div class="card inactive no-back" id="tryagain" data-title="{{ _('Try again') }}">
+        <section>
+          <div class="ask">
+            {% trans %}
+              You have unsubmitted feedback data. Would you like to try submitting
+              it again?
+            {% endtrans %}
+          </div>
+          <div class="input-box">
+            <button class="complete btn submit">{{ _('Try again') }}</button>
+            <button class="cancel btn submit">{{ _('Cancel') }}</button>
+          </div>
+        </section>
       </div>
-    </section>
-  </x-card>
-
-  <x-card id="tryagain" transition-override="none">
-    <x-appbar>
-      <header>{{ _('Try again') }}</header>
-    </x-appbar>
-
-    <section class="cf">
-      <div>
-        <p>
-          {% trans %}
-          You have unsubmitted feedback data. Would you like to try submitting
-          it again?
-          {% endtrans %}
-        </p>
-        <button class="complete btn submit">{{ _('Try again') }}</button>
-        <button class="cancel btn submit">{{ _('Cancel') }}</button>
-      </div>
-    </section>
-  </x-card>
-</x-deck>
+    </div>
+  </div>
 {% endblock %}

@@ -17,8 +17,8 @@ class FxOSFeedbackFormPage(Page):
         self.is_the_current_page
 
     # Intro card
-    _happy_button_locator = (By.CSS_SELECTOR, '#intro button.happy')
-    _sad_button_locator = (By.CSS_SELECTOR, '#intro button.sad')
+    _happy_button_locator = (By.CSS_SELECTOR, '#intro #happy-button')
+    _sad_button_locator = (By.CSS_SELECTOR, '#intro #sad-button')
 
     def click_happy_feedback(self):
         self.selenium.find_element(*self._happy_button_locator).click()
@@ -44,9 +44,11 @@ class FxOSFeedbackFormPage(Page):
         self.selenium.find_element(*self._device_next_locator).click()
         self.wait_for(self._moreinfo_text_locator)
 
-    # Description card
+    # Moreinfo card
     _moreinfo_text_locator = (By.CSS_SELECTOR, '#moreinfo #description')
-    _moreinfo_next_locator = (By.CSS_SELECTOR, '#moreinfo button.next')
+    _email_checkbox_locator = (By.CSS_SELECTOR, '#moreinfo input#email-ok')
+    _email_text_locator = (By.CSS_SELECTOR, '#moreinfo input#id_email')
+    _submit_locator = (By.CSS_SELECTOR, '#moreinfo button.submit')
 
     def set_description_execute_script(self, text):
         """Sets the value of the description textarea using execute_script
@@ -64,24 +66,14 @@ class FxOSFeedbackFormPage(Page):
         desc = self.selenium.find_element(*self._moreinfo_text_locator)
         desc.clear()
         desc.send_keys(text)
-        
+
     def update_description(self, text):
         desc = self.selenium.find_element(*self._moreinfo_text_locator)
         desc.send_keys(text)
 
     @property
-    def is_moreinfo_next_enabled(self):
-        return self.selenium.find_element(*self._moreinfo_next_locator).is_enabled()
-
-    def click_moreinfo_next(self):
-        self.selenium.find_element(*self._moreinfo_next_locator).click()
-        self.wait_for(self._email_checkbox_locator)
-
-    # Email card
-    _email_checkbox_locator = (By.CSS_SELECTOR, '#email input#email-ok')
-    _email_text_locator = (By.CSS_SELECTOR, '#email input#email-input')
-    _submit_locator = (By.CSS_SELECTOR, '#email button.submit')
-    _thanks_locator = (By.CSS_SELECTOR, '#thanks')
+    def is_submit_enabled(self):
+        return self.selenium.find_element(*self._submit_locator).is_enabled()
 
     def check_email_checkbox(self, checked=True):
         if not self.is_element_visible(self._email_checkbox_locator):
@@ -98,6 +90,8 @@ class FxOSFeedbackFormPage(Page):
         email = self.selenium.find_element(*self._email_text_locator)
         email.clear()
         email.send_keys(text)
+
+    _thanks_locator = (By.CSS_SELECTOR, '#thanks')
 
     def submit(self, expect_success=True):
         self.selenium.find_element(*self._submit_locator).click()

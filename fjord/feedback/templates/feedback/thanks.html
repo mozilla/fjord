@@ -10,10 +10,6 @@
   {{ js('singlecard') }}
 {% endblock %}
 
-{% block site_css %}
-  {{ css('generic_feedback') }}
-{% endblock %}
-
 {% set extra_body_attrs = {'data-ga-push': '[["_trackEvent", "FeedbackFlow", "generic-thanks"]]'} %}
 
 {% block body %}
@@ -65,7 +61,7 @@
                 {% endtrans %}
               </p>
             </div>
-          
+
             <div class="part" id="thanks-news">
               <h2>{{ _('Find the latest news about Firefox.') }}</h2>
               <ul>
