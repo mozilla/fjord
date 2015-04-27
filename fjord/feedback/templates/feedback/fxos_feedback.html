@@ -8,9 +8,8 @@
 
 {% set extra_body_attrs = {'data-form-name': 'fxos'} %}
 
-{% block body %}
-  {# FIXME: form id="responseform" #}
-  <div class="main">
+{% block content %}
+  <div class="content">
     <header>
       <div class="header-content">
         <div class="left-side">
@@ -92,17 +91,15 @@
         <input type="hidden" name="happy" id="happy" value="0"/>
       </div>
 
-      {# FIXME: should data-focus get set? #}
-      <div class="card inactive" id="country" data-focus="" data-title="{{ _('Country') }}">
+      <div class="card inactive" id="country" data-title="{{ _('Country') }}">
         <section>
           <div class="ask">
-            {# FIXME: for="xxx" #}
-            <label>
+            <label for="country-select">
               {{ _('In what country did you purchase your Firefox OS device?') }}
             </label>
           </div>
           <div class="input-box">
-            <select name="country">
+            <select name="country" id="country-select">
               {% for value, display in countries %}
                 <option value="{{ value }}">{{ display }}</option>
               {% endfor %}
@@ -110,24 +107,21 @@
             </select>
           </div>
           <div class="input-box">
-            {# FIXME: id="form-submit-btn" #}
             <button class="btn next">{{ _('Next') }}</button>
           </div>
           <input type="hidden" id="locale" name="locale" value="{{ request.locale }}"/>
         </section>
       </div>
 
-      {# FIXME: should data-focus get set? #}
-      <div class="card inactive" id="device" data-focus="" data-title="{{ _('Device') }}">
+      <div class="card inactive" id="device" data-title="{{ _('Device') }}">
         <section>
           <div class="ask">
-            {# FIXME: for="xxx" #}
-            <label>
+            <label for="device-select">
               {{ _('What Firefox OS device are you using?') }}
             </label>
           </div>
           <div class="input-box">
-            <select name="device">
+            <select name="device" id="device-select">
               {% for value in devices %}
                 <option value="{{ value }}">{{ value }}</option>
               {% endfor %}
@@ -135,7 +129,6 @@
             </select>
           </div>
           <div class="input-box">
-            {# FIXME: id="form-submit-btn" #}
             <button class="btn next">{{ _('Next') }}</button>
           </div>
         </section>
@@ -235,7 +228,6 @@
         </section>
       </div>
 
-      {# FIXME: #}
       <div class="card inactive no-back" id="failure" data-title="{{ _('We\'re sorry!') }}">
         <section>
           <div class="ask">
@@ -251,7 +243,6 @@
         </section>
       </div>
 
-      {# FIXME: #}
       <div class="card inactive no-back" id="tryagain" data-title="{{ _('Try again') }}">
         <section>
           <div class="ask">

@@ -2,78 +2,71 @@
 
 {% block page_title %}{{ _('Thanks') }}{% endblock %}
 
-{% block extra_headers %}
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-{% endblock %}
-
 {% block site_js %}
   {{ js('singlecard') }}
 {% endblock %}
 
 {% set extra_body_attrs = {'data-ga-push': '[["_trackEvent", "FeedbackFlow", "generic-thanks"]]'} %}
 
-{% block body %}
-  <div class="main" id="thanks">
-    <div class="content">
-      <header>
-        <div class="header-content">
-          <div class="middle">
-            <h1>{{ _('Thanks for Your Feedback') }}</h1>
-          </div>
-        </div>
-      </header>
-
-      <div class="deck">
-        <div class="card thanks">
-          <section>
-            <div class="part">
-              {% trans %}
-                Your feedback will be used to create a better experience in
-                future releases of Firefox.
-              {% endtrans %}
-            </div>
-
-            <div class="part" id="thanks_download">
-              <h2>{{ _('Shape the future of Firefox.') }}</h2>
-              <p>
-                {% trans download_url="http://www.mozilla.org/firefox/channel" %}
-                  Download
-                  <a href="{{ download_url }}">the build that is right for you</a>.
-                {% endtrans %}
-              </p>
-            </div>
-
-            <div class="part" id="thanks_help">
-              <h2>{{ _('Having problems? Get help.') }}</h2>
-              <p>
-                {% trans url="https://support.mozilla.org/?utm_source=input&utm_campaign=thankyou" %}
-                  Go to our support forum where you can <a href="{{ url }}">get help and
-                  find answers</a>.
-                {% endtrans %}
-              </p>
-            </div>
-
-            <div class="part" id="thanks_contribute">
-              <h2>{{ _('Contribute to Mozilla.') }}</h2>
-              <p>
-                {% trans url='http://mozilla.org/contribute/' %}
-                  Learn how you can <a href="{{ url }}">make Firefox and Mozilla better</a>.
-                {% endtrans %}
-              </p>
-            </div>
-
-            <div class="part" id="thanks-news">
-              <h2>{{ _('Find the latest news about Firefox.') }}</h2>
-              <ul>
-                <li><a id="twitter" href="http://twitter.com/firefox"><span>Twitter</span></a></li>
-                <li><a id="facebook" href="http://www.facebook.com/Firefox"><span>Facebook</a></span></li>
-                <li><a id="planet" href="http://planet.mozilla.org/"><span>Planet Mozilla</a></span></li>
-              </ul>
-            </div>
-          </section>
+{% block content %}
+  <div class="content" id="thanks">
+    <header>
+      <div class="header-content">
+        <div class="middle">
+          <h1>{{ _('Thanks for Your Feedback') }}</h1>
         </div>
       </div>
+    </header>
+
+    <div class="deck">
+      <div class="card thanks">
+        <section>
+          <div class="part">
+            {% trans %}
+              Your feedback will be used to create a better experience in
+              future releases of Firefox.
+            {% endtrans %}
+          </div>
+
+          <div class="part" id="thanks_download">
+            <h2>{{ _('Shape the future of Firefox.') }}</h2>
+            <p>
+              {% trans download_url="http://www.mozilla.org/firefox/channel" %}
+                Download
+                <a href="{{ download_url }}">the build that is right for you</a>.
+              {% endtrans %}
+            </p>
+          </div>
+
+          <div class="part" id="thanks_help">
+            <h2>{{ _('Having problems? Get help.') }}</h2>
+            <p>
+              {% trans url="https://support.mozilla.org/?utm_source=input&utm_campaign=thankyou" %}
+                Go to our support forum where you can <a href="{{ url }}">get help and
+                find answers</a>.
+              {% endtrans %}
+            </p>
+          </div>
+
+          <div class="part" id="thanks_contribute">
+            <h2>{{ _('Contribute to Mozilla.') }}</h2>
+            <p>
+              {% trans url='http://mozilla.org/contribute/' %}
+                Learn how you can <a href="{{ url }}">make Firefox and Mozilla better</a>.
+              {% endtrans %}
+            </p>
+          </div>
+
+          <div class="part" id="thanks-news">
+            <h2>{{ _('Find the latest news about Firefox.') }}</h2>
+            <ul>
+              <li><a id="twitter" href="http://twitter.com/firefox"><span>Twitter</span></a></li>
+              <li><a id="facebook" href="http://www.facebook.com/Firefox"><span>Facebook</a></span></li>
+              <li><a id="planet" href="http://planet.mozilla.org/"><span>Planet Mozilla</a></span></li>
+            </ul>
+          </div>
+        </section>
+      </div>
     </div>
-    {% include "includes/footer.html" %}
   </div>
 {% endblock %}

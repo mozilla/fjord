@@ -1,18 +1,13 @@
 {% extends "feedback/base.html" %}
-{# Note: This is not l10n-ized since it's a prototype. #}
 
 {% block page_title %}{{ _('Select A Product') }}{% endblock %}
-
-{% block extra_headers %}
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-{% endblock %}
 
 {% block site_js %}
   {{ js('singlecard') }}
 {% endblock %}
 
-{% block body %}
-  <div class="main">
+{% block content %}
+  <div class="content">
     <header>
       <div class="header-content">
         <div class="middle">

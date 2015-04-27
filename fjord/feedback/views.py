@@ -60,9 +60,7 @@ def thanks(request):
     else:
         template = 'feedback/thanks.html'
 
-    return render(request, template, {
-        'no_lang_switcher': True
-    })
+    return render(request, template)
 
 
 def requires_firefox(func):
