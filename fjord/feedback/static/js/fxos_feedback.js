@@ -91,8 +91,7 @@
         $('#happy-button').click(function(ev) {
             selectHappySad(1);
             return false;
-        });
-        $('#happy-button').keypress(function(ev) {
+        }).keypress(function(ev) {
             if ((ev.keyCode || ev.which) === '13') {
                 $('#happy-button').click();
             }
@@ -100,8 +99,7 @@
         $('#sad-button').click(function(ev) {
             selectHappySad(0);
             return false;
-        });
-        $('#sad-button').keypress(function(ev) {
+        }).keypress(function(ev) {
             if ((ev.keyCode || ev.which) === '13') {
                 $('#sad-button').click();
             }
@@ -113,8 +111,7 @@
             // do tabindex in Firefox (bug #778654).
             window.history.back();
             return false;
-        });
-        $('#back-button-container').keypress(function(ev) {
+        }).keypress(function(ev) {
             if ((ev.keyCode || ev.which) === '13') {
                 $('#back-button-container').click();
             }
