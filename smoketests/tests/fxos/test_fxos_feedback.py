@@ -21,6 +21,9 @@ class TestFeedback(TestCase):
         feedback_pg = FxOSFeedbackFormPage(mozwebqa)
         feedback_pg.go_to_feedback_page()
 
+        # Verify there is a privacy link
+        feedback_pg.has_privacy_link
+
         # 2. click on happy
         feedback_pg.click_happy_feedback()
 
@@ -31,12 +34,13 @@ class TestFeedback(TestCase):
         feedback_pg.click_device_next()
 
         # 5. fill in description
+        feedback_pg.has_privacy_link
         Assert.false(feedback_pg.is_submit_enabled)
         feedback_pg.set_description(desc)
         Assert.true(feedback_pg.is_submit_enabled)
 
         # 6. fill in url
-        # FIXME: set url
+        feedback_pg.set_url('http://example.com/foo')
 
         # 7. fill in email address
         # FIXME: check email input disabled

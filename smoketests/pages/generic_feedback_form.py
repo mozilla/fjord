@@ -7,12 +7,12 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
-from pages.base import Page
+from pages.feedback import FeedbackPage
 from pages.generic_feedback_picker import PickerPage
 from pages.generic_feedback_thanks import ThanksPage
 
 
-class GenericFeedbackFormPage(Page):
+class GenericFeedbackFormPage(FeedbackPage):
     _page_title = 'Submit Your Feedback :: Firefox Input'
 
     _intro_card_locator = (By.ID, 'intro')
@@ -116,7 +116,7 @@ class GenericFeedbackFormPage(Page):
 
     @property
     def is_submit_enabled(self):
-        # return not 'disabled' in self.selenium.find_element(*self._submit_feedback_locator).get_attribute('class'        
+        # return not 'disabled' in self.selenium.find_element(*self._submit_feedback_locator).get_attribute('class'
         return self.selenium.find_element(*self._submit_locator).is_enabled()
 
     def submit(self, expect_success=True):
