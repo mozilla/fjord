@@ -75,7 +75,8 @@ apt-get update
 apt-get install -y -q openjdk-7-jre-headless
 apt-get install elasticsearch=0.90.10
 update-rc.d elasticsearch defaults 95 10
-
+cp ~vagrant/fjord/vagrant/elasticsearch/elasticsearch.yml /etc/elasticsearch/.
+service elasticsearch restart
 # Install memcached
 apt-get install -y -q memcached
 
