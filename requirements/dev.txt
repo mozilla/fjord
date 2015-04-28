@@ -45,6 +45,3 @@ simplejson==3.0.7
 
 # sha256: HDW0rCBs7y0kgWyJ-Jzyid09OM98RJuz-re_bUPwGx8
 ordereddict==1.1
-
-# sha256: s6eaI9N7WgL6pVC5LLu-vrSqHXfmScPrOcGav1Ji2gQ
-argparse==1.3.0
