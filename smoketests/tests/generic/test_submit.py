@@ -20,11 +20,15 @@ class TestSubmit(object):
         feedback_pg = GenericFeedbackFormPage(mozwebqa)
         feedback_pg.go_to_feedback_page('firefox')
 
+        # Verify there is a privacy link
+        feedback_pg.has_privacy_link
+
         # 2. click on happy
         feedback_pg.click_happy_feedback()
 
         # 3. fill out description, url, email checkbox and email
         # address
+        feedback_pg.has_privacy_link
         feedback_pg.set_description(desc)
         feedback_pg.set_url(url)
         feedback_pg.check_email_checkbox()

@@ -5,7 +5,6 @@ body {
   background-color: #333;
   color: #333;
   font-size: 14px;
-  height: 100%;
   line-height: 140%;
   margin: 0;
   padding: 0;
@@ -13,10 +12,10 @@ body {
 
 .main {
   background-color: #f1f1f1;
-  height: 100%;
+  box-sizing: border-box;
   margin: 0 auto;
   min-height: 100vh;
-  padding: 0;
+  padding: 0 0 200px;
   position: relative;
   width: 100%;
 }
@@ -33,7 +32,6 @@ a {
   box-sizing: border-box;
   clear: all;
   display: block;
-  height: 100%;
   margin: 0;
   padding: 5px 0 0 0;
   width: 100%;
@@ -42,7 +40,6 @@ a {
 .card {
   box-sizing: border-box;
   display: block;
-  height: 100%;
   margin: 0 auto;
   padding: 0;
   width: 100%;
@@ -356,101 +353,97 @@ aside {
 }
 
 #thanks {
-  .content {
-    padding: 0 0 200px;
+  h2 {
+    color: #6d7581;
+    font-family: Georgia, "Times New Roman", Times, serif;
+    font-size: 1.3rem;
+    font-style: italic;
+    margin-bottom: .25em;
+    margin-bottom: .375em;
+  }
 
-    h2 {
-      color: #6d7581;
-      font-family: Georgia, "Times New Roman", Times, serif;
-      font-size: 1.3rem;
-      font-style: italic;
-      margin-bottom: .25em;
-      margin-bottom: .375em;
-    }
+  .part {
+    margin: 0 auto;
+    padding: 0 1.8em;
+    text-align: left;
+  }
 
-    .part {
-      margin: 0 auto;
-      padding: 0 1.8em;
-      text-align: left;
-    }
+  #thanks-news ul {
+    padding: 0;
 
-    #thanks-news ul {
-      padding: 0;
+    li {
+      list-style: none;
+      padding: 5px;
 
-      li {
-        list-style: none;
-        padding: 5px;
-
-        a {
-          text-decoration: none;
-        }
-        a:hover span {
-          text-decoration: underline;
-        }
-        a:before {
-          background: url(../img/sharing.png) no-repeat 0 0;
-          content: " ";
-          display: inline-block;
-          height: 20px;
-          margin-right: .40em;
-          text-decoration: none;
-          width: 30px;
-        }
-
-        #twitter:before { background-position: 0 0; }
-        #facebook:before { background-position: -40px 0; }
-        #planet:before { background-position: -80px 0; }
-
-        #twitter:hover:before { background-position: 0 -40px; }
-        #facebook:hover:before { background-position: -40px -40px; }
-        #planet:hover:before { background-position: -80px -40px; }
+      a {
+        text-decoration: none;
       }
+      a:hover span {
+        text-decoration: underline;
+      }
+      a:before {
+        background: url(../img/sharing.png) no-repeat 0 0;
+        content: " ";
+        display: inline-block;
+        height: 20px;
+        margin-right: .40em;
+        text-decoration: none;
+        width: 30px;
+      }
+
+      #twitter:before { background-position: 0 0; }
+      #facebook:before { background-position: -40px 0; }
+      #planet:before { background-position: -80px 0; }
+
+      #twitter:hover:before { background-position: 0 -40px; }
+      #facebook:hover:before { background-position: -40px -40px; }
+      #planet:hover:before { background-position: -80px -40px; }
+    }
+  }
+}
+
+footer {
+  background: #F8F8F8;
+  border-top: 1px solid #e0e0e0;
+  bottom: 0px;
+  color: #909090;
+  font-size: 11px;
+  height: 190px;
+  padding: 0;
+  position: absolute;
+  width: 100%;
+
+  &:hover {
+    color: #606060;
+  }
+
+  a {
+    color: inherit;
+    font-weight: bold;
+
+    &:hover {
+      text-decoration: underline;
     }
   }
 
-  footer {
-    background: #F8F8F8;
-    border-top: 1px solid #e0e0e0;
-    bottom: 0px;
-    color: #909090;
-    font-size: 11px;
-    height: 190px;
+  .contents {
+    background: url(../img/footer-logo.png) no-repeat 0 0;
+    margin: 0 20px;
+    padding: 0 0 0 60px;
+    position: relative;
+  }
+
+  ul#footer-links {
     padding: 0;
-    position: absolute;
-    width: 100%;
 
-    &:hover {
-      color: #606060;
+    li {
+      list-style: none;
     }
+  }
 
-    a {
-      color: inherit;
-      font-weight: bold;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-
-    .contents {
-      background: url(../img/footer-logo.png) no-repeat 0 0;
-      margin: 0 20px;
-      padding: 0 0 0 60px;
-      position: relative;
-    }
-
-    ul#footer-links {
-      padding: 0;
-
-      li {
-        list-style: none;
-      }
-    }
-
-    p {
-      line-height: 1.25;
-      margin-bottom: .25em;
-    }
+  p {
+    line-height: 1.25;
+    margin-bottom: .25em;
   }
 }
 
@@ -495,11 +488,9 @@ aside {
     }
   }
   #thanks {
-    .content {
-      padding: 0 0 110px;
-      .part {
-        padding: 0.3em 1.8em;
-      }
+    padding: 0 0 110px;
+    .part {
+      padding: 0.3em 1.8em;
     }
 
     #thanks-news ul {
@@ -507,17 +498,17 @@ aside {
         display: inline;
       }
     }
+  }
 
-    footer {
-      height: 100px;
+  footer {
+    height: 100px;
 
-      ul#footer-links {
-        padding: 0;
-        li {
-          display: inline;
-          &:not(:last-child):after {
-            content: " | ";
-          }
+    ul#footer-links {
+      padding: 0;
+      li {
+        display: inline;
+        &:not(:last-child):after {
+          content: " | ";
         }
       }
     }

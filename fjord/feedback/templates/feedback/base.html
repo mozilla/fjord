@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import 'includes/common.html' as common with context %}
 
 {% block extra_headers %}
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,4 +11,11 @@
 
 {% block site_js %}
   {{ js('generic_feedback') }}
+{% endblock %}
+
+{% block body %}
+  <div class="main">
+    {% block content %}{% endblock %}
+    {{ common.footer(show_lang_switcher=False) }}
+  </div>
 {% endblock %}

@@ -6,10 +6,10 @@
 
 from selenium.webdriver.common.by import By
 
-from pages.base import Page
+from pages.feedback import FeedbackPage
 
 
-class FxOSFeedbackFormPage(Page):
+class FxOSFeedbackFormPage(FeedbackPage):
     _page_title = 'Submit Your Feedback :: Firefox Input'
 
     def go_to_feedback_page(self):
@@ -46,6 +46,7 @@ class FxOSFeedbackFormPage(Page):
 
     # Moreinfo card
     _moreinfo_text_locator = (By.CSS_SELECTOR, '#moreinfo #description')
+    _url_locator = (By.ID, 'id_url')
     _email_checkbox_locator = (By.CSS_SELECTOR, '#moreinfo input#email-ok')
     _email_text_locator = (By.CSS_SELECTOR, '#moreinfo input#id_email')
     _submit_locator = (By.CSS_SELECTOR, '#moreinfo button.submit')
@@ -74,6 +75,11 @@ class FxOSFeedbackFormPage(Page):
     @property
     def is_submit_enabled(self):
         return self.selenium.find_element(*self._submit_locator).is_enabled()
+
+    def set_url(self, text):
+        url = self.selenium.find_element(*self._url_locator)
+        url.clear()
+        url.send_keys(text)
 
     def check_email_checkbox(self, checked=True):
         if not self.is_element_visible(self._email_checkbox_locator):

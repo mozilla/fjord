@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.base import Page
+from pages.feedback import FeedbackPage
 
 
 class Product(Page):
@@ -32,14 +33,20 @@ class Product(Page):
         return feedback_pg
 
 
-class PickerPage(Page):
+class PickerPage(FeedbackPage):
     _page_title = 'Select A Product :: Firefox Input'
 
     _products_locator = (By.CSS_SELECTOR, '.product-card')
 
+    _privacy_locator = (By.CSS_SELECTOR, 'footer #privacy-policy')
+
     def go_to_picker_page(self):
         self.selenium.get(self.base_url + '/feedback/')
         self.is_the_current_page
+
+    @property
+    def privacy_link(self):
+        return self._root_element.find_element(*self._privacy_locator).get_attribute('href')
 
     @property
     def products(self):
