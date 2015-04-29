@@ -249,7 +249,6 @@ INSTALLED_APPS = (
 
     # Third-party apps, patches, fixes
     'commonware.response.cookies',
-    'djcelery',
     'session_csrf',
     'waffle',
 

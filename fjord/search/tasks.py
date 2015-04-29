@@ -7,9 +7,9 @@ from django.conf import settings
 from django.core.mail import mail_admins
 from django.db.models.signals import post_save, pre_delete
 
-from celery import task
 from multidb.pinning import pin_this_thread, unpin_this_thread
 
+from fjord.celery import app
 from fjord.search.index import index_chunk
 from fjord.search.models import Record
 from fjord.search.utils import from_class_path, to_class_path
@@ -18,7 +18,7 @@ from fjord.search.utils import from_class_path, to_class_path
 log = logging.getLogger('i.task')
 
 
-@task()
+@app.task()
 def index_chunk_task(index, batch_id, rec_id, chunk):
     """Index a chunk of things.
 
@@ -69,7 +69,7 @@ RETRY_TIMES = (
 MAX_RETRIES = len(RETRY_TIMES)
 
 
-@task()
+@app.task()
 def index_item_task(cls_path, item_id, **kwargs):
     """Index an item given it's mapping_type cls_path and id"""
     mapping_type = from_class_path(cls_path)
@@ -94,7 +94,7 @@ def index_item_task(cls_path, item_id, **kwargs):
         index_item_task.retry(args, kwargs, exc, countdown=retry_time)
 
 
-@task()
+@app.task()
 def unindex_item_task(cls_path, item_id, **kwargs):
     """Remove item from index, given it's mapping_type class_path and id"""
     mapping_type = from_class_path(cls_path)

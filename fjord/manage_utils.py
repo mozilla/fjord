@@ -10,8 +10,6 @@ import site
 import sys
 from itertools import chain
 
-from fjord import path
-
 
 log = logging.getLogger(__name__)
 
@@ -62,6 +60,9 @@ def check_dependencies():
     # Import this here because not all environments have pip.
     from pip.req import parse_requirements
     from pip.download import PipSession
+
+    # Avoid circular import
+    from fjord import path
 
     req_path = path('requirements')
     req_files = [os.path.join(req_path, fn) for fn in os.listdir(req_path)]
@@ -119,9 +120,6 @@ def setup_environ():
 
     from django.conf import settings
     validate_settings(settings)
-
-    import djcelery
-    djcelery.setup_loader()
 
     _has_setup_environ = True
 

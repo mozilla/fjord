@@ -1,13 +1,12 @@
 from django.db.models.signals import post_save
 from django.utils.module_loading import import_by_path
 
-from celery import task
-
 from fjord.base.utils import key_to_instance
+from fjord.celery import app
 from .utils import translate
 
 
-@task(rate_limit='60/m')
+@app.task(rate_limit='60/m')
 def translate_task(instance_key, system, src_lang, src_field,
                    dst_lang, dst_field):
     """Celery task to perform a single translation
@@ -36,7 +35,7 @@ def translate_task(instance_key, system, src_lang, src_field,
     translate(instance, system, src_lang, src_field, dst_lang, dst_field)
 
 
-@task
+@app.task()
 def translate_tasks_by_id_list(model_path, id_list):
     """Takes a model path and a list of ids and generates translation tasks"""
     model_cls = import_by_path(model_path)
