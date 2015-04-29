@@ -50,12 +50,11 @@ class PublicFeedbackAPITest(ElasticTestCase):
     def test_multiple_ids(self):
         # Create some responses that we won't ask for
         for i in range(5):
-            feedback = ResponseFactory()
+            ResponseFactory()
 
         resps = []
         for i in range(5):
-            feedback = ResponseFactory()
-            resps.append(feedback)
+            resps.append(ResponseFactory())
 
         self.refresh()
 
@@ -421,6 +420,27 @@ class PostFeedbackAPITest(TestCase):
             else:
                 eq_(getattr(feedback, field), data[field])
 
+    def test_missing_happy_defaults_to_sad(self):
+        # We want to require "happy" to be in the values, but for
+        # various reasons we can't. Instead, if it's not provided, we
+        # want to make sure it defaults to sad.
+        data = {
+            'description': u'Great!',
+            'version': u'1.1',
+            'platform': u'Firefox OS',
+            'product': u'Firefox OS',
+            'locale': 'en-US',
+        }
+
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
+        eq_(r.status_code, 201)
+
+        feedback = models.Response.objects.latest(field_name='id')
+        eq_(feedback.happy, False)
+
     def test_invalid_unicode_url(self):
         """Tests an API call with invalid unicode URL"""
         data = {
@@ -611,22 +631,6 @@ class PostFeedbackAPITest(TestCase):
             data=json.dumps(data))
         eq_(r.status_code, 400)
         assert 'email' in r.content
-
-    def test_missing_happy_returns_400(self):
-        data = {
-            'description': u'Great!',
-            'version': u'1.1',
-            'platform': u'Firefox OS',
-            'product': u'Firefox OS',
-            'locale': 'en-US',
-        }
-
-        r = self.client.post(
-            reverse('feedback-api'),
-            content_type='application/json',
-            data=json.dumps(data))
-        eq_(r.status_code, 400)
-        assert 'happy' in r.content
 
     def test_missing_description_returns_400(self):
         data = {

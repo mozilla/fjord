@@ -637,7 +637,14 @@ class PostResponseSerializer(serializers.Serializer):
     emails.
 
     """
-    happy = serializers.BooleanField(required=True)
+    # We want to require the happy field, but we can't because for a
+    # long while we used a version of DRF which had a bug where a
+    # BooleanField marked as required would actually just default to
+    # False if a value wasn't provided. Bug #1155600 means we need to
+    # maintain that old (busted) behavior. Thus we need to not require
+    # this and instead default it to False.
+    happy = serializers.BooleanField(default=False)
+
     url = serializers.CharField(max_length=200, required=False, default=u'')
     description = serializers.CharField(required=True)
 
@@ -673,7 +680,6 @@ class PostResponseSerializer(serializers.Serializer):
             if not is_url(value):
                 msg = u'{0} is not a valid url'.format(value)
                 raise serializers.ValidationError(msg)
-
 
         return attrs
 
