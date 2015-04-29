@@ -142,6 +142,28 @@ class GuessLanguageTest(BaseGengoTestCase):
         text = u'Facebook no se puede enlazar con peru'
         eq_(gengo_api.guess_language(text), u'es')
 
+    def test_guess_language_unintelligible_response(self):
+        # If the gengo api returns some crazy non-json response, make sure
+        # that guess_language should throw a GengoAPIFailure.
+        gengo_api = gengo_utils.FjordGengo()
+
+        with patch('fjord.translations.gengo_utils.requests') as req_patch:
+            # Create a mock that we can call .post() on and it returns
+            # a response that has a .json() method that throws a
+            # ValueError which is what happens when it's not valid
+            # JSON.
+            post_return = MagicMock()
+            post_return.text = 'abcd'
+            post_return.status_code = 500
+            post_return.json.side_effect = ValueError('bleh')
+            req_patch.post.return_value = post_return
+
+            self.assertRaises(
+                gengo_utils.GengoAPIFailure,
+                gengo_api.guess_language,
+                u'whatever text'
+            )
+
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
 class GetLanguagesTestCase(BaseGengoTestCase):
