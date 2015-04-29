@@ -52,40 +52,6 @@ Fjord repository this way::
 This creates a directory called ``fjord/``. We'll call that the "Fjord
 repository top-level directory".
 
-
-Fix the version mismatch between Virtualbox and the Virtualbox Guest Additions
-==============================================================================
-
-It's likely there will be a version mismatch between the version of
-Virtualbox you're using and the version of the Virtualbox Guest
-Additions in the image you're going to use.
-
-**If you're using Mac OSX or Linux**, you can do this from the Fjord
-repository top-level directory::
-
-    ./bin/vagrant_fix_guest_additions.sh
-
-
-**If you're not using Mac OSX or Linux or that doesn't work**, then you
-can do it by hand::
-
-    # Installs the VirtualBox Guest plugin
-    vagrant plugin install vagrant-vbguest
-
-    # Creates and launches the vm without provisioning it
-    vagrant up --no-provision
-
-    # Runs a command in the vm to remove the packages in the vm that
-    # are the cause of the mismatch
-    vagrant ssh -c 'sudo apt-get -y -q purge virtualbox-guest-dkms virtualbox-guest-utils virtualbox-guest-x11'
-
-    # Halts the vm so you can move onwards
-    vagrant halt
-
-After that, the versions of the two things should be the same and you
-should be good to go to the next step.
-
-
 Building a vm and booting it
 ============================
 
