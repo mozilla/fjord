@@ -196,7 +196,17 @@ class FjordGengo(object):
                 'Accept': 'application/json'
             })
 
-        resp_json = resp.json()
+        try:
+            resp_json = resp.json()
+        except ValueError:
+            # If it's not JSON, then I don't really know what it is,
+            # so I want to see it in an error email. Chances are it's
+            # some ephemeral problem.
+            #
+            # FIXME: Figure out a better thing to do here.
+            raise GengoAPIFailure(
+                u'ValueError: non-json response: {0} {1}'.format(
+                    resp.status_code, resp.text))
 
         if 'detected_lang_code' in resp_json:
             lang = resp_json['detected_lang_code']
