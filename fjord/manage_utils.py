@@ -10,20 +10,16 @@ import site
 import sys
 from itertools import chain
 
+from fjord import path
+
 
 log = logging.getLogger(__name__)
-
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Denotes that setup_environ has been run.
 _has_setup_environ = False
 
 # Prevent from patching twice.
 _has_patched = False
-
-
-def path(*a):
-    return os.path.join(ROOT, *a)
 
 
 # Taken from peep
@@ -112,40 +108,14 @@ def check_dependencies():
 def setup_environ():
     """Sets up the Django environment
 
-    1. sets up path and vendor/ stuff
-    2. validates settings
-    3. sets up django-celery
+    1. validates settings
+    2. sets up django-celery
 
     """
     global _has_setup_environ
 
     if _has_setup_environ:
         return
-
-    # Adjust the python path and put local packages in front.
-    prev_sys_path = list(sys.path)
-
-    # Make root application importable without the need for
-    # python setup.py install|develop
-    sys.path.append(ROOT)
-
-    # FIXME: This is vendor/-specific. When we ditch vendor/ we can
-    # ditch this.
-
-    # Check for ~/.virtualenvs/fjordvagrant/. If that doesn't exist, then
-    # launch all the vendor/ stuff.
-    possible_venv = os.path.expanduser('~/.virtualenvs/fjordvagrant/')
-    if not os.path.exists(possible_venv):
-        os.environ['USING_VENDOR'] = '1'
-        site.addsitedir(path('vendor'))
-
-        # Move the new items to the front of sys.path. (via virtualenv)
-        new_sys_path = []
-        for item in list(sys.path):
-            if item not in prev_sys_path:
-                new_sys_path.append(item)
-                sys.path.remove(item)
-        sys.path[:0] = new_sys_path
 
     from django.conf import settings
     validate_settings(settings)
