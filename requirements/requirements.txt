@@ -45,8 +45,8 @@ anyjson==0.3.3
 # sha256: nwLQNXGE3h8JPBABK1LnRUoQCL5qXBhat6Mwes6x0S4
 Babel==1.3
 
-# sha256: czbsWbjQoTKh7p8WagY9RKXn8tL-FfefvO3aWDu9YcE
-billiard==3.3.0.9
+# sha256: aI-UZrHDrhQQY4Hm29MoEV51xSYMVC60jmxGkx9pKMw
+billiard==3.3.0.20
 
 # sha256: q2lHUVrCzC-4lOcYy6sb7rNChD_YFtTCondZndvvuns
 bleach==1.4
@@ -54,8 +54,8 @@ bleach==1.4
 # sha256: y0Y3TzyIPFgNFCp50mCYg3E6hnzIbgUUFjrc54TOJGg
 carrot==0.10.7
 
-# sha256: z-K2UyaL1Ybi0Ip16Ib3vjvlW6Ny9y4vV0eut2xHA2I
-celery==3.1.17
+# sha256: CST5QHDG_FfUCLFphIxbOIMmaP_-Bg5ItIA_sj4OPq8
+celery==3.1.18
 
 # sha256: 1PjonJ5wn2ciG_ISMdD6ZqANNxK8tp1LWu83BTOcjc0
 certifi==1.0.0
@@ -141,8 +141,8 @@ html5lib==0.95
 # sha256: fLtRSjUvghxpuOi9qmsuWXKFR6iWVQPHWGUsKCbRV7U
 importlib==1.0.3
 
-# sha256: uf8EN2BxE66nAf1RIsKvpAwF3_bx2k9YsvHqGNnyv40
-kombu==3.0.24
+# sha256: H1ZavUTEt9-qTdVD1S-YLS8AaroKKzgwVCtNJagB_gk
+kombu==3.0.26
 
 # sha256: uDndLZwRfHAUMMFJlWkYpCOphjtIsJyQ4wpgE-fS9E8
 mock==1.0.1
