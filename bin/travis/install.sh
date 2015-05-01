@@ -12,6 +12,10 @@ echo "Install Python dependencies"
 pip freeze
 echo
 
+if [[ $TEST_SETUP == "minimal" ]]; then
+    exit 0
+fi
+
 echo "Installing Node.js dependencies"
 npm install > /dev/null 2> /dev/null
 npm list
