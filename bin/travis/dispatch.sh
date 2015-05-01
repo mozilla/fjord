@@ -3,11 +3,11 @@
 SUITE=${1:-all}
 
 case $SUITE in
-    all )
-        bin/travis/test.sh
-        ;;
     django )
         bin/travis/test.sh
+        ;;
+    djangocheck )
+        bin/travis/djangocheck.sh
         ;;
     * )
         echo "Unknown test suite '$SUITE'."

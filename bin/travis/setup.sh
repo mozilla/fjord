@@ -8,10 +8,13 @@ cp fjord/settings/travis.py-dist fjord/settings/local.py
 echo "Creating test database"
 mysql -e 'CREATE DATABASE fjord CHARACTER SET utf8 COLLATE utf8_unicode_ci;'
 
-echo "Updating product details"
-python manage.py update_product_details
+if [[ $TEST_SETUP == "minimal" ]]; then
+    exit 0
+fi
 
-echo "Starting ElasticSearch"
+# Start Elasticsearch first to give it time to fully start up before
+# the tests run.
+echo "Starting Elasticsearch"
 pushd "elasticsearch-${ELASTICSEARCH_VERSION}"
 # Elasticsearch 0.90.10 daemonizes by default. Other versions require
 # -d to be passed.
@@ -22,6 +25,9 @@ else
 fi
 popd
 
-echo "Doing static dance."
-./manage.py collectstatic --noinput > /dev/null
-./manage.py compress_assets > /dev/null
+echo "Updating product details"
+python manage.py update_product_details
+
+echo "Doing static dance"
+python manage.py collectstatic --noinput > /dev/null
+python manage.py compress_assets > /dev/null
