@@ -3,10 +3,11 @@ from datetime import datetime
 
 from django.core.mail import mail_admins
 
-from celery import task, VERSION
+from celery import VERSION
 
+from fjord.celery import app
 
-@task()
+@app.task()
 def celery_health_task(creation_dt):
     """Emails celery health"""
     now = datetime.now()

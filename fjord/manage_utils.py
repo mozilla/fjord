@@ -120,9 +120,6 @@ def setup_environ():
     from django.conf import settings
     validate_settings(settings)
 
-    import djcelery
-    djcelery.setup_loader()
-
     _has_setup_environ = True
 
 

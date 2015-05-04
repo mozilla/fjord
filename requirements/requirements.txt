@@ -25,10 +25,6 @@ https://github.com/fwenzel/django-sha2/archive/3ba2b4771056fb722bc9fe52cf26918a3
 # sha256: 4buoVNpBPIKO5ziwNqu6xu46TkzWhMgNxNQeA8Mq0h0
 https://github.com/mozilla/django-session-csrf/archive/f00ad913c62e139d36078e8a7e07dab65a021386.tar.gz#egg=django-session-csrf==0.5.0.1
 
-# django-celery: no new releases
-# sha256: dmqn4o32-wsXoiX4O6IFfsRPcLOZVrEhtByqvQs81Ms
-https://github.com/celery/django-celery/archive/da0b98caf9dc96c4d9ec91c09e00c5e19dcb0da3.tar.gz#egg=django-celery==3.1.10.1
-
 # tower: no new releases
 # sha256: qm0q7z3NpXlebil6MCUbfIAahKy4h2MwiBjXscUjCdA
 https://github.com/clouserw/tower/archive/ade9804345eb49dd1b626fd276cd9572fd15d1b3.tar.gz#egg=tower==0.4.1.1
