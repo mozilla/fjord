@@ -20,3 +20,5 @@ CACHES = {
         'CACHE_URL', default='locmem://', type_='cache_url'
     )
 }
+
+SUGGEST_PROVIDERS = []
