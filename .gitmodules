@@ -100,3 +100,6 @@
 [submodule "vendor/src/django-sslserver"]
 	path = vendor/src/django-sslserver
 	url = https://github.com/teddziuba/django-sslserver.git
+[submodule "vendor/src/py-amqp"]
+	path = vendor/src/py-amqp
+	url = https://github.com/celery/py-amqp.git
