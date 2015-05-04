@@ -6,11 +6,6 @@ import os
 import site
 import sys
 
-from fjord.manage_utils import monkeypatch
-
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fjord.settings')
-
 
 # Denotes that setup_vendor_path has been run.
 _has_setup_vendor_path = False
@@ -58,8 +53,6 @@ def setup_vendor_path():
 
 
 setup_vendor_path()
-
-monkeypatch()
 
 
 # Setup celery

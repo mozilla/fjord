@@ -11,12 +11,12 @@ import sys
 from django.core.management.base import BaseCommand
 
 import celery
-from celery.bin import worker
+from celery.bin.worker import worker as WorkerCommand
 
 from fjord.celery import app
 
 
-worker = worker.worker(app=app)
+worker = WorkerCommand(app=app)
 
 
 # This code is based on django-celery code. It's a merge of
@@ -31,7 +31,6 @@ class Command(BaseCommand):
     requires_model_validation = False
     keep_base_opts = False
     stdout, stderr = sys.stdout, sys.stderr
-
 
     def handle(self, *args, **options):
         worker.check_args(args)
