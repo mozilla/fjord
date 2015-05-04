@@ -1,6 +1,5 @@
 packages/Babel
 packages/GitPython/lib
-packages/amqp
 packages/anyjson
 packages/carrot
 packages/certifi
@@ -58,6 +57,7 @@ src/jingo
 src/jingo-minify
 src/kombu
 src/nuggets
+src/py-amqp
 src/pystatsd
 src/tower
 src/django-waffle

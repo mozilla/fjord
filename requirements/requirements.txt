@@ -36,8 +36,8 @@ https://github.com/clouserw/tower/archive/ade9804345eb49dd1b626fd276cd9572fd15d1
 
 # Requirements from PyPI
 
-# sha256: HegYoUcr9iVxLF06QwEw03dJz4qUE8th6UEeLr4X2ok
-amqp==1.4.2
+# sha256: 68_IZ95aaPn1uhTRHbrYjmr_hDWo05M51c6w5bBt5kA
+amqp==1.4.6
 
 # sha256: N4Ethjya0-NcBzTELgvwMgzow77YLNIK1UyzTRWBV7o
 anyjson==0.3.3
