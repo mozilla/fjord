@@ -1,34 +1,110 @@
-"""
+# This code is composed of code from the following files from django-celery:
+#
+# * djcelery/app.py
+# * djcelery/management/base.py
+# * djcelery/management/commands/celeryd.py
+#
+# Copyright (c) 2012-2013 GoPivotal, Inc.  All Rights Reserved.
+# Copyright (c) 2009-2012 Ask Solem.  All Rights Reserved.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#     * Redistributions of source code must retain the above copyright notice,
+#       this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#
+# Neither the name of Ask Solem nor the names of its contributors may be used
+# to endorse or promote products derived from this software without specific
+# prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+# THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+# BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
 
-Start the celery daemon from the Django management command.
-
-"""
 from __future__ import absolute_import, unicode_literals
 
+import django
 import os
 import sys
 
 from django.core.management.base import BaseCommand
 
 import celery
-from celery.bin.worker import worker as WorkerCommand
+from celery.bin import worker
 
-from fjord.celery import app
+DB_SHARED_THREAD = """\
+DatabaseWrapper objects created in a thread can only \
+be used in that same thread.  The object with alias '{0}' \
+was created in thread id {1} and this is thread id {2}.\
+"""
+
+VALIDATE_MODELS = not django.VERSION >= (1, 7)
 
 
-worker = WorkerCommand(app=app)
+def patch_thread_ident():
+    # monkey patch django.
+    # This patch make sure that we use real threads to get the ident which
+    # is going to happen if we are using gevent or eventlet.
+    # -- patch taken from gunicorn
+    if getattr(patch_thread_ident, 'called', False):
+        return
+    try:
+        from django.db.backends import BaseDatabaseWrapper, DatabaseError
+
+        if 'validate_thread_sharing' in BaseDatabaseWrapper.__dict__:
+            import thread
+            _get_ident = thread.get_ident
+
+            __old__init__ = BaseDatabaseWrapper.__init__
+
+            def _init(self, *args, **kwargs):
+                __old__init__(self, *args, **kwargs)
+                self._thread_ident = _get_ident()
+
+            def _validate_thread_sharing(self):
+                if (not self.allow_thread_sharing
+                        and self._thread_ident != _get_ident()):
+                    raise DatabaseError(
+                        DB_SHARED_THREAD % (
+                            self.alias, self._thread_ident, _get_ident()),
+                    )
+
+            BaseDatabaseWrapper.__init__ = _init
+            BaseDatabaseWrapper.validate_thread_sharing = \
+                _validate_thread_sharing
+
+        patch_thread_ident.called = True
+    except ImportError:
+        pass
+patch_thread_ident()
 
 
-# This code is based on django-celery code. It's a merge of
-# djcelery.management.base.CeleryCommand and
-# djcelery.management.commands.celeryd.Command.
+from celery import current_app
+app = current_app._get_current_object()
+worker = worker.worker(app=app)
+
+
 class Command(BaseCommand):
+    """Run the celery daemon."""
     help = 'Old alias to the "celery worker" command.'
     options = (BaseCommand.option_list
                + worker.get_options()
                + worker.preload_options)
+
     skip_opts = ['--app', '--loader', '--config', '--no-color']
-    requires_model_validation = False
+    requires_model_validation = VALIDATE_MODELS
     keep_base_opts = False
     stdout, stderr = sys.stdout, sys.stderr
 
