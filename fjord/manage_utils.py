@@ -6,7 +6,6 @@ These functions shouldn't be used after startup is completed.
 """
 import logging
 import os
-import site
 import sys
 from itertools import chain
 
@@ -186,7 +185,7 @@ def monkeypatch():
     from jingo import load_helpers
     load_helpers()
 
-    logging.debug("Note: monkeypatches executed in %s" % __file__)
+    logging.debug('Note: monkeypatches executed in %s' % __file__)
 
     # Prevent it from being run again later.
     _has_patched = True

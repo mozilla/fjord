@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 import os
+# Do this before *anything*.
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fjord.settings')
 
 from fjord import manage_utils
 
 
-if __name__ == "__main__":
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fjord.settings')
-
+if __name__ == '__main__':
     # This has to get called after DJANGO_SETTINGS_MODULE stuff has
     # been sorted out.
     manage_utils.setup_environ()
