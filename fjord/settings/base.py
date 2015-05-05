@@ -279,6 +279,7 @@ INSTALLED_APPS = (
     'fjord.heartbeat',
     'fjord.journal',
     'fjord.search',
+    'fjord.suggest',
     'fjord.translations',
 )
 
@@ -319,6 +320,8 @@ SUPPORTED_NONLOCALES = [
     'services',
     'static',
 ]
+
+SUGGEST_PROVIDERS = []
 
 ## Media and templates.
 
