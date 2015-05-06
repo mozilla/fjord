@@ -7,7 +7,6 @@ packages/chardet
 packages/click
 packages/cssselect
 packages/django-picklefield/src
-packages/fancy-tag
 packages/html5lib
 packages/importlib
 packages/mock
