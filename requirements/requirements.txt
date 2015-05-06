@@ -77,8 +77,8 @@ django-adminplus==0.3
 # sha256: vYDtkF00OzZ4WioB9VkuBKdX7xUY2Q25FQ6e2uiBIDo
 django-appconf==0.5
 
-# sha256: EXGi39Bz0MuXOkgtic_AweW52n1VHcCgAkEoZ-z1KT4
-django-browserid==0.11.1
+# sha256: -jPrQhcqGbcVrbp6ZJcJEftdj9G2nPjaepXyvH8PMDs
+django-browserid==1.0
 
 # sha256: F3KVsUQkAMks22fo4Y-f9ZRvtEL4WBO50IN4I3IuoI0
 django-cronjobs==0.2.3
