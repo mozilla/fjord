@@ -122,9 +122,6 @@ elasticutils==0.10.2
 # sha256: 1wEkmeUt5aRBPiKu1R34lIUzaFRS3-FrQQAfKPnOWxw
 factory-boy==2.4.1
 
-# sha256: akF58qKszaKyc7_Ybeb3AkzuIDBDzJp8BA_nswa74SA
-fancy-tag==0.2.0
-
 # sha256: QD1vswdD9scqnh9UG5xiOZiyI50PcALy-ZqyKn53UEo
 gengo==0.1.19
 
