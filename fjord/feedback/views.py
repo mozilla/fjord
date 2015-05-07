@@ -17,6 +17,7 @@ from fjord.base.urlresolvers import reverse
 from fjord.base.utils import (
     actual_ip_plus_context,
     ratelimit,
+    smart_int,
     smart_str,
     translate_country_name
 )
@@ -26,6 +27,7 @@ from fjord.feedback.forms import ResponseForm
 from fjord.feedback.models import Response
 from fjord.feedback.utils import clean_url
 from fjord.feedback.config import TRUNCATE_LENGTH
+from fjord.suggest.utils import get_suggestions
 
 
 def happy_redirect(request):
@@ -44,23 +46,39 @@ def download_firefox(request, template):
 
 
 def thanks(request):
-    if waffle.flag_is_active(request, 'thankyou'):
-        template = 'feedback/thanks.html'
-        try:
-            opinion_id = request.session.get('opinion_id')
-            user_opinion = Response.objects.get(id=opinion_id)
-        except Response.ObjectDoesNotExist:
-            pass
-        else:
-            word_count = len(user_opinion.description.split())
-            if (user_opinion.locale == 'en-US' and
-                    not user_opinion.happy and
-                    word_count >= 7):
-                template = 'feedback/thanks_sad.html'
-    else:
-        template = 'feedback/thanks.html'
+    suggestions = None
+    response = None
 
-    return render(request, template)
+    if waffle.flag_is_active(request, 'thankyou'):
+        response_id = None
+
+        # If the user is an analyzer/admin, then we let them specify
+        # the response_id via the querystring. This makes debugging
+        # the system easier.
+        if ((request.user.is_authenticated()
+             and request.user.has_perm('analytics.can_view_dashboard'))):
+            response_id = smart_int(request.GET.get('response_id', None))
+
+        # If we don't have a response_id, then pull it from the
+        # session where it was placed if the user had just left
+        # feedback.
+        if response_id is None:
+            response_id = request.session.get('response_id')
+
+        # If we have a response_id, then pull the response and get
+        # suggestions.
+        if response_id is not None:
+            try:
+                response = Response.objects.get(id=response_id)
+            except Response.ObjectDoesNotExist:
+                pass
+            else:
+                suggestions = get_suggestions(response)
+
+    return render(request, 'feedback/thanks.html', {
+        'response': response,
+        'suggestions': suggestions
+    })
 
 
 def requires_firefox(func):
@@ -270,7 +288,7 @@ def _handle_feedback_post(request, locale=None, product=None,
     else:
         statsd.incr('feedback.sad')
 
-    request.session['opinion_id'] = opinion.id
+    request.session['response_id'] = opinion.id
 
     return HttpResponseRedirect(reverse('thanks'))
 
