@@ -1,14 +1,21 @@
 import json
 
+from django.contrib.auth.models import Group
 from django.core.cache import cache
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
 from nose.tools import eq_
 
-from fjord.base.tests import TestCase, LocalizingClient, reverse, with_waffle
+from fjord.base.tests import (
+    LocalizingClient,
+    ProfileFactory,
+    reverse,
+    TestCase,
+    with_waffle
+)
 from fjord.feedback import models
-from fjord.feedback.tests import ProductFactory
+from fjord.feedback.tests import ProductFactory, ResponseFactory
 
 
 class TestRedirectFeedback(TestCase):
@@ -72,20 +79,15 @@ class TestFeedback(TestCase):
         # Make sure it doesn't create a context record
         eq_(models.ResponseContext.objects.count(), 0)
 
-    def test_opinion_id_in_session(self):
-        """Test that the opinion ID is in the session."""
-
+    def test_response_id_in_session(self):
         url = reverse('feedback', args=(u'firefox',))
         self.client.post(url, {
             'happy': 1,
             'description': u'Firefox rocks!',
             'url': u'http://mozilla.org/'
         })
-        opinion = models.Response.objects.order_by('-id')[0]
-
-        # Make sure that the ID has been saved to the user's session
-        eq_(self.client.session['opinion_id'], opinion.id)
-
+        response = models.Response.objects.order_by('-id')[0]
+        eq_(self.client.session['response_id'], response.id)
 
     def test_valid_sad(self):
         """Submitting a valid sad form creates an item in the DB.
@@ -115,68 +117,73 @@ class TestFeedback(TestCase):
         eq_(u'14.0.1', feedback.version)
 
     @with_waffle('thankyou', True)
-    def test_use_thank_you_sad(self):
-        """Thanks_sad template is used when appropriate"""
+    def test_thankyou_flag_active(self):
+        """Verify response and suggestions when thankyou flag is active"""
         url = reverse('feedback', args=(u'firefox',), locale='en-US')
         r = self.client.post(url, {
             'happy': 0,
-            'description': u"I want to know why Firefox doesn't make me sandwiches!",
+            'description': u'Why Firefox not make me sandwiches!',
         }, follow=True)
 
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(u"I want to know why Firefox doesn't make me sandwiches!", feedback.description)
-        eq_(u'', feedback.url)
-        eq_(False, feedback.happy)
-        eq_(u'en-US', feedback.locale)
         eq_(r.status_code, 200)
-        self.assertTemplateUsed(r, 'feedback/thanks_sad.html')
+        eq_(r.context['response'].id, feedback.id)
+        eq_(r.context['suggestions'], [])
 
     @with_waffle('thankyou', True)
-    def test_use_default_thank_you_words(self):
-        """Default thank you page is used when descirption is under 7 words"""
+    def test_thankyou_flag_and_response_id_in_qs_unauthenticated(self):
+        """Verify response_id in querystring is ignored if user is not
+        authenticated
+        """
+        feedback = ResponseFactory()
+        url = reverse('thanks') + '?response_id={0}'.format(feedback.id)
+        r = self.client.get(url)
+
+        eq_(r.status_code, 200)
+        eq_(r.context['response'], None)
+        eq_(r.context['suggestions'], None)
+
+    @with_waffle('thankyou', True)
+    def test_thankyou_flag_and_response_id_in_qs_authenticated(self):
+        """Verify response_id in querystring overrides session id"""
+        # Create analyzer and log in.
+        jane = ProfileFactory(user__email='jane@example.com').user
+        jane.groups.add(Group.objects.get(name='analyzers'))
+        self.client_login_user(jane)
+
+        # Create some feedback which sets the response_id in the
+        # session.
         url = reverse('feedback', args=(u'firefox',), locale='en-US')
         r = self.client.post(url, {
             'happy': 0,
-            'description': u"Why doesn't it load?",
+            'description': u'Why Firefox not make me sandwiches!',
         }, follow=True)
 
-        feedback = models.Response.objects.latest(field_name='id')
-        eq_(u'', feedback.url)
-        eq_(r.status_code, 200)
-        self.assertTemplateUsed(r, 'feedback/thanks.html')
+        # Create another piece of feedback which is not the one we
+        # just did.
+        feedback = ResponseFactory(description=u'purple horseshoes')
 
-    @with_waffle('thankyou', True)
-    def test_use_default_thank_you_happy(self):
-        """Default thank you page is used when the feedback is happy."""
+        # Fetch the thank you page with the response_id in the
+        # querystring.
+        url = reverse('thanks') + '?response_id={0}'.format(feedback.id)
+        r = self.client.get(url)
+
+        eq_(r.status_code, 200)
+        eq_(r.context['response'].id, feedback.id)
+        eq_(r.context['suggestions'], [])
+
+    @with_waffle('thankyou', False)
+    def test_thankyou_flag_inactive(self):
+        """Verify response and suggestions when thankyou flag is inactive"""
         url = reverse('feedback', args=(u'firefox',), locale='en-US')
         r = self.client.post(url, {
-            'happy': 1,
-            'description': u"Firefox is the best browser I've ever used!",
+            'happy': 0,
+            'description': u'Why Firefox not make me sandwiches!',
         }, follow=True)
 
-        feedback = models.Response.objects.latest(field_name='id')
-        eq_(True, feedback.happy)
         eq_(r.status_code, 200)
-        self.assertTemplateUsed(r, 'feedback/thanks.html')
-
-    @override_settings(DEV_LANGUAGES=('en-US', 'es'))
-    @with_waffle('thankyou', True)
-    def test_use_default_thank_you_locale(self):
-        """Default thank you page is used when the locale is not en-US"""
-        try:
-            url = reverse('feedback', args=(u'firefox',), locale='es')
-            r = self.client.post(url, {
-                'happy': 0,
-                'description': u'Tell me why Firefox is not making lunch.',
-            }, follow=True)
-
-            self.assertRedirects(r, reverse('thanks'))
-            feedback = models.Response.objects.latest(field_name='id')
-            eq_(u'es', feedback.locale)
-            self.assertTemplateUsed(r, 'feedback/thanks.html')
-
-        finally:
-            r = self.client.get('/en-US/feedback/')
+        eq_(r.context['response'], None)
+        eq_(r.context['suggestions'], None)
 
     def test_happy_prefill_in_querystring_is_ignored(self):
         url = reverse('feedback', args=(u'firefox',), locale='en-US')
@@ -628,7 +635,7 @@ class TestFeedback(TestCase):
 
         r = self.client.post(url, {
             'happy': 0,
-            'description': u"I like the colors.",
+            'description': u'I like the colors.',
             'email': 'bob@example.com',
             'email_ok': 'on',
         })
@@ -643,7 +650,7 @@ class TestFeedback(TestCase):
 
         r = self.client.post(url, {
             'happy': 0,
-            'description': u"I like the colors.",
+            'description': u'I like the colors.',
             'email': 'bob@example.com',
             'email_ok': '',
         })
@@ -698,7 +705,7 @@ class TestFeedback(TestCase):
 
         r = self.client.post(url, {
             'happy': 0,
-            'description': u"I like the colors.",
+            'description': u'I like the colors.',
             'browser_ok': 'on',
             'browser_data': json.dumps(browser_data)
         })
@@ -718,7 +725,7 @@ class TestFeedback(TestCase):
 
         r = self.client.post(url, {
             'happy': 0,
-            'description': u"I like the colors.",
+            'description': u'I like the colors.',
             'browser_ok': '',
             'browser_data': json.dumps(browser_data)
         })
@@ -731,7 +738,7 @@ class TestFeedback(TestCase):
 
         r = self.client.post(url, {
             'happy': 0,
-            'description': u"I like the colors.",
+            'description': u'I like the colors.',
             'browser_ok': 'on',
             'browser_data': 'invalid json'
         })
@@ -797,7 +804,7 @@ class TestFeedback(TestCase):
 
         r = self.client.post(url + '?src=newsletter', {
             'happy': 0,
-            'description': u"I like the colors.",
+            'description': u'I like the colors.',
         })
 
         self.assertRedirects(r, reverse('thanks'))
@@ -811,7 +818,7 @@ class TestFeedback(TestCase):
 
         r = self.client.post(url + '?utm_source=newsletter', {
             'happy': 0,
-            'description': u"I like the colors.",
+            'description': u'I like the colors.',
         })
 
         self.assertRedirects(r, reverse('thanks'))
@@ -825,7 +832,7 @@ class TestFeedback(TestCase):
 
         r = self.client.post(url + '?utm_campaign=20140220_email', {
             'happy': 0,
-            'description': u"I like the colors.",
+            'description': u'I like the colors.',
         })
 
         self.assertRedirects(r, reverse('thanks'))
@@ -839,7 +846,7 @@ class TestFeedback(TestCase):
 
         r = self.client.post(url + '?foo=bar', {
             'happy': 0,
-            'description': u"I like the colors.",
+            'description': u'I like the colors.',
         })
 
         self.assertRedirects(r, reverse('thanks'))
@@ -853,7 +860,7 @@ class TestFeedback(TestCase):
 
         r = self.client.post(url + '?foo12345678901234567890=bar', {
             'happy': 0,
-            'description': u"I like the colors.",
+            'description': u'I like the colors.',
         })
 
         self.assertRedirects(r, reverse('thanks'))
@@ -867,7 +874,7 @@ class TestFeedback(TestCase):
 
         r = self.client.post(url + '?foo=' + ('a' * 100) + 'b', {
             'happy': 0,
-            'description': u"I like the colors.",
+            'description': u'I like the colors.',
         })
 
         self.assertRedirects(r, reverse('thanks'))
@@ -883,7 +890,7 @@ class TestFeedback(TestCase):
 
         r = self.client.post(url + '?' + qs, {
             'happy': 0,
-            'description': u"I like the colors.",
+            'description': u'I like the colors.',
         })
 
         self.assertRedirects(r, reverse('thanks'))
