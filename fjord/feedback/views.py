@@ -70,7 +70,7 @@ def thanks(request):
         if response_id is not None:
             try:
                 response = Response.objects.get(id=response_id)
-            except Response.ObjectDoesNotExist:
+            except Response.DoesNotExist:
                 pass
             else:
                 suggestions = get_suggestions(response)

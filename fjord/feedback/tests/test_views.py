@@ -146,12 +146,25 @@ class TestFeedback(TestCase):
     @with_waffle('thankyou', True)
     def test_thankyou_flag_and_response_id_in_qs_authenticated(self):
         """Verify response_id in querystring overrides session id"""
-        # Create analyzer and log analyzer in
+        # Create analyzer and log in.
         jane = ProfileFactory(user__email='jane@example.com').user
         jane.groups.add(Group.objects.get(name='analyzers'))
         self.client_login_user(jane)
 
-        feedback = ResponseFactory()
+        # Create some feedback which sets the response_id in the
+        # session.
+        url = reverse('feedback', args=(u'firefox',), locale='en-US')
+        r = self.client.post(url, {
+            'happy': 0,
+            'description': u'Why Firefox not make me sandwiches!',
+        }, follow=True)
+
+        # Create another piece of feedback which is not the one we
+        # just did.
+        feedback = ResponseFactory(description=u'purple horseshoes')
+
+        # Fetch the thank you page with the response_id in the
+        # querystring.
         url = reverse('thanks') + '?response_id={0}'.format(feedback.id)
         r = self.client.get(url)
 
@@ -161,7 +174,7 @@ class TestFeedback(TestCase):
 
     @with_waffle('thankyou', False)
     def test_thankyou_flag_inactive(self):
-        """Verify response and suggestions when thankyou flag is active"""
+        """Verify response and suggestions when thankyou flag is inactive"""
         url = reverse('feedback', args=(u'firefox',), locale='en-US')
         r = self.client.post(url, {
             'happy': 0,
