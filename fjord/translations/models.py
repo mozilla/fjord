@@ -282,7 +282,7 @@ class GengoMachineTranslator(TranslationSystem):
                            metadata=metadata)
             statsd.incr('translation.gengo_machine.unsupported')
 
-        except (GengoAPIFailure, GengoMachineTranslationFailure):
+        except (GengoAPIFailure, GengoMachineTranslationFailure) as exc:
             # FIXME: For now, if we have a machine translation
             # failure, we're just going to ignore it and move on.
             self.log_error(instance, action='translate', msg=unicode(exc),
