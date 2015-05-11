@@ -17,8 +17,9 @@ packages/pyquery
 packages/python-dateutil
 packages/python-memcached
 packages/pytz
-packages/requests
-packages/six
+packages/requests-2.7.0
+packages/requests-mock-0.6.0
+packages/six-1.9.0
 packages/tldextract
 packages/translate-toolkit
 packages/urllib3

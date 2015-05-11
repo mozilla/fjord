@@ -1,0 +1,101 @@
+CHANGES
+=======
+
+0.6.0
+-----
+
+* Update docs
+* Allow to decorate class with mock
+* Use weakref to hold matcher
+* Include matcher in request history
+* Add called and call_count to mocker
+* Update README to use newer syntax
+* Allow specifying an exception to raise
+* Update novaclient and keystoneclient git repo
+* Add pbr to all tox environments
+* Add docs environment to tox.ini
+* Work toward Python 3.4 support and testing
+* Run tip tests against requests master as well
+* Add link to find bug tracker
+
+0.5.1
+-----
+
+* Convert headers to bytes testing request_headers
+* Don't use requests.Response object directly
+* Allow interpreting a sent request as text and json
+* Create a tox env for requests v1.2.3
+* Add get_all to compatibility function
+* Lowercase scheme in regexp test
+* Don't use session.prepare_request
+
+0.5.0
+-----
+
+* Remove old _Context object
+* Correctly set adapter to response.connection
+* Add keystoneclient and novaclient tests to tox
+* Remove some github specific jobs
+* Make compatible with requests 1.2
+* Requires requests >= 2.3
+* Added stackforge gitreview
+* Fix tests running for zuul
+* Make a public create_response function
+* Change query string tests
+* Add wrapper around Request object
+* Add a mock() function
+* Export symbols for HTTP methods
+* Standardize request history tracking
+* Allow querying if a mock was called
+* Add period to error message
+* Http Methods handling to look more like requests
+
+0.4.0
+-----
+
+* Autodeploy wheel format
+* Deploy from all branches
+* Always add request to history
+* Fixture should depend on MockerCore
+
+0.3.0
+-----
+
+* Allow custom matchers
+* Test matcher by __call__
+* Update travis file
+
+0.2.0
+-----
+
+* Remove invalid link from readme
+* Remove Overview section of fixtures
+* Doctest fixups
+* fixup README
+* Add request_headers matching
+* Create the Mocker
+* Fixup doc function link
+* Remove wheel from dependencies
+* Add regexp url matching
+* Add the ANY wildcard
+
+0.1.0
+-----
+
+* Set classifier to Alpha
+* Setup pypi releasing process
+* Split docs for better RTFD viewing
+* Requirements file for RTFD dependencies
+* Set some metadata options
+* A documentation effort
+* Change callback format
+* Fixes in the course of using library in practice
+* Add PBR files to .gitignore
+* Enable coverage testing
+* Discover package for py2.6 tests
+* Fixup and start travis build
+* Convert tests to testr, add flake8 tox command
+* More reorganizing
+* Rework ideas
+* Added a simple README file
+* Initial commit

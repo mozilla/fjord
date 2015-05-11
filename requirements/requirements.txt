@@ -161,11 +161,14 @@ python-memcached==1.48
 # sha256: QlIib6IOBxXU3NBfkjPwB2xEvKMOTxeTsv4DzftCLtQ
 pytz==2013.9
 
-# sha256: e3c179Ox4jI9yfzvBgs4DQX18YvQ8kf16edKYoJ53mY
-requests==2.5.1
+# sha256: OYo9ttYYmdJf1KBsbKEgUbDOFx1wXezX7VURUXtLuT0
+requests==2.7.0
 
-# sha256: 1ZeT-bJVvQDegAuX-aUMzk_IpEwgX33vpbt9aR0TuFI
-six==1.3.0
+# sha256: ofEO5T_vaqxspUz7j9sbfKbaWdaOoajCGsUTIRhCrT4
+requests-mock==0.6.0
+
+# sha256: 4kBSQR_E-9H2cmNVN8P8IzDZSBsYwDF2lbRiWVEskdU
+six==1.9.0
 
 # sha256: HhLNQXx94_wcl9EUouRNXDA8OuXMnS_YihiktArLd5o
 statsd==2.0.3

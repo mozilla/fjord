@@ -14,9 +14,9 @@
     -   id: trailing-whitespace
     -   id: flake8
         exclude: "\
-            (fjord/settings*)|\
+            (fjord/settings.*)|\
             (.*migrations.*)|\
-            (bin/peep-2.2.py)|\
+            (bin/peep-2.4.py)|\
             (bin/update/update.py)|\
             (smoketests/.*)|\
             (vendor/.*)|\
