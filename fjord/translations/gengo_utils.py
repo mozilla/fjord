@@ -35,6 +35,8 @@ unable to respond to translator comments.
 If the response is nonsensical or junk text, then write "spam".
 """
 
+GENGO_DETECT_LANGUAGE_API = 'https://api.gengo.com/service/detect_language'
+
 
 class FjordGengoError(Exception):
     """Superclass for all Gengo translation errors"""
@@ -189,7 +191,7 @@ class FjordGengo(object):
         # get_language is a "private API" thing Gengo has, so it's not
         # included in the gengo library and we have to do it manually.
         resp = requests.post(
-            'https://api.gengo.com/service/detect_language',
+            GENGO_DETECT_LANGUAGE_API,
             data=json.dumps({'text': text.encode('utf-8')}),
             headers={
                 'Content-Type': 'application/json',
