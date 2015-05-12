@@ -7,7 +7,7 @@
   <head>
     <title>{{ _('Something has gone horribly wrong') }} :: {{ _('Firefox Input') }}</title>
 
-    {{ css('base') }}
+    {% stylesheet 'base' %}
 
     {# Settings isn't available when rendering this page, so hard code the static url.
      # If this turns out to be the wrong setting, oh well, it's just a favicon. #}

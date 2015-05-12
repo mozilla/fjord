@@ -1,7 +1,7 @@
 {% extends "mobile/base.html" %}
 
 {% block site_css %}
-  {{ css('mobile/thanks') }}
+  {% stylesheet 'mobile-base' %}
 {% endblock %}
 
 {% block page_title %}{{ _('Download Firefox') }}{% endblock %}

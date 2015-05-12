@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
 {% block site_css %}
-  {{ css('dashboard') }}
+  {% stylesheet 'dashboard' %}
 {% endblock %}
 
 {% block site_js %}
-  {{ js('dashboard') }}
+  {% javascript 'dashboard' %}
   <script type="text/javascript" src="https://login.persona.org/include.js"></script>
 {% endblock %}

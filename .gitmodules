@@ -100,3 +100,6 @@
 [submodule "vendor/src/elasticsearch-dsl-py"]
 	path = vendor/src/elasticsearch-dsl-py
 	url = https://github.com/elastic/elasticsearch-dsl-py.git
+[submodule "vendor/src/django-pipeline"]
+	path = vendor/src/django-pipeline
+	url = https://github.com/cyberdelia/django-pipeline.git

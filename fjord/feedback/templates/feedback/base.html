@@ -6,11 +6,11 @@
 {% endblock %}
 
 {% block site_css %}
-  {{ css('feedback') }}
+  {% stylesheet 'feedback' %}
 {% endblock %}
 
 {% block site_js %}
-  {{ js('generic_feedback') }}
+  {% javascript 'generic_feedback' %}
 {% endblock %}
 
 {% block body %}

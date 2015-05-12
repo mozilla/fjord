@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=320, initial-scale=1, maximum-scale=1, minimum-scale=1">
 
     {% block site_css %}
-      {{ css('mobile/base') }}
+      {% stylesheet 'mobile-base' %}
     {% endblock %}
 
     <link rel="shortcut icon" type="image/png" href="{{ settings.STATIC_URL }}img/favicon.png"/>
@@ -44,7 +44,7 @@
     {% endblock content_block %}
 
     {% block site_js %}
-      {{ js('base') }}
+      {% javascript 'base' %}
     {% endblock %}
   </body>
 </html>

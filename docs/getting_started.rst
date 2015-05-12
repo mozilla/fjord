@@ -449,8 +449,8 @@ reflected in your database tables. To update your database, do this::
 See :ref:`getting-started-chapter-migrate`.
 
 
-Updating requirements
----------------------
+Updating Python requirements
+----------------------------
 
 Fjord will often tell you when you need to update your virtualenv
 with new requirements. You'll see something like this::
@@ -470,6 +470,20 @@ with new requirements. You'll see something like this::
 
 
 Follow the instructions to update them.
+
+
+Updating Node.js dependencies
+-----------------------------
+
+If you need to update your node.js dependencies. To do so simply use::
+
+    npm install
+
+.. Note::
+
+    If you see a "npm ERR! notarget No valid targets found." error while
+    installing the Node packages, this is due to npm-lockdown being unable to
+    find a package that matches the hash in ``lockdown.json``.
 
 
 Where to go from here?

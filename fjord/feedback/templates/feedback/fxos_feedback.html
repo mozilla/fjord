@@ -1,7 +1,7 @@
 {% extends "feedback/base.html" %}
 
 {% block site_js %}
-  {{ js('fxos_feedback') }}
+  {% javascript 'fxos_feedback' %}
 {% endblock %}
 
 {% block page_title %}{{ _('Submit Your Feedback') }}{% endblock %}
