@@ -3,7 +3,7 @@
 {% block page_title %}{{ _('Select A Product') }}{% endblock %}
 
 {% block site_js %}
-  {{ js('singlecard') }}
+  {% javascript 'singlecard' %}
 {% endblock %}
 
 {% block content %}

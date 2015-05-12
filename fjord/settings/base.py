@@ -266,7 +266,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'django_nose',
     'eadred',
-    'jingo_minify',
+    'pipeline',
     'dennis.django_dennis',
 
     'fjord.alerts',
@@ -350,7 +350,8 @@ def JINJA_CONFIG():
             'tower.template.i18n',
             'jinja2.ext.do',
             'jinja2.ext.with_',
-            'jinja2.ext.loopcontrols'
+            'jinja2.ext.loopcontrols',
+            'pipeline.jinja2.ext.PipelineExtension'
         ],
         'finalize': lambda x: x if x is not None else ''
     }
@@ -366,42 +367,62 @@ JINGO_EXCLUDE_APPS = [
     'browserid',
 ]
 
-MINIFY_BUNDLES = {
-    'css': {
-        'base': (
+# Django Pipeline
+PIPELINE_CSS = {
+    'base': {
+        'source_filenames': (
             'css/lib/normalize.css',
             'css/fjord.less',
         ),
-        'dashboard': (
+        'output_filename': 'base.css'
+    },
+    'dashboard': {
+        'source_filenames': (
             'css/ui-lightness-jquery-ui.css',
             'css/lib/normalize.css',
             'css/fjord.less',
             'css/dashboard.less',
         ),
-        'monitor': (
+        'output_filename': 'dashboard.css'
+    },
+    'monitor': {
+        'source_filenames': (
             'css/ui-lightness-jquery-ui.css',
             'css/lib/normalize.css',
             'css/fjord.less',
             'css/monitor.less',
         ),
-        'mobile/base': (
+        'output_filename': 'monitor.css'
+    },
+    'mobile-base': {
+        'source_filenames': (
             'css/lib/normalize.css',
             'css/mobile/base.less',
         ),
-        'feedback': (
+        'output_filename': 'mobile-base.css'
+    },
+    'feedback': {
+        'source_filenames': (
             'css/lib/normalize.css',
             'css/feedback.less',
         ),
+        'output_filename': 'feedback.css'
     },
-    'js': {
-        'base': (
+}
+
+PIPELINE_JS = {
+    'base': {
+        'source_filenames': (
             'js/lib/jquery.min.js',
             'browserid/api.js',
             'browserid/browserid.js',
             'js/init.js',
             'js/ga.js',
         ),
-        'dashboard': (
+        'output_filename': 'base.js'
+    },
+    'dashboard': {
+        'source_filenames': (
             'js/lib/jquery.min.js',
             'js/lib/jquery-ui.min.js',
             'js/init.js',
@@ -415,7 +436,10 @@ MINIFY_BUNDLES = {
             'browserid/browserid.js',
             'js/ga.js',
         ),
-        'hourlydashboard': (
+        'output_filename': 'dashboard.js'
+    },
+    'hourlydashboard': {
+        'source_filenames': (
             'js/lib/jquery.min.js',
             'js/lib/jquery-ui.min.js',
             'js/init.js',
@@ -429,7 +453,10 @@ MINIFY_BUNDLES = {
             'browserid/browserid.js',
             'js/ga.js',
         ),
-        'productdashboard': (
+        'output_filename': 'hourlydashboard.js'
+    },
+    'productdashboard': {
+        'source_filenames': (
             'js/lib/jquery.min.js',
             'js/lib/jquery-ui.min.js',
             'js/init.js',
@@ -443,7 +470,10 @@ MINIFY_BUNDLES = {
             'browserid/browserid.js',
             'js/ga.js',
         ),
-        'productdashboardfirefox': (
+        'output_filename': 'productdashboard.js'
+    },
+    'productdashboardfirefox': {
+        'source_filenames': (
             'js/lib/jquery.min.js',
             'js/lib/jquery-ui.min.js',
             'js/init.js',
@@ -457,11 +487,17 @@ MINIFY_BUNDLES = {
             'browserid/browserid.js',
             'js/ga.js',
         ),
-        'singlecard': (
+        'output_filename': 'productdashboardfirefox.js'
+    },
+    'singlecard': {
+        'source_filenames': (
             'js/lib/jquery.min.js',
             'js/ga.js',
         ),
-        'generic_feedback': (
+        'output_filename': 'singlecard.js'
+    },
+    'generic_feedback': {
+        'source_filenames': (
             'js/lib/jquery.min.js',
             'js/fjord_utils.js',
             'js/remote.js',
@@ -470,7 +506,10 @@ MINIFY_BUNDLES = {
             'js/generic_feedback.js',
             'js/ga.js',
         ),
-        'fxos_feedback': (
+        'output_filename': 'generic_feedback.js'
+    },
+    'fxos_feedback': {
+        'source_filenames': (
             'js/lib/jquery.min.js',
             'js/fjord_utils.js',
             'js/cards.js',
@@ -478,13 +517,24 @@ MINIFY_BUNDLES = {
             'js/fxos_feedback.js',
             'js/ga.js',
         ),
-    }
+        'output_filename': 'fxos_feedback.js'
+    },
 }
-LESS_PREPROCESS = True
-JINGO_MINIFY_USE_STATIC = True
 
-LESS_BIN = 'lessc'
-JAVA_BIN = 'java'
+PIPELINE_COMPILERS = (
+    'pipeline.compilers.less.LessCompiler',
+)
+
+PIPELINE_DISABLE_WRAPPER = True
+
+PIPELINE_JS_COMPRESSOR = 'pipeline.compressors.uglifyjs.UglifyJSCompressor'
+PIPELINE_UGLIFYJS_BINARY = path('node_modules/.bin/uglifyjs')
+PIPELINE_UGLIFYJS_ARGUMENTS = '-r "\$super"'
+
+PIPELINE_CSS_COMPRESSOR = 'pipeline.compressors.cssmin.CSSMinCompressor'
+PIPELINE_CSSMIN_BINARY = path('node_modules/.bin/cssmin')
+
+PIPELINE_LESS_BINARY = path('node_modules/.bin/lessc')
 
 # Sessions
 #
@@ -575,8 +625,8 @@ GENGO_ACCOUNT_BALANCE_THRESHOLD = 100.0
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'fjord.base.static_utils.WTFinder',
 )
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
 # ElasticSearch settings.
 

@@ -65,7 +65,6 @@ def update_locales(ctx):
 def update_assets(ctx):
     with ctx.lcd(settings.SRC_DIR):
         ctx.local(PYTHON + " manage.py collectstatic --noinput")
-        ctx.local(PYTHON + " manage.py compress_assets")
 
 
 @task
@@ -126,9 +125,17 @@ def update_info(ctx):
 
 
 @task
+def setup_dependencies(ctx):
+    with ctx.lcd(settings.SRC_DIR):
+        # Install Node dependencies
+        ctx.local('npm install --production --unsafe-perm')
+
+
+@task
 def pre_update(ctx, ref=settings.UPDATE_REF):
     """Update code to pick up changes to this file."""
     update_code(ref)
+    setup_dependencies()
     update_info()
 
 
