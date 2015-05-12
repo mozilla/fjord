@@ -6,6 +6,7 @@ from django.test.utils import override_settings
 
 from mock import MagicMock, patch
 from nose.tools import eq_
+import requests_mock
 
 from fjord.base.tests import TestCase, skip_if
 from fjord.translations import gengo_utils
@@ -70,11 +71,6 @@ def guess_language(lang):
     def guess_language_handler(fun):
         @wraps(fun)
         def _guess_language_handler(*args, **kwargs):
-            patcher = patch('fjord.translations.gengo_utils.requests')
-            mocker = patcher.start()
-
-            post_return = MagicMock()
-
             ret = {
                 u'text_bytes_found': 10,
                 u'opstat': u'ok',
@@ -113,13 +109,10 @@ def guess_language(lang):
                     ],
                     u'detected_lang_name': u'ENGLISH'
                 })
-            post_return.json.return_value = ret
-            mocker.post.return_value = post_return
 
-            try:
+            with requests_mock.Mocker() as m:
+                m.post(gengo_utils.GENGO_DETECT_LANGUAGE_API, json=ret)
                 return fun(*args, **kwargs)
-            finally:
-                patcher.stop()
 
         return _guess_language_handler
     return guess_language_handler
