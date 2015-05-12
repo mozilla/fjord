@@ -4,5 +4,6 @@ set -e
 
 python manage.py test \
   --noinput --logging-clear-handlers \
-  --with-nicedots
+  --with-nicedots \
+  --with-blockage
 echo 'Booyahkasha!'

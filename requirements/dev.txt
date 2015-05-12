@@ -19,6 +19,9 @@ django-sslserver==0.14
 # sha256: ku47hrXBkhwtnawhe--JkMX4Usi8TZAYyv4PPzuBzTo
 nosenicedots==0.5
 
+# sha256: c0XZOWs_PApljFy328eZw6lq-kgpnZbZeB6rprqwt7A
+nose-blockage==0.1.2
+
 # sha256: jnbbT3Kv6QCHxHRntYjQ3j2_hvbj7nYqok7KqmyhuwM
 pre-commit==0.4.4
 
