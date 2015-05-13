@@ -1,15 +1,12 @@
 from rest_framework import authentication
 from rest_framework import exceptions
 from rest_framework import permissions
+from rest_framework import serializers
 import rest_framework.response
 import rest_framework.views
 
 from fjord.alerts.models import Alert, AlertFlavor, AlertSerializer, Link
 from fjord.api_auth.models import Token
-from fjord.base.utils import (
-    smart_int,
-    smart_str
-)
 
 
 class TokenAuthentication(authentication.BaseAuthentication):
@@ -65,6 +62,19 @@ class FlavorPermission(permissions.BasePermission):
         return token and obj.is_permitted(token)
 
 
+def positive_integer(value):
+    if value <= 0:
+        raise serializers.ValidationError(
+            'This field must be positive and non-zero.')
+
+
+class AlertsGETSerializer(serializers.Serializer):
+    flavors = serializers.CharField(required=True)
+    max = serializers.IntegerField(
+        required=False, default=100,
+        validators=[positive_integer])
+
+
 class AlertsAPI(rest_framework.views.APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (FlavorPermission,)
@@ -84,16 +94,13 @@ class AlertsAPI(rest_framework.views.APIView):
             })
 
     def get(self, request):
-        flavorslugs = smart_str(request.GET.get('flavors', '')).split(',')
-        max_count = smart_int(request.GET.get('max', None))
-        max_count = max_count or 100
-        max_count = min(max(1, max_count), 10000)
+        serializer = AlertsGETSerializer(data=request.GET)
+        if not serializer.is_valid():
+            return self.rest_error(status=400, errors=serializer.errors)
 
-        if not flavorslugs:
-            return self.rest_error(
-                status=400,
-                errors='You must specify flavors to retrieve alerts for.'
-            )
+        data = serializer.object
+        flavorslugs = data['flavors'].split(',')
+        max_count = min(data['max'], 10000)
 
         flavors = []
         for flavorslug in flavorslugs:
@@ -103,7 +110,9 @@ class AlertsAPI(rest_framework.views.APIView):
             except AlertFlavor.DoesNotExist:
                 return self.rest_error(
                     status=404,
-                    errors='Flavor "{}" does not exist.'.format(flavorslug)
+                    errors={'flavor': [
+                        'Flavor "{}" does not exist.'.format(flavorslug)
+                    ]}
                 )
 
             self.check_object_permissions(request, flavor)
@@ -111,7 +120,9 @@ class AlertsAPI(rest_framework.views.APIView):
             if not flavor.enabled:
                 return self.rest_error(
                     status=400,
-                    errors='Flavor "{}" is disabled.'.format(flavorslug)
+                    errors={'flavor': [
+                        'Flavor "{}" is disabled.'.format(flavorslug)
+                    ]}
                 )
 
             flavors.append(flavor)

@@ -24,7 +24,7 @@ class AlertsGetAPIAuthTest(TestCase):
 
         eq_(resp.status_code, 404)
         eq_(json.loads(resp.content),
-            {'detail': 'Flavor "fooflavor" does not exist.'}
+            {'detail': {'flavor': ['Flavor "fooflavor" does not exist.']}}
         )
 
         qs = {
@@ -36,7 +36,7 @@ class AlertsGetAPIAuthTest(TestCase):
 
         eq_(resp.status_code, 404)
         eq_(json.loads(resp.content),
-            {'detail': 'Flavor "fooflavor" does not exist.'}
+            {'detail': {'flavor': ['Flavor "fooflavor" does not exist.']}}
         )
 
         flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
@@ -50,7 +50,7 @@ class AlertsGetAPIAuthTest(TestCase):
 
         eq_(resp.status_code, 404)
         eq_(json.loads(resp.content),
-            {'detail': 'Flavor "barflavor" does not exist.'}
+            {'detail': {'flavor': ['Flavor "barflavor" does not exist.']}}
         )
 
     def test_missing_auth_token(self):
@@ -171,7 +171,7 @@ class AlertsGetAPIAuthTest(TestCase):
 
         eq_(resp.status_code, 400)
         eq_(json.loads(resp.content),
-            {'detail': 'Flavor "fooflavor" is disabled.'}
+            {'detail': {'flavor': ['Flavor "fooflavor" is disabled.']}}
         )
 
     def test_fjord_authorization_token(self):
@@ -361,6 +361,39 @@ class AlertsGetAPITest(TestCase):
                     }
                 ]
             }
+        )
+
+    def test_bad_max(self):
+        token = TokenFactory()
+        flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
+        flavor.allowed_tokens.add(token)
+
+        qs = {
+            'flavors': flavor.slug,
+            'max': 'one'
+        }
+        resp = self.client.get(
+            reverse('alerts-api') + '?' + urllib.urlencode(qs),
+            HTTP_AUTHORIZATION='token ' + token.token
+        )
+
+        eq_(resp.status_code, 400)
+        eq_(json.loads(resp.content),
+            {'detail': {'max': ['Enter a whole number.']}}
+        )
+
+        qs = {
+            'flavors': flavor.slug,
+            'max': 0
+        }
+        resp = self.client.get(
+            reverse('alerts-api') + '?' + urllib.urlencode(qs),
+            HTTP_AUTHORIZATION='token ' + token.token
+        )
+
+        eq_(resp.status_code, 400)
+        eq_(json.loads(resp.content),
+            {'detail': {'max': ['This field must be positive and non-zero.']}}
         )
 
     def test_links(self):
@@ -603,7 +636,7 @@ class AlertsPostAPITest(TestCase):
                 ]
             }
         )
-        
+
     def test_post_with_link(self):
         token = TokenFactory()
         flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
