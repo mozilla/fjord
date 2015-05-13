@@ -68,11 +68,38 @@ def positive_integer(value):
             'This field must be positive and non-zero.')
 
 
+def is_after(value1, value2):
+    return value1 and value2 and value1 > value2
+
+
 class AlertsGETSerializer(serializers.Serializer):
     flavors = serializers.CharField(required=True)
     max = serializers.IntegerField(
         required=False, default=100,
         validators=[positive_integer])
+    start_time_start = serializers.DateTimeField(required=False)
+    start_time_end = serializers.DateTimeField(required=False)
+
+    end_time_start = serializers.DateTimeField(required=False)
+    end_time_end = serializers.DateTimeField(required=False)
+
+    created_start = serializers.DateTimeField(required=False)
+    created_end = serializers.DateTimeField(required=False)
+
+    def validate(self, data):
+        if is_after(data.get('start_time_start'), data.get('start_time_end')):
+            raise serializers.ValidationError(
+                'start_time_start must occur before start_time_end.')
+
+        if is_after(data.get('end_time_start'), data.get('end_time_end')):
+            raise serializers.ValidationError(
+                'end_time_start must occur before end_time_end.')
+
+        if is_after(data.get('created_start'), data.get('created_end')):
+            raise serializers.ValidationError(
+                'created_start must occur before created_end.')
+
+        return data
 
 
 class AlertsAPI(rest_framework.views.APIView):
@@ -127,7 +154,23 @@ class AlertsAPI(rest_framework.views.APIView):
 
             flavors.append(flavor)
 
-        alerts = Alert.objects.filter(flavor__in=flavors).order_by('-created')
+        alerts = Alert.objects.filter(flavor__in=flavors)
+        if data.get('start_time_start'):
+            alerts = alerts.filter(start_time__gte=data['start_time_start'])
+        if data.get('start_time_end'):
+            alerts = alerts.filter(start_time__lte=data['start_time_end'])
+
+        if data.get('end_time_start'):
+            alerts = alerts.filter(end_time__gte=data['end_time_start'])
+        if data.get('end_time_end'):
+            alerts = alerts.filter(end_time__lte=data['end_time_end'])
+
+        if data.get('created_start'):
+            alerts = alerts.filter(created__gte=data['created_start'])
+        if data.get('created_end'):
+            alerts = alerts.filter(created__lte=data['created_end'])
+
+        alerts = alerts.order_by('-created')
 
         alerts_ser = AlertSerializer(alerts[:max_count], many=True)
         return rest_framework.response.Response(
