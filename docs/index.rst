@@ -31,6 +31,9 @@ Project details:
 :get involved: https://wiki.mozilla.org/Webdev/GetInvolved/input.mozilla.org
 
 
+.. yippie:: Yay!
+
+   
 Contents
 ========
 
