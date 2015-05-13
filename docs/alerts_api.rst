@@ -282,10 +282,63 @@ Arguments are specified in the querystring.
 |                   |        |                                                        |
 |                   |        |    max=1000                                            |
 +-------------------+--------+--------------------------------------------------------+
+|start_time_start   |datetime|Default: none                                           |
+|                   |        |                                                        |
+|                   |        |Filter alerts by ``start_time`` >= the                  |
+|                   |        |``start_time_start`` value.                             |
+|                   |        |                                                        |
+|                   |        |Example::                                               |
+|                   |        |                                                        |
+|                   |        |    start_time_start=2015-05-13T01:22Z                  |
++-------------------+--------+--------------------------------------------------------+
+|start_time_end     |datetime|Default: none                                           |
+|                   |        |                                                        |
+|                   |        |Filter alerts by ``start_time`` <= the                  |
+|                   |        |``start_time_end`` value.                               |
+|                   |        |                                                        |
+|                   |        |Example::                                               |
+|                   |        |                                                        |
+|                   |        |    start_time_end=2015-05-13T01:22Z                    |
++-------------------+--------+--------------------------------------------------------+
+|end_time_start     |datetime|Default: none                                           |
+|                   |        |                                                        |
+|                   |        |Filter alerts by ``end_time`` >= the ``end_time_start`` |
+|                   |        |value.                                                  |
+|                   |        |                                                        |
+|                   |        |Example::                                               |
+|                   |        |                                                        |
+|                   |        |    end_time_start=2015-05-13T01:22Z                    |
++-------------------+--------+--------------------------------------------------------+
+|end_time_end       |datetime|Default: none                                           |
+|                   |        |                                                        |
+|                   |        |Filter alerts by ``end_time`` <= the ``end_time_end``   |
+|                   |        |value.                                                  |
+|                   |        |                                                        |
+|                   |        |Example::                                               |
+|                   |        |                                                        |
+|                   |        |    end_time_end=2015-05-13T01:22Z                      |
++-------------------+--------+--------------------------------------------------------+
+|created_start      |datetime|Default: none                                           |
+|                   |        |                                                        |
+|                   |        |Filter alerts by ``created`` >= the ``created_start``   |
+|                   |        |value.                                                  |
+|                   |        |                                                        |
+|                   |        |Example::                                               |
+|                   |        |                                                        |
+|                   |        |    created_start=2015-05-13T01:22Z                     |
++-------------------+--------+--------------------------------------------------------+
+|created_end        |datetime|Default: none                                           |
+|                   |        |                                                        |
+|                   |        |Filter alerts by ``created`` <= the ``created_end``     |
+|                   |        |value.                                                  |
+|                   |        |                                                        |
+|                   |        |Example::                                               |
+|                   |        |                                                        |
+|                   |        |    created_end=2015-05-13T01:22Z                       |
++-------------------+--------+--------------------------------------------------------+
 
-
-Example
--------
+Examples
+--------
 
 Using curl on the command line::
 
@@ -325,3 +378,67 @@ Using Python requests:
    # 200
    print resp.json()
    # alerts data
+
+
+Using Python requests to get all the alerts created in the last week:
+
+.. code-block:: python
+
+   from datetime import datetime, timedelta
+
+   import requests
+
+   seven_days_ago = datetime.now() - timedelta(days=7)
+
+   headers = {
+       'content-type': 'application/json',
+       'accept': 'application/json; indent=4',
+       'fjord-authorization': 'Token cd64de0e6c4c491f90fe1d362104c1e5',
+   }
+   qs_params = {
+       'flavors': 'mfbt',
+       'created_start': seven_days_ago.isoformat()
+   }
+
+   url = 'https://input.mozilla.org/api/v1/alerts/alert/?' + urllib.urlencode(qs_params),
+
+   resp = requests.get(url, headers=headers)
+
+   print resp.status_code
+   # 200
+   print resp.json()
+   # alerts data...
+
+
+Using Python requests to get all the alerts that were "live" between
+2015-05-01 and 2015-05-08:
+
+.. code-block:: python
+
+   from datetime import datetime, timedelta
+
+   import requests
+
+   seven_days_ago = datetime.now() - timedelta(days=7)
+
+   headers = {
+       'content-type': 'application/json',
+       'accept': 'application/json; indent=4',
+       'fjord-authorization': 'Token cd64de0e6c4c491f90fe1d362104c1e5',
+   }
+   qs_params = {
+       'flavors': 'mfbt',
+       # end_time >= 2015-05-01
+       'end_time_start': datetime(2015, 05, 01, 0, 0).isoformat(),
+       # start_time <= 2015-05-08
+       'start_time_end': datetime(2015, 05, 08, 0, 0).isoformat(),
+   }
+
+   url = 'https://input.mozilla.org/api/v1/alerts/alert/?' + urllib.urlencode(qs_params),
+
+   resp = requests.get(url, headers=headers)
+
+   print resp.status_code
+   # 200
+   print resp.json()
+   # alerts data...

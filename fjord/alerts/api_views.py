@@ -1,15 +1,12 @@
 from rest_framework import authentication
 from rest_framework import exceptions
 from rest_framework import permissions
+from rest_framework import serializers
 import rest_framework.response
 import rest_framework.views
 
 from fjord.alerts.models import Alert, AlertFlavor, AlertSerializer, Link
 from fjord.api_auth.models import Token
-from fjord.base.utils import (
-    smart_int,
-    smart_str
-)
 
 
 class TokenAuthentication(authentication.BaseAuthentication):
@@ -65,6 +62,46 @@ class FlavorPermission(permissions.BasePermission):
         return token and obj.is_permitted(token)
 
 
+def positive_integer(value):
+    if value <= 0:
+        raise serializers.ValidationError(
+            'This field must be positive and non-zero.')
+
+
+def is_after(value1, value2):
+    return value1 and value2 and value1 > value2
+
+
+class AlertsGETSerializer(serializers.Serializer):
+    flavors = serializers.CharField(required=True)
+    max = serializers.IntegerField(
+        required=False, default=100,
+        validators=[positive_integer])
+    start_time_start = serializers.DateTimeField(required=False)
+    start_time_end = serializers.DateTimeField(required=False)
+
+    end_time_start = serializers.DateTimeField(required=False)
+    end_time_end = serializers.DateTimeField(required=False)
+
+    created_start = serializers.DateTimeField(required=False)
+    created_end = serializers.DateTimeField(required=False)
+
+    def validate(self, data):
+        if is_after(data.get('start_time_start'), data.get('start_time_end')):
+            raise serializers.ValidationError(
+                'start_time_start must occur before start_time_end.')
+
+        if is_after(data.get('end_time_start'), data.get('end_time_end')):
+            raise serializers.ValidationError(
+                'end_time_start must occur before end_time_end.')
+
+        if is_after(data.get('created_start'), data.get('created_end')):
+            raise serializers.ValidationError(
+                'created_start must occur before created_end.')
+
+        return data
+
+
 class AlertsAPI(rest_framework.views.APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (FlavorPermission,)
@@ -84,16 +121,13 @@ class AlertsAPI(rest_framework.views.APIView):
             })
 
     def get(self, request):
-        flavorslugs = smart_str(request.GET.get('flavors', '')).split(',')
-        max_count = smart_int(request.GET.get('max', None))
-        max_count = max_count or 100
-        max_count = min(max(1, max_count), 10000)
+        serializer = AlertsGETSerializer(data=request.GET)
+        if not serializer.is_valid():
+            return self.rest_error(status=400, errors=serializer.errors)
 
-        if not flavorslugs:
-            return self.rest_error(
-                status=400,
-                errors='You must specify flavors to retrieve alerts for.'
-            )
+        data = serializer.object
+        flavorslugs = data['flavors'].split(',')
+        max_count = min(data['max'], 10000)
 
         flavors = []
         for flavorslug in flavorslugs:
@@ -103,7 +137,9 @@ class AlertsAPI(rest_framework.views.APIView):
             except AlertFlavor.DoesNotExist:
                 return self.rest_error(
                     status=404,
-                    errors='Flavor "{}" does not exist.'.format(flavorslug)
+                    errors={'flavor': [
+                        'Flavor "{}" does not exist.'.format(flavorslug)
+                    ]}
                 )
 
             self.check_object_permissions(request, flavor)
@@ -111,12 +147,30 @@ class AlertsAPI(rest_framework.views.APIView):
             if not flavor.enabled:
                 return self.rest_error(
                     status=400,
-                    errors='Flavor "{}" is disabled.'.format(flavorslug)
+                    errors={'flavor': [
+                        'Flavor "{}" is disabled.'.format(flavorslug)
+                    ]}
                 )
 
             flavors.append(flavor)
 
-        alerts = Alert.objects.filter(flavor__in=flavors).order_by('-created')
+        alerts = Alert.objects.filter(flavor__in=flavors)
+        if data.get('start_time_start'):
+            alerts = alerts.filter(start_time__gte=data['start_time_start'])
+        if data.get('start_time_end'):
+            alerts = alerts.filter(start_time__lte=data['start_time_end'])
+
+        if data.get('end_time_start'):
+            alerts = alerts.filter(end_time__gte=data['end_time_start'])
+        if data.get('end_time_end'):
+            alerts = alerts.filter(end_time__lte=data['end_time_end'])
+
+        if data.get('created_start'):
+            alerts = alerts.filter(created__gte=data['created_start'])
+        if data.get('created_end'):
+            alerts = alerts.filter(created__lte=data['created_end'])
+
+        alerts = alerts.order_by('-created')
 
         alerts_ser = AlertSerializer(alerts[:max_count], many=True)
         return rest_framework.response.Response(

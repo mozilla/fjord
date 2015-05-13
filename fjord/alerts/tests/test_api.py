@@ -5,7 +5,7 @@ from uuid import uuid4
 
 from django.test.utils import override_settings
 
-from nose.tools import eq_
+from nose.tools import eq_, ok_
 
 from . import AlertFlavorFactory, AlertFactory, LinkFactory
 from fjord.alerts.models import Alert, Link
@@ -24,7 +24,7 @@ class AlertsGetAPIAuthTest(TestCase):
 
         eq_(resp.status_code, 404)
         eq_(json.loads(resp.content),
-            {'detail': 'Flavor "fooflavor" does not exist.'}
+            {'detail': {'flavor': ['Flavor "fooflavor" does not exist.']}}
         )
 
         qs = {
@@ -36,7 +36,7 @@ class AlertsGetAPIAuthTest(TestCase):
 
         eq_(resp.status_code, 404)
         eq_(json.loads(resp.content),
-            {'detail': 'Flavor "fooflavor" does not exist.'}
+            {'detail': {'flavor': ['Flavor "fooflavor" does not exist.']}}
         )
 
         flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
@@ -50,7 +50,7 @@ class AlertsGetAPIAuthTest(TestCase):
 
         eq_(resp.status_code, 404)
         eq_(json.loads(resp.content),
-            {'detail': 'Flavor "barflavor" does not exist.'}
+            {'detail': {'flavor': ['Flavor "barflavor" does not exist.']}}
         )
 
     def test_missing_auth_token(self):
@@ -171,7 +171,7 @@ class AlertsGetAPIAuthTest(TestCase):
 
         eq_(resp.status_code, 400)
         eq_(json.loads(resp.content),
-            {'detail': 'Flavor "fooflavor" is disabled.'}
+            {'detail': {'flavor': ['Flavor "fooflavor" is disabled.']}}
         )
 
     def test_fjord_authorization_token(self):
@@ -361,6 +361,385 @@ class AlertsGetAPITest(TestCase):
                     }
                 ]
             }
+        )
+
+    def test_bad_max(self):
+        token = TokenFactory()
+        flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
+        flavor.allowed_tokens.add(token)
+
+        qs = {
+            'flavors': flavor.slug,
+            'max': 'one'
+        }
+        resp = self.client.get(
+            reverse('alerts-api') + '?' + urllib.urlencode(qs),
+            HTTP_AUTHORIZATION='token ' + token.token
+        )
+
+        eq_(resp.status_code, 400)
+        eq_(json.loads(resp.content),
+            {'detail': {'max': ['Enter a whole number.']}}
+        )
+
+        qs = {
+            'flavors': flavor.slug,
+            'max': 0
+        }
+        resp = self.client.get(
+            reverse('alerts-api') + '?' + urllib.urlencode(qs),
+            HTTP_AUTHORIZATION='token ' + token.token
+        )
+
+        eq_(resp.status_code, 400)
+        eq_(json.loads(resp.content),
+            {'detail': {'max': ['This field must be positive and non-zero.']}}
+        )
+
+    def test_start_time(self):
+        token = TokenFactory()
+        flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
+        flavor.allowed_tokens.add(token)
+
+        today = datetime.datetime.now()
+        yesterday = today - datetime.timedelta(days=1)
+        daybeforeyesterday = yesterday - datetime.timedelta(days=1)
+
+        alert1 = AlertFactory(
+            summary=u'alert 1',
+            flavor=flavor,
+            start_time=yesterday
+        )
+        alert2 = AlertFactory(
+            summary=u'alert 2',
+            flavor=flavor,
+            start_time=daybeforeyesterday
+        )
+
+        def test_scenario(start_time_start, start_time_end, expected):
+            qs = {
+                'flavors': flavor.slug,
+            }
+            if start_time_start:
+                qs['start_time_start'] = start_time_start
+            if start_time_end:
+                qs['start_time_end'] = start_time_end
+
+            resp = self.client.get(
+                reverse('alerts-api') + '?' + urllib.urlencode(qs),
+                HTTP_AUTHORIZATION='token ' + token.token
+            )
+
+            eq_(resp.status_code, 200)
+            data = json.loads(resp.content)
+            eq_(sorted([alert['summary'] for alert in data['alerts']]),
+                sorted(expected))
+
+        # Start yesterday at 00:00
+        test_scenario(
+            start_time_start=yesterday.strftime('%Y-%m-%dT00:00'),
+            start_time_end=None,
+            expected=[alert1.summary]
+        )
+
+        # Start today at 00:00
+        test_scenario(
+            start_time_start=today.strftime('%Y-%m-%dT00:00'),
+            start_time_end=None,
+            expected=[]
+        )
+
+        # End today at 23:59
+        test_scenario(
+            start_time_start=None,
+            start_time_end=today.strftime('%Y-%m-%dT23:59'),
+            expected=[alert1.summary, alert2.summary]
+        )
+
+        # End day before yesterday at 00:00
+        test_scenario(
+            start_time_start=None,
+            start_time_end=daybeforeyesterday.strftime('%Y-%m-%dT23:59'),
+            expected=[alert2.summary]
+        )
+
+        # Start daybeforeyesterday at 00:00 and end today at 23:59
+        test_scenario(
+            start_time_start=daybeforeyesterday.strftime('%Y-%m-%dT00:00'),
+            start_time_end=today.strftime('%Y-%m-%dT23:59'),
+            expected=[alert1.summary, alert2.summary]
+        )
+
+    def test_start_time_invalid(self):
+        token = TokenFactory()
+        flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
+        flavor.allowed_tokens.add(token)
+
+        qs = {
+            'flavors': flavor.slug,
+            'start_time_start': 'one',
+            'start_time_end': 'one'
+        }
+        resp = self.client.get(
+            reverse('alerts-api') + '?' + urllib.urlencode(qs),
+            HTTP_AUTHORIZATION='token ' + token.token
+        )
+
+        eq_(resp.status_code, 400)
+        data = json.loads(resp.content)
+        ok_(data['detail']['start_time_start'][0]
+            .startswith('Datetime has wrong format'))
+        ok_(data['detail']['start_time_end'][0]
+            .startswith('Datetime has wrong format'))
+
+        qs = {
+            'flavors': flavor.slug,
+            'start_time_start': datetime.datetime.now(),
+            'start_time_end': (
+                datetime.datetime.now() - datetime.timedelta(days=1)
+            )
+        }
+        resp = self.client.get(
+            reverse('alerts-api') + '?' + urllib.urlencode(qs),
+            HTTP_AUTHORIZATION='token ' + token.token
+        )
+
+        eq_(resp.status_code, 400)
+        data = json.loads(resp.content)
+        eq_(data['detail'],
+            {'non_field_errors': [
+                u'start_time_start must occur before start_time_end.'
+            ]}
+        )
+
+    def test_end_time(self):
+        token = TokenFactory()
+        flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
+        flavor.allowed_tokens.add(token)
+
+        today = datetime.datetime.now()
+        yesterday = today - datetime.timedelta(days=1)
+        daybeforeyesterday = yesterday - datetime.timedelta(days=1)
+
+        alert1 = AlertFactory(
+            summary=u'alert 1',
+            flavor=flavor,
+            end_time=yesterday
+        )
+        alert2 = AlertFactory(
+            summary=u'alert 2',
+            flavor=flavor,
+            end_time=daybeforeyesterday
+        )
+
+        def test_scenario(end_time_start, end_time_end, expected):
+            qs = {
+                'flavors': flavor.slug,
+            }
+            if end_time_start:
+                qs['end_time_start'] = end_time_start
+            if end_time_end:
+                qs['end_time_end'] = end_time_end
+
+            resp = self.client.get(
+                reverse('alerts-api') + '?' + urllib.urlencode(qs),
+                HTTP_AUTHORIZATION='token ' + token.token
+            )
+
+            eq_(resp.status_code, 200)
+            data = json.loads(resp.content)
+            eq_(sorted([alert['summary'] for alert in data['alerts']]),
+                sorted(expected))
+
+        # Start yesterday at 00:00
+        test_scenario(
+            end_time_start=yesterday.strftime('%Y-%m-%dT00:00'),
+            end_time_end=None,
+            expected=[alert1.summary]
+        )
+
+        # Start today at 00:00
+        test_scenario(
+            end_time_start=today.strftime('%Y-%m-%dT00:00'),
+            end_time_end=None,
+            expected=[]
+        )
+
+        # End today at 23:59
+        test_scenario(
+            end_time_start=None,
+            end_time_end=today.strftime('%Y-%m-%dT23:59'),
+            expected=[alert1.summary, alert2.summary]
+        )
+
+        # End day before yesterday at 00:00
+        test_scenario(
+            end_time_start=None,
+            end_time_end=daybeforeyesterday.strftime('%Y-%m-%dT23:59'),
+            expected=[alert2.summary]
+        )
+
+        # Start daybeforeyesterday at 00:00 and end today at 23:59
+        test_scenario(
+            end_time_start=daybeforeyesterday.strftime('%Y-%m-%dT00:00'),
+            end_time_end=today.strftime('%Y-%m-%dT23:59'),
+            expected=[alert1.summary, alert2.summary]
+        )
+
+    def test_end_time_invalid(self):
+        token = TokenFactory()
+        flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
+        flavor.allowed_tokens.add(token)
+
+        qs = {
+            'flavors': flavor.slug,
+            'end_time_start': 'one',
+            'end_time_end': 'one'
+        }
+        resp = self.client.get(
+            reverse('alerts-api') + '?' + urllib.urlencode(qs),
+            HTTP_AUTHORIZATION='token ' + token.token
+        )
+
+        eq_(resp.status_code, 400)
+        data = json.loads(resp.content)
+        ok_(data['detail']['end_time_start'][0]
+            .startswith('Datetime has wrong format'))
+        ok_(data['detail']['end_time_end'][0]
+            .startswith('Datetime has wrong format'))
+
+        qs = {
+            'flavors': flavor.slug,
+            'end_time_start': datetime.datetime.now(),
+            'end_time_end': (
+                datetime.datetime.now() - datetime.timedelta(days=1)
+            )
+        }
+        resp = self.client.get(
+            reverse('alerts-api') + '?' + urllib.urlencode(qs),
+            HTTP_AUTHORIZATION='token ' + token.token
+        )
+
+        eq_(resp.status_code, 400)
+        data = json.loads(resp.content)
+        eq_(data['detail'],
+            {'non_field_errors': [
+                u'end_time_start must occur before end_time_end.'
+            ]}
+        )
+
+    def test_created(self):
+        token = TokenFactory()
+        flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
+        flavor.allowed_tokens.add(token)
+
+        today = datetime.datetime.now()
+        yesterday = today - datetime.timedelta(days=1)
+        daybeforeyesterday = yesterday - datetime.timedelta(days=1)
+
+        alert1 = AlertFactory(summary=u'alert 1', flavor=flavor)
+        alert1.created = yesterday
+        alert1.save()
+
+        alert2 = AlertFactory(summary=u'alert 2', flavor=flavor)
+        alert2.created = daybeforeyesterday
+        alert2.save()
+
+        def test_scenario(created_start, created_end, expected):
+            qs = {
+                'flavors': flavor.slug,
+            }
+            if created_start:
+                qs['created_start'] = created_start
+            if created_end:
+                qs['created_end'] = created_end
+
+            resp = self.client.get(
+                reverse('alerts-api') + '?' + urllib.urlencode(qs),
+                HTTP_AUTHORIZATION='token ' + token.token
+            )
+
+            eq_(resp.status_code, 200)
+            data = json.loads(resp.content)
+            eq_(sorted([alert['summary'] for alert in data['alerts']]),
+                sorted(expected))
+
+        # Start yesterday at 00:00 yields alert1.
+        test_scenario(
+            created_start=yesterday.strftime('%Y-%m-%dT00:00'),
+            created_end=None,
+            expected=[alert1.summary]
+        )
+
+        # Start today at 00:00 yields nothing.
+        test_scenario(
+            created_start=today.strftime('%Y-%m-%dT00:00'),
+            created_end=None,
+            expected=[]
+        )
+
+        # End today at 23:59 yields both.
+        test_scenario(
+            created_start=None,
+            created_end=today.strftime('%Y-%m-%dT23:59'),
+            expected=[alert1.summary, alert2.summary]
+        )
+
+        # End day before yesterday at 00:00 yields alert2.
+        test_scenario(
+            created_start=None,
+            created_end=daybeforeyesterday.strftime('%Y-%m-%dT23:59'),
+            expected=[alert2.summary]
+        )
+
+        # Start daybeforeyesterday at 00:00 and end today at 23:59 yields
+        # both.
+        test_scenario(
+            created_start=daybeforeyesterday.strftime('%Y-%m-%dT00:00'),
+            created_end=today.strftime('%Y-%m-%dT23:59'),
+            expected=[alert1.summary, alert2.summary]
+        )
+
+    def test_created_invalid(self):
+        token = TokenFactory()
+        flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
+        flavor.allowed_tokens.add(token)
+
+        qs = {
+            'flavors': flavor.slug,
+            'created_start': 'one',
+            'created_end': 'one'
+        }
+        resp = self.client.get(
+            reverse('alerts-api') + '?' + urllib.urlencode(qs),
+            HTTP_AUTHORIZATION='token ' + token.token
+        )
+
+        eq_(resp.status_code, 400)
+        data = json.loads(resp.content)
+        ok_(data['detail']['created_start'][0]
+            .startswith('Datetime has wrong format'))
+        ok_(data['detail']['created_end'][0]
+            .startswith('Datetime has wrong format'))
+
+        qs = {
+            'flavors': flavor.slug,
+            'created_start': datetime.datetime.now(),
+            'created_end': (
+                datetime.datetime.now() - datetime.timedelta(days=1)
+            )
+        }
+        resp = self.client.get(
+            reverse('alerts-api') + '?' + urllib.urlencode(qs),
+            HTTP_AUTHORIZATION='token ' + token.token
+        )
+
+        eq_(resp.status_code, 400)
+        data = json.loads(resp.content)
+        eq_(data['detail'],
+            {'non_field_errors': [
+                u'created_start must occur before created_end.'
+            ]}
         )
 
     def test_links(self):
@@ -603,7 +982,7 @@ class AlertsPostAPITest(TestCase):
                 ]
             }
         )
-        
+
     def test_post_with_link(self):
         token = TokenFactory()
         flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')

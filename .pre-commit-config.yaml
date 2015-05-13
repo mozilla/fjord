@@ -21,7 +21,9 @@
             (smoketests/.*)|\
             (vendor/.*)|\
             (docs/.*)"
-        args: [--max-line-length=79]
+        args:
+        - "--max-line-length=79"
+        - "--ignore=E123,E124"
 
 -   repo: https://github.com/pre-commit/mirrors-jshint
     sha: 'v2.6.3'
