@@ -2,6 +2,7 @@ from django.conf import settings
 
 import pytz
 from rest_framework import fields
+from rest_framework import serializers
 
 
 class UTCDateTimeField(fields.DateTimeField):
@@ -45,3 +46,37 @@ class UTCDateTimeField(fields.DateTimeField):
             if not settings.USE_TZ:
                 result = result.replace(tzinfo=None)
         return result
+
+
+class StrictArgumentsMixin(object):
+    """DRF Serializer mixin that requires init_data to be a subset of
+    fields
+
+    This is for API endpoints that require that all arguments passed in
+    are handled. If an argument is specified that doesn't exist, then
+    this will raise a ``serializers.ValidationError`` during validation.
+
+    To use::
+
+        from rest_framework import serializers
+
+        from fjord.base.api_utils import StrictArgumentsMixin
+
+
+        class MySerializer(StrictArgumentMixin, serializers.Serializer):
+            ...
+
+    """
+    def validate(self, data):
+        data = super(StrictArgumentsMixin, self).validate(data)
+
+        # Guarantee that arguments passed in are a subset of possible
+        # fields.
+        if self.init_data:
+            for key in self.init_data.keys():
+                if key not in self.fields:
+                    raise serializers.ValidationError(
+                        '"{0}" is not a valid argument.'.format(key)
+                    )
+
+        return data

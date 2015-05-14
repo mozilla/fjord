@@ -442,3 +442,27 @@ Using Python requests to get all the alerts that were "live" between
    # 200
    print resp.json()
    # alerts data...
+
+
+Responses
+---------
+
+All response bodies are in JSON.
+
+HTTP 200: Success
+~~~~~~~~~~~~~~~~~
+
+The returned content is what you asked for.
+
+
+HTTP 400: Bad request
+~~~~~~~~~~~~~~~~~~~~~
+
+The request has errors. Details will be in the response body.
+
+Possibilities include:
+
+* An argument has a bad value. E.g. you passed in a string instead of
+  an integer.
+* You passed in an argument that doesn't exist. E.g. you passed in
+  "mx" instead of "max".
