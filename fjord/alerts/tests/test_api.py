@@ -197,6 +197,30 @@ class AlertsGetAPIAuthTest(TestCase):
 
 
 class AlertsGetAPITest(TestCase):
+    def test_bad_args(self):
+        token = TokenFactory()
+        flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
+        flavor.allowed_tokens.add(token)
+
+        AlertFactory(summary=u'alert 1', flavor=flavor)
+
+        qs = {
+            'flavors': flavor.slug,
+            'foo': 'bar'
+        }
+        resp = self.client.get(
+            reverse('alerts-api') + '?' + urllib.urlencode(qs),
+            HTTP_AUTHORIZATION='token ' + token.token
+        )
+
+        eq_(resp.status_code, 400)
+        eq_(json.loads(resp.content),
+            {
+                'detail': {
+                    'non_field_errors': ['"foo" is not a valid argument.']
+                }
+            })
+
     def test_get_one_flavor(self):
         token = TokenFactory()
         flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')

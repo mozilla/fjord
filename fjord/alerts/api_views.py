@@ -7,6 +7,7 @@ import rest_framework.views
 
 from fjord.alerts.models import Alert, AlertFlavor, AlertSerializer, Link
 from fjord.api_auth.models import Token
+from fjord.base.api_utils import StrictArgumentsMixin
 
 
 class TokenAuthentication(authentication.BaseAuthentication):
@@ -72,7 +73,7 @@ def is_after(value1, value2):
     return value1 and value2 and value1 > value2
 
 
-class AlertsGETSerializer(serializers.Serializer):
+class AlertsGETSerializer(StrictArgumentsMixin, serializers.Serializer):
     flavors = serializers.CharField(required=True)
     max = serializers.IntegerField(
         required=False, default=100,
@@ -87,6 +88,7 @@ class AlertsGETSerializer(serializers.Serializer):
     created_end = serializers.DateTimeField(required=False)
 
     def validate(self, data):
+        data = super(AlertsGETSerializer, self).validate(data)
         if is_after(data.get('start_time_start'), data.get('start_time_end')):
             raise serializers.ValidationError(
                 'start_time_start must occur before start_time_end.')
