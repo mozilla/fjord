@@ -158,7 +158,7 @@ class Response(ModelBase):
     happy = models.BooleanField(default=True)
     rating = models.PositiveIntegerField(null=True)
     url = EnhancedURLField(blank=True)
-    description = models.TextField(blank=True)
+    description = models.TextField()
 
     # Translation into English of the description
     translated_description = models.TextField(blank=True)
