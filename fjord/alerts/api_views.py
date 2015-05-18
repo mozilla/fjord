@@ -7,7 +7,7 @@ import rest_framework.views
 
 from fjord.alerts.models import Alert, AlertFlavor, AlertSerializer, Link
 from fjord.api_auth.models import Token
-from fjord.base.api_utils import StrictArgumentsMixin
+from fjord.base.api_utils import NotFound, StrictArgumentsMixin
 
 
 class TokenAuthentication(authentication.BaseAuthentication):
@@ -103,58 +103,58 @@ class AlertsGETSerializer(StrictArgumentsMixin, serializers.Serializer):
 
         return data
 
-
-class AlertsAPI(rest_framework.views.APIView):
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (FlavorPermission,)
-
-    def rest_error(self, status, errors):
-        return rest_framework.response.Response(
-            status=status,
-            data={
-                'detail': errors
-            })
-
-    def rest_created(self, data):
-        return rest_framework.response.Response(
-            status=201,
-            data={
-                'detail': data
-            })
-
-    def get(self, request):
-        serializer = AlertsGETSerializer(data=request.GET)
-        if not serializer.is_valid():
-            return self.rest_error(status=400, errors=serializer.errors)
-
-        data = serializer.object
-        flavorslugs = data['flavors'].split(',')
-        max_count = min(data['max'], 10000)
-
+    def validate_flavors(self, attrs, source):
+        flavorslugs = attrs[source].split(',')
         flavors = []
+        errors = []
+
         for flavorslug in flavorslugs:
             try:
                 flavor = AlertFlavor.objects.get(slug=flavorslug)
 
             except AlertFlavor.DoesNotExist:
-                return self.rest_error(
-                    status=404,
-                    errors={'flavor': [
-                        'Flavor "{}" does not exist.'.format(flavorslug)
-                    ]}
+                errors.append(
+                    'Flavor "{0}" does not exist.'.format(flavorslug)
                 )
-
-            self.check_object_permissions(request, flavor)
+                continue
 
             if not flavor.enabled:
-                return self.rest_error(
-                    status=400,
-                    errors={'flavor': [
-                        'Flavor "{}" is disabled.'.format(flavorslug)
-                    ]}
+                errors.append(
+                    'Flavor "{0}" is disabled.'.format(flavorslug)
                 )
+                continue
 
             flavors.append(flavor)
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        # Return a list of the validated AlertFlavor objects. We're
+        # (ab)using validate_flavors here since we should only be
+        # doing validation, but since doing the validation also
+        # transforms the slugs into AlertFlavor objects, we'll do them
+        # both here.
+        attrs[source] = flavors
+        return attrs
+
+
+class AlertsAPI(rest_framework.views.APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (FlavorPermission,)
+
+    def get(self, request):
+        serializer = AlertsGETSerializer(data=request.GET)
+
+        if not serializer.is_valid():
+            raise exceptions.ParseError(serializer.errors)
+
+        data = serializer.object
+        max_count = min(data['max'], 10000)
+        flavors = data['flavors']
+
+        # Make sure the token has permission to view each flavor.
+        for flavor in flavors:
+            self.check_object_permissions(request, flavor)
 
         alerts = Alert.objects.filter(flavor__in=flavors)
         if data.get('start_time_start'):
@@ -189,26 +189,29 @@ class AlertsAPI(rest_framework.views.APIView):
         try:
             flavorslug = request.DATA['flavor']
         except KeyError:
-            return self.rest_error(
-                status=404,
-                errors='Flavor not specified in payload.'
-            )
+            raise exceptions.ParseError({
+                'flavor': [
+                    'Flavor not specified in payload'
+                ]
+            })
 
         try:
             flavor = AlertFlavor.objects.get(slug=flavorslug)
         except AlertFlavor.DoesNotExist:
-            return self.rest_error(
-                status=404,
-                errors='Flavor "{}" does not exist.'.format(flavorslug)
-            )
+            raise NotFound({
+                'flavor': [
+                    'Flavor "{0}" does not exist.'.format(flavorslug)
+                ]
+            })
 
         self.check_object_permissions(request, flavor)
 
         if not flavor.enabled:
-            return self.rest_error(
-                status=400,
-                errors='Flavor "{}" is disabled.'.format(flavorslug)
-            )
+            raise exceptions.ParseError({
+                'flavor': [
+                    'Flavor "{0}" is disabled.'.format(flavorslug)
+                ]
+            })
 
         # Get the links out--we'll deal with them next.
         link_data = data.pop('links', [])
@@ -216,10 +219,7 @@ class AlertsAPI(rest_framework.views.APIView):
         # Validate the alert data
         alert_ser = AlertSerializer(data=data)
         if not alert_ser.is_valid():
-            return self.rest_error(
-                status=400,
-                errors=alert_ser.errors
-            )
+            raise exceptions.ParseError(alert_ser.errors)
 
         # Validate links
         for link_item in link_data:
@@ -227,10 +227,7 @@ class AlertsAPI(rest_framework.views.APIView):
                 link_errors = 'Missing names or urls in link data. {}'.format(
                     repr(link_data))
 
-                return self.rest_error(
-                    status=400,
-                    errors={'links': link_errors}
-                )
+                raise exceptions.ParseError({'links': link_errors})
 
         # Everything is good, so let's save it all to the db
         alert = alert_ser.object
@@ -242,4 +239,8 @@ class AlertsAPI(rest_framework.views.APIView):
             )
             link.save()
 
-        return self.rest_created({'id': alert.id})
+        return rest_framework.response.Response(
+            status=201,
+            data={
+                'detail': {'id': alert.id}
+            })

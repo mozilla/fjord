@@ -22,9 +22,9 @@ class AlertsGetAPIAuthTest(TestCase):
             reverse('alerts-api') + '?' + urllib.urlencode(qs)
         )
 
-        eq_(resp.status_code, 404)
+        eq_(resp.status_code, 400)
         eq_(json.loads(resp.content),
-            {'detail': {'flavor': ['Flavor "fooflavor" does not exist.']}}
+            {'detail': {'flavors': ['Flavor "fooflavor" does not exist.']}}
         )
 
         qs = {
@@ -34,9 +34,12 @@ class AlertsGetAPIAuthTest(TestCase):
             reverse('alerts-api') + '?' + urllib.urlencode(qs)
         )
 
-        eq_(resp.status_code, 404)
+        eq_(resp.status_code, 400)
         eq_(json.loads(resp.content),
-            {'detail': {'flavor': ['Flavor "fooflavor" does not exist.']}}
+            {'detail': {'flavors': [
+                'Flavor "fooflavor" does not exist.',
+                'Flavor "barflavor" does not exist.'
+            ]}}
         )
 
         flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
@@ -48,9 +51,9 @@ class AlertsGetAPIAuthTest(TestCase):
             reverse('alerts-api') + '?' + urllib.urlencode(qs)
         )
 
-        eq_(resp.status_code, 404)
+        eq_(resp.status_code, 400)
         eq_(json.loads(resp.content),
-            {'detail': {'flavor': ['Flavor "barflavor" does not exist.']}}
+            {'detail': {'flavors': ['Flavor "barflavor" does not exist.']}}
         )
 
     def test_missing_auth_token(self):
@@ -171,7 +174,7 @@ class AlertsGetAPIAuthTest(TestCase):
 
         eq_(resp.status_code, 400)
         eq_(json.loads(resp.content),
-            {'detail': {'flavor': ['Flavor "fooflavor" is disabled.']}}
+            {'detail': {'flavors': ['Flavor "fooflavor" is disabled.']}}
         )
 
     def test_fjord_authorization_token(self):
