@@ -225,6 +225,7 @@ Possibilities include:
 
 * missing name/url in links
 * flavor is disabled
+* flavor is missing
 
 
 HTTP 401: Unauthorized
@@ -241,12 +242,6 @@ HTTP 403: Forbidden
 
 Your token doesn't have permission to GET/POST to the specified alert
 flavor.
-
-
-HTTP 404: Not found
-~~~~~~~~~~~~~~~~~~~
-
-The flavor you're GET/POSTing doesn't exist.
 
 
 HTTP 500: Server error
