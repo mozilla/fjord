@@ -6,10 +6,10 @@ from fjord.feedback.tests import ResponseFactory
 from fjord.suggest import get_providers
 from fjord.suggest.utils import get_suggestions
 from fjord.suggest.providers.dummy import DummyProvider
-from fjord.suggest.providers.tests import ProviderTestCase
+from fjord.suggest.tests import ProviderTestCase
 
 
-class TestDummyProviderLoading(ProviderTestCase):
+class DummyProviderLoadingTestCase(ProviderTestCase):
     providers = []
 
     def test_didnt_load(self):
@@ -20,7 +20,7 @@ class TestDummyProviderLoading(ProviderTestCase):
         eq_(len(dummy_providers), 0)
 
 
-class TestDummyProvider(ProviderTestCase):
+class DummyProviderTestCase(ProviderTestCase):
     providers = [
         'fjord.suggest.providers.dummy.DummyProvider'
     ]
