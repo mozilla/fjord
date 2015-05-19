@@ -617,24 +617,11 @@ class ResponsePI(ModelBase):
         return unicode(self.id)
 
 
-class NoNullsCharField(serializers.CharField):
-    """Further restricts CharField so it doesn't accept nulls
-
-    DRF lets CharFields take nulls which is not what I want. This
-    raises a ValidationError if the value is a null.
-
-    """
-    def from_native(self, value):
-        if value is None:
-            raise ValidationError('Value cannot be null')
-        return super(NoNullsCharField, self).from_native(value)
-
-
 class PostResponseSerializer(serializers.Serializer):
     """This handles incoming feedback
 
     This handles responses as well as the additional data for response
-    emails.
+    emails and slop.
 
     """
     # We want to require the happy field, but we can't because for a
@@ -645,100 +632,103 @@ class PostResponseSerializer(serializers.Serializer):
     # this and instead default it to False.
     happy = serializers.BooleanField(default=False)
 
-    url = serializers.CharField(max_length=200, required=False, default=u'')
+    url = serializers.CharField(max_length=200, allow_blank=True, default=u'')
     description = serializers.CharField(required=True)
 
     category = serializers.CharField(max_length=50, required=False,
                                      default=u'')
 
     # product, channel, version, locale, platform
-    product = NoNullsCharField(max_length=20, required=True)
-    channel = NoNullsCharField(max_length=30, required=False, default=u'')
-    version = NoNullsCharField(max_length=30, required=False, default=u'')
-    locale = NoNullsCharField(max_length=8, required=False, default=u'')
-    platform = NoNullsCharField(max_length=30, required=False, default=u'')
-    country = NoNullsCharField(max_length=4, required=False, default=u'')
+    product = serializers.CharField(
+        max_length=20, required=True, allow_null=False)
+    channel = serializers.CharField(
+        max_length=30, allow_null=False, default=u'')
+    version = serializers.CharField(
+        max_length=30, allow_null=False, default=u'')
+    locale = serializers.CharField(
+        max_length=8, allow_null=False, default=u'')
+    platform = serializers.CharField(
+        max_length=30, allow_null=False, default=u'')
+    country = serializers.CharField(
+        max_length=4, allow_null=False, default=u'')
 
     # device information
-    manufacturer = NoNullsCharField(max_length=255, required=False,
-                                    default=u'')
-    device = NoNullsCharField(max_length=255, required=False, default=u'')
+    manufacturer = serializers.CharField(
+        max_length=255, allow_null=False, default=u'')
+    device = serializers.CharField(
+        max_length=255, allow_null=False, default=u'')
 
     # user's email address
     email = serializers.EmailField(required=False)
 
     # user agent
-    user_agent = NoNullsCharField(max_length=255, required=False, default=u'')
+    user_agent = serializers.CharField(
+        max_length=255, allow_null=False, default=u'')
 
     # source and campaign
-    source = NoNullsCharField(max_length=100, required=False, default=u'')
-    campaign = NoNullsCharField(max_length=100, required=False, default=u'')
+    source = serializers.CharField(
+        max_length=100, allow_null=False, default=u'')
+    campaign = serializers.CharField(
+        max_length=100, allow_null=False, default=u'')
 
-    def validate_url(self, attrs, source):
-        value = attrs[source]
+    def validate_url(self, value):
         if value:
             if not is_url(value):
-                msg = u'{0} is not a valid url'.format(value)
-                raise serializers.ValidationError(msg)
+                raise serializers.ValidationError(
+                    u'{0} is not a valid url'.format(value)
+                )
+        return value
 
-        return attrs
-
-    def validate_product(self, attrs, source):
+    def validate_product(self, value):
         """Validates the product against Product model"""
-        value = attrs[source]
-
         # This looks goofy, but it makes it more likely we have a
         # cache hit.
         products = Product.objects.values_list('display_name', flat=True)
         if value not in products:
             raise serializers.ValidationError(
-                '{0} is not a valid product'.format(value))
-        return attrs
+                u'{0} is not a valid product'.format(value)
+            )
+        return value
 
-    def restore_object(self, attrs, instance=None):
-        # Note: instance should never be anything except None here
-        # since we only accept POST and not PUT/PATCH.
+    def create(self, validated_data):
+        # First, pop out 'email' since it's not in the Response.
+        validated_data.pop('email', None)
 
-        opinion = Response(
-            happy=attrs['happy'],
-            url=attrs['url'].strip(),
-            description=attrs['description'].strip(),
-            category=attrs['category'].strip(),
-            product=attrs['product'].strip(),
-            channel=attrs['channel'].strip(),
-            version=attrs['version'].strip(),
-            platform=attrs['platform'].strip(),
-            locale=attrs['locale'].strip(),
-            manufacturer=attrs['manufacturer'].strip(),
-            device=attrs['device'].strip(),
-            country=attrs['country'].strip(),
-            source=attrs['source'].strip(),
-            campaign=attrs['campaign'].strip(),
-            api=1,  # Hard-coded api version number
-        )
+        # Strip string data
+        for key in ['url', 'description', 'category', 'product',
+                    'channel', 'version', 'platform', 'locale',
+                    'manufacturer', 'device', 'country', 'source',
+                    'campaign', 'user_agent']:
+            if key in validated_data:
+                validated_data[key] = validated_data[key].strip()
 
-        # If there's a user agent, infer all the things from the user
-        # agent.
-        user_agent = attrs['user_agent'].strip()
+        # If there's a user agent, infer all the things from
+        # the user agent.
+        user_agent = validated_data.get('user_agent')
         if user_agent:
-            opinion.user_agent = user_agent
             browser = parse_ua(user_agent)
-            opinion.browser = browser.browser
-            opinion.browser_version = browser.browser_version
-            opinion.browser_platform = browser.platform
+            validated_data['browser'] = browser.browser
+            validated_data['browser_version'] = browser.browser_version
+            bp = browser.platform
             if browser.platform == 'Windows':
-                opinion.browser_platform += (' ' + browser.platform_version)
+                bp += (' ' + browser.platform_version)
+            validated_data['browser_platform'] = bp
 
-        # If there is an email address, stash it on this instance so
-        # we can save it later in .save() and so it gets returned
-        # correctly in the response. This doesn't otherwise affect the
-        # Response model instance.
-        opinion.email = attrs.get('email', '').strip()
+        return Response.objects.create(api=1, **validated_data)
+
+    def save(self):
+        obj = super(PostResponseSerializer, self).save()
+
+        if 'email' in self.initial_data:
+            ResponseEmail.objects.create(
+                email=self.initial_data['email'].strip(),
+                opinion=obj
+            )
 
         slop = {}
-        data_items = sorted(self.context['request'].DATA.items())
+        data_items = sorted(self.initial_data.items())
         for key, val in data_items:
-            if key in attrs:
+            if key in self.validated_data:
                 continue
             # Restrict key to 20 characters
             key = key[:20]
@@ -751,26 +741,8 @@ class PostResponseSerializer(serializers.Serializer):
             if len(slop) >= 20:
                 break
 
-        opinion.slop = slop
-
-        return opinion
-
-    def save_object(self, obj, **kwargs):
-        obj.save(**kwargs)
-
-        if obj.email:
-            opinion_email = ResponseEmail(
-                email=obj.email,
-                opinion=obj
-            )
-            opinion_email.save(**kwargs)
-
-        if obj.slop:
-            context = ResponseContext(
-                data=obj.slop,
-                opinion=obj
-            )
-            context.save(**kwargs)
+        if slop:
+            ResponseContext.objects.create(data=slop, opinion=obj)
 
         return obj
 

@@ -1,4 +1,3 @@
-from rest_framework import authentication
 from rest_framework import exceptions
 from rest_framework import permissions
 from rest_framework import serializers
@@ -6,53 +5,8 @@ import rest_framework.response
 import rest_framework.views
 
 from fjord.alerts.models import Alert, AlertFlavor, AlertSerializer, Link
-from fjord.api_auth.models import Token
+from fjord.api_auth.api_utils import TokenAuthentication
 from fjord.base.api_utils import NotFound, StrictArgumentsMixin
-
-
-class TokenAuthentication(authentication.BaseAuthentication):
-    """Authenticates against a api_auth Token. This is loosely based on
-    the django-rest-framework TokenAuthentication except theirs is
-    tied to Django users.
-
-    """
-    def authenticate(self, request):
-        auth = request.META.get('HTTP_AUTHORIZATION', '')
-        if not auth:
-            # FIXME: ZLB isn't passing along the Authorization header,
-            # so we never see it in Django land. This adds support for
-            # an additional header. Why support an additional one?
-            # Because when we switch to AWS, we can alleviate this
-            # silliness.
-            auth = request.META.get('HTTP_FJORD_AUTHORIZATION', '')
-
-        auth = auth.split()
-
-        if not auth or auth[0].lower() != 'token':
-            return None
-
-        if len(auth) == 1:
-            raise exceptions.AuthenticationFailed(
-                'Invalid token header. No token provided.'
-            )
-
-        if len(auth) > 2:
-            raise exceptions.AuthenticationFailed(
-                'Invalid token header. Token string should not contain spaces.'
-            )
-
-        try:
-            token = Token.objects.get(token=auth[1])
-        except Token.DoesNotExist:
-            raise exceptions.AuthenticationFailed('Invalid token.')
-
-        if not token.enabled:
-            raise exceptions.AuthenticationFailed('Token disabled.')
-
-        return (None, token)
-
-    def authenticate_header(self, request):
-        return 'Token'
 
 
 class FlavorPermission(permissions.BasePermission):
@@ -74,10 +28,9 @@ def is_after(value1, value2):
 
 
 class AlertsGETSerializer(StrictArgumentsMixin, serializers.Serializer):
+    """Serializer that validates GET API arguments"""
     flavors = serializers.CharField(required=True)
-    max = serializers.IntegerField(
-        required=False, default=100,
-        validators=[positive_integer])
+    max = serializers.IntegerField(default=100, min_value=1)
     start_time_start = serializers.DateTimeField(required=False)
     start_time_end = serializers.DateTimeField(required=False)
 
@@ -89,22 +42,24 @@ class AlertsGETSerializer(StrictArgumentsMixin, serializers.Serializer):
 
     def validate(self, data):
         data = super(AlertsGETSerializer, self).validate(data)
+        errors = []
+
         if is_after(data.get('start_time_start'), data.get('start_time_end')):
-            raise serializers.ValidationError(
-                'start_time_start must occur before start_time_end.')
+            errors.append('start_time_start must occur before start_time_end.')
 
         if is_after(data.get('end_time_start'), data.get('end_time_end')):
-            raise serializers.ValidationError(
-                'end_time_start must occur before end_time_end.')
+            errors.append('end_time_start must occur before end_time_end.')
 
         if is_after(data.get('created_start'), data.get('created_end')):
-            raise serializers.ValidationError(
-                'created_start must occur before created_end.')
+            errors.append('created_start must occur before created_end.')
+
+        if errors:
+            raise serializers.ValidationError(errors)
 
         return data
 
-    def validate_flavors(self, attrs, source):
-        flavorslugs = attrs[source].split(',')
+    def validate_flavors(self, value):
+        flavorslugs = value.split(',')
         flavors = []
         errors = []
 
@@ -134,8 +89,7 @@ class AlertsGETSerializer(StrictArgumentsMixin, serializers.Serializer):
         # doing validation, but since doing the validation also
         # transforms the slugs into AlertFlavor objects, we'll do them
         # both here.
-        attrs[source] = flavors
-        return attrs
+        return flavors
 
 
 class AlertsAPI(rest_framework.views.APIView):
@@ -146,9 +100,9 @@ class AlertsAPI(rest_framework.views.APIView):
         serializer = AlertsGETSerializer(data=request.GET)
 
         if not serializer.is_valid():
-            raise exceptions.ParseError(serializer.errors)
+            raise exceptions.ValidationError({'detail': serializer.errors})
 
-        data = serializer.object
+        data = serializer.validated_data
         max_count = min(data['max'], 10000)
         flavors = data['flavors']
 
@@ -189,7 +143,7 @@ class AlertsAPI(rest_framework.views.APIView):
         try:
             flavorslug = request.DATA['flavor']
         except KeyError:
-            raise exceptions.ParseError({
+            raise exceptions.ValidationError({
                 'flavor': [
                     'Flavor not specified in payload'
                 ]
@@ -207,7 +161,7 @@ class AlertsAPI(rest_framework.views.APIView):
         self.check_object_permissions(request, flavor)
 
         if not flavor.enabled:
-            raise exceptions.ParseError({
+            raise exceptions.ValidationError({
                 'flavor': [
                     'Flavor "{0}" is disabled.'.format(flavorslug)
                 ]
@@ -219,19 +173,21 @@ class AlertsAPI(rest_framework.views.APIView):
         # Validate the alert data
         alert_ser = AlertSerializer(data=data)
         if not alert_ser.is_valid():
-            raise exceptions.ParseError(alert_ser.errors)
+            raise exceptions.ValidationError({'detail': alert_ser.errors})
 
         # Validate links
+        link_errors = []
         for link_item in link_data:
             if 'name' not in link_item or 'url' not in link_item:
-                link_errors = 'Missing names or urls in link data. {}'.format(
-                    repr(link_data))
+                link_errors.append(
+                    'Missing names or urls in link data. {}'.format(
+                        repr(link_item)))
 
-                raise exceptions.ParseError({'links': link_errors})
+        if link_errors:
+            raise exceptions.ValidationError({'detail': {'links': link_errors}})
 
-        # Everything is good, so let's save it all to the db
-        alert = alert_ser.object
-        alert.save()
+        # Everything is good, so let's save it all to the db.
+        alert = alert_ser.save()
 
         for link_item in link_data:
             link = Link(

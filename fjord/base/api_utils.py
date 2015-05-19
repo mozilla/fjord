@@ -9,12 +9,12 @@ from rest_framework.exceptions import APIException
 
 class UTCDateTimeField(fields.DateTimeField):
     """Like DateTimeField, except it is always in UTC in the API"""
-    def to_native(self, value):
-        """Convert outgoing datetimes into UTC
+    def to_representation(self, value):
+        """Convert outgoing datetimes into UTC strings
 
-        Input currently saves everything in Pacific time, so this
-        takes the datetimes and converts them from Pacific time to
-        UTC.
+        Input currently saves everything in Pacific time, but without
+        timezone info. So this takes the datetimes and converts them
+        from Pacific time to UTC.
 
         If this situation ever changes, then we'd change
         settings.TIME_ZONE and this should continue to work.
@@ -24,10 +24,10 @@ class UTCDateTimeField(fields.DateTimeField):
             default_tzinfo = pytz.timezone(settings.TIME_ZONE)
             value = default_tzinfo.localize(value)
             value = value.astimezone(pytz.utc)
-        return super(UTCDateTimeField, self).to_native(value)
+        return super(UTCDateTimeField, self).to_representation(value)
 
-    def from_native(self, value):
-        """Converts incoming strings to localtime
+    def to_internal_value(self, value):
+        """Converts incoming UTC strings to localtime datetimes
 
         Input currently saves everything in Pacific time, so this
         takes the datetime that super().from_native() produces,
@@ -36,9 +36,15 @@ class UTCDateTimeField(fields.DateTimeField):
         If this situation ever changes, this should continue to work.
 
         """
-        result = super(UTCDateTimeField, self).from_native(value)
+        result = super(UTCDateTimeField, self).to_internal_value(value)
 
-        if result is not None and result.tzinfo is not None:
+        if result is not None:
+            if result.tzinfo is None:
+                # We have a timezone-less datetime, so we need to give
+                # it a timezone to do the rest of the work. We choose
+                # UTC because the API using this is all about UTC.
+                result = pytz.utc.localize(result)
+
             # Convert from whatever timezone it's in to local
             # time.
             local_tzinfo = pytz.timezone(settings.TIME_ZONE)
@@ -47,6 +53,7 @@ class UTCDateTimeField(fields.DateTimeField):
             # If USE_TZ = False, drop the timezone
             if not settings.USE_TZ:
                 result = result.replace(tzinfo=None)
+
         return result
 
 
@@ -74,8 +81,8 @@ class StrictArgumentsMixin(object):
 
         # Guarantee that arguments passed in are a subset of possible
         # fields.
-        if self.init_data:
-            for key in self.init_data.keys():
+        if self.initial_data:
+            for key in self.initial_data.keys():
                 if key not in self.fields:
                     raise serializers.ValidationError(
                         '"{0}" is not a valid argument.'.format(key)

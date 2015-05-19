@@ -10,7 +10,6 @@ from fjord.journal.utils import j_error
 
 
 class HeartbeatV2API(rest_framework.views.APIView):
-
     @classmethod
     def as_view(cls, **initkwargs):
         # Enable CORS
@@ -46,7 +45,7 @@ class HeartbeatV2API(rest_framework.views.APIView):
         if not serializer.is_valid():
             return self.rest_error(post_data, serializer.errors)
 
-        valid_data = serializer.object
+        valid_data = serializer.validated_data
 
         # Try to save it and if it kicks up an integrity error, then
         # we already have this object and we should update it with the
@@ -65,9 +64,9 @@ class HeartbeatV2API(rest_framework.views.APIView):
         # Failing the save() above means there's an existing Answer,
         # so we fetch the existing answer to update.
         ans = Answer.objects.get(
-            person_id=valid_data.person_id,
-            survey_id=valid_data.survey_id,
-            flow_id=valid_data.flow_id
+            person_id=valid_data['person_id'],
+            survey_id=valid_data['survey_id'],
+            flow_id=valid_data['flow_id']
         )
 
         # Check the updated timestamp. If it's the same or older, we

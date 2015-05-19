@@ -406,7 +406,7 @@ class AlertsGetAPITest(TestCase):
 
         eq_(resp.status_code, 400)
         eq_(json.loads(resp.content),
-            {'detail': {'max': ['Enter a whole number.']}}
+            {'detail': {'max': ['A valid integer is required.']}}
         )
 
         qs = {
@@ -419,9 +419,13 @@ class AlertsGetAPITest(TestCase):
         )
 
         eq_(resp.status_code, 400)
-        eq_(json.loads(resp.content),
-            {'detail': {'max': ['This field must be positive and non-zero.']}}
-        )
+        eq_(json.loads(resp.content), {
+            'detail': {
+                'max': [
+                    'Ensure this value is greater than or equal to 1.'
+                ]
+            }
+        })
 
     def test_start_time(self):
         token = TokenFactory()
@@ -901,17 +905,10 @@ class AlertsPostAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
         eq_(resp.status_code, 400)
-        eq_(json.loads(resp.content),
-            {
-                u'detail': {
-                    u'start_time': [
-                        u'Datetime has wrong format. Use one of these formats '
-                        u'instead: '
-                        u'YYYY-MM-DDThh:mm[:ss[.uuuuuu]][+HH:MM|-HH:MM|Z]'
-                    ]
-                }
-            }
-        )
+        content = json.loads(resp.content)
+        ok_(content['detail']['start_time'][0].startswith(
+            u'Datetime has wrong format.'))
+
 
     @override_settings(TIME_ZONE='America/Los_Angeles')
     def test_post_start_time_timezone_change(self):
@@ -1072,13 +1069,14 @@ class AlertsPostAPITest(TestCase):
         eq_(json.loads(resp.content),
             {
                 u'detail': {
-                    'links': (
-                        'Missing names or urls in link data. '
-                        "[{u'url': u'http://example.com/'}]"
-                    )
+                    u'links': [
+                        u"Missing names or urls in link data. "
+                        u"{u'url': u'http://example.com/'}"
+                    ]
                 }
             }
         )
+
         eq_(Alert.objects.filter(summary=data['summary']).count(), 0)
 
         # Missing link url
@@ -1105,10 +1103,10 @@ class AlertsPostAPITest(TestCase):
         eq_(json.loads(resp.content),
             {
                 u'detail': {
-                    'links': (
-                        'Missing names or urls in link data. '
-                        "[{u'name': u'link'}]"
-                    )
+                    u'links': [
+                        u'Missing names or urls in link data. '
+                        u"{u'name': u'link'}"
+                    ]
                 }
             }
         )
