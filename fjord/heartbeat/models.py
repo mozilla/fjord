@@ -130,34 +130,25 @@ class Answer(ModelBase):
 
 
 class AnswerSerializer(serializers.ModelSerializer):
-    updated_ts = serializers.IntegerField(source='updated_ts', required=True)
-    survey_id = serializers.SlugRelatedField(slug_field='name')
+    updated_ts = serializers.IntegerField(required=True)
+    survey_id = serializers.SlugRelatedField(
+        queryset=Survey.objects.all(), slug_field='name')
 
     received_ts = UTCDateTimeField(read_only=True)
 
     class Meta:
         model = Answer
 
-    def validate_survey_id(self, attrs, source):
+    def validate_survey_id(self, survey):
         # Make sure the survey is enabled--otherwise error out.
-        survey = attrs[source]
         if not survey.enabled:
             raise serializers.ValidationError(
                 'survey "%s" is not enabled' % survey.name)
-        return attrs
+        return survey
 
-    def full_clean(self, instance):
-        # Based on DRF Serializer.full_clean
-        #
-        # This one ignores the unique fields check on the model
-        # instance because if we do that we can't do the "update on
-        # POST" thing we do.
-        try:
-            instance.full_clean(
-                exclude=self.get_validation_exclusions(instance),
-                validate_unique=False
-            )
-        except ValidationError as err:
-            self._errors = err.message_dict
-            return None
-        return instance
+    def get_unique_together_validators(self):
+        # We no-op this because we want to ignore the unique fields
+        # check on the model instance so that we can "update on
+        # POST". We do "update on POST" in order to simplify the
+        # heartbeat client.
+        return []

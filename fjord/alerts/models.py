@@ -83,7 +83,8 @@ class LinkSerializer(serializers.ModelSerializer):
 
 
 class AlertSerializer(serializers.ModelSerializer):
-    flavor = serializers.SlugRelatedField(slug_field='slug')
+    flavor = serializers.SlugRelatedField(
+        queryset=AlertFlavor.objects.all(), slug_field='slug')
     # Note: This is read-only because we handle the POST side
     # manually.
     links = LinkSerializer(source='link_set', many=True, read_only=True)

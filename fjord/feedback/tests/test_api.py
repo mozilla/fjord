@@ -399,7 +399,8 @@ class PostFeedbackAPITest(TestCase):
         # This makes sure the test is up-to-date. If we add fields
         # to the serializer, then this will error out unless we've
         # also added them to this test.
-        for field in models.PostResponseSerializer.base_fields.keys():
+        prs = models.PostResponseSerializer()
+        for field in prs.fields.keys():
             assert field in data, '{0} not in data'.format(field)
 
         # Post the data and then make sure everything is in the
@@ -413,7 +414,7 @@ class PostFeedbackAPITest(TestCase):
         eq_(r.status_code, 201)
 
         feedback = models.Response.objects.latest(field_name='id')
-        for field in models.PostResponseSerializer.base_fields.keys():
+        for field in prs.fields.keys():
             if field == 'email':
                 email = models.ResponseEmail.objects.latest(field_name='id')
                 eq_(email.email, data['email'])
@@ -467,9 +468,11 @@ class PostFeedbackAPITest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        ok_(r.rendered_content.startswith('{"url": ["'))
-        ok_(r.rendered_content.endswith('is not a valid url"]}'))
+
         eq_(r.status_code, 400)
+        content = json.loads(r.content)
+        ok_(u'url' in content)
+        ok_(content['url'][0].endswith(u'is not a valid url'))
 
     def test_with_email(self):
         data = {
