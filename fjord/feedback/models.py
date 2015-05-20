@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 
 from django.core.cache import cache
-from django.core.exceptions import ValidationError
 from django.db import models
 
 from elasticutils.contrib.django import Indexable, MLT
@@ -670,6 +669,13 @@ class PostResponseSerializer(serializers.Serializer):
         max_length=100, allow_null=False, default=u'')
     campaign = serializers.CharField(
         max_length=100, allow_null=False, default=u'')
+
+    def validate_description(self, value):
+        if not value.strip():
+            raise serializers.ValidationError(
+                u'This field may not be blank.'
+            )
+        return value
 
     def validate_url(self, value):
         if value:

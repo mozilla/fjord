@@ -442,6 +442,19 @@ class PostFeedbackAPITest(TestCase):
         feedback = models.Response.objects.latest(field_name='id')
         eq_(feedback.happy, False)
 
+    def test_whitespace_description_is_invalid(self):
+        data = {
+            'happy': True,
+            'description': u' ',
+            'product': u'Firefox OS'
+        }
+
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
+        eq_(r.status_code, 400)
+
     def test_invalid_unicode_url(self):
         """Tests an API call with invalid unicode URL"""
         data = {
