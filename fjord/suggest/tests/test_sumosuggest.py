@@ -114,7 +114,8 @@ class SUMOSuggestProviderTestCase(TestCase):
             # Abuse the fact that we know what order the links are in
             # since we're mocking.
             for i in range(3):
-                eq_(links[i].type_, 'sumosuggest')
+                eq_(links[i].provider, 'sumosuggest')
+                eq_(links[i].provider_version, 1)
                 eq_(links[i].url, ret['documents'][i]['url'])
                 eq_(links[i].summary, ret['documents'][i]['title'])
                 eq_(links[i].description, ret['documents'][i]['summary'])
@@ -176,7 +177,8 @@ class LiveSUMOSuggestProviderTestCase(TestCase):
         # Verify we get the right number of links.
         ok_(0 < len(links) <= 3)
 
-        eq_(links[0].type_, u'sumosuggest')
+        eq_(links[0].provider, 'sumosuggest')
+        eq_(links[0].provider_version, 1)
 
         # Verify that the first link has non-empty summary, url and
         # description.

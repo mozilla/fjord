@@ -6,6 +6,11 @@ import requests
 from fjord.suggest import Link, Provider
 
 
+PROVIDER = 'sumosuggest'
+# Increment this any time we change the heuristics for creating
+# suggestions.
+PROVIDER_VERSION = 1
+
 SUMO_SUGGEST_API_URL = 'https://support.mozilla.org/api/2/search/suggest/'
 
 
@@ -68,7 +73,8 @@ class SUMOSuggestProvider(Provider):
 
         return [
             Link(
-                type_=u'sumosuggest',
+                provider=PROVIDER,
+                provider_version=PROVIDER_VERSION,
                 summary=doc['title'],
                 description=doc['summary'],
                 url=doc['url']
