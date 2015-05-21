@@ -26,8 +26,9 @@ class Provider(object):
 
 class Link(object):
     """Represents a single Link"""
-    def __init__(self, type_, summary, url, description):
-        self.type_ = type_
+    def __init__(self, provider, provider_version, summary, url, description):
+        self.provider = provider
+        self.provider_version = provider_version
         self.summary = summary
         self.url = url
         self.description = description

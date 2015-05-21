@@ -42,7 +42,8 @@ class DummyProviderTestCase(ProviderTestCase):
         )
         links = get_suggestions(resp)
         eq_(len(links), 1)
-        eq_(links[0].type_, u'dummy')
+        eq_(links[0].provider, 'dummy')
+        eq_(links[0].provider_version, 1)
         eq_(links[0].summary, u'summary {0}'.format(now)),
         eq_(links[0].description, u'description {0}'.format(now))
         eq_(links[0].url, resp.url)
