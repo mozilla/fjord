@@ -634,41 +634,41 @@ class PostResponseSerializer(serializers.Serializer):
     url = serializers.CharField(max_length=200, allow_blank=True, default=u'')
     description = serializers.CharField(required=True)
 
-    category = serializers.CharField(max_length=50, required=False,
-                                     default=u'')
+    category = serializers.CharField(
+        max_length=50, allow_blank=True, default=u'')
 
     # product, channel, version, locale, platform
     product = serializers.CharField(
         max_length=20, required=True, allow_null=False)
     channel = serializers.CharField(
-        max_length=30, allow_null=False, default=u'')
+        max_length=30, allow_blank=True, default=u'')
     version = serializers.CharField(
-        max_length=30, allow_null=False, default=u'')
+        max_length=30, allow_blank=True, default=u'')
     locale = serializers.CharField(
-        max_length=8, allow_null=False, default=u'')
+        max_length=8, allow_blank=True, default=u'')
     platform = serializers.CharField(
-        max_length=30, allow_null=False, default=u'')
+        max_length=30, allow_blank=True, default=u'')
     country = serializers.CharField(
-        max_length=4, allow_null=False, default=u'')
+        max_length=4, allow_blank=True, default=u'')
 
     # device information
     manufacturer = serializers.CharField(
-        max_length=255, allow_null=False, default=u'')
+        max_length=255, allow_blank=True, default=u'')
     device = serializers.CharField(
-        max_length=255, allow_null=False, default=u'')
+        max_length=255, allow_blank=True, default=u'')
 
     # user's email address
     email = serializers.EmailField(required=False)
 
     # user agent
     user_agent = serializers.CharField(
-        max_length=255, allow_null=False, default=u'')
+        max_length=255, allow_blank=True, default=u'')
 
     # source and campaign
     source = serializers.CharField(
-        max_length=100, allow_null=False, default=u'')
+        max_length=100, allow_blank=True, default=u'')
     campaign = serializers.CharField(
-        max_length=100, allow_null=False, default=u'')
+        max_length=100, allow_blank=True, default=u'')
 
     def validate_description(self, value):
         if not value.strip():

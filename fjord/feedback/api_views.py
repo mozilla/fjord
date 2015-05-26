@@ -96,7 +96,8 @@ class PublicFeedbackAPI(rest_framework.views.APIView):
         search = search.filter(f)
 
         # Explicitly include only publicly visible fields
-        search = search.values_dict(*models.ResponseMappingType.public_fields())
+        search = search.values_dict(
+            *models.ResponseMappingType.public_fields())
 
         maximum = smart_int(request.GET.get('max', None))
         maximum = maximum or 1000
@@ -124,7 +125,7 @@ class PostFeedbackAPI(rest_framework.generics.CreateAPIView):
     def get_throttles(self):
         """Returns throttle class instances"""
         def _get_desc(req):
-            return req.DATA.get('description', u'no description')
+            return req.data.get('description', u'no description')
 
         return [
             RatelimitThrottle(

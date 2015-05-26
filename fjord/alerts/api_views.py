@@ -138,10 +138,10 @@ class AlertsAPI(rest_framework.views.APIView):
         )
 
     def post(self, request):
-        data = request.DATA
+        data = request.data
 
         try:
-            flavorslug = request.DATA['flavor']
+            flavorslug = data['flavor']
         except KeyError:
             raise exceptions.ValidationError({
                 'flavor': [
@@ -184,7 +184,8 @@ class AlertsAPI(rest_framework.views.APIView):
                         repr(link_item)))
 
         if link_errors:
-            raise exceptions.ValidationError({'detail': {'links': link_errors}})
+            raise exceptions.ValidationError(
+                {'detail': {'links': link_errors}})
 
         # Everything is good, so let's save it all to the db.
         alert = alert_ser.save()

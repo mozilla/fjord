@@ -19,7 +19,7 @@ from django.utils.feedgenerator import Atom1Feed
 
 from product_details import product_details
 from ratelimit.helpers import is_ratelimited
-from rest_framework.throttling import SimpleRateThrottle
+from rest_framework.throttling import BaseThrottle
 from statsd import statsd
 
 from fjord.base.urlresolvers import reverse
@@ -343,7 +343,7 @@ def ratelimit(rulename, keyfun=actual_ip, rate='5/m'):
 RATE_RE = re.compile(r'^(\d+)/(\d*)([smhd])$')
 
 
-class RatelimitThrottle(SimpleRateThrottle):
+class RatelimitThrottle(BaseThrottle):
     """This wraps the django-ratelimit ratelimiter in a DRF class
 
     Django Rest Framework has its own throttling system. That's great,
@@ -377,9 +377,6 @@ class RatelimitThrottle(SimpleRateThrottle):
         self.keyfun = keyfun or actual_ip
         self.methods = methods
 
-    def get_cache_key(self, request, view):
-        return self.keyfun(request)
-
     def parse_rate(self, rate):
         """Handles num/(multi * period) like 1/10m"""
         num, multiplier, period = RATE_RE.match(rate).groups()
@@ -411,7 +408,7 @@ class RatelimitThrottle(SimpleRateThrottle):
 
     def wait(self):
         # We don't want to calculate the actual wait time, so we cheat
-        # here and just return the duration.
+        # here and just return the full duration.
         return self.duration
 
 
@@ -445,7 +442,7 @@ def cors_enabled(origin, methods=['GET']):
                         'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' in request.META):
 
                     response = HttpResponse()
-                    response['Access-Control-Allow-Methods'] = ", ".join(
+                    response['Access-Control-Allow-Methods'] = ', '.join(
                         methods)
 
                     # TODO: We might need to change this

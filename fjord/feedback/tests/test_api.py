@@ -455,6 +455,20 @@ class PostFeedbackAPITest(TestCase):
             data=json.dumps(data))
         eq_(r.status_code, 400)
 
+    def test_blank_category_is_fine_we_suppose(self):
+        data = {
+            'happy': True,
+            'description': u'happy',
+            'product': u'Loop',
+            'category': u''
+        }
+
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
+        eq_(r.status_code, 201)
+
     def test_invalid_unicode_url(self):
         """Tests an API call with invalid unicode URL"""
         data = {

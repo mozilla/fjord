@@ -39,7 +39,7 @@ class HeartbeatV2API(rest_framework.views.APIView):
             data={'msg': 'success!'})
 
     def post(self, request):
-        post_data = dict(request.DATA)
+        post_data = dict(request.data)
 
         serializer = AnswerSerializer(data=post_data)
         if not serializer.is_valid():
