@@ -1,6 +1,7 @@
+from datetime import datetime
 import re
 import sys
-from datetime import datetime
+import time
 
 from django import VERSION
 from django.contrib import admin, messages
@@ -11,6 +12,57 @@ from django.views import debug
 from celery import current_app
 
 from .tasks import celery_health_task
+
+
+def timezone_view(request):
+    """Admin view showing times and timezones in data."""
+    # Note: This is an admin page that gets used once in a blue moon.
+    # As such, I'm taking some liberties (hand-indexing the response,
+    # time.sleep, etc) that I would never take if it was used more
+    # often or was viewable by users. If these two assumptions ever
+    # change, then this should be rewritten.
+
+    from elasticutils import get_es
+
+    from fjord.feedback.models import Response, ResponseMappingType
+    from fjord.feedback.tests import ResponseFactory
+    from fjord.search.index import get_index
+
+    server_time = datetime.now()
+
+    # Create a new response.
+    resp = ResponseFactory.create()
+    resp_time = resp.created
+
+    # Index the response by hand so we know it gets to Elasticsearch. Otherwise
+    # it gets done by celery and we don't know how long that'll take.
+    doc = ResponseMappingType.extract_document(resp.id)
+    ResponseMappingType.index(doc, resp.id)
+
+    # Fetch the response from the db.
+    resp = Response.objects.get(id=resp.id)
+    resp2_time = resp.created
+
+    # Refresh and sleep 5 seconds as a hand-wavey way to make sure
+    # that Elasticsearch has had time to refresh the index.
+    get_es().indices.refresh(get_index())
+    time.sleep(5)
+
+    es_time = ResponseMappingType.search().filter(id=resp.id)[0].created
+
+    # Delete the test response we created.
+    resp.delete()
+
+    return render(request, 'admin/timezone_view.html', {
+        'server_time': server_time,
+        'resp_time': resp_time,
+        'resp2_time': resp2_time,
+        'es_time': es_time
+    })
+
+admin.site.register_view(path='timezone',
+                         name='Timezone - Time/Timezone stuff',
+                         view=timezone_view)
 
 
 def settings_view(request):
