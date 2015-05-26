@@ -1,0 +1,68 @@
+{% extends "admin/base_site.html" %}
+
+{% block content_title %}
+  <h1>Timezone - Timezone stuff</h1>
+{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style type="text/css">
+    section {
+      margin: 1em;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <section>
+    <h2>Times (should be pacific)</h2>
+    <table id="times">
+      <tbody>
+        <tr>
+          <th>Server time</th>
+          <td>{{ server_time }}</td>
+        </tr>
+        <tr>
+          <th>Response instance created</th>
+          <td>{{ resp_time }}</td>
+        </tr>
+        <tr>
+          <th>Response instance pulled from db</th>
+          <td>{{ resp2_time }}</td>
+        </tr>
+        <tr>
+          <th>Pulled from Elasticsearch</th>
+          <td>{{ es_time }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      Note: This will show any transformations of the "created" field
+      in feedback responses. If the above datetimes are different, it
+      means the data is getting transformed somewhere and probably
+      inappropriately.
+    </p>
+    <p>
+      Double-check this with the celery health check.
+    </p>
+    <p>
+      We should assume any weirdness here is a bug and should get
+      looked into pronto.
+    </p>
+  </section>
+  <section>
+    <h2>Settings</h2>
+    <table id="settings">
+      <tbody>
+        <tr>
+          <th>TIME_ZONE</th>
+          <td>{{ settings.TIME_ZONE }}</td>
+        </tr>
+        <tr>
+          <th>USE_TZ</th>
+          <td>{{ settings.USE_TZ }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+{% endblock %}
