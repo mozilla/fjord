@@ -22,7 +22,7 @@ def timezone_view(request):
     # often or was viewable by users. If these two assumptions ever
     # change, then this should be rewritten.
 
-    from elasticutils import get_es
+    from elasticutils.contrib.django import get_es
 
     from fjord.feedback.models import Response, ResponseMappingType
     from fjord.feedback.tests import ResponseFactory
