@@ -8,11 +8,11 @@ class Suggester(object):
         """Implement this to perform any startup work"""
         pass
 
-    def get_suggestions(self, feedback):
-        """Implement this to return suggestions for a given piece of
-        feedback
+    def get_suggestions(self, feedback, request=None):
+        """Implement this to return suggestions for a given piece of feedback
 
         :arg feedback: feedback Response
+        :arg request: the HTTP request or None
 
         :returns: list of Link instances
 

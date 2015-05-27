@@ -47,7 +47,7 @@ def download_firefox(request, template):
 
 def thanks(request):
     suggestions = None
-    response = None
+    feedback = None
 
     if waffle.flag_is_active(request, 'thankyou'):
         response_id = None
@@ -69,14 +69,14 @@ def thanks(request):
         # suggestions.
         if response_id is not None:
             try:
-                response = Response.objects.get(id=response_id)
+                feedback = Response.objects.get(id=response_id)
             except Response.DoesNotExist:
                 pass
             else:
-                suggestions = get_suggestions(response)
+                suggestions = get_suggestions(feedback, request)
 
     return render(request, 'feedback/thanks.html', {
-        'response': response,
+        'feedback': feedback,
         'suggestions': suggestions
     })
 
