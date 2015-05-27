@@ -8,6 +8,7 @@ import rest_framework.response
 
 from elasticutils.contrib.django import F
 
+from fjord.analytics.utils import zero_fill
 from fjord.base.utils import (
     actual_ip_plus_context,
     cors_enabled,
@@ -17,6 +18,99 @@ from fjord.base.utils import (
     smart_timedelta
 )
 from fjord.feedback import models
+
+
+class FeedbackHistogramAPI(rest_framework.views.APIView):
+    def get(self, request):
+        search = models.ResponseMappingType.search()
+        f = F()
+
+        if 'happy' in request.GET:
+            happy = {'0': False, '1': True}.get(request.GET['happy'], None)
+            if happy is not None:
+                f &= F(happy=happy)
+
+        if 'platforms' in request.GET:
+            platforms = request.GET['platforms'].split(',')
+            if platforms:
+                f &= F(platform__in=platforms)
+
+        if 'locales' in request.GET:
+            locales = request.GET['locales'].split(',')
+            if locales:
+                f &= F(locale__in=locales)
+
+        if 'products' in request.GET:
+            products = request.GET['products'].split(',')
+            if products:
+                f &= F(product__in=products)
+
+                if 'versions' in request.GET:
+                    versions = request.GET['versions'].split(',')
+                    if versions:
+                        f &= F(version__in=versions)
+
+        date_start = smart_date(request.GET.get('date_start', None))
+        date_end = smart_date(request.GET.get('date_end', None))
+        delta = smart_timedelta(request.GET.get('date_delta', None))
+
+        # Default to 7d.
+        if not date_start and not date_end:
+            delta = delta or smart_timedelta('7d')
+
+        if delta is not None:
+            if date_end is not None:
+                date_start = date_end - delta
+            elif date_start is not None:
+                date_end = date_start + delta
+            else:
+                date_end = date.today()
+                date_start = date_end - delta
+
+        # If there's no end, then the end is today.
+        if not date_end:
+            date_end = date.today()
+
+        # Restrict to a 6 month range. Must have a start date.
+        if (date_end - date_start) > timedelta(days=180):
+            date_end = date_start + timedelta(days=180)
+
+        # date_start up to but not including date_end.
+        f &= F(created__gte=date_start, created__lt=date_end)
+
+        search_query = request.GET.get('q', None)
+        if search_query is not None:
+            search = search.query(description__sqs=search_query)
+
+        search = search.filter(f)
+
+        # FIXME: improve validation
+        interval = request.GET.get('interval', 'day')
+        if interval not in ('hour', 'day'):
+            interval = 'day'
+
+        histograms = search.facet_raw(
+            counts={
+                'date_histogram': {'interval': interval, 'field': 'created'},
+                'facet_filter': search._process_filters(f.filters)
+            }
+        ).facet_counts()
+
+        data = dict((p['time'], p['count']) for p in histograms['counts'])
+        zero_fill(date_start, date_end - timedelta(days=1), [data])
+
+        return rest_framework.response.Response({
+            'results': sorted(data.items())
+        })
+
+    def get_throttles(self):
+        """Returns throttle class instances"""
+        return [
+            RatelimitThrottle(
+                rulename='api_get_200ph',
+                rate='200/h',
+                methods=('GET',))
+        ]
 
 
 class PublicFeedbackAPI(rest_framework.views.APIView):

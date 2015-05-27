@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import random
 import time
 from datetime import date, datetime, timedelta
 
@@ -342,6 +343,57 @@ class PublicFeedbackAPIDateTest(ElasticTestCase):
                 self.last_month + '-03',
                 self.last_month + '-02'
             ])
+
+
+class FeedbackHistogramAPITest(ElasticTestCase):
+    def generate_response(self, d):
+        ResponseFactory(
+            created=datetime(d.year, d.month, d.day, random.randint(0, 23), 0)
+        )
+
+    def to_date_string(self, value):
+        """Takes a milliseconds since epoch int and converts to string"""
+        d = time.gmtime(value / 1000)
+        return time.strftime('%Y-%m-%d %H:%M:%S', d)
+
+    def test_basic(self):
+        """Show last 7 days of counts"""
+        today = date.today()
+        for i in range(8):
+            self.generate_response(today - timedelta(days=i))
+            self.generate_response(today - timedelta(days=i))
+        self.refresh()
+
+        resp = self.client.get(reverse('feedback-histogram-api'))
+        eq_(resp.status_code, 200)
+        json_data = json.loads(resp.content)
+
+        # Default is the last 7 days.
+        eq_(len(json_data['results']), 7)
+
+        # Last item in the list should be yesterday.
+        eq_(
+            self.to_date_string(json_data['results'][-1][0]),
+            (today - timedelta(days=1)).strftime('%Y-%m-%d 00:00:00')
+        )
+        # Count is 2.
+        eq_(json_data['results'][-1][1], 2)
+
+        # First item is 7 days ago.
+        eq_(
+            self.to_date_string(json_data['results'][0][0]),
+            (today - timedelta(days=7)).strftime('%Y-%m-%d 00:00:00')
+        )
+        # Count is 2.
+        eq_(json_data['results'][0][1], 2)
+
+    # FIXME: Test date_start, date_end and date_delta
+    # FIXME: Test products, versions
+    # FIXME: Test locales
+    # FIXME: Test happy/sad
+    # FIXME: Test platforms
+    # FIXME: Test q
+    # FIXME: Test interval
 
 
 class PostFeedbackAPITest(TestCase):
