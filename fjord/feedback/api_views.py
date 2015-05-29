@@ -21,6 +21,12 @@ from fjord.feedback import models
 
 
 class FeedbackHistogramAPI(rest_framework.views.APIView):
+    @classmethod
+    def as_view(cls, *args, **kwargs):
+        view = super(FeedbackHistogramAPI, cls).as_view(*args, **kwargs)
+        view = cors_enabled('*', methods=['GET'])(view)
+        return view
+
     def get(self, request):
         search = models.ResponseMappingType.search()
         f = F()
