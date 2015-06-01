@@ -25,7 +25,11 @@ DATABASES = {
 
 CELERY_ALWAYS_EAGER = True
 
-CACHE_BACKEND = 'caching.backends.locmem://'
+CACHES = {
+    'default': config(
+        'CACHE_URL', default='locmem://', type_='cache_url'
+    )
+}
 
 ES_INDEX_PREFIX = 'input'
 ES_URLS = ['http://localhost:9200']
