@@ -113,8 +113,8 @@ class FeedbackHistogramAPI(rest_framework.views.APIView):
         """Returns throttle class instances"""
         return [
             RatelimitThrottle(
-                rulename='api_get_200ph',
-                rate='200/h',
+                rulename='api_get_2000ph',
+                rate='2000/h',
                 methods=('GET',))
         ]
 
