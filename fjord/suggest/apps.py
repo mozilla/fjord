@@ -3,7 +3,7 @@ import logging
 from django.apps import AppConfig
 from django.conf import settings
 
-from fjord.suggest import _PROVIDERS
+from fjord.suggest import _SUGGESTERS
 from fjord.base.plugin_utils import load_providers
 
 
@@ -14,6 +14,6 @@ class SuggestConfig(AppConfig):
     name = 'fjord.suggest'
 
     def ready(self):
-        # Load providers and store them in _PROVIDERS stomping on
+        # Load Suggestersand store them in _SUGGESTERS stomping on
         # whatever was there.
-        _PROVIDERS[:] = load_providers(settings.SUGGEST_PROVIDERS, logger)
+        _SUGGESTERS[:] = load_providers(settings.SUGGEST_PROVIDERS, logger)

@@ -1,4 +1,4 @@
-class Provider(object):
+class Suggester(object):
     """Suggestion provider class
 
     Implement ``load`` and ``get_suggestions`` methods.
@@ -8,11 +8,11 @@ class Provider(object):
         """Implement this to perform any startup work"""
         pass
 
-    def get_suggestions(self, response):
+    def get_suggestions(self, feedback):
         """Implement this to return suggestions for a given piece of
         feedback
 
-        :arg response: feedback Response
+        :arg feedback: feedback Response
 
         :returns: list of Link instances
 

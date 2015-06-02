@@ -75,6 +75,11 @@ def split_path(path_):
             return '', path
 
 
+def is_supported_nonlocale(path):
+    """Is this path a supported nonlocale (e.g. 'admin', etc)"""
+    return path.lstrip('/').partition('/')[0] in settings.SUPPORTED_NONLOCALES
+
+
 class Prefixer(object):
     """URL prefixer for generating urls prefixed with the locale"""
     def __init__(self, request=None, locale=None):
@@ -128,7 +133,7 @@ class Prefixer(object):
         path = path.lstrip('/')
         url_parts = [self.request.META['SCRIPT_NAME']]
 
-        if path.partition('/')[0] not in settings.SUPPORTED_NONLOCALES:
+        if not is_supported_nonlocale(path):
             locale = self.locale if self.locale else self.get_language()
             url_parts.append(locale)
 

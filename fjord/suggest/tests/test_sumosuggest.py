@@ -8,12 +8,12 @@ from fjord.base.tests import TestCase, skip_if
 from fjord.feedback.tests import ResponseFactory
 from fjord.suggest.providers.sumosuggest import (
     SUMO_SUGGEST_API_URL,
-    SUMOSuggestProvider
+    SUMOSuggest
 )
 
 
-class SUMOSuggestProviderTestCase(TestCase):
-    provider = SUMOSuggestProvider()
+class SUMOSuggestTestCase(TestCase):
+    suggester = SUMOSuggest()
 
     def test_not_sad(self):
         resp = ResponseFactory(
@@ -22,7 +22,7 @@ class SUMOSuggestProviderTestCase(TestCase):
             product=u'Firefox',
             description=u'Firefox does not make good sandwiches. Srsly.'
         )
-        links = self.provider.get_suggestions(resp)
+        links = self.suggester.get_suggestions(resp)
         eq_(len(links), 0)
 
     def test_not_en_us(self):
@@ -32,7 +32,7 @@ class SUMOSuggestProviderTestCase(TestCase):
             product=u'Firefox',
             description=u'Firefox does not make good sandwiches. Srsly.'
         )
-        links = self.provider.get_suggestions(resp)
+        links = self.suggester.get_suggestions(resp)
         eq_(len(links), 0)
 
     def test_not_firefox(self):
@@ -42,7 +42,7 @@ class SUMOSuggestProviderTestCase(TestCase):
             product=u'Firefox for Android',
             description=u'Firefox does not make good sandwiches. Srsly.'
         )
-        links = self.provider.get_suggestions(resp)
+        links = self.suggester.get_suggestions(resp)
         eq_(len(links), 0)
 
     def test_too_short(self):
@@ -52,7 +52,7 @@ class SUMOSuggestProviderTestCase(TestCase):
             product=u'Firefox',
             description=u'Firefox is bad.'
         )
-        links = self.provider.get_suggestions(resp)
+        links = self.suggester.get_suggestions(resp)
         eq_(len(links), 0)
 
     def test_suggestions(self):
@@ -108,7 +108,7 @@ class SUMOSuggestProviderTestCase(TestCase):
                 )
             )
 
-            links = self.provider.get_suggestions(resp)
+            links = self.suggester.get_suggestions(resp)
             eq_(len(links), 3)
 
             # Abuse the fact that we know what order the links are in
@@ -143,7 +143,7 @@ class SUMOSuggestProviderTestCase(TestCase):
                     )
                 )
 
-                links = self.provider.get_suggestions(resp)
+                links = self.suggester.get_suggestions(resp)
 
                 # Make sure we get back no links.
                 eq_(len(links), 0)
@@ -161,7 +161,7 @@ class LiveSUMOSuggestProviderTestCase(TestCase):
     up development and will help us debug issues in the future.
 
     """
-    provider = SUMOSuggestProvider()
+    suggester = SUMOSuggest()
 
     def test_get_suggestions(self):
         resp = ResponseFactory(
@@ -172,7 +172,7 @@ class LiveSUMOSuggestProviderTestCase(TestCase):
                 u'slow browser please speed improve i am wait speed improve'
             )
         )
-        links = self.provider.get_suggestions(resp)
+        links = self.suggester.get_suggestions(resp)
 
         # Verify we get the right number of links.
         ok_(0 < len(links) <= 3)
