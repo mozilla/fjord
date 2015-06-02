@@ -188,7 +188,7 @@ class BaseTestCase(OriginalTestCase):
     def client_login_user(self, user):
         with mock_browserid(user.email):
             ret = self.client.login(audience='faux', assertion='faux')
-            assert ret, "Login failed."
+            assert ret, 'Login failed.'
 
     def setUp(self):
         super(BaseTestCase, self).setUp()
@@ -210,55 +210,6 @@ class MobileTestCase(TestCase):
     def setUp(self):
         super(MobileTestCase, self).setUp()
         self.client.cookies[settings.MOBILE_COOKIE] = 'on'
-
-
-# def with_save(func):
-#     """Decorate a model maker to add a `save` kwarg.
-
-#     If save=True, the model maker will save the object before returning it.
-
-#     """
-#     @wraps(func)
-#     def saving_func(*args, **kwargs):
-#         save = kwargs.pop('save', False)
-#         ret = func(*args, **kwargs)
-#         if save:
-#             ret.save()
-#         return ret
-
-#     return saving_func
-
-
-# @with_save
-# def user(**kwargs):
-#     """Return a user with all necessary defaults filled in.
-
-#     Default password is 'testpass' unless you say otherwise in a kwarg.
-
-#     """
-#     defaults = {}
-#     if 'username' not in kwargs:
-#         defaults['username'] = ''.join(random.choice(letters)
-#                                        for x in xrange(15))
-#     if 'email' not in kwargs:
-#         defaults['email'] = ''.join(
-#             random.choice(letters) for x in xrange(10)) + '@example.com'
-#     defaults.update(kwargs)
-#     user = User(**defaults)
-#     user.set_password(kwargs.get('password', 'testpass'))
-#     return user
-
-
-# @with_save
-# def profile(**kwargs):
-#     """Returns a Profile"""
-#     defaults = {}
-#     if 'user' not in kwargs:
-#         defaults['user'] = user(save=True)
-
-#     defaults.update(kwargs)
-
-#     return Profile(**defaults)
 
 
 class ProfileFactory(factory.django.DjangoModelFactory):
