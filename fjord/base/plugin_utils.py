@@ -14,7 +14,7 @@ def load_providers(provider_list, logger=None):
     :returns: list of providers.
 
     >>> load_providers(['some.path.Class', 'some.other.path.OtherClass'])
-    [<Class>, <OtherClass>]
+    [<Class instance>, <OtherClass instance>]
 
     .. Note::
 
