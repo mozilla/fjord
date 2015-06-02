@@ -17,7 +17,7 @@ from nose import SkipTest
 # reverse is here for convenience so other test modules import it from
 # here rather than importing it from urlresolvers
 from fjord.base.urlresolvers import reverse  # noqa
-from fjord.base.urlresolvers import split_path
+from fjord.base.urlresolvers import is_supported_nonlocale, split_path
 
 from fjord.base.models import Profile
 
@@ -154,6 +154,8 @@ class LocalizingClient(Client):
     This prevents the locale middleware from returning a 301 to add the
     prefixes, which makes tests more complicated.
 
+    This pays attention to ``settings.SUPPORTED_NONLOCALES``.
+
     It also ensures there is a user agent set in the header. The default is a
     Firefox 14 on Linux user agent. It can be overridden by passing a
     user_agent parameter to ``__init__``, setting ``self.user_agent`` to the
@@ -175,7 +177,7 @@ class LocalizingClient(Client):
         # Fall back to defaults as in the superclass's implementation:
         path = request.get('PATH_INFO', self.defaults.get('PATH_INFO', '/'))
         locale, shortened = split_path(path)
-        if not locale:
+        if not locale and not is_supported_nonlocale(path):
             request['PATH_INFO'] = '/%s/%s' % (settings.LANGUAGE_CODE,
                                                shortened)
         if 'HTTP_USER_AGENT' not in request and self.user_agent:
