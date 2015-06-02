@@ -1,17 +1,16 @@
 from django.conf import settings
 
 from fjord.base.plugin_utils import load_providers
-from fjord.base.tests import TestCase
-from fjord.suggest import _PROVIDERS
+from fjord.suggest import _SUGGESTERS
 
 
-class ProviderTestCase(TestCase):
-    providers = settings.SUGGEST_PROVIDERS
+class SuggesterTestMixin(object):
+    suggesters = settings.SUGGEST_PROVIDERS
 
     def setUp(self):
-        super(ProviderTestCase, self).setUp()
-        _PROVIDERS[:] = load_providers(self.providers)
+        super(SuggesterTestMixin, self).setUp()
+        _SUGGESTERS[:] = load_providers(self.suggesters)
 
     def tearDown(self):
-        super(ProviderTestCase, self).tearDown()
-        _PROVIDERS[:] = []
+        super(SuggesterTestMixin, self).tearDown()
+        _SUGGESTERS[:] = []

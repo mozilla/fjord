@@ -2,33 +2,34 @@ import datetime
 
 from nose.tools import eq_
 
+from fjord.base.tests import TestCase
 from fjord.feedback.tests import ResponseFactory
-from fjord.suggest import get_providers
+from fjord.suggest import get_suggesters
 from fjord.suggest.utils import get_suggestions
-from fjord.suggest.providers.dummy import DummyProvider
-from fjord.suggest.tests import ProviderTestCase
+from fjord.suggest.providers.dummy import DummySuggester
+from fjord.suggest.tests import SuggesterTestMixin
 
 
-class DummyProviderLoadingTestCase(ProviderTestCase):
-    providers = []
+class DummyProviderLoadingTestCase(SuggesterTestMixin, TestCase):
+    suggesters = []
 
     def test_didnt_load(self):
         dummy_providers = [
-            prov for prov in get_providers()
-            if isinstance(prov, DummyProvider)
+            prov for prov in get_suggesters()
+            if isinstance(prov, DummySuggester)
         ]
         eq_(len(dummy_providers), 0)
 
 
-class DummyProviderTestCase(ProviderTestCase):
-    providers = [
-        'fjord.suggest.providers.dummy.DummyProvider'
+class DummyProviderTestCase(SuggesterTestMixin, TestCase):
+    suggesters = [
+        'fjord.suggest.providers.dummy.DummySuggester'
     ]
 
     def test_load(self):
         dummy_providers = [
-            prov for prov in get_providers()
-            if isinstance(prov, DummyProvider)
+            prov for prov in get_suggesters()
+            if isinstance(prov, DummySuggester)
         ]
         eq_(len(dummy_providers), 1)
 

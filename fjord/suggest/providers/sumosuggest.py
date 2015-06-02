@@ -3,7 +3,7 @@ import logging
 
 import requests
 
-from fjord.suggest import Link, Provider
+from fjord.suggest import Link, Suggester
 
 
 PROVIDER = 'sumosuggest'
@@ -49,21 +49,21 @@ def get_kb_articles(locale, product, text):
     return resp.json()['documents']
 
 
-class SUMOSuggestProvider(Provider):
-    def get_suggestions(self, response):
+class SUMOSuggest(Suggester):
+    def get_suggestions(self, feedback):
         # Note: We only want to run suggestions for sad responses for
         # Firefox product with en-US locale and for feedback that has
         # more than 7 words.
         #
         # If any of that changes, we'll need to rethink this.
-        if ((response.happy
-             or response.locale != u'en-US'
-             or response.product != u'Firefox'
-             or len(response.description.split()) < 7)):
+        if ((feedback.happy
+             or feedback.locale != u'en-US'
+             or feedback.product != u'Firefox'
+             or len(feedback.description.split()) < 7)):
             return []
 
         try:
-            docs = get_kb_articles(u'en-US', u'Firefox', response.description)
+            docs = get_kb_articles(u'en-US', u'Firefox', feedback.description)
         except Exception:
             # FIXME: As we discover what exceptions actually get
             # kicked up, we can handle them individually as

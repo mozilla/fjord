@@ -1,19 +1,15 @@
-__all__ = ['get_providers', 'Link', 'Provider']
+__all__ = ['get_suggesters', 'Link', 'Suggester']
 
 default_app_config = 'fjord.suggest.apps.SuggestConfig'
 
 
-# List of loaded provider classes
-_PROVIDERS = []
+# List of loaded Suggester classes
+_SUGGESTERS = []
 
 
-def get_providers():
-    """Returns suggestion providers
-
-    :returns: list of Provider
-
-    """
-    return list(_PROVIDERS)
+def get_suggesters():
+    """Returns Suggester instances"""
+    return list(_SUGGESTERS)
 
 
-from .base import Link, Provider
+from .base import Link, Suggester
