@@ -46,36 +46,38 @@ def download_firefox(request, template):
 
 
 def thanks(request):
-    suggestions = None
     feedback = None
+    suggestions = None
+    # FIXME: Hard-coded default product.
+    product = u'Firefox'
 
-    if waffle.flag_is_active(request, 'thankyou'):
-        response_id = None
+    response_id = None
+    # If the user is an analyzer/admin, then we let them specify
+    # the response_id via the querystring. This makes debugging
+    # the system easier.
+    if ((request.user.is_authenticated()
+         and request.user.has_perm('analytics.can_view_dashboard'))):
+        response_id = smart_int(request.GET.get('response_id', None))
 
-        # If the user is an analyzer/admin, then we let them specify
-        # the response_id via the querystring. This makes debugging
-        # the system easier.
-        if ((request.user.is_authenticated()
-             and request.user.has_perm('analytics.can_view_dashboard'))):
-            response_id = smart_int(request.GET.get('response_id', None))
+    # If we don't have a response_id, then pull it from the
+    # session where it was placed if the user had just left
+    # feedback.
+    if not response_id:
+        response_id = request.session.get('response_id')
 
-        # If we don't have a response_id, then pull it from the
-        # session where it was placed if the user had just left
-        # feedback.
-        if response_id is None:
-            response_id = request.session.get('response_id')
+    if response_id:
+        try:
+            feedback = Response.objects.get(id=response_id)
+        except Response.DoesNotExist:
+            pass
 
-        # If we have a response_id, then pull the response and get
-        # suggestions.
-        if response_id is not None:
-            try:
-                feedback = Response.objects.get(id=response_id)
-            except Response.DoesNotExist:
-                pass
-            else:
-                suggestions = get_suggestions(feedback, request)
+    if feedback:
+        product = feedback.product
+        if waffle.flag_is_active(request, 'thankyou'):
+            suggestions = get_suggestions(feedback, request)
 
     return render(request, 'feedback/thanks.html', {
+        'product': product,
         'feedback': feedback,
         'suggestions': suggestions
     })

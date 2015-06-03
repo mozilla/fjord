@@ -146,6 +146,7 @@ class SUMOSuggest(Suggester):
             Link(
                 provider=PROVIDER,
                 provider_version=PROVIDER_VERSION,
+                cssclass=u'document',
                 summary=doc['summary'],
                 description=doc['description'],
                 url=build_redirect_url(format_redirect(i))
@@ -156,11 +157,9 @@ class SUMOSuggest(Suggester):
             Link(
                 provider=PROVIDER,
                 provider_version=PROVIDER_VERSION,
-                summary=_(u'Having problems? Get help.'),
-                description=_(
-                    'Go to our support forum where you can get help and '
-                    'find answers.'
-                ),
+                cssclass=u'support',
+                summary=_(u'Ask a question in our support forum'),
+                description='',
                 url=build_redirect_url(format_redirect('aaq'))
             )
         )

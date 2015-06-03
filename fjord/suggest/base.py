@@ -26,9 +26,11 @@ class Suggester(object):
 
 class Link(object):
     """Represents a single Link"""
-    def __init__(self, provider, provider_version, summary, url, description):
+    def __init__(self, provider, provider_version, cssclass, summary,
+                 url, description):
         self.provider = provider
         self.provider_version = provider_version
+        self.cssclass = cssclass
         self.summary = summary
         self.url = url
         self.description = description

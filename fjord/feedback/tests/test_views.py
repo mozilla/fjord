@@ -174,7 +174,7 @@ class TestFeedback(TestCase):
 
     @with_waffle('thankyou', False)
     def test_thankyou_flag_inactive(self):
-        """Verify response and suggestions when thankyou flag is inactive"""
+        """Verify no suggestions when thankyou flag is inactive"""
         url = reverse('feedback', args=(u'firefox',), locale='en-US')
         r = self.client.post(url, {
             'happy': 0,
@@ -182,7 +182,6 @@ class TestFeedback(TestCase):
         }, follow=True)
 
         eq_(r.status_code, 200)
-        eq_(r.context['feedback'], None)
         eq_(r.context['suggestions'], None)
 
     def test_happy_prefill_in_querystring_is_ignored(self):
