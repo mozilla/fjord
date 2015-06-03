@@ -14,7 +14,9 @@ PROVIDER = 'sumosuggest'
 # suggestions.
 PROVIDER_VERSION = 1
 
-EVENT_CATEGORY = 'sumo_suggest'
+# Append provider version so that if we change the algorithm, we
+# increment the version and then we can compare the two flows.
+EVENT_CATEGORY = 'sumo_suggest' + str(PROVIDER_VERSION)
 
 SUMO_HOST = 'https://support.mozilla.org'
 SUMO_SUGGEST_API_URL = SUMO_HOST + '/api/2/search/suggest/'
@@ -124,7 +126,7 @@ class SUMOSuggestRedirector(Redirector):
             'ec': EVENT_CATEGORY,
             'ea': 'view' if rank != 'aaq' else 'viewaaq',
             'el': url
-        })
+        }, async=True)
 
         return url
 
@@ -194,11 +196,13 @@ class SUMOSuggest(Suggester):
             logger.exception('SUMO Suggest API raised exception.')
             return []
 
+        # Note: This needs to be synchronous so that "suggest" events
+        # come before their respective "view*" events.
         ga_track_event({
             'cid': str(feedback.id),
             'ec': EVENT_CATEGORY,
             'ea': 'suggest'
-        })
+        }, async=False)
 
         links = self.docs_to_links(docs)
 
