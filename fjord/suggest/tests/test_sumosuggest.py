@@ -4,59 +4,119 @@ from mock import MagicMock, patch
 from nose.tools import eq_, ok_
 import requests_mock
 
-from fjord.base.tests import TestCase, skip_if
+from fjord.base.google_utils import GOOGLE_API_URL
+from fjord.base.tests import (
+    LocalizingClient,
+    reverse,
+    skip_if,
+    TestCase,
+    with_waffle
+)
 from fjord.feedback.tests import ResponseFactory
 from fjord.suggest.providers.sumosuggest import (
+    SUMO_AAQ_URL,
+    SUMO_HOST,
     SUMO_SUGGEST_API_URL,
+    SUMO_SUGGEST_SESSION_KEY,
     SUMOSuggest
 )
+from fjord.suggest.tests import SuggesterTestMixin
+from fjord.redirector.tests import RedirectorTestMixin
 
 
 class SUMOSuggestTestCase(TestCase):
     suggester = SUMOSuggest()
 
     def test_not_sad(self):
-        resp = ResponseFactory(
-            happy=True,  # Happy
-            locale=u'en-US',
-            product=u'Firefox',
-            description=u'Firefox does not make good sandwiches. Srsly.'
-        )
-        links = self.suggester.get_suggestions(resp)
-        eq_(len(links), 0)
+        with requests_mock.Mocker():
+            feedback = ResponseFactory(
+                happy=True,  # Happy
+                locale=u'en-US',
+                product=u'Firefox',
+                description=u'Firefox does not make good sandwiches. Srsly.'
+            )
+            links = self.suggester.get_suggestions(feedback)
+            eq_(len(links), 0)
 
     def test_not_en_us(self):
-        resp = ResponseFactory(
-            happy=False,
-            locale=u'fr',
-            product=u'Firefox',
-            description=u'Firefox does not make good sandwiches. Srsly.'
-        )
-        links = self.suggester.get_suggestions(resp)
-        eq_(len(links), 0)
+        with requests_mock.Mocker():
+            feedback = ResponseFactory(
+                happy=False,
+                locale=u'fr',
+                product=u'Firefox',
+                description=u'Firefox does not make good sandwiches. Srsly.'
+            )
+            links = self.suggester.get_suggestions(feedback)
+            eq_(len(links), 0)
 
     def test_not_firefox(self):
-        resp = ResponseFactory(
-            happy=False,
-            locale=u'en-US',
-            product=u'Firefox for Android',
-            description=u'Firefox does not make good sandwiches. Srsly.'
-        )
-        links = self.suggester.get_suggestions(resp)
-        eq_(len(links), 0)
+        with requests_mock.Mocker():
+            feedback = ResponseFactory(
+                happy=False,
+                locale=u'en-US',
+                product=u'Firefox for Android',
+                description=u'Firefox does not make good sandwiches. Srsly.'
+            )
+            links = self.suggester.get_suggestions(feedback)
+            eq_(len(links), 0)
 
     def test_too_short(self):
-        resp = ResponseFactory(
-            happy=False,
-            locale=u'en-US',
-            product=u'Firefox',
-            description=u'Firefox is bad.'
-        )
-        links = self.suggester.get_suggestions(resp)
-        eq_(len(links), 0)
+        with requests_mock.Mocker():
+            feedback = ResponseFactory(
+                happy=False,
+                locale=u'en-US',
+                product=u'Firefox',
+                description=u'Firefox is bad.'
+            )
+            links = self.suggester.get_suggestions(feedback)
+            eq_(len(links), 0)
 
-    def test_suggestions(self):
-        ret = {
+    def test_not_json(self):
+        # If we get back text and not JSON, then the sumo search
+        # suggest provider should return no links. This tests the "if
+        # any exception happens, return nothing" handling.
+        with requests_mock.Mocker() as m:
+            m.get(SUMO_SUGGEST_API_URL, text='Gah! Something bad happened')
+
+            patch_point = 'fjord.suggest.providers.sumosuggest.logger'
+            with patch(patch_point) as logger_patch:
+                # Create a mock that we can call .exception() on and
+                # it makes sure it got called.
+                logger_patch.exception = MagicMock()
+
+                feedback = ResponseFactory(
+                    happy=False,
+                    locale=u'en-US',
+                    product=u'Firefox',
+                    description=(
+                        u'slow browser please speed improve i am wait '
+                        u'speed improv'
+                    )
+                )
+
+                links = self.suggester.get_suggestions(feedback)
+
+                # Make sure we get back no links.
+                eq_(len(links), 0)
+
+                # Make sure logger.exception() got called once.
+                eq_(logger_patch.exception.call_count, 1)
+
+
+class SuggestWithRequestTestCase(SuggesterTestMixin, RedirectorTestMixin,
+                                 TestCase):
+    client_class = LocalizingClient
+    suggesters = [
+        'fjord.suggest.providers.sumosuggest.SUMOSuggest'
+    ]
+    redirectors = [
+        'fjord.suggest.providers.sumosuggest.SUMOSuggestRedirector'
+    ]
+
+    @with_waffle('thankyou', True)
+    def test_mocked_get_suggestions(self):
+        """Tests the whole thing with mocked API calls"""
+        sumo_api_ret = {
             'documents': [
                 {
                     'id': 12345,
@@ -97,86 +157,113 @@ class SUMOSuggestTestCase(TestCase):
         }
 
         with requests_mock.Mocker() as m:
-            m.get(SUMO_SUGGEST_API_URL, json=ret)
+            m.get(SUMO_SUGGEST_API_URL, json=sumo_api_ret)
+            m.post(GOOGLE_API_URL, text='whatever')
 
-            resp = ResponseFactory(
-                happy=False,
-                locale=u'en-US',
-                product=u'Firefox',
-                description=(
-                    u'slow browser please speed improve i am wait speed improv'
-                )
-            )
+            url = reverse('feedback', args=(u'firefox',))
+            desc = u'slow browser please speed improve i am wait speed improv'
 
-            links = self.suggester.get_suggestions(resp)
-            eq_(len(links), 3)
+            # Post some basic feedback that meets the SUMO Suggest
+            # Provider standards and follow through to the Thank You
+            # page. This triggers the suggestions and docs should be
+            # in the session.
+            resp = self.client.post(url, {
+                'happy': 0,
+                'description': desc,
+            }, follow=True)
+
+            feedback_id = self.client.session['response_id']
+            session_key = SUMO_SUGGEST_SESSION_KEY.format(feedback_id)
+
+            # Check the docs in the session. Abuse the fact that we
+            # know what order the docs are in since we're mocking.
+            docs = self.client.session[session_key]
+            for i in range(3):
+                doc = docs[i]
+                ret_doc = sumo_api_ret['documents'][i]
+                eq_(doc['url'], SUMO_HOST + ret_doc['url'])
+                eq_(doc['summary'], ret_doc['title'])
+                eq_(doc['description'], ret_doc['summary'])
+
+            links = resp.context['suggestions']
 
             # Abuse the fact that we know what order the links are in
             # since we're mocking.
-            for i in range(3):
-                eq_(links[i].provider, 'sumosuggest')
-                eq_(links[i].provider_version, 1)
-                eq_(links[i].url, ret['documents'][i]['url'])
-                eq_(links[i].summary, ret['documents'][i]['title'])
-                eq_(links[i].description, ret['documents'][i]['summary'])
+            for i, link in enumerate(links):
+                if i == 3:
+                    # This is the aaq link.
+                    eq_(link.provider, 'sumosuggest')
+                    eq_(link.provider_version, 1)
+                    eq_(link.url, '/redirect?r=sumosuggest.aaq')
 
-    def test_not_json(self):
-        # If we get back text and not JSON, then the sumo search
-        # suggest provider should return no links. This tests the "if
-        # any exception happens, return nothing" handling.
-        with requests_mock.Mocker() as m:
-            m.get(SUMO_SUGGEST_API_URL, text='Gah! Something bad happened')
+                    # Fetch the link and make sure it redirects to the
+                    # right place.
+                    resp = self.client.get(link.url)
+                    # Temporary redirect.
+                    eq_(resp.status_code, 302)
+                    # Redirects to the actual SUMO url.
+                    eq_(resp['Location'], SUMO_AAQ_URL)
 
-            patch_point = 'fjord.suggest.providers.sumosuggest.logger'
-            with patch(patch_point) as logger_patch:
-                # Create a mock that we can call .exception() on and
-                # it makes sure it got called.
-                logger_patch.exception = MagicMock()
+                else:
+                    # This is a kb link.
+                    ret_doc = sumo_api_ret['documents'][i]
+                    eq_(link.provider, 'sumosuggest')
+                    eq_(link.provider_version, 1)
+                    eq_(link.url, '/redirect?r=sumosuggest.{0}'.format(i))
+                    eq_(link.summary, ret_doc['title'])
+                    eq_(link.description, ret_doc['summary'])
 
-                resp = ResponseFactory(
-                    happy=False,
-                    locale=u'en-US',
-                    product=u'Firefox',
-                    description=(
-                        u'slow browser please speed improve i am wait '
-                        u'speed improv'
-                    )
-                )
-
-                links = self.suggester.get_suggestions(resp)
-
-                # Make sure we get back no links.
-                eq_(len(links), 0)
-
-                # Make sure logger.exception() got called once.
-                eq_(logger_patch.exception.call_count, 1)
+                    # Fetch the link and make sure it redirects to the
+                    # right place.
+                    resp = self.client.get(link.url)
+                    # Temporary redirect.
+                    eq_(resp.status_code, 302)
+                    # Redirects to the actual SUMO url.
+                    eq_(resp['Location'], docs[i]['url'])
 
 
 @skip_if(lambda: 'LIVE_API' not in os.environ)
-class LiveSUMOSuggestProviderTestCase(TestCase):
-    """This only executes if LIVE_API is defined in the environment. Otherwise
-    we skip it.
+class LiveSUMOSuggestProviderTestCase(SuggesterTestMixin, TestCase):
+    """Test it LIVE!
 
-    This makes it easier to test against the actual SUMO which speeds
-    up development and will help us debug issues in the future.
+    This only executes if LIVE_API is defined in the environment.
+    Otherwise we skip it.
+
+    This makes it easier to test against what SUMO is actually doing to
+    aid debugging issues in the future.
 
     """
-    suggester = SUMOSuggest()
+    client_class = LocalizingClient
+    suggesters = [
+        'fjord.suggest.providers.sumosuggest.SUMOSuggest'
+    ]
 
+    @with_waffle('thankyou', True)
     def test_get_suggestions(self):
-        resp = ResponseFactory(
-            happy=False,
-            locale=u'en-US',
-            product=u'Firefox',
-            description=(
-                u'slow browser please speed improve i am wait speed improve'
-            )
-        )
-        links = self.suggester.get_suggestions(resp)
+        url = reverse('feedback', args=(u'firefox',))
+        desc = u'slow browser please speed improve i am wait speed improv 2'
 
-        # Verify we get the right number of links.
-        ok_(0 < len(links) <= 3)
+        # Post some basic feedback that meets the SUMO Suggest
+        # Provider standards and follow through to the Thank You
+        # page. This triggers the suggestions and docs should be
+        # in the session.
+        resp = self.client.post(url, {
+            'happy': 0,
+            'description': desc,
+        }, follow=True)
 
+        docs = self.client.session[SUMO_SUGGEST_SESSION_KEY]
+        # Verify we get the right number of docs from the SUMO Suggest
+        # API and that the urls start with SUMO_HOST.
+        ok_(0 < len(docs) <= 3)
+        for doc in docs:
+            ok_(doc['url'].startswith(SUMO_HOST))
+
+        # Note: Since SUMO content changes, we can't check specific
+        # strings since we don't really know what it's going to
+        # return.
+
+        links = resp.context['suggestions']
         eq_(links[0].provider, 'sumosuggest')
         eq_(links[0].provider_version, 1)
 
@@ -185,7 +272,3 @@ class LiveSUMOSuggestProviderTestCase(TestCase):
         ok_(links[0].summary)
         ok_(links[0].url)
         ok_(links[0].description)
-
-        # Note: Since SUMO content changes, we can't check specific
-        # strings since we don't really know what it's going to
-        # return.

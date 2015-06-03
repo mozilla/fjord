@@ -280,6 +280,7 @@ INSTALLED_APPS = (
     'fjord.journal',
     'fjord.search',
     'fjord.suggest',
+    'fjord.redirector',
     'fjord.translations',
 )
 
@@ -317,11 +318,13 @@ SUPPORTED_NONLOCALES = [
     'media',
     'robots.txt',
     'contribute.json',
-    'services',
+    'redirect',  # from fjord.redirector
+    'services',  # from fjord.base
     'static',
 ]
 
 SUGGEST_PROVIDERS = []
+REDIRECTOR_PROVIDERS = []
 
 ## Media and templates.
 

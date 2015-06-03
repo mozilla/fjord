@@ -3,7 +3,7 @@ __all__ = ['get_suggesters', 'Link', 'Suggester']
 default_app_config = 'fjord.suggest.apps.SuggestConfig'
 
 
-# List of loaded Suggester classes
+# List of loaded Suggester instances
 _SUGGESTERS = []
 
 

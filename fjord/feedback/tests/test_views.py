@@ -127,7 +127,7 @@ class TestFeedback(TestCase):
 
         feedback = models.Response.objects.latest(field_name='id')
         eq_(r.status_code, 200)
-        eq_(r.context['response'].id, feedback.id)
+        eq_(r.context['feedback'].id, feedback.id)
         eq_(r.context['suggestions'], [])
 
     @with_waffle('thankyou', True)
@@ -140,7 +140,7 @@ class TestFeedback(TestCase):
         r = self.client.get(url)
 
         eq_(r.status_code, 200)
-        eq_(r.context['response'], None)
+        eq_(r.context['feedback'], None)
         eq_(r.context['suggestions'], None)
 
     @with_waffle('thankyou', True)
@@ -169,7 +169,7 @@ class TestFeedback(TestCase):
         r = self.client.get(url)
 
         eq_(r.status_code, 200)
-        eq_(r.context['response'].id, feedback.id)
+        eq_(r.context['feedback'].id, feedback.id)
         eq_(r.context['suggestions'], [])
 
     @with_waffle('thankyou', False)
@@ -182,7 +182,7 @@ class TestFeedback(TestCase):
         }, follow=True)
 
         eq_(r.status_code, 200)
-        eq_(r.context['response'], None)
+        eq_(r.context['feedback'], None)
         eq_(r.context['suggestions'], None)
 
     def test_happy_prefill_in_querystring_is_ignored(self):

@@ -6,14 +6,14 @@ PROVIDER = 'dummy'
 PROVIDER_VERSION = 1
 
 
-logger = logging.getLogger('i.dummyprovider')
+logger = logging.getLogger('i.dummysuggester')
 
 
 class DummySuggester(Suggester):
     def load(self):
         logger.debug('dummy load')
 
-    def get_suggestions(self, feedback):
+    def get_suggestions(self, feedback, request=None):
         logger.debug('dummy get_suggestions')
         return [
             Link(
