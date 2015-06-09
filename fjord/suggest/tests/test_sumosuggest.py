@@ -252,9 +252,12 @@ class LiveSUMOSuggestProviderTestCase(SuggesterTestMixin, TestCase):
             'description': desc,
         }, follow=True)
 
-        docs = self.client.session[SUMO_SUGGEST_SESSION_KEY]
+        feedback_id = self.client.session['response_id']
+        session_key = SUMO_SUGGEST_SESSION_KEY.format(feedback_id)
+
         # Verify we get the right number of docs from the SUMO Suggest
         # API and that the urls start with SUMO_HOST.
+        docs = self.client.session[session_key]
         ok_(0 < len(docs) <= 3)
         for doc in docs:
             ok_(doc['url'].startswith(SUMO_HOST))
