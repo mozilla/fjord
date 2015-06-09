@@ -28,7 +28,35 @@
             {% endtrans %}
           </div>
 
-          <div class="part" id="thanks_download">
+          {% if suggestions %}
+            <div class="part" id="suggestions">
+              <h2>{{ _('Suggestions from your feedback:') }}</h2>
+              <div id="suggestions-list">
+                {% for link in suggestions %}
+                  <div class="suggestion {{ link.cssclass }}">
+                    {#
+                    Note: This means the suggestion provider is in charge of
+                    providing localized text for the summary and description.
+                    #}
+                    <a href="{{ link.url }}">{{ link.summary }}</a>
+                    {{ link.description }}
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% else %}
+            <div class="part">
+              <h2>{{ _('Having problems? Get help.') }}</h2>
+              <p>
+                {% trans url="https://support.mozilla.org/questions/new?utm_source=input&utm_campaign=thankyou" %}
+                  Go to our support forum where you can <a href="{{ url }}">get help and
+                  find answers</a>.
+                {% endtrans %}
+              </p>
+            </div>
+          {% endif %}
+
+          <div class="part">
             <h2>{{ _('Shape the future of Firefox.') }}</h2>
             <p>
               {% trans download_url="http://www.mozilla.org/firefox/channel" %}
@@ -38,17 +66,7 @@
             </p>
           </div>
 
-          <div class="part" id="thanks_help">
-            <h2>{{ _('Having problems? Get help.') }}</h2>
-            <p>
-              {% trans url="https://support.mozilla.org/questions/new?utm_source=input&utm_campaign=thankyou" %}
-                Go to our support forum where you can <a href="{{ url }}">get help and
-                find answers</a>.
-              {% endtrans %}
-            </p>
-          </div>
-
-          <div class="part" id="thanks_contribute">
+          <div class="part">
             <h2>{{ _('Contribute to Mozilla.') }}</h2>
             <p>
               {% trans url='http://mozilla.org/contribute/' %}

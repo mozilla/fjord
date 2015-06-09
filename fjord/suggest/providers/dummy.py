@@ -19,6 +19,7 @@ class DummySuggester(Suggester):
             Link(
                 provider=PROVIDER,
                 provider_version=PROVIDER_VERSION,
+                cssclass=u'document',
                 summary=u'summary {0}'.format(feedback.description),
                 description=u'description {0}'.format(feedback.description),
                 url=feedback.url

@@ -192,6 +192,7 @@ class SuggestWithRequestTestCase(SuggesterTestMixin, RedirectorTestMixin,
             for i, link in enumerate(links):
                 if i == 3:
                     # This is the aaq link.
+                    eq_(link.cssclass, u'support')
                     eq_(link.provider, 'sumosuggest')
                     eq_(link.provider_version, 1)
                     eq_(link.url, '/redirect?r=sumosuggest.aaq')
@@ -209,6 +210,7 @@ class SuggestWithRequestTestCase(SuggesterTestMixin, RedirectorTestMixin,
                     ret_doc = sumo_api_ret['documents'][i]
                     eq_(link.provider, 'sumosuggest')
                     eq_(link.provider_version, 1)
+                    eq_(link.cssclass, u'document')
                     eq_(link.url, '/redirect?r=sumosuggest.{0}'.format(i))
                     eq_(link.summary, ret_doc['title'])
                     eq_(link.description, ret_doc['summary'])

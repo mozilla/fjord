@@ -323,8 +323,12 @@ SUPPORTED_NONLOCALES = [
     'static',
 ]
 
-SUGGEST_PROVIDERS = []
-REDIRECTOR_PROVIDERS = []
+SUGGEST_PROVIDERS = [
+    'fjord.suggest.providers.sumosuggest.SUMOSuggest'
+]
+REDIRECTOR_PROVIDERS = [
+    'fjord.suggest.providers.sumosuggest.SUMOSuggestRedirector'
+]
 
 ## Media and templates.
 
