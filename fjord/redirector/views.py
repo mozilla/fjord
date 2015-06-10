@@ -1,6 +1,7 @@
 import logging
 
 from django.http import HttpResponseNotFound, HttpResponseRedirect
+from django.views.decorators.cache import never_cache
 
 from fjord.redirector import get_redirectors
 
@@ -8,6 +9,11 @@ from fjord.redirector import get_redirectors
 logger = logging.getLogger('i.redirector')
 
 
+# Note: We never want to cache redirects. This allows redirectors to
+# capture correct metrics. At some point, we could make this optional
+# on a redirector-to-redirector basis, but there's no need for that,
+# yet.
+@never_cache
 def redirect_view(request):
     redirect = request.GET.get('r', None)
     if redirect is None:
