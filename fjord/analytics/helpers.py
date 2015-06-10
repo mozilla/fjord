@@ -1,5 +1,6 @@
+from django.utils.translation import ugettext_lazy as _lazy
+
 from jingo import register
-from tower import ugettext_lazy as _lazy
 
 
 @register.filter

@@ -9,10 +9,10 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.template import defaultfilters
 from django.utils.encoding import smart_str
 from django.utils.html import strip_tags
+from django.utils.translation import ugettext_lazy as _lazy
 
 import jinja2
 from jingo import register
-from tower import ugettext_lazy as _lazy
 from product_details import product_details
 
 from fjord.base.urlresolvers import reverse

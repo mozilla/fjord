@@ -1,8 +1,9 @@
 import json
 import logging
 
+from django.utils.translation import ugettext as _
+
 import requests
-from tower import ugettext as _
 
 from fjord.base.google_utils import ga_track_event
 from fjord.suggest import Link, Suggester
