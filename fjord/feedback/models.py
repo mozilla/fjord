@@ -2,12 +2,12 @@ from datetime import datetime, timedelta
 
 from django.core.cache import cache
 from django.db import models
+from django.utils.translation import ugettext_lazy as _lazy
 
 from elasticutils.contrib.django import Indexable, MLT
 from product_details import product_details
 from rest_framework import serializers
 from statsd import statsd
-from tower import ugettext_lazy as _lazy
 
 from fjord.base.browsers import parse_ua
 from fjord.base.domain import get_domain

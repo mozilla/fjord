@@ -11,12 +11,12 @@ from django.http import (
     HttpResponseRedirect
 )
 from django.shortcuts import get_object_or_404, render
+from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from elasticsearch import ElasticsearchException
 from elasticutils.contrib.django import F, es_required_or_50x
 from mobility.decorators import mobile_template
-from tower import ugettext as _
 
 from fjord.analytics.utils import (
     counts_to_options,

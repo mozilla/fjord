@@ -2,8 +2,7 @@ import json
 
 from django.contrib.auth.models import User
 from django.db import models
-
-from tower import ugettext_lazy as _lazy
+from django.utils.translation import ugettext_lazy as _lazy
 
 from fjord.base import forms
 from fjord.base.validators import EnhancedURLValidator

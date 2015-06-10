@@ -101,7 +101,7 @@ templates.
 
 In Python::
 
-    from tower import ugettext as _, ugettext_lazy as _lazy
+    from django.utils.translation import ugettext as _, ugettext_lazy as _lazy
 
     yodawg = _lazy('The Internet')
 
