@@ -64,7 +64,7 @@ USE_L10N = True
 
 # Gettext text domain
 TEXT_DOMAIN = 'messages'
-STANDALONE_DOMAINS = [TEXT_DOMAIN, 'javascript']
+STANDALONE_DOMAINS = [TEXT_DOMAIN]
 TOWER_KEYWORDS = {'_lazy': None}
 TOWER_ADD_HEADERS = True
 
