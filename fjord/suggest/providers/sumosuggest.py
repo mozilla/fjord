@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 import requests
 
 from fjord.base.google_utils import ga_track_event
-from fjord.journal.utils import j_error
+from fjord.journal.utils import j_info
 from fjord.suggest import Link, Suggester
 from fjord.redirector import Redirector, build_redirect_url
 
@@ -125,19 +125,20 @@ class SUMOSuggestRedirector(Redirector):
 
         # FIXME: Putting this in here because I can't figure out
         # what's going on with bug #1173763 and hoping this sheds some
-        # light.
-        if not url.startswith('https://') or ' ' in url:
-            j_error(
-                app='suggest',
-                src='sumosuggest',
-                action='redirect',
-                msg='url is https:',
-                metadata={
-                    'response_id': response_id,
-                    'redirect': redirect,
-                    'docs': docs
-                }
-            )
+        # light. We'll take this out as soon as we identify the issue.
+        j_info(
+            app='suggest',
+            src='sumosuggest',
+            action='redirect',
+            msg='url is https:',
+            metadata={
+                'response_id': response_id,
+                'redirect': redirect,
+                'rank': rank,
+                'url': url,
+                'docs': docs
+            }
+        )
 
         ga_track_event({
             'cid': str(response_id),
