@@ -41,7 +41,7 @@ def ga_track_event(params, async=True):
 
     # If we're in DEBUG mode or running tests, we don't want to hose
     # production data, so we prepend test_ to the category.
-    if 'ec' in params and settings.DEBUG or 'test' in sys.argv:
+    if 'ec' in params and (settings.DEBUG or 'test' in sys.argv):
         params['ec'] = 'test_' + params['ec']
 
     if async:
