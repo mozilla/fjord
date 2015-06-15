@@ -126,7 +126,7 @@ class SUMOSuggestRedirector(Redirector):
         # FIXME: Putting this in here because I can't figure out
         # what's going on with bug #1173763 and hoping this sheds some
         # light.
-        if url == 'https:':
+        if not url.startswith('https://') or ' ' in url:
             j_error(
                 app='suggest',
                 src='sumosuggest',
