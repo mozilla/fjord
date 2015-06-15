@@ -63,7 +63,7 @@ USE_I18N = True
 USE_L10N = True
 
 # Gettext text domain
-TEXT_DOMAIN = 'messages'
+TEXT_DOMAIN = 'django'
 STANDALONE_DOMAINS = [TEXT_DOMAIN]
 TOWER_KEYWORDS = {'_lazy': None}
 TOWER_ADD_HEADERS = True
@@ -561,7 +561,7 @@ CSRF_FAILURE_VIEW = 'fjord.base.views.csrf_failure'
 # Tells the extract script what files to look for L10n in and what
 # function handles the extraction. The Tower library expects this.
 DOMAIN_METHODS = {
-    'messages': [
+    'django': [
         ('%s/**.py' % PROJECT_MODULE,
          'tower.management.commands.extract.extract_tower_python'),
         ('%s/**/templates/**.html' % PROJECT_MODULE,

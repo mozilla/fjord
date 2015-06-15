@@ -22,9 +22,9 @@ echo "extract and merge...."
 echo "creating dir...."
 mkdir -p locale/xx/LC_MESSAGES
 
-echo "copying messages.pot file...."
-cp locale/templates/LC_MESSAGES/messages.pot locale/xx/LC_MESSAGES/messages.po
+echo "copying django.pot file...."
+cp locale/templates/LC_MESSAGES/django.pot locale/xx/LC_MESSAGES/django.po
 
-echo "translate messages.po file...."
-./manage.py translate --pipeline=html,pirate locale/xx/LC_MESSAGES/messages.po
+echo "translate django.po file...."
+./manage.py translate --pipeline=html,pirate locale/xx/LC_MESSAGES/django.po
 locale/compile-mo.sh locale/xx/
