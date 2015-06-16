@@ -34,7 +34,7 @@ USAGE = 'usage: %prog [OPTIONS] OUTPUT-FILE LOCALES-DIR'
 
 def get_language(fn):
     """Given a filename, returns the locale it applies to"""
-    # FIXME - this expects the fn to be '.../XX/LC_MESSAGES/messages.po'
+    # FIXME - this expects the fn to be '.../XX/LC_MESSAGES/django.po'
     return fn.split(os.sep)[-3]
 
 
