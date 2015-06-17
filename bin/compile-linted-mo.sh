@@ -18,7 +18,7 @@ if [ "$1" = "-p" ]
 then
     PYTHON="$2"
 else
-    PYTHON="python2.6"
+    PYTHON="python"
 fi
 
 NO_MO_FILES=();
