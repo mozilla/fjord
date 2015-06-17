@@ -308,7 +308,7 @@ MIDDLEWARE_CLASSES = (
 )
 
 LOCALE_PATHS = (
-    os.path.join(ROOT, PROJECT_MODULE, 'locale'),
+    os.path.join(ROOT, 'locale'),
 )
 
 SUPPORTED_NONLOCALES = [

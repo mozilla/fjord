@@ -3,13 +3,13 @@ from warnings import warn
 
 from django.conf import settings
 from django.http import HttpResponsePermanentRedirect
+from django.utils import translation
 from django.utils.encoding import smart_str
-
-import tower
 
 from fjord.base import urlresolvers
 from fjord.base.browsers import parse_ua
 from fjord.base.helpers import urlparams
+from fjord.base.l10n import install_gettext
 
 
 """
@@ -163,4 +163,5 @@ class LocaleURLMiddleware(object):
 
         request.path_info = '/' + prefixer.shortened_path
         request.locale = prefixer.locale
-        tower.activate(prefixer.locale)
+        translation.activate(prefixer.locale)
+        install_gettext()
