@@ -59,6 +59,12 @@ body.html-rtl .ask {
   text-align: right;
 }
 
+.ask-large {
+  font-size: 1.1em;
+  font-weight: bold;
+  text-align: center;
+}
+
 .inactive {
   display: none;
 }
@@ -191,9 +197,17 @@ body.html-rtl #back-button {
 
     .face-description {
       font-weight: 600;
+      line-height: 1em;
       margin: 0 auto;
       text-align: center;
-      width: 120px;
+      width: 130px;
+
+      &.happy-description {
+        color: #689D57;
+      }
+      &.sad-description {
+        color: #896653;
+      }
     }
   }
 }
@@ -275,6 +289,7 @@ aside {
   .border-radius(10px);
   border: 1px solid #a4c5db;
   box-sizing: border-box;
+  font-size: 0.9em;
   margin: 20px;
   padding: 10px;
   text-align: center;
@@ -503,6 +518,9 @@ footer {
   .main {
     width: 700px;
   }
+  .ask-large {
+    font-size: 1.4em;
+  }
   header {
     .header-content {
       width: 700px;
@@ -575,6 +593,9 @@ footer {
   .main {
     margin: 0 auto;
     width: 900px;
+  }
+  aside {
+    font-size: 1em;
   }
   header .header-content {
     margin: 0 auto;

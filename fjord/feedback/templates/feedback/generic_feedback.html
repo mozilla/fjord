@@ -31,7 +31,7 @@
       <div class="deck">
         <div class="card no-back" id="intro" data-title="{{ _('{product} feedback')|fe(product=product.display_name) }}">
           <section>
-            <div class="ask">
+            <div class="ask-large">
               <noscript>
                 <p class="error">
                   {% trans %}
@@ -56,7 +56,7 @@
                     <path d="M22 58 C 35 85, 65 85, 78 58" stroke-width="6" fill="none"/>
                   </g>
                 </svg>
-                <div class="face-description">
+                <div class="face-description happy-description">
                   {% trans product=product.display_name %}
                     {{product}} makes me happy
                   {% endtrans %}
@@ -73,7 +73,7 @@
                     <path d="M24 72 C 35 55, 65 55, 76 72" stroke-width="6" fill="none"/>
                   </g>
                 </svg>
-                <div class="face-description">
+                <div class="face-description sad-description">
                   {% trans product=product.display_name %}
                     {{product}} makes me sad
                   {% endtrans %}
