@@ -58,6 +58,5 @@ src/kombu
 src/nuggets
 src/py-amqp
 src/pystatsd
-src/tower
 src/django-waffle
 src/spicedham
