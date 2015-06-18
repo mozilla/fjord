@@ -10,7 +10,6 @@ packages/django-picklefield/src
 packages/html5lib
 packages/importlib
 packages/mock
-packages/nose
 packages/ordereddict
 packages/polib
 packages/pyquery
@@ -41,7 +40,6 @@ src/django-grappelli
 src/django-mobility
 src/django-product-details
 src/django-multidb-router
-src/django-nose
 src/django-ratelimit
 src/django-rest-framework
 src/django-session-csrf
