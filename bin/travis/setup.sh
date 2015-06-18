@@ -30,4 +30,3 @@ python manage.py update_product_details
 
 echo "Doing static dance"
 python manage.py collectstatic --noinput > /dev/null
-python manage.py compress_assets > /dev/null
