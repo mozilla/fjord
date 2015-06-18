@@ -237,7 +237,6 @@ LANGUAGES = lazy(lazy_langs, dict)()
 
 INSTALLED_APPS = (
     # Local apps
-    'tower',  # for ./manage.py extract (L10n)
     'cronjobs',  # for ./manage.py cron * cmd line tasks
     'django_browserid',
 
@@ -559,15 +558,15 @@ ANON_ALWAYS = True
 CSRF_FAILURE_VIEW = 'fjord.base.views.csrf_failure'
 
 # Tells the extract script what files to look for L10n in and what
-# function handles the extraction. The Tower library expects this.
+# function handles the extraction.
 DOMAIN_METHODS = {
     'django': [
         ('%s/**.py' % PROJECT_MODULE,
-         'tower.management.commands.extract.extract_tower_python'),
+         'fjord.base.l10n.extract_tower_python'),
         ('%s/**/templates/**.html' % PROJECT_MODULE,
-         'tower.management.commands.extract.extract_tower_template'),
+         'fjord.base.l10n.extract_tower_template'),
         ('templates/**.html',
-         'tower.management.commands.extract.extract_tower_template'),
+         'fjord.base.l10n.extract_tower_template'),
     ]
 }
 
