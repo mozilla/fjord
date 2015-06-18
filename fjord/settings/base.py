@@ -354,7 +354,7 @@ STATIC_URL = '/static/'
 def JINJA_CONFIG():
     config = {
         'extensions': [
-            'tower.template.i18n',
+            'fjord.base.l10n.MozInternationalizationExtension',
             'jinja2.ext.do',
             'jinja2.ext.with_',
             'jinja2.ext.loopcontrols'
