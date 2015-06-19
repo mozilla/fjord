@@ -3,14 +3,13 @@ import logging
 from datetime import date, datetime, timedelta
 
 from elasticsearch.exceptions import ConnectionError
-from nose.tools import eq_
 from pyquery import PyQuery
 
 from django.contrib.auth.models import Group
 from django.http import QueryDict
 
 from fjord.analytics import views
-from fjord.base.tests import LocalizingClient, ProfileFactory, reverse
+from fjord.base.tests import eq_, LocalizingClient, ProfileFactory, reverse
 from fjord.feedback.tests import ResponseFactory, ProductFactory
 from fjord.search.tests import ElasticTestCase
 
@@ -357,7 +356,7 @@ class TestDashboardView(ElasticTestCase):
         # something like that.  The point being that "end" is actually
         # not the end point we want to test against.
         while d < end:
-            assert d.day in days, "Day %s has no data." % d.day
+            assert d.day in days, 'Day %s has no data.' % d.day
             d += timedelta(days=1)
 
     def test_frontpage_es_down(self):

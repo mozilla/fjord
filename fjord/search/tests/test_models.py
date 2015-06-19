@@ -1,6 +1,4 @@
-from nose.tools import eq_
-
-from fjord.base.tests import TestCase
+from fjord.base.tests import eq_, TestCase
 from fjord.search.models import Record
 from fjord.search.tests import RecordFactory
 

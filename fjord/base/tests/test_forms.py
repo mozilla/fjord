@@ -1,9 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from nose.tools import eq_
-
 from fjord.base.forms import EnhancedURLField
+from fjord.base.tests import eq_
 
 
 class EnhancedURLFieldTests(TestCase):

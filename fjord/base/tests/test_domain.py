@@ -1,7 +1,5 @@
-from nose.tools import eq_
-
 from fjord.base.domain import get_domain
-from fjord.base.tests import TestCase
+from fjord.base.tests import eq_, TestCase
 
 
 class TestGetDomain(TestCase):

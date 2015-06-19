@@ -5,9 +5,8 @@ from django.core.cache import cache
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
-from nose.tools import eq_
-
 from fjord.base.tests import (
+    eq_,
     LocalizingClient,
     ProfileFactory,
     reverse,

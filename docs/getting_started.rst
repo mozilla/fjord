@@ -216,7 +216,6 @@ Command                 Explanation
 generatedata            Generates fake data so Fjord works
 runserver               Runs the Django server
 collectstatic           Collects static files and "compiles" them
-test                    Runs the unit tests
 migrate                 Migrates the db with all the migrations specified in the repository
 shell                   Opens a Python REPL in the Django context for debugging
 esreindex               Reindexes all the db data into Elasticsearch
@@ -276,28 +275,6 @@ relevant CSS and JS files for a page. It makes our pages load faster.
 
 However, a handful of tests depend on the bundles being built and will
 fail unless you run ``collectstatic`` first.
-
-
-test
-----
-
-The test suite will create and use this database, to keep any data in
-your development database safe from tests.
-
-Before you run the tests, make sure you run ``collectstatic``::
-
-    ./manage.py collectstatic
-
-I run this any time I run the tests with a clean database.
-
-The test suite is run like this::
-
-    ./manage.py test
-
-
-For more information about running the tests, writing tests, flags you
-can pass, running specific tests and other such things, see the
-:ref:`test documentation <tests-chapter>`.
 
 
 .. _getting-started-chapter-migrate:
@@ -370,6 +347,29 @@ superuser/admin status. To do that, do::
     ./manage.py ihavepower <email-address>
 
 
+Running tests
+=============
+
+Fjord comes with unit tests and we use py.test for running them.
+
+Before you run the tests, make sure you run ``collectstatic``::
+
+    ./manage.py collectstatic
+
+I run this any time I run the tests with a clean database.
+
+The test suite is run like this::
+
+    ./py.test
+
+That uses the default options defined in ``pytest.ini``. You can
+specify different command line options on the command line.
+
+For more information about running the tests, writing tests, flags you
+can pass, running specific tests and other such things, see the
+:ref:`test documentation <tests-chapter>`.
+
+
 Helpful tips
 ============
 
@@ -440,7 +440,7 @@ with new requirements. You'll see something like this::
     (fjordvagrant)vagrant@vagrant-ubuntu-trusty-64:~/fjord$ ./manage.py runserver 0.0.0.0:8000
     There are 28 requirements that cannot be checked.
     The following requirements are not satsifed:
-    UNSATISFIED: nosenicedots==0.5
+    UNSATISFIED: foo==0.5
 
     Update your virtual environment by doing:
 

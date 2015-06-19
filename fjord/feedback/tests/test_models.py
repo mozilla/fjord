@@ -1,8 +1,7 @@
 import datetime
 
-from nose.tools import eq_
-
-from fjord.base.tests import TestCase
+from fjord.base.tests import eq_, TestCase
+from fjord.feedback.config import TRUNCATE_LENGTH
 from fjord.feedback.models import (
     Product,
     Response,
@@ -19,9 +18,9 @@ from fjord.feedback.tests import (
     ResponsePIFactory
 )
 from fjord.feedback.utils import compute_grams
-from fjord.search.tests import ElasticTestCase
-from fjord.feedback.config import TRUNCATE_LENGTH
 from fjord.journal.models import Record
+from fjord.search.tests import ElasticTestCase
+
 
 class TestResponseModel(TestCase):
     def test_description_truncate_on_save(self):
@@ -341,7 +340,7 @@ class TestParseData(ElasticTestCase):
                         'feedback_responsecontext: 5, '
                         'feedback_responsepi: 5')
         eq_(expected_msg,
-           Record.objects.get(action='purge_data').msg)
+            Record.objects.get(action='purge_data').msg)
 
         # Everything should still be in the index, but the number of
         # things with has_email=True should go down

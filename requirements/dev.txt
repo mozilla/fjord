@@ -16,12 +16,6 @@ pep8==1.6.1
 # sha256: Y6KG6ssDzV9kPX60WMbGK3DBEbRjT9jVnyfMrKS3yDo
 django-sslserver==0.14
 
-# sha256: ku47hrXBkhwtnawhe--JkMX4Usi8TZAYyv4PPzuBzTo
-nosenicedots==0.5
-
-# sha256: c0XZOWs_PApljFy328eZw6lq-kgpnZbZeB6rprqwt7A
-nose-blockage==0.1.2
-
 # sha256: jnbbT3Kv6QCHxHRntYjQ3j2_hvbj7nYqok7KqmyhuwM
 pre-commit==0.4.4
 
@@ -48,3 +42,12 @@ simplejson==3.0.7
 
 # sha256: HDW0rCBs7y0kgWyJ-Jzyid09OM98RJuz-re_bUPwGx8
 ordereddict==1.1
+
+# sha256: KN0LkNKbOGr7VS78TjVciJ9GOc6TZYp4cqIVDs4ou4k
+py==1.4.26
+
+# sha256: Uw8jx54bE4UOk_OllyDx7KdbrQEwfcT9aUpqGWGfucs
+pytest==2.7.1
+
+# sha256: 0UWsncelV6cZq3l3C-CUEATh4DjhN8NFkZGdnfKnkLE
+pytest-django==2.8.0

@@ -263,7 +263,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.messages',
     'django_extensions',
-    'django_nose',
     'eadred',
     'jingo_minify',
     'dennis.django_dennis',
@@ -638,9 +637,6 @@ GRAPPELLI_ADMIN_TITLE = 'Input admin and diabolical dashboard'
 # Waffle settings
 # Always allow for override via querystring
 WAFFLE_OVERRIDE = True
-
-# Switch the test runner to django-nose
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 ## Logging
 LOG_LEVEL = logging.INFO

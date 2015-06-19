@@ -1,14 +1,15 @@
 import os
 
 from mock import MagicMock, patch
-from nose.tools import eq_, ok_
+import pytest
 import requests_mock
 
 from fjord.base.google_utils import GOOGLE_API_URL
 from fjord.base.tests import (
+    eq_,
+    ok_,
     LocalizingClient,
     reverse,
-    skip_if,
     TestCase,
     with_waffle
 )
@@ -224,7 +225,8 @@ class SuggestWithRequestTestCase(SuggesterTestMixin, RedirectorTestMixin,
                     eq_(resp['Location'], docs[i]['url'])
 
 
-@skip_if(lambda: 'LIVE_API' not in os.environ)
+@pytest.mark.skipif('LIVE_API' not in os.environ,
+                    reason='LIVE_API not in environ')
 class LiveSUMOSuggestProviderTestCase(SuggesterTestMixin, TestCase):
     """Test it LIVE!
 

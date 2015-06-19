@@ -5,10 +5,10 @@ from django.core import mail
 from django.test.utils import override_settings
 
 from mock import MagicMock, patch
-from nose.tools import eq_
 import requests_mock
+import pytest
 
-from fjord.base.tests import TestCase, skip_if
+from fjord.base.tests import eq_, TestCase
 from fjord.translations import gengo_utils
 from fjord.translations.models import (
     GengoHumanTranslator,
@@ -851,7 +851,8 @@ def use_sandbox(fun):
     )(fun)
 
 
-@skip_if(lambda: not has_gengo_creds())
+@pytest.mark.skipif(not has_gengo_creds(),
+                    reason='no gengo creds')
 class LiveGengoTestCase(TestCase):
     """These are tests that execute calls against the real live Gengo API
 
@@ -878,7 +879,8 @@ class LiveGengoTestCase(TestCase):
         gengo_api = gengo_utils.FjordGengo()
         eq_(gengo_api.guess_language(text), u'es')
 
-    @skip_if(lambda: getattr(settings, 'GENGO_USE_SANDBOX', True))
+    @pytest.mark.skipif(getattr(settings, 'GENGO_USE_SANDBOX', True),
+                        reason='GENGO_USE_SANDBOX=False')
     def test_gengo_machine_translation(self):
         # Note: This doesn't work in the sandbox, so we skip it if
         # we're in sandbox mode. That is some happy horseshit, but so

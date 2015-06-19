@@ -1,6 +1,4 @@
-from nose.tools import eq_
-
-from fjord.base.tests import TestCase
+from fjord.base.tests import eq_, TestCase
 from fjord.feedback.models import ResponseMappingType
 from fjord.feedback.tests import ResponseFactory
 from fjord.search.index import chunked

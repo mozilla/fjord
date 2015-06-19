@@ -1,6 +1,4 @@
-from nose.tools import eq_
-
-from fjord.base.tests import TestCase
+from fjord.base.tests import eq_, TestCase
 from fjord.feedback.utils import clean_url, compute_grams
 
 
@@ -39,8 +37,8 @@ class TestComputeGrams(TestCase):
              [u'load tabs', u'load slow', u'slow tabs', u'damn slow']),
 
             ("I'm one of the guys that likes to try Firefox ahead of the "
-             "herd... usually I use Nightly, but then a while back my "
-             "favorite add-on, TabMixPlus stopped working because Firefox "
+             'herd... usually I use Nightly, but then a while back my '
+             'favorite add-on, TabMixPlus stopped working because Firefox '
              "redid something in the code. \"No problem,\" says I to myself, "
              "I'll just use Aurora until they get it fixed.",
              [u'add-on favorite', u'add-on tabmixplus', u'ahead herd',

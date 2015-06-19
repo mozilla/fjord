@@ -1,11 +1,9 @@
 import json
 import time
 
-from nose.tools import eq_
-
 from . import SurveyFactory
 from ..models import Answer
-from fjord.base.tests import TestCase, reverse
+from fjord.base.tests import eq_, TestCase, reverse
 from fjord.journal.models import Record
 
 

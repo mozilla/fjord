@@ -1,7 +1,6 @@
 from fjord.base.middleware import MOBILE_COOKIE
-from nose.tools import eq_
 
-from fjord.base.tests import LocalizingClient
+from fjord.base.tests import eq_, LocalizingClient
 from fjord.search.tests import ElasticTestCase
 
 

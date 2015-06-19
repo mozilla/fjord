@@ -16,7 +16,7 @@ except ImportError as exc:
     raise exc
 
 
-TEST = len(sys.argv) > 1 and sys.argv[1] == 'test'
+TEST = [arg for arg in sys.argv if 'py.test' in arg]
 if TEST:
-    print 'Using test configuration'
+    print 'Using test settings'
     from fjord.settings.test import *

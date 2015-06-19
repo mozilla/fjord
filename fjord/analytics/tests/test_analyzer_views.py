@@ -1,12 +1,17 @@
 import logging
 from datetime import datetime, timedelta
 
-from nose.tools import eq_, ok_
 from pyquery import PyQuery
 
 from django.contrib.auth.models import Group
 
-from fjord.base.tests import LocalizingClient, ProfileFactory, reverse
+from fjord.base.tests import (
+    eq_,
+    ok_,
+    LocalizingClient,
+    ProfileFactory,
+    reverse
+)
 from fjord.feedback.tests import ResponseFactory, ResponseEmailFactory
 from fjord.search.tests import ElasticTestCase
 
