@@ -1,5 +1,4 @@
-from nose.tools import eq_
-
+from fjord.base.tests import eq_
 from fjord.feedback.models import ResponseMappingType
 from fjord.feedback.tests import ResponseFactory
 from fjord.search.index import get_index

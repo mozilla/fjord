@@ -3,11 +3,11 @@ import json
 from django.contrib.auth.models import Group
 from django.test.utils import override_settings
 
-from nose.tools import eq_
 from pyquery import PyQuery
 
 from fjord.base import views
 from fjord.base.tests import (
+    eq_,
     LocalizingClient,
     TestCase,
     ProfileFactory,
@@ -50,10 +50,10 @@ class MonitorViewTest(ElasticTestCase):
                 SHOW_STAGE_NOTICE=True,
                 CACHES={
                     'default': {
-                        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+                        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',  # noqa
                         'LOCATION': ['localhost:11211', 'localhost2:11211']
-                        }
-                    }):
+                    }
+                }):
 
                 # Mock the test_memcached function so it always returns
                 # True.

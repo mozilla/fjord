@@ -2,10 +2,14 @@ import json
 
 from django.test.client import RequestFactory
 
-from nose.tools import eq_
-
 from fjord.base.browserid import FjordVerify
-from fjord.base.tests import BaseTestCase, ProfileFactory, reverse, UserFactory
+from fjord.base.tests import (
+    BaseTestCase,
+    eq_,
+    ProfileFactory,
+    reverse,
+    UserFactory
+)
 
 
 class TestAuth(BaseTestCase):

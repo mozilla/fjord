@@ -1,5 +1,4 @@
-from nose.tools import eq_
-
+from fjord.base.tests import eq_
 from fjord.search.utils import from_class_path, to_class_path
 
 

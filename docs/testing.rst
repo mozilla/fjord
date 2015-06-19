@@ -9,6 +9,14 @@ the system continues to work. Further, they make it easier to verify
 correctness for behavioral details.
 
 
+.. Note::
+
+   We use the ``py.test`` script in the root directory rather than the
+   one installed with py.test in PATH. We need it to set up the path
+   because we have many of the libraries in ``vendor/``. Once we get
+   rid of ``vendor/`` we can use the regular ``py.test`` script.
+
+
 Running tests
 =============
 
@@ -35,79 +43,71 @@ Running tests and arguments
 
 To run the test suite, do::
 
-    ./manage.py test
+    ./py.test
 
 
-The ``NOSE_ARGS`` setting in ``fjord/settings/local.py`` sets some
-default arguments so you don't see tons and tons and tons and tons and
-tons and tons and tons and tons and tons and tons and tons and tons
-and tons of debugging output. Ew.
+Default options for running the test are in ``pytest.ini``. This is a
+good set of defaults.
 
-If you ever need to see that debugging, comment the arguments out.
+If you ever need to change the defaults, you can do so at the command
+line.
 
-The ``--nocapture`` flag is important if you want to be able to drop into PDB
-from within tests.
-
-Other helpful flags when debugging are:
-
-``-x``:
-  Fast fail. Exit immediately on failure. No need to run the whole
-  test suite if you already know something is broken.
+Helpful command-line arguments:
 
 ``--pdb``:
-  Drop into PDB on an uncaught exception. (These show up as ``E`` or
-  errors in the test results, not ``F`` or failures.)
+  Drop into pdb on test failure.
 
-``--pdb-fail``:
-  Drop into PDB on a test failure. This usually drops you right at the
-  assertion.
+``--create-db``:
+  Create a new test database.
+
+``--showlocals``:
+  Shows local variables in tracebacks on errors.
+
+``--exitfirst``:
+  Exits on the first failure.
+
+See ``./py.test --help`` for more arguments.
 
 
 The test suite will create a new database named ``test_%s`` where
 ``%s`` is whatever value you have for
 ``settings.DATABASES['default']['NAME']``.
 
-If you know there haven't been any schema changes, you can run the
-tests with ``REUSE_DB=1`` in the environment. This will reuse the existing
-database::
-
-    REUSE_DB=1 ./manage.py test -s --noinput --logging-clear-handlers
-
-
-Further, running the test suite can be a good way to suss out Python
-warnings and 2to3 problems. To do that, run the test suite like this::
-
-    python -t -3 -Wd ./manage.py test
-
-
-Argument explanations:
-
-``-t``
-    Issue warnings about inconsistent tab usage.
-
-``-3``
-    Warns about Python 3.x incompatabilities that 2to3 can't fix.
-
-``-Wd``
-    Enables default warnings.
-
-
-See ``python -h`` for details and other arguments you can use.
-
 
 Running specific tests
 ----------------------
 
-You can run part of the test suite by specifying the directories of the
-code you want to run, like::
+There are a bunch of ways to specify a subset of tests to run:
 
-    ./manage.py test fjord/feedback/tests
+* only tests marked with the 'es_tests' marker::
 
-You can specify specific tests::
+    ./py.test -m es_tests
 
-    ./manage.py test fjord.feedback.tests.test_ui:TestFeedback.test_happy_url
+* all the tests but those marked with the 'es_tests' marker::
 
-See the output of ``./manage.py test --help`` for more arguments.
+    ./py.test -m "not es_tests"
+
+* all the tests but the suggests ones::
+
+    ./py.test --ignore fjord/suggests
+
+* all the tests that have "foobar" in their names::
+
+    ./py.test -k foobar
+
+* all the tests that don't have "foobar" in their names::
+
+    ./py.test -k "not foobar"
+
+* tests in a certain directory::
+
+    ./py.test fjord/suggest/
+
+* specific test::
+
+    ./py.test fjord/suggest/tests/test_dummy.py::DummySuggesterTestCase::test_get_suggestions
+
+See http://pytest.org/latest/usage.html for more examples.
 
 
 Writing New Tests

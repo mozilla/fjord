@@ -1,8 +1,6 @@
-from nose.tools import eq_
-
 from ..models import SuperModel
 from ..tasks import translate_tasks_by_id_list
-from fjord.base.tests import TestCase
+from fjord.base.tests import eq_, TestCase
 
 
 class TranslateTasksByIdListTestCase(TestCase):
@@ -19,7 +17,7 @@ class TranslateTasksByIdListTestCase(TestCase):
 
         # Fetch the object from the db to verify it's been translated.
         obj = SuperModel.objects.get(id=obj.id)
-        
+
         eq_(obj.trans_desc, u'THIS IS A TEST STRING')
 
     def test_many(self):
@@ -30,8 +28,9 @@ class TranslateTasksByIdListTestCase(TestCase):
             obj = SuperModel(locale='br', desc=u'string %d' % i)
             obj.save()
             objs.append(obj)
-        
-        translate_tasks_by_id_list.delay(model_path, [obj.id for obj in objs])
+
+        translate_tasks_by_id_list.delay(
+            model_path, [obj_.id for obj_ in objs])
 
         for obj in objs:
             obj = SuperModel.objects.get(id=obj.id)

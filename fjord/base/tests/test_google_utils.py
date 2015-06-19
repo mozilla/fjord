@@ -3,10 +3,9 @@ from functools import wraps
 
 import requests_mock
 from mock import MagicMock, patch
-from nose.tools import eq_
 
 from fjord.base.google_utils import GOOGLE_API_URL, ga_track_event
-from fjord.base.tests import TestCase
+from fjord.base.tests import eq_, TestCase
 
 
 def set_sys_argv(sys_argv):

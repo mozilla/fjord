@@ -3,9 +3,7 @@ import datetime
 
 from django.test.client import RequestFactory
 
-from nose.tools import eq_, ok_
-
-from fjord.base.tests import TestCase, reverse
+from fjord.base.tests import eq_, ok_, reverse, TestCase
 from fjord.base.utils import (
     actual_ip_plus_context,
     instance_to_key,

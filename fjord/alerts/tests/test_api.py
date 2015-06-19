@@ -5,12 +5,10 @@ from uuid import uuid4
 
 from django.test.utils import override_settings
 
-from nose.tools import eq_, ok_
-
 from . import AlertFlavorFactory, AlertFactory, LinkFactory
 from fjord.alerts.models import Alert, Link
 from fjord.api_auth.tests import TokenFactory
-from fjord.base.tests import reverse, TestCase, WHATEVER
+from fjord.base.tests import eq_, ok_, reverse, TestCase, WHATEVER
 
 
 class AlertsGetAPIAuthTest(TestCase):
@@ -909,7 +907,6 @@ class AlertsPostAPITest(TestCase):
         ok_(content['detail']['start_time'][0].startswith(
             u'Datetime has wrong format.'))
 
-
     @override_settings(TIME_ZONE='America/Los_Angeles')
     def test_post_start_time_timezone_change(self):
         token = TokenFactory()
@@ -1070,7 +1067,7 @@ class AlertsPostAPITest(TestCase):
             {
                 u'detail': {
                     u'links': [
-                        u"Missing names or urls in link data. "
+                        u'Missing names or urls in link data. '
                         u"{u'url': u'http://example.com/'}"
                     ]
                 }

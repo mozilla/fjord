@@ -1,9 +1,8 @@
 from datetime import datetime
 from unittest import TestCase
 
-from nose.tools import eq_
-
 from fjord.analytics.utils import counts_to_options, zero_fill
+from fjord.base.tests import eq_
 from fjord.base.utils import epoch_milliseconds
 
 
@@ -84,5 +83,5 @@ class TestZeroFillHelper(TestCase):
 
         for day in range(1, 7):
             millis = epoch_milliseconds(datetime(2012, 1, day))
-            assert millis in data1, "Day %s was not zero filled." % day
-            assert millis in data2, "Day %s was not zero filled." % day
+            assert millis in data1, 'Day %s was not zero filled.' % day
+            assert millis in data2, 'Day %s was not zero filled.' % day

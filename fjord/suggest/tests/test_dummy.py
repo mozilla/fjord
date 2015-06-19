@@ -1,8 +1,6 @@
 import datetime
 
-from nose.tools import eq_
-
-from fjord.base.tests import TestCase
+from fjord.base.tests import eq_, TestCase
 from fjord.feedback.tests import ResponseFactory
 from fjord.suggest import get_suggesters
 from fjord.suggest.utils import get_suggestions

@@ -1,5 +1,3 @@
-from nose.tools import eq_
-
 from ..utils import translate
 from fjord.base.tests import TestCase
 from fjord.translations import gengo_utils
@@ -21,14 +19,14 @@ class GeneralTranslateTests(TestCase):
         obj = SuperModel(locale='br', desc=u'This is a test string')
         obj.save()
 
-        eq_(obj.trans_desc, u'')
+        assert obj.trans_desc == u''
         translate(obj, 'fake', 'br', 'desc', 'en', 'trans_desc')
-        eq_(obj.trans_desc, u'THIS IS A TEST STRING')
+        assert obj.trans_desc == u'THIS IS A TEST STRING'
 
     def test_translate_dennis(self):
         obj = SuperModel(locale='fr', desc=u'This is a test string')
         obj.save()
 
-        eq_(obj.trans_desc, u'')
+        assert obj.trans_desc == u''
         translate(obj, 'dennis', 'br', 'desc', 'en', 'trans_desc')
-        eq_(obj.trans_desc, u'\xabTHIS IS A TEST STRING\xbb')
+        assert obj.trans_desc == u'\xabTHIS IS A TEST STRING\xbb'

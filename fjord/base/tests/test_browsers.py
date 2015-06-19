@@ -3,9 +3,8 @@ import os
 
 from django import test
 
-from nose.tools import eq_
-
 from fjord.base import browsers, middleware
+from fjord.base.tests import eq_
 
 
 class TestUserAgentDetection(object):
@@ -43,7 +42,7 @@ class TestUserAgentDetection(object):
 
     def test_middleware(self):
         """Check that the middleware injects data properly."""
-        ua = "Mozilla/5.0 (Android; Mobile; rv:14.0) Gecko/14.0 Firefox/14.0.2"
+        ua = 'Mozilla/5.0 (Android; Mobile; rv:14.0) Gecko/14.0 Firefox/14.0.2'
         d = {
             'HTTP_USER_AGENT': ua,
         }

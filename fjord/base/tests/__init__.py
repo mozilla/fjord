@@ -12,7 +12,6 @@ from django.test.utils import override_settings
 import factory
 import waffle
 from django_browserid.tests import mock_browserid
-from nose import SkipTest
 
 # reverse is here for convenience so other test modules import it from
 # here rather than importing it from urlresolvers
@@ -27,42 +26,18 @@ def has_environ_variable(var):
     return var in os.environ
 
 
-def skip_if(test_func, msg=''):
-    """Decorator that skips the test if the function returns True
+def eq_(a, b, msg=None):
+    if msg:
+        assert a == b, msg
+    else:
+        assert a == b
 
-    This works for functions and classes.
 
-    """
-    msg = msg or test_func.__name__
-
-    def skipping_cls_or_fun(cls_or_func):
-        """Class or function decorator for skipping tests"""
-
-        def skipping_fun(func):
-            """Function decorator for skipping tests"""
-            @wraps(func)
-            def _skipping_fun(*args, **kwargs):
-                if test_func():
-                    raise SkipTest('Skipping because {0}'.format(msg))
-                return func(*args, **kwargs)
-            return _skipping_fun
-
-        if inspect.isclass(cls_or_func):
-            # If cls_or_func is a class, then we wrap all the callable
-            # methods that start with 'test'.
-            for attr in cls_or_func.__dict__.keys():
-                if (attr.startswith('test')
-                        and callable(getattr(cls_or_func, attr))):
-
-                    setattr(cls_or_func, attr,
-                            skipping_fun(getattr(cls_or_func, attr)))
-            return cls_or_func
-        else:
-            # If cls_or_func is a function, then we return the
-            # skipping_fun
-            return skipping_fun(cls_or_func)
-
-    return skipping_cls_or_fun
+def ok_(a, msg=None):
+    if msg:
+        assert a, msg
+    else:
+        assert a
 
 
 def with_waffle(flagname, flagvalue=True):

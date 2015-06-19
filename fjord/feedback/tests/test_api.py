@@ -7,9 +7,7 @@ from datetime import date, datetime, timedelta
 from django.core.cache import get_cache
 from django.test.client import Client
 
-from nose.tools import eq_, ok_
-
-from fjord.base.tests import TestCase, reverse
+from fjord.base.tests import eq_, ok_, TestCase, reverse
 from fjord.feedback import models
 from fjord.feedback.tests import ResponseFactory
 from fjord.search.tests import ElasticTestCase

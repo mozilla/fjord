@@ -1,6 +1,4 @@
-from nose.tools import eq_
-
-from fjord.base.tests import reverse, TestCase
+from fjord.base.tests import eq_, reverse, TestCase
 from fjord.redirector import get_redirectors
 from fjord.redirector.base import build_redirect_url
 from fjord.redirector.providers.dummy import DummyRedirector
