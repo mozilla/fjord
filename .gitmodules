@@ -97,3 +97,6 @@
 [submodule "vendor/src/py-amqp"]
 	path = vendor/src/py-amqp
 	url = https://github.com/celery/py-amqp.git
+[submodule "vendor/src/elasticsearch-dsl-py"]
+	path = vendor/src/elasticsearch-dsl-py
+	url = https://github.com/elastic/elasticsearch-dsl-py.git

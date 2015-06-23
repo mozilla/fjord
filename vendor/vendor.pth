@@ -48,6 +48,7 @@ src/django-sslserver
 src/django-statsd
 src/elasticutils
 src/elasticsearch-py
+src/elasticsearch-dsl-py
 src/factory_boy
 src/gengo-python
 src/jingo
