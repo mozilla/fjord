@@ -17,7 +17,7 @@ class Record(ModelBase):
         (STATUS_IN_PROGRESS, 'in progress'),
         (STATUS_FAIL, 'done - fail'),
         (STATUS_SUCCESS, 'done - success'),
-        )
+    )
 
     batch_id = models.CharField(max_length=10)
     name = models.CharField(max_length=255)

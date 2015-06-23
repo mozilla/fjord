@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from pyquery import PyQuery
 
@@ -74,7 +74,7 @@ class TestSearchView(ElasticTestCase):
             (True, 'Linux', 'en-US', 'apple', now - timedelta(days=3)),
             (False, 'Windows XP', 'en-US', 'banana', now - timedelta(days=2)),
             (False, 'Windows 7', 'en-US', 'orange', now - timedelta(days=1)),
-            (False, 'Linux', 'es', u'\u2713 apple', now - timedelta(days=0)),
+            (False, 'Linux', 'es', u'\u2713 apple', now),
         ]
         for happy, platform, locale, description, created in items:
             # We don't need to keep this around, just need to create it.
@@ -88,6 +88,35 @@ class TestSearchView(ElasticTestCase):
         jane.groups.add(Group.objects.get(name='analyzers'))
 
         self.client_login_user(jane)
+
+    def test_zero_fill(self):
+        """If a day in a date range has no data, it should be zero filled."""
+        # Note that we request a date range that includes 3 days without data.
+        start = (date.today() - timedelta(days=9))
+        end = (date.today() - timedelta(days=3))
+
+        r = self.client.get(self.url, {
+            'date_start': start.strftime('%Y-%m-%d'),
+            'date_end': end.strftime('%Y-%m-%d'),
+        })
+        # The histogram data is of the form [d, v], where d is a number of
+        # milliseconds since the epoch, and v is the value at that time stamp.
+        dates = [d[0] for d in r.context['histogram'][0]['data']]
+        dates = [date.fromtimestamp(d // 1000) for d in dates]
+        days = [d.day for d in dates]
+
+        d = start
+        # FIXME: This seems like it should be <= end (including the
+        # end date), but what happens is that that includes an extra
+        # day. I suspect there's some funny business in regards to
+        # timezones and we're actually looking at a late time for the
+        # previous day for each day because of timezones and then that
+        # gets handled in flot after being converted to UTC or
+        # something like that.  The point being that "end" is actually
+        # not the end point we want to test against.
+        while d < end:
+            assert d.day in days, 'Day %s has no data.' % d.day
+            d += timedelta(days=1)
 
     def test_front_page(self):
         r = self.client.get(self.url)

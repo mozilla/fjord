@@ -72,16 +72,17 @@ MAX_RETRIES = len(RETRY_TIMES)
 @app.task()
 def index_item_task(cls_path, item_id, **kwargs):
     """Index an item given it's mapping_type cls_path and id"""
-    mapping_type = from_class_path(cls_path)
+    doctype = from_class_path(cls_path)
     retries = kwargs.get('task_retries', 0)
     log.debug('Index attempt #%s', retries)
     try:
-        doc = mapping_type.extract_document(item_id)
-        mapping_type.index(doc, item_id)
+        resp = doctype.get_model().objects.get(id=item_id)
+        doc = doctype.extract_doc(resp)
+        doctype.docs.bulk_index(docs=[doc])
 
     except Exception as exc:
-        log.exception("Error while live indexing %s %d: %s",
-                      mapping_type, item_id, exc)
+        log.exception('Error while live indexing %s %d: %s',
+                      doctype, item_id, exc)
         if retries >= MAX_RETRIES:
             raise
         retry_time = RETRY_TIMES[retries]
@@ -97,19 +98,19 @@ def index_item_task(cls_path, item_id, **kwargs):
 @app.task()
 def unindex_item_task(cls_path, item_id, **kwargs):
     """Remove item from index, given it's mapping_type class_path and id"""
-    mapping_type = from_class_path(cls_path)
+    doctype = from_class_path(cls_path)
     try:
-        mapping_type.unindex(item_id)
+        doctype.docs.delete(item_id)
 
     except Exception as exc:
         retries = kwargs.get('task_retries', 0)
-        log.exception("Error while live unindexing %s %d: %s",
-                      mapping_type, item_id, exc)
+        log.exception('Error while live unindexing %s %d: %s',
+                      doctype, item_id, exc)
         if retries >= MAX_RETRIES:
             raise
         retry_time = RETRY_TIMES[retries]
 
-        args = (mapping_type, item_id)
+        args = (doctype, item_id)
         if not kwargs:
             # Celery is lame. It requires that kwargs be non empty, but when
             # EAGER is true, it provides empty kwargs.
@@ -127,11 +128,11 @@ def _live_index_handler(sender, **kwargs):
 
     try:
         if kwargs['signal'] == post_save:
-            cls_path = to_class_path(instance.get_mapping_type())
+            cls_path = to_class_path(instance.get_doctype())
             index_item_task.delay(cls_path, instance.id)
 
         elif kwargs['signal'] == pre_delete:
-            cls_path = to_class_path(instance.get_mapping_type())
+            cls_path = to_class_path(instance.get_doctype())
             unindex_item_task.delay(cls_path, instance.id)
 
     except Exception:

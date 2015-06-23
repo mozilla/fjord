@@ -1,7 +1,7 @@
 from fjord.base.tests import eq_
-from fjord.feedback.models import ResponseMappingType
+from fjord.feedback.models import ResponseDocType
 from fjord.feedback.tests import ResponseFactory
-from fjord.search.index import get_index
+from fjord.search.index import get_index_name
 from fjord.search.models import Record
 from fjord.search.tasks import index_chunk_task
 from fjord.search.tests import RecordFactory, ElasticTestCase
@@ -18,21 +18,23 @@ class IndexChunkTaskTest(ElasticTestCase):
         self.setup_indexes(empty=True)
 
         # Verify there's nothing in the index.
-        eq_(len(ResponseMappingType.search()), 0)
+        eq_(ResponseDocType.docs.search().count(), 0)
 
         # Create the record and the chunk and then run it through
         # celery.
         batch_id = 'ou812'
         rec = RecordFactory(batch_id=batch_id)
 
-        chunk = (to_class_path(ResponseMappingType),
-                 [item.id for item in responses])
-        index_chunk_task.delay(get_index(), batch_id, rec.id, chunk)
+        chunk = (
+            to_class_path(ResponseDocType),
+            [item.id for item in responses]
+        )
+        index_chunk_task.delay(get_index_name(), batch_id, rec.id, chunk)
 
-        ResponseMappingType.refresh_index()
+        self.refresh()
 
         # Verify everything is in the index now.
-        eq_(len(ResponseMappingType.search()), 10)
+        eq_(ResponseDocType.docs.search().count(), 10)
 
         # Verify the record was marked succeeded.
         rec = Record.objects.get(pk=rec.id)

@@ -1,10 +1,9 @@
 from datetime import datetime, timedelta
 
-from django.core.cache import cache
 from django.db import models
 from django.utils.translation import ugettext_lazy as _lazy
 
-from elasticutils.contrib.django import Indexable, MLT
+import elasticsearch_dsl as es_dsl
 from product_details import product_details
 from rest_framework import serializers
 from statsd import statsd
@@ -21,15 +20,11 @@ from fjord.feedback.config import (
 from fjord.feedback.utils import compute_grams
 from fjord.journal.utils import j_info
 from fjord.search.index import (
-    register_mapping_type,
-    FjordMappingType,
-    boolean_type,
-    date_type,
-    integer_type,
-    keyword_type,
-    terms_type,
-    text_type,
-    index_chunk
+    FjordDocType,
+    FjordDocTypeManager,
+    get_index_name,
+    index_chunk,
+    register_doctype
 )
 from fjord.search.tasks import register_live_index
 from fjord.translations.models import get_translation_system_choices
@@ -370,8 +365,8 @@ class Response(ModelBase):
         return country
 
     @classmethod
-    def get_mapping_type(self):
-        return ResponseMappingType
+    def get_doctype(self):
+        return ResponseDocType
 
     @classmethod
     def infer_product(cls, browser):
@@ -408,8 +403,103 @@ class Response(ModelBase):
         return u''
 
 
-@register_mapping_type
-class ResponseMappingType(FjordMappingType, Indexable):
+class ResponseDocTypeManager(FjordDocTypeManager):
+    @classmethod
+    def get_doctype(cls):
+        return ResponseDocType
+
+    @classmethod
+    def get_indexable(cls):
+        return super(ResponseDocTypeManager, cls).get_indexable().reverse()
+
+    @classmethod
+    def to_public(cls, docs):
+        """Converts this data to dicts with only publicly ok data
+
+        :args docs: list of ResponseDocType instances
+
+        :returns: list of dicts of publicly ok data
+
+        """
+        public_fields = cls.get_doctype().public_fields()
+
+        def publicfy(doc):
+            doc = doc.to_dict()
+            return dict(
+                (key, doc.get(key, None))
+                for key in public_fields
+            )
+
+        return [publicfy(doc) for doc in docs]
+
+
+@register_doctype
+class ResponseDocType(FjordDocType):
+    id = es_dsl.Integer()
+    happy = es_dsl.Boolean()
+    api = es_dsl.Integer()
+    url = es_dsl.String(index='not_analyzed')
+    url_domain = es_dsl.String(index='not_analyzed')
+    has_email = es_dsl.Boolean()
+    description = es_dsl.String(analyzer='snowball')
+    category = es_dsl.String(index='not_analyzed')
+    description_bigrams = es_dsl.String(index='not_analyzed')
+    description_terms = es_dsl.String(analyzer='standard')
+    user_agent = es_dsl.String(index='not_analyzed')
+    product = es_dsl.String(index='not_analyzed')
+    channel = es_dsl.String(index='not_analyzed')
+    version = es_dsl.String(index='not_analyzed')
+    browser = es_dsl.String(index='not_analyzed')
+    browser_version = es_dsl.String(index='not_analyzed')
+    platform = es_dsl.String(index='not_analyzed')
+    locale = es_dsl.String(index='not_analyzed')
+    country = es_dsl.String(index='not_analyzed')
+    device = es_dsl.String(index='not_analyzed')
+    manufacturer = es_dsl.String(index='not_analyzed')
+    source = es_dsl.String(index='not_analyzed')
+    campaign = es_dsl.String(index='not_analyzed')
+    souce_campaign = es_dsl.String(index='not_analyzed')
+    organic = es_dsl.Boolean()
+    created = es_dsl.Date()
+
+    docs = ResponseDocTypeManager()
+
+    class Meta:
+        pass
+
+    def mlt(self):
+        """Returns a search with a morelikethis query for docs like this"""
+        # Short responses tend to not repeat any words, so then MLT
+        # returns nothing. This fixes that by setting min_term_freq to
+        # 1. Longer responses tend to repeat important words, so we can
+        # set min_term_freq to 2.
+        num_words = len(self.description.split(' '))
+        if num_words > 40:
+            min_term_freq = 2
+        else:
+            min_term_freq = 1
+
+        s = self.search()
+        if self.product:
+            s = s.filter('term', product=self.product)
+        if self.platform:
+            s = s.filter('term', platform=self.platform)
+
+        s = s.query(
+            'more_like_this',
+            fields=['description'],
+            docs=[
+                {
+                    '_index': get_index_name(),
+                    '_type': self._doc_type.name,
+                    '_id': self.id
+                }
+            ],
+            min_term_freq=min_term_freq,
+            stop_words=list(ANALYSIS_STOPWORDS)
+        )
+        return s
+
     @classmethod
     def get_model(cls):
         return Response
@@ -443,148 +533,64 @@ class ResponseMappingType(FjordMappingType, Indexable):
             'created'
         )
 
-    @classmethod
-    def reshape(cls, results):
-        """Reshapes the results so lists are lists and everything is not"""
-        def delist(item):
-            return val if key == 'description_bigrams' else val[0]
-
-        return [
-            dict([(key, delist(val)) for key, val in result.items()])
-            for result in results
-        ]
-
-    @classmethod
-    def get_mapping(cls):
-        return {
-            'id': integer_type(),
-            'happy': boolean_type(),
-            'api': integer_type(),
-            'url': keyword_type(),
-            'url_domain': keyword_type(),
-            'has_email': boolean_type(),
-            'description': text_type(),
-            'category': text_type(),
-            'description_bigrams': keyword_type(),
-            'description_terms': terms_type(),
-            'user_agent': keyword_type(),
-            'product': keyword_type(),
-            'channel': keyword_type(),
-            'version': keyword_type(),
-            'browser': keyword_type(),
-            'browser_version': keyword_type(),
-            'platform': keyword_type(),
-            'locale': keyword_type(),
-            'country': keyword_type(),
-            'device': keyword_type(),
-            'manufacturer': keyword_type(),
-            'source': keyword_type(),
-            'campaign': keyword_type(),
-            'source_campaign': keyword_type(),
-            'organic': boolean_type(),
-            'created': date_type(),
-        }
-
-    @classmethod
-    def extract_document(cls, obj_id, obj=None):
-        if obj is None:
-            obj = cls.get_model().objects.get(pk=obj_id)
-
-        doc = {
-            'id': obj.id,
-            'happy': obj.happy,
-            'api': obj.api,
-            'url': obj.url,
-            'url_domain': obj.url_domain,
-            'has_email': bool(obj.user_email),
-            'description': obj.description,
-            'category': obj.category,
-            'description_terms': obj.description,
-            'user_agent': obj.user_agent,
-            'product': obj.product,
-            'channel': obj.channel,
-            'version': obj.version,
-            'browser': obj.browser,
-            'browser_version': obj.browser_version,
-            'platform': obj.platform,
-            'locale': obj.locale,
-            'country': obj.country,
-            'device': obj.device,
-            'manufacturer': obj.manufacturer,
-            'source': obj.source,
-            'campaign': obj.campaign,
-            'source_campaign': '::'.join([
-                (obj.source or '--'),
-                (obj.campaign or '--')
-            ]),
-            'organic': (not obj.campaign),
-            'created': obj.created,
-        }
-
-        # We only compute bigrams for english because the analysis
-        # uses English stopwords, stemmers, ...
-        if obj.locale.startswith(u'en') and obj.description:
-            bigrams = compute_grams(obj.description)
-            doc['description_bigrams'] = bigrams
-
-        return doc
-
     @property
     def truncated_description(self):
         """Shorten feedback for dashboard view."""
         return smart_truncate(self.description, length=500)
 
     @classmethod
-    def get_products(cls):
-        """Returns a list of all products
+    def extract_doc(cls, resp, with_id=True):
+        """Converts a Response to a dict of values
 
-        This is cached.
+        This can be used with ``ResponseDocType.from_obj()`` to create a
+        ``ResponseDocType`` object or it can be used for indexing.
+
+        :arg resp: a Response object
+        :arg with_id: whether or not to include the ``_id`` value--include
+            it when you're bulk indexing
+
+        :returns: a dict
 
         """
-        key = 'feedback:response_products1'
-        products = cache.get(key)
-        if products is not None:
-            return products
+        doc = {
+            'id': resp.id,
+            'happy': resp.happy,
+            'api': resp.api,
+            'url': resp.url,
+            'url_domain': resp.url_domain,
+            'has_email': bool(resp.user_email),
+            'description': resp.description,
+            'user_agent': resp.user_agent,
+            'product': resp.product,
+            'channel': resp.channel,
+            'version': resp.version,
+            'browser': resp.browser,
+            'browser_version': resp.browser_version,
+            'platform': resp.platform,
+            'locale': resp.locale,
+            'country': resp.country,
+            'device': resp.device,
+            'manufacturer': resp.manufacturer,
+            'source': resp.source,
+            'campaign': resp.campaign,
+            'source_campaign': '::'.join([
+                (resp.source or '--'),
+                (resp.campaign or '--')
+            ]),
+            'organic': (not resp.campaign),
+            'created': resp.created
+        }
 
-        facet = cls.search().facet('product').facet_counts()
-        products = [prod['term'] for prod in facet['product']]
-
-        cache.add(key, products)
-        return products
-
-    @classmethod
-    def get_indexable(cls):
-        return super(ResponseMappingType, cls).get_indexable().reverse()
-
-    @classmethod
-    def morelikethis(cls, resp):
-        """Returns a list of responses that are like the specified one"""
-        s = cls.search()
-        s = s.filter(happy=resp.happy)
-        if resp.product:
-            s = s.filter(product=resp.product)
-        if resp.platform:
-            s = s.filter(platform=resp.platform)
-
-        # Short responses tend to not repeat any words, so then MLT
-        # returns nothing. This fixes that by setting min_term_freq to
-        # 1. Longer responses tend to repeat important words, so we can
-        # set min_term_freq to 2.
-        num_words = len(resp.description.split(' '))
-        if num_words > 40:
-            min_term_freq = 2
+        # We only compute bigrams for english because the analysis
+        # uses English stopwords, stemmers, ...
+        if resp.locale.startswith(u'en') and resp.description:
+            doc['description_bigrams'] = compute_grams(resp.description)
         else:
-            min_term_freq = 1
+            doc['description_bigrams'] = []
 
-        return MLT(
-            id_=resp.id,
-            s=s,
-            mlt_fields=['description'],
-            index=cls.get_index(),
-            doctype=cls.get_mapping_type_name(),
-            stop_words=list(ANALYSIS_STOPWORDS),
-            min_term_freq=min_term_freq
-        )
+        if with_id:
+            doc['_id'] = doc['id']
+        return doc
 
 
 class ResponseEmail(ModelBase):
@@ -789,4 +795,4 @@ def purge_data(cutoff=None, verbose=False):
            msg=msg)
 
     if responses_to_update:
-        index_chunk(ResponseMappingType, list(responses_to_update))
+        index_chunk(ResponseDocType, list(responses_to_update))

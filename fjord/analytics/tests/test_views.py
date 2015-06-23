@@ -1,6 +1,6 @@
 import json
 import logging
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
 from elasticsearch.exceptions import ConnectionError
 from pyquery import PyQuery
@@ -245,25 +245,6 @@ class TestDashboardView(ElasticTestCase):
 
         assert 'http://www.w3.org/2005/Atom' in r.content
 
-    # FIXME - This was backed out. We can re-enable this test when urls are
-    # re-added.
-    # def test_search_format_atom_has_related_links(self):
-    #     """Atom output works"""
-    #     response(description='relatedlinks', url='http://example.com',
-    #              save=True)
-    #     self.refresh()
-
-    #     url = reverse('dashboard')
-    #     # Text search
-    #     r = self.client.get(url, {'q': 'relatedlinks', 'format': 'atom'})
-    #     eq_(r.status_code, 200)
-
-    #     assert 'http://www.w3.org/2005/Atom' in r.content
-    #     # FIXME: This is a lousy way to test for a single link with
-    #     # both attributes.
-    #     assert 'rel="related"' in r.content
-    #     assert 'href="http://example.com"' in r.content
-
     def test_date_search(self):
         url = reverse('dashboard')
         # These start and end dates will give known slices of the data.
@@ -328,36 +309,6 @@ class TestDashboardView(ElasticTestCase):
         self.teardown_indexes()
         resp = self.client.get(reverse('dashboard'))
         self.assertTemplateUsed(resp, 'analytics/es_down.html')
-
-    def test_zero_fill(self):
-        """If a day in a date range has no data, it should be zero filled."""
-        # Note that we request a date range that includes 3 days without data.
-        url = reverse('dashboard')
-        start = (date.today() - timedelta(days=9))
-        end = (date.today() - timedelta(days=3))
-
-        r = self.client.get(url, {
-            'date_start': start.strftime('%Y-%m-%d'),
-            'date_end': end.strftime('%Y-%m-%d'),
-        })
-        # The histogram data is of the form [d, v], where d is a number of
-        # milliseconds since the epoch, and v is the value at that time stamp.
-        dates = [d[0] for d in r.context['histogram'][0]['data']]
-        dates = [date.fromtimestamp(d // 1000) for d in dates]
-        days = [d.day for d in dates]
-
-        d = start
-        # FIXME: This seems like it should be <= end (including the
-        # end date), but what happens is that that includes an extra
-        # day. I suspect there's some funny business in regards to
-        # timezones and we're actually looking at a late time for the
-        # previous day for each day because of timezones and then that
-        # gets handled in flot after being converted to UTC or
-        # something like that.  The point being that "end" is actually
-        # not the end point we want to test against.
-        while d < end:
-            assert d.day in days, 'Day %s has no data.' % d.day
-            d += timedelta(days=1)
 
     def test_frontpage_es_down(self):
         """If can't connect to ES, show es_down template."""

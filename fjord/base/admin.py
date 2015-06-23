@@ -22,11 +22,9 @@ def timezone_view(request):
     # often or was viewable by users. If these two assumptions ever
     # change, then this should be rewritten.
 
-    from elasticutils.contrib.django import get_es
-
     from fjord.feedback.models import Response, ResponseMappingType
     from fjord.feedback.tests import ResponseFactory
-    from fjord.search.index import get_index
+    from fjord.search.index import get_es, get_index
 
     server_time = datetime.now()
 

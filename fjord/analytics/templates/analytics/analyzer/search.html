@@ -145,6 +145,12 @@
 
 {% block content_middle %}
   <div class="col full">
+    <div class="block graph secret">
+      {# A graph will be dynamically inserted in these divs by Flot. #}
+      <div class="histogram" data-histogram="{{ histogram|to_json }}"></div>
+      <div class="legend"></div>
+      <div class="note">{{ _('Note: All dates and times are in Pacific Time.') }}</div>
+    </div>
 
     <div class="block feedback">
       <h2>Feedback search: {{ opinion_count }} responses</h2>

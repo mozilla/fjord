@@ -14,11 +14,11 @@
 # Also, since it's just analyzers, everyone is expected to speak
 # English. Ergo, there's no localization here.
 
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from pprint import pformat
 import csv
 
-from elasticutils.contrib.django import F, es_required_or_50x
+from elasticsearch_dsl import F
 
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.core.urlresolvers import reverse_lazy
@@ -32,7 +32,7 @@ from fjord.analytics.forms import (
     ProductsUpdateForm,
     SurveyCreateForm
 )
-from fjord.analytics.utils import counts_to_options
+from fjord.analytics.utils import counts_to_options, zero_fill
 from fjord.base.helpers import locale_name
 from fjord.base.utils import (
     analyzer_required,
@@ -41,9 +41,10 @@ from fjord.base.utils import (
     smart_date
 )
 from fjord.feedback.helpers import country_name
-from fjord.feedback.models import Product, Response, ResponseMappingType
+from fjord.feedback.models import Product, Response, ResponseDocType
 from fjord.heartbeat.models import Answer, Survey
 from fjord.journal.models import Record
+from fjord.search.index import es_required_or_50x
 from fjord.search.utils import es_error_statsd
 
 
@@ -166,12 +167,12 @@ def _analytics_search_export(request, opinions_s):
     keys = Response.get_export_keys(confidential=True)
     total_opinions = opinions_s.count()
 
-    opinions_s = opinions_s.values_list('id')[:MAX_OPINIONS]
+    opinions_s = opinions_s.fields('id')[:MAX_OPINIONS].execute()
 
     # We convert what we get back from ES to what's in the db so we
     # can get all the information.
     opinions = Response.objects.filter(
-        id__in=[mem[0][0] for mem in opinions_s])
+        id__in=[mem['id'][0] for mem in opinions_s])
 
     writer = csv.writer(response)
 
@@ -209,13 +210,9 @@ def analytics_search(request):
     # Note: If we add additional querystring fields, we need to add
     # them to generate_dashboard_url.
     search_happy = request.GET.get('happy', None)
-    search_has_email = request.GET.get('has_email', None)
     search_platform = request.GET.get('platform', None)
     search_locale = request.GET.get('locale', None)
-    search_country = request.GET.get('country', None)
     search_product = request.GET.get('product', None)
-    search_domain = request.GET.get('domain', None)
-    search_api = smart_int(request.GET.get('api', None), fallback=None)
     search_version = request.GET.get('version', None)
     search_query = request.GET.get('q', None)
     search_date_start = smart_date(
@@ -223,27 +220,32 @@ def analytics_search(request):
     search_date_end = smart_date(
         request.GET.get('date_end', None), fallback=None)
     search_bigram = request.GET.get('bigram', None)
+    selected = request.GET.get('selected', None)
+
+    search_has_email = request.GET.get('has_email', None)
+    search_country = request.GET.get('country', None)
+    search_domain = request.GET.get('domain', None)
+    search_api = smart_int(request.GET.get('api', None), fallback=None)
     search_source = request.GET.get('source', None)
     search_campaign = request.GET.get('campaign', None)
     search_organic = request.GET.get('organic', None)
-    selected = request.GET.get('selected', None)
 
     filter_data = []
     current_search = {'page': page}
 
-    search = ResponseMappingType.search()
+    search = ResponseDocType.docs.search()
     f = F()
     # If search happy is '0' or '1', set it to False or True, respectively.
     search_happy = {'0': False, '1': True}.get(search_happy, None)
     if search_happy in [False, True]:
-        f &= F(happy=search_happy)
+        f &= F('term', happy=search_happy)
         current_search['happy'] = int(search_happy)
 
     # If search has_email is '0' or '1', set it to False or True,
     # respectively.
     search_has_email = {'0': False, '1': True}.get(search_has_email, None)
     if search_has_email in [False, True]:
-        f &= F(has_email=search_has_email)
+        f &= F('term', has_email=search_has_email)
         current_search['has_email'] = int(search_has_email)
 
     def unknown_to_empty(text):
@@ -251,57 +253,59 @@ def analytics_search(request):
         return u'' if text.lower() == u'unknown' else text
 
     if search_platform is not None:
-        f &= F(platform=unknown_to_empty(search_platform))
+        f &= F('term', platform=unknown_to_empty(search_platform))
         current_search['platform'] = search_platform
     if search_locale is not None:
-        f &= F(locale=unknown_to_empty(search_locale))
+        f &= F('term', locale=unknown_to_empty(search_locale))
         current_search['locale'] = search_locale
     if search_product is not None:
-        f &= F(product=unknown_to_empty(search_product))
+        f &= F('term', product=unknown_to_empty(search_product))
         current_search['product'] = search_product
 
         # Only show the version if there's a product.
         if search_version is not None:
             # Note: We only filter on version if we're filtering on
             # product.
-            f &= F(version=unknown_to_empty(search_version))
+            f &= F('term', version=unknown_to_empty(search_version))
             current_search['version'] = search_version
 
         # Only show the country if the product is Firefox OS.
         if search_country is not None and search_product == 'Firefox OS':
-            f &= F(country=unknown_to_empty(search_country))
+            f &= F('term', country=unknown_to_empty(search_country))
             current_search['country'] = search_country
     if search_domain is not None:
-        f &= F(url_domain=unknown_to_empty(search_domain))
+        f &= F('term', url_domain=unknown_to_empty(search_domain))
         current_search['domain'] = search_domain
     if search_api is not None:
-        f &= F(api=search_api)
+        f &= F('term', api=search_api)
         current_search['api'] = search_api
 
     if search_date_start is None and search_date_end is None:
         selected = '7d'
 
     if search_date_end is None:
-        search_date_end = datetime.now()
+        search_date_end = date.today()
     if search_date_start is None:
         search_date_start = search_date_end - timedelta(days=7)
 
+    # If the start and end dates are inverted, switch them into proper
+    # chronological order
+    search_date_start, search_date_end = sorted(
+        [search_date_start, search_date_end])
+
     current_search['date_end'] = search_date_end.strftime('%Y-%m-%d')
-    # Add one day, so that the search range includes the entire day.
-    end = search_date_end + timedelta(days=1)
-    # Note 'less than', not 'less than or equal', because of the added
-    # day above.
-    f &= F(created__lt=end)
+    f &= F('range', created={'lte': search_date_end})
 
     current_search['date_start'] = search_date_start.strftime('%Y-%m-%d')
-    f &= F(created__gte=search_date_start)
+    f &= F('range', created={'gte': search_date_start})
 
     if search_query:
         current_search['q'] = search_query
-        search = search.query(description__sqs=search_query)
+        search = search.query('simple_query_string', query=search_query,
+                              fields=['description'])
 
     if search_bigram is not None:
-        f &= F(description_bigrams=search_bigram)
+        f &= F('terms', description_bigrams=search_bigram)
         filter_data.append({
             'display': 'Bigram',
             'name': 'bigram',
@@ -315,22 +319,24 @@ def analytics_search(request):
         })
 
     if search_source is not None:
-        f &= F(source=search_source)
+        f &= F('term', source=search_source)
         current_search['source'] = search_source
     if search_campaign is not None:
-        f &= F(campaign=search_campaign)
+        f &= F('term', campaign=search_campaign)
         current_search['campaign'] = search_campaign
     search_organic = {'0': False, '1': True}.get(search_organic, None)
     if search_organic in [False, True]:
-        f &= F(organic=search_organic)
+        f &= F('term', organic=search_organic)
         current_search['organic'] = int(search_organic)
 
-    search = search.filter(f).order_by('-created')
+    search = search.filter(f).sort('-created')
 
     # If they're asking for a CSV export, then send them to the export
     # screen.
     if output_format == 'csv':
         return _analytics_search_export(request, search)
+
+    original_search = search._clone()
 
     # Search results and pagination
     if page < 1:
@@ -340,19 +346,14 @@ def analytics_search(request):
     end = start + page_count
 
     search_count = search.count()
-    search_results = search.values_list('id')[start:end]
-    opinion_page_ids = [mem[0][0] for mem in search_results]
+    search_results = search.fields('id')[start:end].execute()
+    opinion_page_ids = [mem['id'][0] for mem in search_results]
 
     # We convert what we get back from ES to what's in the db so we
     # can get all the information.
     opinion_page = Response.objects.filter(id__in=opinion_page_ids)
 
-    # Navigation facet data
-
-    # This loop does two things. First it maps 'T' -> True and 'F' ->
-    # False.  This is probably something EU should be doing for
-    # us. Second, it restructures the data into a more convenient
-    # form.
+    # Add navigation aggregations
     counts = {
         'happy': {},
         'has_email': {},
@@ -367,19 +368,22 @@ def analytics_search(request):
         'campaign': {},
         'organic': {},
     }
-    facets = search.facet(*(counts.keys()),
-                          size=1000,
-                          filtered=bool(search._process_filters(f.filters)))
 
-    for param, terms in facets.facet_counts().items():
-        for term in terms:
-            name = term['term']
-            if name == 'T':
-                name = True
-            elif name == 'F':
-                name = False
+    for name in counts.keys():
+        search.aggs.bucket(name, 'terms', field=name, size=1000)
 
-            counts[param][name] = term['count']
+    results = search.execute()
+
+    # Extract the value and doc_count for the various facets we do
+    # faceted navigation on.
+    for name in counts.keys():
+        buckets = getattr(results.aggregations, name)['buckets']
+        for bucket in buckets:
+            key = bucket['key']
+            # Convert from 'T'/'F' to True/False
+            if key in ['T', 'F']:
+                key = (key == 'T')
+            counts[name][key] = bucket['doc_count']
 
     def empty_to_unknown(text):
         return 'Unknown' if text == u'' else text
@@ -476,10 +480,44 @@ def analytics_search(request):
         ]
     )
 
+    # Histogram data
+    happy_data = []
+    sad_data = []
+
+    (original_search.aggs
+     .bucket('histogram', 'date_histogram', field='created', interval='day')
+     .bucket('per_sentiment', 'terms', field='happy')
+    )
+
+    results = original_search.execute()
+    buckets = results.aggregations['histogram']['buckets']
+
+    happy_data = {}
+    sad_data = {}
+    for bucket in buckets:
+        # value -> count
+        val_counts = dict(
+            (item['key'], item['doc_count'])
+            for item in bucket['per_sentiment']['buckets']
+        )
+        # key is ms since epoch here which is what the frontend wants, so
+        # we can just leave it.
+        happy_data[bucket['key']] = val_counts.get('T', 0)
+        sad_data[bucket['key']] = val_counts.get('F', 0)
+
+    zero_fill(search_date_start, search_date_end, [happy_data, sad_data])
+    histogram = [
+        {'label': 'Happy', 'name': 'happy',
+         'data': sorted(happy_data.items())},
+        {'label': 'Sad', 'name': 'sad',
+         'data': sorted(sad_data.items())},
+    ]
+
     return render(request, template, {
         'opinions': opinion_page,
         'opinion_count': search_count,
         'filter_data': filter_data,
+        'histogram': histogram,
         'page': page,
         'prev_page': page - 1 if start > 0 else None,
         'next_page': page + 1 if end < search_count else None,
