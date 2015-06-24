@@ -14,8 +14,7 @@
 # Also, since it's just analyzers, everyone is expected to speak
 # English. Ergo, there's no localization here.
 
-from collections import defaultdict
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 from pprint import pformat
 import csv
 
@@ -30,20 +29,16 @@ from django.views.generic.edit import FormView, CreateView, UpdateView
 from django.utils.decorators import method_decorator
 
 from fjord.analytics.forms import (
-    OccurrencesComparisonForm,
     ProductsUpdateForm,
     SurveyCreateForm
 )
-from fjord.analytics.utils import (
-    counts_to_options,
-    zero_fill)
+from fjord.analytics.utils import counts_to_options
 from fjord.base.helpers import locale_name
 from fjord.base.utils import (
     analyzer_required,
     check_new_user,
     smart_int,
-    smart_date,
-    smart_str
+    smart_date
 )
 from fjord.feedback.helpers import country_name
 from fjord.feedback.models import Product, Response, ResponseMappingType
@@ -118,7 +113,6 @@ def hb_data(request, answerid=None):
     })
 
 
-
 @check_new_user
 @analyzer_required
 def hb_errorlog(request, errorid=None):
@@ -153,202 +147,6 @@ def analytics_dashboard(request):
     """Main page for analytics related things"""
     template = 'analytics/analyzer/dashboard.html'
     return render(request, template)
-
-
-@check_new_user
-@analyzer_required
-@es_required_or_50x(error_template='analytics/es_down.html')
-@es_error_statsd
-def analytics_occurrences(request):
-    template = 'analytics/analyzer/occurrences.html'
-
-    first_facet_bi = None
-    first_params = {}
-    first_facet_total = 0
-
-    second_facet_bi = None
-    second_params = {}
-    second_facet_total = 0
-
-    if 'product' in request.GET:
-        form = OccurrencesComparisonForm(request.GET)
-        if form.is_valid():
-            cleaned = form.cleaned_data
-
-            # First item
-            first_resp_s = (ResponseMappingType.search()
-                            .filter(product=cleaned['product'])
-                            .filter(locale__startswith='en'))
-
-            first_params['product'] = cleaned['product']
-
-            if cleaned['first_version']:
-                first_resp_s = first_resp_s.filter(
-                    version=cleaned['first_version'])
-                first_params['version'] = cleaned['first_version']
-            if cleaned['first_start_date']:
-                first_resp_s = first_resp_s.filter(
-                    created__gte=cleaned['first_start_date'])
-                first_params['date_start'] = cleaned['first_start_date']
-            if cleaned['first_end_date']:
-                first_resp_s = first_resp_s.filter(
-                    created__lte=cleaned['first_end_date'])
-                first_params['date_end'] = cleaned['first_end_date']
-            if cleaned['first_search_term']:
-                first_resp_s = first_resp_s.query(
-                    description__match=cleaned['first_search_term'])
-                first_params['q'] = cleaned['first_search_term']
-
-            if ('date_start' not in first_params
-                    and 'date_end' not in first_params):
-
-                # FIXME - If there's no start date, then we want
-                # "everything" so we use a hard-coded 2013-01-01 date
-                # here to hack that.
-                #
-                # Better way might be to change the dashboard to allow
-                # for an "infinite" range, but there's no other use
-                # case for that and the ranges are done in the ui--not
-                # in the backend.
-                first_params['date_start'] = '2013-01-01'
-
-            first_resp_s = first_resp_s.facet('description_bigrams',
-                                              size=30, filtered=True)
-            first_resp_s = first_resp_s[0:0]
-
-            first_facet_total = first_resp_s.count()
-            first_facet = first_resp_s.facet_counts()
-
-            first_facet_bi = first_facet['description_bigrams']
-            first_facet_bi = sorted(
-                first_facet_bi, key=lambda item: -item['count'])
-
-            if (cleaned['second_version']
-                    or cleaned['second_search_term']
-                    or cleaned['second_start_date']):
-
-                second_resp_s = (ResponseMappingType.search()
-                                 .filter(product=cleaned['product'])
-                                 .filter(locale__startswith='en'))
-
-                second_params['product'] = cleaned['product']
-
-                if cleaned['second_version']:
-                    second_resp_s = second_resp_s.filter(
-                        version=cleaned['second_version'])
-                    second_params['version'] = cleaned['second_version']
-                if cleaned['second_start_date']:
-                    second_resp_s = second_resp_s.filter(
-                        created__gte=cleaned['second_start_date'])
-                    second_params['date_start'] = cleaned['second_start_date']
-                if cleaned['second_end_date']:
-                    second_resp_s = second_resp_s.filter(
-                        created__lte=cleaned['second_end_date'])
-                    second_params['date_end'] = cleaned['second_end_date']
-                if form.cleaned_data['second_search_term']:
-                    second_resp_s = second_resp_s.query(
-                        description__match=cleaned['second_search_term'])
-                    second_params['q'] = cleaned['second_search_term']
-
-                if ('date_start' not in second_params
-                        and 'date_end' not in second_params):
-
-                    # FIXME - If there's no start date, then we want
-                    # "everything" so we use a hard-coded 2013-01-01 date
-                    # here to hack that.
-                    #
-                    # Better way might be to change the dashboard to allow
-                    # for an "infinite" range, but there's no other use
-                    # case for that and the ranges are done in the ui--not
-                    # in the backend.
-                    second_params['date_start'] = '2013-01-01'
-
-                # Have to do raw because we want a size > 10.
-                second_resp_s = second_resp_s.facet('description_bigrams',
-                                                    size=30, filtered=True)
-                second_resp_s = second_resp_s[0:0]
-
-                second_facet_total = second_resp_s.count()
-                second_facet = second_resp_s.facet_counts()
-
-                second_facet_bi = second_facet['description_bigrams']
-                second_facet_bi = sorted(
-                    second_facet_bi, key=lambda item: -item['count'])
-
-        permalink = request.build_absolute_uri()
-
-    else:
-        permalink = ''
-        form = OccurrencesComparisonForm()
-
-    # FIXME - We have responses that have no product set. This ignores
-    # those. That's probably the right thing to do for the Occurrences Report
-    # but maybe not.
-    products = [prod for prod in ResponseMappingType.get_products() if prod]
-
-    return render(request, template, {
-        'permalink': permalink,
-        'form': form,
-        'products': products,
-        'first_facet_bi': first_facet_bi,
-        'first_params': first_params,
-        'first_facet_total': first_facet_total,
-        'first_normalization': round(first_facet_total * 1.0 / 1000, 3),
-        'second_facet_bi': second_facet_bi,
-        'second_params': second_params,
-        'second_facet_total': second_facet_total,
-        'second_normalization': round(second_facet_total * 1.0 / 1000, 3),
-        'render_time': datetime.now(),
-    })
-
-
-@check_new_user
-@analyzer_required
-@es_required_or_50x(error_template='analytics/es_down.html')
-@es_error_statsd
-def analytics_duplicates(request):
-    """Shows all duplicate descriptions over the last n days"""
-    template = 'analytics/analyzer/duplicates.html'
-
-    n = 14
-
-    responses = (ResponseMappingType.search()
-                 .filter(created__gte=datetime.now() - timedelta(days=n))
-                 .values_dict('description', 'happy', 'created', 'locale',
-                              'user_agent', 'id')
-                 .order_by('created').everything())
-
-    responses = ResponseMappingType.reshape(responses)
-
-    total_count = len(responses)
-
-    response_dupes = {}
-    for resp in responses:
-        response_dupes.setdefault(resp['description'], []).append(resp)
-
-    response_dupes = [
-        (key, val) for key, val in response_dupes.items()
-        if len(val) > 1
-    ]
-
-    # convert the dict into a list of tuples sorted by the number of
-    # responses per tuple largest number first
-    response_dupes = sorted(response_dupes, key=lambda item: len(item[1]) * -1)
-
-    # duplicate_count -> count
-    # i.e. "how many responses had 2 duplicates?"
-    summary_counts = defaultdict(int)
-    for desc, responses in response_dupes:
-        summary_counts[len(responses)] = summary_counts[len(responses)] + 1
-    summary_counts = sorted(summary_counts.items(), key=lambda item: item[0])
-
-    return render(request, template, {
-        'n': 14,
-        'response_dupes': response_dupes,
-        'render_time': datetime.now(),
-        'summary_counts': summary_counts,
-        'total_count': total_count,
-    })
 
 
 def _analytics_search_export(request, opinions_s):
@@ -690,57 +488,6 @@ def analytics_search(request):
     })
 
 
-@check_new_user
-@analyzer_required
-@es_required_or_50x(error_template='analytics/es_down.html')
-@es_error_statsd
-def analytics_hourly_histogram(request):
-    """Shows an hourly histogram for the last 5 days of all responses"""
-    template = 'analytics/analyzer/hourly_histogram.html'
-
-    date_end = smart_date(
-        request.GET.get('date_end', None), fallback=None)
-
-    if date_end is None:
-        date_end = date.today()
-
-    date_start = date_end - timedelta(days=5)
-
-    search = ResponseMappingType.search()
-    filters = F(created__gte=date_start, created__lte=date_end)
-    search.filter(filters)
-
-    hourly_histogram = search.facet_raw(
-        hourly={
-            'date_histogram': {'interval': 'hour', 'field': 'created'},
-            'facet_filter': search._process_filters(filters.filters)
-        }).facet_counts()
-
-    hourly_data = dict((p['time'], p['count'])
-                       for p in hourly_histogram['hourly'])
-
-    hour = 60 * 60 * 1000.0
-    zero_fill(date_start, date_end, [hourly_data], spacing=hour)
-
-    # FIXME: This is goofy. After zero_fill, we end up with a bunch of
-    # trailing zeros for reasons I don't really understand, so instead
-    # of fixing that, I'm just going to remove them here.
-    hourly_data = sorted(hourly_data.items())
-    while hourly_data and hourly_data[-1][1] == 0:
-        hourly_data.pop(-1)
-
-    histogram = [
-        {'label': 'Hourly', 'name': 'hourly',
-         'data': hourly_data},
-    ]
-
-    return render(request, template, {
-        'histogram': histogram,
-        'start_date': date_start,
-        'end_date': date_end
-    })
-
-
 class ProductsUpdateView(FormView):
     """An administrator view for showing, adding, and updating the products."""
     template_name = 'analytics/analyzer/addproducts.html'
@@ -779,11 +526,14 @@ class ProductsUpdateView(FormView):
             instance.on_dashboard = form.data.get('on_dashboard') or False
             instance.on_picker = form.data.get('on_picker') or False
             instance.browser = form.data.get('browser') or u''
-            instance.browser_data_browser = form.data.get('browser_data_browser') or u''
+            instance.browser_data_browser = (
+                form.data.get('browser_data_browser') or u''
+            )
             self.object = instance.save()
         except Product.DoesNotExist:
             self.object = form.save()
         return super(ProductsUpdateView, self).form_valid(form)
+
 
 class SurveyCreateView(CreateView):
     model = Survey
