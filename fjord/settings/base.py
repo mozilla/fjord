@@ -9,13 +9,8 @@ from django.utils.functional import lazy
 
 from fjord.settings_utils import config
 
-
-ROOT = os.path.abspath(
-    os.path.join(
-        os.path.dirname(__file__),
-        '..',
-        '..'
-    ))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(BASE_DIR)
 
 
 def path(*dirs):
@@ -29,7 +24,6 @@ PROJECT_MODULE = 'fjord'
 ROOT_URLCONF = '%s.urls' % PROJECT_MODULE
 
 ADMINS = ()
-MANAGERS = ADMINS
 DEV = False
 
 DATABASES = {'default': config('DATABASE_URL', type_='database_url')}
@@ -39,9 +33,6 @@ SLAVE_DATABASES = []
 DATABASE_ROUTERS = ('multidb.PinningMasterSlaveRouter',)
 
 CACHES = {'default': config('CACHE_URL', type_='cache_url')}
-
-# Site ID is used by Django's Sites framework.
-SITE_ID = 1
 
 ## Internationalization.
 
