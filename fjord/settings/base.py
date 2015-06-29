@@ -34,6 +34,10 @@ DATABASE_ROUTERS = ('multidb.PinningMasterSlaveRouter',)
 
 CACHES = {'default': config('CACHE_URL', type_='cache_url')}
 
+# Need this because the settings file on -stage and -prod specify
+# MANAGERS so it fails the check.
+TEST_RUNNER = 'fake.test.runner'
+
 ## Internationalization.
 
 # Local time zone for this installation. Choices can be found here:
