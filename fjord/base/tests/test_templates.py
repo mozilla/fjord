@@ -1,6 +1,6 @@
 from fjord.base.middleware import MOBILE_COOKIE
 
-from fjord.base.tests import eq_, LocalizingClient
+from fjord.base.tests import eq_, LocalizingClient, reverse
 from fjord.search.tests import ElasticTestCase
 
 
@@ -31,3 +31,17 @@ class MobileQueryStringOverrideTest(ElasticTestCase):
         })
         assert MOBILE_COOKIE in resp.cookies
         eq_(resp.cookies[MOBILE_COOKIE].value, 'no')
+
+
+class GettextStringTest(ElasticTestCase):
+    client_class = LocalizingClient
+
+    def test_gettext_in_templates(self):
+        """Verify that _() returns a safe string in templates."""
+        url = reverse('dashboard')
+        r = self.client.get(url)
+        eq_(200, r.status_code)
+
+        # The & shouldn't get escaped to &amp;
+        assert '&amp;raquo;' not in r.content
+        assert '&raquo;' in r.content
