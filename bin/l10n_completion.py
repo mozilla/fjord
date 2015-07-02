@@ -67,7 +67,7 @@ def get_completion_data_for_file(fn):
         return 1
 
     for poentry in pofile:
-        if poentry.obsolete or 'fuzzy' in poentry.flags:
+        if poentry.obsolete:
             continue
 
         for occ in poentry.occurrences:
