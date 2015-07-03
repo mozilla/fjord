@@ -31,7 +31,7 @@ def update_code(ctx, tag):
 def update_product_details(ctx):
     """Update mozilla product details"""
     with ctx.lcd(settings.SRC_DIR):
-        ctx.local(PYTHON + " manage.py update_product_details -f")
+        ctx.local(PYTHON + ' manage.py update_product_details -f')
 
 
 @task
@@ -64,15 +64,15 @@ def update_locales(ctx):
 @task
 def update_assets(ctx):
     with ctx.lcd(settings.SRC_DIR):
-        ctx.local(PYTHON + " manage.py collectstatic --noinput")
-        ctx.local(PYTHON + " manage.py compress_assets")
+        ctx.local(PYTHON + ' manage.py collectstatic --noinput')
+        ctx.local(PYTHON + ' manage.py compress_assets')
 
 
 @task
 def update_db(ctx):
     """Update the database schema, if necessary."""
     with ctx.lcd(settings.SRC_DIR):
-        ctx.local(PYTHON + " manage.py migrate --noinput")
+        ctx.local(PYTHON + ' manage.py migrate --noinput')
 
 
 @task
@@ -80,12 +80,12 @@ def update_cron(ctx):
     with ctx.lcd(settings.SRC_DIR):
         if getattr(settings, 'PYTHON_PATH', None) is not None:
             # FIXME: Temporary until all servers have PYTHON_PATH.
-            ctx.local(PYTHON + " ./bin/crontab/gen-crons.py -p %s -w %s -s %s -u apache > /etc/cron.d/.%s" %
+            ctx.local(PYTHON + ' ./bin/crontab/gen-crons.py -p %s -w %s -s %s -u apache > /etc/cron.d/.%s' %
                       (settings.PYTHON_PATH, settings.WWW_DIR, settings.SRC_DIR, settings.CRON_NAME))
         else:
-            ctx.local(PYTHON + " ./bin/crontab/gen-crons.py -w %s -s %s -u apache > /etc/cron.d/.%s" %
+            ctx.local(PYTHON + ' ./bin/crontab/gen-crons.py -w %s -s %s -u apache > /etc/cron.d/.%s' %
                       (settings.WWW_DIR, settings.SRC_DIR, settings.CRON_NAME))
-        ctx.local("mv /etc/cron.d/.%s /etc/cron.d/%s" % (settings.CRON_NAME, settings.CRON_NAME))
+        ctx.local('mv /etc/cron.d/.%s /etc/cron.d/%s' % (settings.CRON_NAME, settings.CRON_NAME))
 
 
 @task
@@ -117,7 +117,7 @@ def update_info(ctx):
         ctx.local('git log -3')
         ctx.local('git status')
         ctx.local('git submodule status')
-        ctx.local(PYTHON + " manage.py migrate --list")
+        ctx.local(PYTHON + ' manage.py migrate --list')
         with ctx.lcd('locale'):
             ctx.local('svn info')
             ctx.local('svn status')
@@ -126,9 +126,17 @@ def update_info(ctx):
 
 
 @task
+def setup_dependencies(ctx):
+    with ctx.lcd(settings.SRC_DIR):
+        # Test npm version
+        ctx.local('npm -v')
+
+
+@task
 def pre_update(ctx, ref=settings.UPDATE_REF):
     """Update code to pick up changes to this file."""
     update_code(ref)
+    setup_dependencies()
     update_info()
 
 
