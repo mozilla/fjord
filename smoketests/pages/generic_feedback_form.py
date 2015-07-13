@@ -47,7 +47,7 @@ class GenericFeedbackFormPage(FeedbackPage):
 
         # Get the first ask and make sure it has the product name in
         # it
-        first_ask = self.selenium.find_element(By.CSS_SELECTOR, 'div.ask:first-child').text
+        first_ask = self.selenium.find_element(By.CSS_SELECTOR, 'div.ask-large').text
         return product_name in first_ask
 
     def go_to_picker_page(self):
