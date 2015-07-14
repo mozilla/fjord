@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.db import models
 
 from rest_framework import serializers
@@ -93,6 +92,8 @@ class Answer(ModelBase):
     channel = models.CharField(max_length=50, blank=True, default=u'')
     version = models.CharField(max_length=50, blank=True, default=u'')
     locale = models.CharField(max_length=50, blank=True, default=u'')
+    country = models.CharField(max_length=4, blank=True, null=True,
+                               default=u'')
     build_id = models.CharField(max_length=50, blank=True, default=u'')
     partner_id = models.CharField(max_length=50, blank=True, default=u'')
 
