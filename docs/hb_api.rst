@@ -117,6 +117,9 @@ Optional fields
 |locale         |string   |Max length: 50; Default: ``""``; The locale that the    |
 |               |         |user's browser's interface is in.                       |
 +---------------+---------+--------------------------------------------------------+
+|country        |string   |Max length: 4; Default: ``""``; The country that the    |
+|               |         |user is in.                                             |
++---------------+---------+--------------------------------------------------------+
 |build_id       |string   |Max length: 50; Default: ``""``                         |
 +---------------+---------+--------------------------------------------------------+
 |partner_id     |string   |Max length: 50; Default: ``""``                         |
@@ -307,6 +310,7 @@ Began:
         "channel": "",
         "version": "",
         "locale": "",
+        "country": "",
         "build_id": "",
         "partner_id": "",
         "profile_age": null,
@@ -343,6 +347,7 @@ Voted, but not engaged, yet::
         "channel": "stable",
         "version": "33.1",
         "locale": "en-US",
+        "locale": "US",
         "build_id": "e3b0971e-6ecf-11e4-af44-843a4bc832e4",
         "partner_id": "Phil, Prince of Heck",
         "profile_age": 365,
