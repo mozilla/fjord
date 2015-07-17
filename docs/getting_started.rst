@@ -35,6 +35,12 @@ Getting the requirements
 3. Download and install Vagrant if you don't have it already:
    http://www.vagrantup.com/
 
+   .. Note::
+
+      You might have to close your terminal and start a new one to
+      pick up changes to PATH or other things in the environment after
+      installing these so that they're available.
+
 
 Download Fjord
 ==============
@@ -52,24 +58,36 @@ Fjord repository this way::
 This creates a directory called ``fjord/``. We'll call that the "Fjord
 repository top-level directory".
 
+
 Building a vm and booting it
 ============================
 
 This will build a VirtualBox vm using Vagrant. The vm will have Ubuntu
-Linux 14.04 installed in it. Fjord works in this environment.
+Linux Trusty 14.04 installed in it. Fjord works in this environment.
 
-Run this commands in the Fjord repository top-level directory::
+.. Note::
+
+   Setting up Fjord in Vagrant takes at least 15 minutes and possibly
+   more depending on your network connection.
+
+   Plan to kick off a command and then go do something else for a
+   while.
+
+
+Run this command in the Fjord repository top-level directory::
 
     vagrant up
 
 
 It takes a while the first time you do this since it has to create the
-virtual machine and provision it. First it downloads an Ubuntu Linux
-14.04 image (~300mb), then it installs some software in this image
-like MySQL and Elasticsearch. Then it sets things up so that Fjord
-runs in this VM using the files on your machine. This allows you to
-use whatever editor you like on your machine to edit code that runs in
-the VM without having to copy files around.
+virtual machine and provision it.
+
+First it downloads an Ubuntu Linux 14.04 image (~300mb), then it
+installs some software in this image like MySQL and
+Elasticsearch. Then it sets things up so that Fjord runs in this VM
+using the files on your machine. This allows you to use whatever
+editor you like on your machine to edit code that runs in the VM
+without having to copy files around.
 
 
 Setting up Fjord
