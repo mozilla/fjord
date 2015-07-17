@@ -67,13 +67,13 @@ cd ~/fjord
 pre-commit install -f
 EOF
 
-# Install Elasticsearch 0.90.10
-curl http://packages.elasticsearch.org/GPG-KEY-elasticsearch | apt-key add -
-echo "deb http://packages.elasticsearch.org/elasticsearch/0.90/debian stable main" \
+# Install Elasticsearch 1.2.4
+curl https://packages.elastic.co/GPG-KEY-elasticsearch | apt-key add -
+echo "deb https://packages.elastic.co/elasticsearch/1.2/debian stable main" \
     > /etc/apt/sources.list.d/elasticsearch.list
 apt-get update
 apt-get install -y -q openjdk-7-jre-headless
-apt-get install elasticsearch=0.90.10
+apt-get install elasticsearch=1.2.4
 update-rc.d elasticsearch defaults 95 10
 cp ~vagrant/fjord/vagrant/elasticsearch/elasticsearch.yml /etc/elasticsearch/.
 service elasticsearch restart
