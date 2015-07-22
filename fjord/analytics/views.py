@@ -14,14 +14,10 @@ from django.shortcuts import get_object_or_404, render
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
-from elasticsearch import ElasticsearchException
-from elasticutils.contrib.django import F, es_required_or_50x
+from elasticsearch_dsl import F
 from mobility.decorators import mobile_template
 
-from fjord.analytics.utils import (
-    counts_to_options,
-    zero_fill
-)
+from fjord.analytics.utils import counts_to_options
 from fjord.base.helpers import locale_name
 from fjord.base.urlresolvers import reverse
 from fjord.base.utils import (
@@ -32,8 +28,9 @@ from fjord.base.utils import (
     Atom1FeedWithRelatedLinks,
     JSONDatetimeEncoder
 )
-from fjord.feedback.models import Product, Response, ResponseMappingType
+from fjord.feedback.models import Product, Response, ResponseDocType
 from fjord.journal.models import Record
+from fjord.search.index import es_required_or_50x
 from fjord.search.utils import es_error_statsd
 from fjord.translations.models import GengoJob, get_translation_systems
 from fjord.translations.tasks import create_translation_tasks
@@ -72,12 +69,7 @@ def response_view(request, responseid, template):
     if (request.user.is_authenticated()
             and request.user.has_perm('analytics.can_view_dashboard')):
 
-        try:
-            # Convert it to a list to force it to execute right now.
-            mlt = ResponseMappingType.reshape(
-                ResponseMappingType.morelikethis(response))
-        except ElasticsearchException as exc:
-            errors.append('Failed to do morelikethis: %s' % exc)
+        mlt = ResponseDocType.from_obj(response).mlt().execute()
 
         records = [
             (u'Response records', Record.objects.records(response)),
@@ -104,7 +96,7 @@ def response_view(request, responseid, template):
 def generate_json_feed(request, search):
     """Generates JSON feed for first 100 results"""
     search_query = request.GET.get('q', None)
-    responses = search.values_dict()[:100]
+    responses = [resp.to_dict() for resp in search[:100]]
     json_data = {
         'total': len(responses),
         'results': list(responses),
@@ -207,12 +199,12 @@ def dashboard(request):
     filter_data = []
     current_search = {'page': page}
 
-    search = ResponseMappingType.search()
+    search = ResponseDocType.docs.search()
     f = F()
     # If search happy is '0' or '1', set it to False or True, respectively.
     search_happy = {'0': False, '1': True}.get(search_happy, None)
     if search_happy in [False, True]:
-        f &= F(happy=search_happy)
+        f &= F('term', happy=search_happy)
         current_search['happy'] = int(search_happy)
 
     def unknown_to_empty(text):
@@ -220,10 +212,10 @@ def dashboard(request):
         return u'' if text.lower() == u'unknown' else text
 
     if search_platform is not None:
-        f &= F(platform=unknown_to_empty(search_platform))
+        f &= F('term', platform=unknown_to_empty(search_platform))
         current_search['platform'] = search_platform
     if search_locale is not None:
-        f &= F(locale=unknown_to_empty(search_locale))
+        f &= F('term', locale=unknown_to_empty(search_locale))
         current_search['locale'] = search_locale
 
     visible_products = [
@@ -235,16 +227,16 @@ def dashboard(request):
     visible_products.append('')
 
     if search_product in visible_products:
-        f &= F(product=unknown_to_empty(search_product))
+        f &= F('term', product=unknown_to_empty(search_product))
         current_search['product'] = search_product
 
         if search_version is not None:
             # Note: We only filter on version if we're filtering on
             # product.
-            f &= F(version=unknown_to_empty(search_version))
+            f &= F('term', version=unknown_to_empty(search_version))
             current_search['version'] = search_version
     else:
-        f &= F(product__in=visible_products)
+        f &= F('terms', product=visible_products)
 
     if search_date_start is None and search_date_end is None:
         selected = '7d'
@@ -266,17 +258,18 @@ def dashboard(request):
     search_date_end = max(search_date_start, search_date_end)
 
     current_search['date_end'] = search_date_end.strftime('%Y-%m-%d')
-    f &= F(created__lte=search_date_end)
+    f &= F('range', created={'lte': search_date_end})
 
     current_search['date_start'] = search_date_start.strftime('%Y-%m-%d')
-    f &= F(created__gte=search_date_start)
+    f &= F('range', created={'gte': search_date_start})
 
     if search_query:
         current_search['q'] = search_query
-        search = search.query(description__sqs=search_query)
+        search = search.query('simple_query_string', query=search_query,
+                              fields=['description'])
 
     if search_bigram is not None:
-        f &= F(description_bigrams=search_bigram)
+        f &= F('terms', description_bigrams=search_bigram)
         filter_data.append({
             'display': _('Bigram'),
             'name': 'bigram',
@@ -289,14 +282,14 @@ def dashboard(request):
             }]
         })
 
-    search = search.filter(f).order_by('-created')
+    search = search.filter(f).sort('-created')
 
     # If the user asked for a feed, give him/her a feed!
     if output_format == 'atom':
-        return generate_atom_feed(request, search)
+        return generate_atom_feed(request, list(search.execute()))
 
     elif output_format == 'json':
-        return generate_json_feed(request, search)
+        return generate_json_feed(request, list(search.execute()))
 
     # Search results and pagination
     if page < 1:
@@ -306,18 +299,9 @@ def dashboard(request):
     end = start + page_count
 
     search_count = search.count()
-    opinion_page = search[start:end]
+    opinion_page = search[start:end].execute()
 
-    # Navigation facet data
-    facets = search.facet(
-        'happy', 'platform', 'locale', 'product', 'version',
-        size=1000,
-        filtered=bool(search._process_filters(f.filters)))
-
-    # This loop does two things. First it maps 'T' -> True and 'F' ->
-    # False.  This is probably something EU should be doing for
-    # us. Second, it restructures the data into a more convenient
-    # form.
+    # Add navigation aggregations
     counts = {
         'happy': {},
         'platform': {},
@@ -326,6 +310,9 @@ def dashboard(request):
         'version': {}
     }
 
+    for name in counts.keys():
+        search.aggs.bucket(name, 'terms', field=name, size=1000)
+
     happy_sad_filter = request.GET.get('happy', None)
 
     if happy_sad_filter:
@@ -333,6 +320,8 @@ def dashboard(request):
             counts['happy'] = {True: 0}
         elif happy_sad_filter == '0':
             counts['happy'] = {False: 0}
+    else:
+        counts['happy'] = {True: 0, False: 0}
 
     if search_platform:
         counts['platform'] = {search_platform: 0}
@@ -346,15 +335,18 @@ def dashboard(request):
     if search_version:
         counts['version'] = {search_version: 0}
 
-    for param, terms in facets.facet_counts().items():
-        for term in terms:
-            name = term['term']
-            if name.upper() == 'T':
-                name = True
-            elif name.upper() == 'F':
-                name = False
+    results = search.execute()
 
-            counts[param][name] = term['count']
+    # Extract the value and doc_count for the various facets we do
+    # faceted navigation on.
+    for name in counts.keys():
+        buckets = getattr(results.aggregations, name)['buckets']
+        for bucket in buckets:
+            key = bucket['key']
+            # Convert from 'T'/'F' to True/False
+            if key in ['T', 'F']:
+                key = (key == 'T')
+            counts[name][key] = bucket['doc_count']
 
     def empty_to_unknown(text):
         return _('Unknown') if text == u'' else text
@@ -408,41 +400,10 @@ def dashboard(request):
         ]
     )
 
-    # Histogram data
-    happy_data = []
-    sad_data = []
-
-    happy_f = f & F(happy=True)
-    sad_f = f & F(happy=False)
-    histograms = search.facet_raw(
-        happy={
-            'date_histogram': {'interval': 'day', 'field': 'created'},
-            'facet_filter': search._process_filters(happy_f.filters)
-        },
-        sad={
-            'date_histogram': {'interval': 'day', 'field': 'created'},
-            'facet_filter': search._process_filters(sad_f.filters)
-        },
-    ).facet_counts()
-
-    # p['time'] is number of milliseconds since the epoch. Which is
-    # convenient, because that is what the front end wants.
-    happy_data = dict((p['time'], p['count']) for p in histograms['happy'])
-    sad_data = dict((p['time'], p['count']) for p in histograms['sad'])
-
-    zero_fill(search_date_start, search_date_end, [happy_data, sad_data])
-    histogram = [
-        {'label': _('Happy'), 'name': 'happy',
-         'data': sorted(happy_data.items())},
-        {'label': _('Sad'), 'name': 'sad',
-         'data': sorted(sad_data.items())},
-    ]
-
     return render(request, template, {
         'opinions': opinion_page,
         'opinion_count': search_count,
         'filter_data': filter_data,
-        'histogram': histogram,
         'page': page,
         'prev_page': page - 1 if start > 0 else None,
         'next_page': page + 1 if end < search_count else None,

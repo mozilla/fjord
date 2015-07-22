@@ -10,8 +10,14 @@ import requests
 from elasticsearch.exceptions import ConnectionError, NotFoundError
 
 from fjord.search.index import (
-    chunked, get_index, get_index_stats, get_indexes, get_indexable,
-    recreate_index, create_batch_id)
+    chunked,
+    get_index_name,
+    get_index_stats,
+    get_indexes,
+    get_indexable,
+    recreate_index,
+    create_batch_id
+)
 from fjord.search.models import Record
 from fjord.search.tasks import index_chunk_task
 from fjord.search.utils import to_class_path
@@ -30,7 +36,7 @@ def reset_records():
 
 def reindex():
     """Calculates and creates indexing chunks"""
-    index = get_index()
+    index = get_index_name()
 
     batch_id = create_batch_id()
 
@@ -124,7 +130,7 @@ def search_admin_view(request):
         'es_deets': es_deets,
         'mapping_type_stats': stats,
         'indexes': indexes,
-        'index': get_index(),
+        'index': get_index_name(),
         'error_messages': error_messages,
         'recent_records': recent_records,
         'outstanding_records': outstanding_records,

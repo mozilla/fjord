@@ -7,8 +7,8 @@ from fjord.feedback.models import (
     Response,
     ResponseEmail,
     ResponseContext,
+    ResponseDocType,
     ResponsePI,
-    ResponseMappingType,
     purge_data
 )
 from fjord.feedback.tests import (
@@ -309,9 +309,9 @@ class TestParseData(ElasticTestCase):
         eq_(ResponsePI.objects.count(), 10)
 
         # Make sure everything is in the index
-        resp_s = ResponseMappingType.search()
+        resp_s = ResponseDocType.docs.search()
         eq_(resp_s.count(), 30)
-        eq_(resp_s.filter(has_email=True).count(), 10)
+        eq_(resp_s.filter('term', has_email=True).count(), 10)
 
         # Now purge everything older than 5 days and make sure things
         # got removed that should have gotten removed. Also check if
@@ -344,6 +344,6 @@ class TestParseData(ElasticTestCase):
 
         # Everything should still be in the index, but the number of
         # things with has_email=True should go down
-        resp_s = ResponseMappingType.search()
+        resp_s = ResponseDocType.docs.search()
         eq_(resp_s.count(), 30)
-        eq_(resp_s.filter(has_email=True).count(), 5)
+        eq_(resp_s.filter('term', has_email=True).count(), 5)

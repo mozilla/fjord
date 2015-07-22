@@ -20,7 +20,7 @@ from mobility.decorators import mobile_template
 
 from fjord.base.models import Profile
 from fjord.base.urlresolvers import reverse
-from fjord.search.index import get_index, get_index_stats
+from fjord.search.index import get_index_name, get_index_stats
 
 
 log = logging.getLogger('i.services')
@@ -182,7 +182,7 @@ def monitor_view(request):
 
     except NotFoundError:
         es_results.append(
-            (ERROR, 'Index "%s" missing.' % get_index()))
+            (ERROR, 'Index "%s" missing.' % get_index_name()))
 
     except Exception as exc:
         es_results.append(
@@ -232,4 +232,4 @@ class IntentionalException(Exception):
 @csrf_exempt
 def throw_error(request):
     """Throw an error for testing purposes."""
-    raise IntentionalException("Error raised for testing purposes.")
+    raise IntentionalException('Error raised for testing purposes.')

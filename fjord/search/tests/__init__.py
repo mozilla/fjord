@@ -6,7 +6,12 @@ import factory
 from elasticsearch.exceptions import NotFoundError
 
 from fjord.base.tests import BaseTestCase
-from fjord.search.index import get_index, get_es
+from fjord.search.index import (
+    es_reindex_cmd,
+    get_index_name,
+    get_es,
+    recreate_index
+)
 from fjord.search.models import Record
 
 
@@ -35,27 +40,14 @@ class ElasticTestCase(BaseTestCase):
         self.teardown_indexes()
 
     def refresh(self, timesleep=0):
-        index = get_index()
-
-        # Any time we're doing a refresh, we're making sure that the
-        # index is ready to be queried.  Given that, it's almost
-        # always the case that we want to run all the generated tasks,
-        # then refresh.
-        # TODO: uncomment this when we have live indexing.
-        # generate_tasks()
-
-        get_es().indices.refresh(index)
+        get_es().indices.refresh()
         if timesleep > 0:
             time.sleep(timesleep)
 
     def setup_indexes(self, empty=False, wait=True):
         """(Re-)create ES indexes."""
-        from fjord.search.index import es_reindex_cmd
-
         if empty:
-            # Removes the index and creates a new one with nothing in
-            # it (by abusing the percent argument).
-            es_reindex_cmd(percent=0)
+            recreate_index()
         else:
             # Removes the index, creates a new one, and indexes
             # existing data into it.
@@ -66,9 +58,8 @@ class ElasticTestCase(BaseTestCase):
             get_es().cluster.health(wait_for_status='yellow')
 
     def teardown_indexes(self):
-        es = get_es()
         try:
-            es.indices.delete(get_index())
+            get_es().indices.delete(get_index_name())
         except NotFoundError:
             # If we get this error, it means the index didn't exist
             # so there's nothing to delete.

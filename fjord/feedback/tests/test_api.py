@@ -201,7 +201,7 @@ class PublicFeedbackAPITest(ElasticTestCase):
         json_data = json.loads(resp.content)
         eq_(json_data['count'], 1)
         eq_(sorted(json_data['results'][0].keys()),
-            sorted(models.ResponseMappingType.public_fields()))
+            sorted(models.ResponseDocType.public_fields()))
 
     def test_max(self):
         for i in range(10):
