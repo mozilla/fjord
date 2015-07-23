@@ -16,9 +16,9 @@ class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--percent', type='int', dest='percent', default=100,
                     help='Reindex a percentage of things'),
-        make_option('--mappingtypes', type='string', dest='mappingtypes',
+        make_option('--doctypes', type='string', dest='doctypes',
                     default=None,
-                    help='Comma-separated list of mapping types to index'),
+                    help='Comma-separated list of doc types to index'),
         )
 
     def handle(self, *args, **options):
@@ -27,7 +27,7 @@ class Command(BaseCommand):
         es_logger.setLevel(logging.ERROR)
 
         percent = options['percent']
-        mappingtypes = options['mappingtypes']
+        doctypes = options['doctypes']
         if not 1 <= percent <= 100:
             raise CommandError('percent should be between 1 and 100')
-        es_reindex_cmd(percent, mappingtypes)
+        es_reindex_cmd(percent, doctypes)

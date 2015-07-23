@@ -71,7 +71,7 @@ MAX_RETRIES = len(RETRY_TIMES)
 
 @app.task()
 def index_item_task(cls_path, item_id, **kwargs):
-    """Index an item given it's mapping_type cls_path and id"""
+    """Index an item given it's DocType cls_path and id"""
     doctype = from_class_path(cls_path)
     retries = kwargs.get('task_retries', 0)
     log.debug('Index attempt #%s', retries)
@@ -97,7 +97,7 @@ def index_item_task(cls_path, item_id, **kwargs):
 
 @app.task()
 def unindex_item_task(cls_path, item_id, **kwargs):
-    """Remove item from index, given it's mapping_type class_path and id"""
+    """Remove item from index, given it's DocType class_path and id"""
     doctype = from_class_path(cls_path)
     try:
         doctype.docs.delete(item_id)

@@ -48,7 +48,7 @@ def reindex():
             (cls, chunk) for chunk in chunked(indexable, CHUNK_SIZE))
 
     for cls, id_list in chunks:
-        chunk_name = '%s %d -> %d' % (cls.get_mapping_type_name(),
+        chunk_name = '%s %d -> %d' % (cls._doc_type.name,
                                       id_list[0], id_list[-1])
         rec = Record(batch_id=batch_id, name=chunk_name)
         rec.save()
@@ -128,7 +128,7 @@ def search_admin_view(request):
     return render(request, 'admin/search_admin_view.html', {
         'title': 'Search',
         'es_deets': es_deets,
-        'mapping_type_stats': stats,
+        'doc_type_stats': stats,
         'indexes': indexes,
         'index': get_index_name(),
         'error_messages': error_messages,

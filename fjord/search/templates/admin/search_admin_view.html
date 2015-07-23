@@ -127,18 +127,18 @@
     </table>
 
     <h2>Index ({{ index }})</h2>
-    {% if mapping_type_stats == None %}
+    {% if doc_type_stats == None %}
       <p>
         Index does not exist.
       </p>
     {% else %}
       <table>
         <thead>
-          <th>mapping type</th>
+          <th>doc type</th>
           <th>count</th>
         </thead>
         <tbody>
-          {% for stats_name, stats_count in mapping_type_stats.items %}
+          {% for stats_name, stats_count in doc_type_stats.items %}
             <tr><td>{{ stats_name }}</td><td>{{ stats_count }}</td></tr>
           {% endfor %}
         </tbody>

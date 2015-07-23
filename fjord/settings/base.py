@@ -543,7 +543,7 @@ ES_URLS = config(
     'ES_URLS', default='http://localhost:9200', type_='list_of_str'
 )
 
-# Dict of mapping-type-name -> index-name to use. Input pretty much
+# Dict of doctype name -> index-name to use. Input pretty much
 # uses one index, so this should be some variation of:
 # {'default': 'inputindex'}.
 ES_INDEXES = {'default': 'inputindex'}
