@@ -88,7 +88,8 @@ class FeedbackHistogramAPI(rest_framework.views.APIView):
         search_query = request.GET.get('q', None)
         if search_query is not None:
             search = search.query(
-                'simple_query_string', description=search_query)
+                'simple_query_string', query=search_query,
+                fields=['description'])
 
         search = search.filter(f)
 

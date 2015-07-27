@@ -344,9 +344,11 @@ class PublicFeedbackAPIDateTest(ElasticTestCase):
 
 
 class FeedbackHistogramAPITest(ElasticTestCase):
-    def generate_response(self, d):
+    def generate_response(self, created, description=u'So awesome!'):
         ResponseFactory(
-            created=datetime(d.year, d.month, d.day, random.randint(0, 23), 0)
+            created=datetime(created.year, created.month, created.day,
+                             random.randint(0, 23), 0),
+            description=description
         )
 
     def to_date_string(self, value):
@@ -385,12 +387,28 @@ class FeedbackHistogramAPITest(ElasticTestCase):
         # Count is 2.
         eq_(json_data['results'][0][1], 2)
 
+    def test_q(self):
+        """Test q argument"""
+        dt = date.today() - timedelta(days=1)
+        self.generate_response(created=dt, description='pocket pocket')
+        self.generate_response(created=dt, description='video video')
+        self.refresh()
+
+        resp = self.client.get(reverse('feedback-histogram-api'), {
+            'q': 'pocket'
+        })
+        eq_(resp.status_code, 200)
+        json_data = json.loads(resp.content)
+
+        # Default range ends yesterday. Only one response with
+        # "pocket" in it yesterday, so this is 1.
+        eq_(json_data['results'][-1][1], 1)
+
     # FIXME: Test date_start, date_end and date_delta
     # FIXME: Test products, versions
     # FIXME: Test locales
     # FIXME: Test happy/sad
     # FIXME: Test platforms
-    # FIXME: Test q
     # FIXME: Test interval
 
 
