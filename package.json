@@ -9,12 +9,11 @@
         "preinstall": "./bin/lockdown.js"
     },
     "devDependencies": {
-        "lockdown": "mozilla/npm-lockdown#c7ceb9ca37fab4ba2639b89f94b88703d4e4d0d2"
+        "lockdown": "0.0.8-dev"
     },
     "dependencies": {
         "cssmin": "0.4.3",
         "less": "1.7.0",
         "uglify-js": "2.4.13"
     }
-
 }
