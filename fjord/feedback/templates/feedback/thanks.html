@@ -22,9 +22,9 @@
       <div class="card thanks">
         <section>
           <div class="part">
-            {% trans %}
+            {% trans product=product %}
               Your feedback will be used to create a better experience in
-              future releases of Firefox.
+              future releases of {{ product }}.
             {% endtrans %}
           </div>
 
@@ -56,12 +56,16 @@
             </div>
           {% endif %}
 
+          {#
+          Note: This is specifically about downloading Firefox. It probably
+          only makes sense for desktop browsers, though.
+          #}
           <div class="part">
             <h2>{{ _('Shape the future of Firefox.') }}</h2>
             <p>
               {% trans download_url="http://www.mozilla.org/firefox/channel" %}
                 Download
-                <a href="{{ download_url }}">the build that is right for you</a>.
+                <a href="{{ download_url }}">the Firefox build that is right for you</a>.
               {% endtrans %}
             </p>
           </div>
@@ -69,14 +73,18 @@
           <div class="part">
             <h2>{{ _('Contribute to Mozilla.') }}</h2>
             <p>
-              {% trans url='http://mozilla.org/contribute/' %}
-                Learn how you can <a href="{{ url }}">make Firefox and Mozilla better</a>.
+              {% trans url='http://mozilla.org/contribute/', product=product %}
+                Learn how you can <a href="{{ url }}">make {{ product }} and Mozilla better</a>.
               {% endtrans %}
             </p>
           </div>
 
           <div class="part" id="thanks-news">
-            <h2>{{ _('Find the latest news about Firefox.') }}</h2>
+            <h2>
+              {% trans product=product %}
+                Find the latest news about {{ product }}.
+              {% endtrans %}
+            </h2>
             <ul>
               <li><a id="twitter" href="http://twitter.com/firefox"><span>Twitter</span></a></li>
               <li><a id="facebook" href="http://www.facebook.com/Firefox"><span>Facebook</a></span></li>
