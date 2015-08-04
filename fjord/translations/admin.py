@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.module_loading import import_by_path
 
-from .gengo_utils import FjordGengo, GENGO_MACHINE_UNSUPPORTED
+from .gengo_utils import FjordGengo
 from .models import GengoJob, GengoOrder
 from .tasks import translate_tasks_by_id_list
 from .utils import locale_equals_language
@@ -135,7 +135,6 @@ def gengo_translator_view(request):
         'configured': configured,
         'settings': settings,
         'products': products,
-        'machine_unsupported': GENGO_MACHINE_UNSUPPORTED,
         'outstanding': outstanding,
         'seven_days_of_orders': seven_days_of_orders,
         'balance': balance,

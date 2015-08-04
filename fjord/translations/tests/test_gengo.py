@@ -1,6 +1,5 @@
 from functools import wraps
 
-from django.conf import settings
 from django.core import mail
 from django.test.utils import override_settings
 
@@ -12,6 +11,7 @@ from fjord.base.tests import eq_, TestCase
 from fjord.translations import gengo_utils
 from fjord.translations.models import (
     GengoHumanTranslator,
+    GengoMachineTranslator,
     GengoJob,
     GengoOrder,
     SuperModel
@@ -236,164 +236,75 @@ class GetBalanceTestCase(BaseGengoTestCase):
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
 class MachineTranslateTestCase(BaseGengoTestCase):
-    def test_machine_translate(self):
-        with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
-            # Note: We're mocking with "Muy lento" because it's
-            # short, but the Gengo language guesser actually can't
-            # figure out what language that is.
-            instance = GengoMock.return_value
-            instance.postTranslationJobs.return_value = {
-                u'opstat': u'ok',
-                u'response': {
-                    u'jobs': {
-                        u'job_1': {
-                            u'status': u'approved',
-                            u'job_id': u'NULL',
-                            u'credits': 0,
-                            u'unit_count': 7,
-                            u'body_src': u'Muy lento',
-                            u'mt': 1,
-                            u'eta': -1,
-                            u'custom_data': u'10101',
-                            u'tier': u'machine',
-                            u'lc_tgt': u'en',
-                            u'lc_src': u'es',
-                            u'body_tgt': u'Very slow',
-                            u'slug': u'Input machine translation',
-                            u'ctime': u'2014-05-21 15:09:50.361847'
-                        }
-                    }
-                }
-            }
-
-            gengo_api = gengo_utils.FjordGengo()
-            text = u'Muy lento'
-            eq_(gengo_api.machine_translate(1010, 'es', 'en', text),
-                u'Very slow')
-
-    def test_machine_translate_unsupported_lc_src(self):
-        with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
-            gengo_api = gengo_utils.FjordGengo()
-            self.assertRaises(
-                gengo_utils.GengoUnsupportedLanguage,
-                gengo_api.machine_translate,
-                1010, 'zh-tw', 'en', 'whatevs'
-            )
-
-            eq_(GengoMock.return_value.postTranslationJobs.mock_calls, [])
-
     @guess_language('es')
     def test_translate_gengo_machine(self):
+        # Note: This just sets up the GengoJob--it doesn't create any
+        # Gengo human translation jobs.
+        obj = SuperModel(
+            locale='es',
+            desc=u'Facebook no se puede enlazar con peru'
+        )
+        obj.save()
+
+        eq_(obj.trans_desc, u'')
+        translate(obj, 'gengo_machine', 'es', 'desc', 'en', 'trans_desc')
+        # Nothing should be translated
+        eq_(obj.trans_desc, u'')
+
+        eq_(len(GengoJob.objects.all()), 1)
+
+    def test_gengo_push_translations(self):
+        """Tests GengoOrders get created"""
+        ght = GengoMachineTranslator()
+
+        # Create a few jobs covering multiple languages
+        descs = [
+            ('es', u'Facebook no se puede enlazar con peru'),
+            ('es', u'No es compatible con whatsap'),
+
+            ('de', u'Absturze und langsam unter Android'),
+        ]
+        for lang, desc in descs:
+            obj = SuperModel(locale=lang, desc=desc)
+            obj.save()
+
+            job = GengoJob(
+                content_object=obj,
+                tier='machine',
+                src_field='desc',
+                dst_field='trans_desc',
+                src_lang=lang,
+                dst_lang='en'
+            )
+            job.save()
+
         with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
-            # Note: We're mocking with "Muy lento" because it's
-            # short, but the Gengo language guesser actually can't
-            # figure out what language that is.
-            instance = GengoMock.return_value
-            instance.postTranslationJobs.return_value = {
+            mocker = GengoMock.return_value
+
+            # FIXME: This returns the same thing both times, but to
+            # make the test "more kosher" we'd have this return two
+            # different order_id values.
+            mocker.postTranslationJobs.return_value = {
                 u'opstat': u'ok',
                 u'response': {
-                    u'jobs': {
-                        u'job_1': {
-                            u'status': u'approved',
-                            u'job_id': u'NULL',
-                            u'credits': 0,
-                            u'unit_count': 7,
-                            u'body_src': u'Muy lento',
-                            u'mt': 1,
-                            u'eta': -1,
-                            u'custom_data': u'10101',
-                            u'tier': u'machine',
-                            u'lc_tgt': u'en',
-                            u'lc_src': u'es',
-                            u'body_tgt': u'Very slow',
-                            u'slug': u'Input machine translation',
-                            u'ctime': u'2014-05-21 15:09:50.361847'
-                        }
-                    }
+                    u'order_id': u'1337',
+                    u'job_count': 2,
+                    u'credits_used': u'0.0',
+                    u'currency': u'USD'
                 }
             }
 
-            obj = SuperModel(locale='es', desc=u'Muy lento')
-            obj.save()
+            ght.push_translations()
 
-            eq_(obj.trans_desc, u'')
-            translate(obj, 'gengo_machine', 'es', 'desc', 'en', 'trans_desc')
-            eq_(obj.trans_desc, u'Very slow')
+            eq_(GengoOrder.objects.count(), 2)
 
-    @guess_language('un')
-    def test_translate_gengo_machine_unknown_language(self):
-        """Translation should handle unknown languages without erroring"""
-        with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
-            gengo_mock_instance = GengoMock.return_value
+            order_by_id = dict(
+                [(order.id, order) for order in GengoOrder.objects.all()]
+            )
 
-            obj = SuperModel(locale='es', desc=u'Muy lento')
-            obj.save()
-
-            eq_(obj.trans_desc, u'')
-            translate(obj, 'gengo_machine', 'es', 'desc', 'en', 'trans_desc')
-            eq_(obj.trans_desc, u'')
-
-            # Make sure we don't call postTranslationJobs().
-            eq_(gengo_mock_instance.postTranslationJobs.call_count, 0)
-
-    @guess_language('es')
-    def test_translate_gengo_machine_unsupported_language(self):
-        """Translation should handle unsupported languages without erroring"""
-        gengo_utils.GENGO_LANGUAGE_CACHE = (
-            {u'opstat': u'ok',
-             u'response': [
-                 {u'unit_type': u'word', u'localized_name': u'Deutsch',
-                  u'lc': u'de', u'language': u'German'}
-             ]},
-            (u'de',)
-        )
-
-        with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
-            gengo_mock_instance = GengoMock.return_value
-
-            obj = SuperModel(locale='es', desc=u'Muy lento')
-            obj.save()
-
-            eq_(obj.trans_desc, u'')
-            translate(obj, 'gengo_machine', 'es', 'desc', 'en', 'trans_desc')
-            eq_(obj.trans_desc, u'')
-
-            # Make sure we don't call postTranslationJobs().
-            eq_(gengo_mock_instance.postTranslationJobs.call_count, 0)
-
-    @guess_language('en')
-    def test_translate_gengo_machine_english_copy_over(self):
-        """If the guesser guesses english, we copy it over"""
-        with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
-            gengo_mock_instance = GengoMock.return_value
-
-            obj = SuperModel(locale='es', desc=u'This is English.')
-            obj.save()
-
-            eq_(obj.trans_desc, u'')
-            translate(obj, 'gengo_machine', 'es', 'desc', 'en', 'trans_desc')
-            eq_(obj.trans_desc, u'This is English.')
-
-            # Make sure we don't call postTranslationJobs().
-            eq_(gengo_mock_instance.postTranslationJobs.call_count, 0)
-
-    @guess_language('es')
-    def test_no_translate_if_disabled(self):
-        """No GengoAPI calls if gengosystem switch is disabled"""
-        with patch('fjord.translations.models.waffle') as waffle_mock:
-            waffle_mock.switch_is_active.return_value = False
-
-            with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
-                obj = SuperModel(locale='es', desc=u'Muy lento')
-                obj.save()
-
-                eq_(obj.trans_desc, u'')
-                translate(obj, 'gengo_machine', 'es', 'desc', 'en',
-                          'trans_desc')
-                eq_(obj.trans_desc, u'')
-
-                # We should not have used the API at all.
-                eq_(GengoMock.called, False)
+            jobs = GengoJob.objects.all()
+            for job in jobs:
+                assert job.order_id in order_by_id
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
@@ -503,6 +414,7 @@ class HumanTranslationTestCase(BaseGengoTestCase):
 
             job = GengoJob(
                 content_object=obj,
+                tier='standard',
                 src_field='desc',
                 dst_field='trans_desc',
                 src_lang=lang,
@@ -511,9 +423,6 @@ class HumanTranslationTestCase(BaseGengoTestCase):
             job.save()
 
         with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
-            # FIXME: This returns the same thing both times, but to
-            # make the test "more kosher" we'd have this return two
-            # different order_id values.
             mocker = GengoMock.return_value
             mocker.getAccountBalance.return_value = {
                 u'opstat': u'ok',
@@ -522,6 +431,9 @@ class HumanTranslationTestCase(BaseGengoTestCase):
                     u'currency': u'USD'
                 }
             }
+            # FIXME: This returns the same thing both times, but to
+            # make the test "more kosher" we'd have this return two
+            # different order_id values.
             mocker.postTranslationJobs.return_value = {
                 u'opstat': u'ok',
                 u'response': {
@@ -563,6 +475,7 @@ class HumanTranslationTestCase(BaseGengoTestCase):
 
             job = GengoJob(
                 content_object=obj,
+                tier='standard',
                 src_field='desc',
                 dst_field='trans_desc',
                 src_lang=lang,
@@ -756,6 +669,7 @@ class CompletedJobsForOrderTestCase(BaseGengoTestCase):
 
         gj = GengoJob(
             content_object=obj,
+            tier='standard',
             src_field='desc',
             dst_field='trans_desc',
             src_lang='es',
@@ -831,26 +745,6 @@ class CompletedJobsForOrderTestCase(BaseGengoTestCase):
             eq_(orders[0].status, 'complete')
 
 
-def use_sandbox(fun):
-    """Decorator to force the use of the sandbox
-
-    This forces the test to use ths Gengo sandbox. This requires that
-    you have GENGO_SANDBOX_PUBLIC_KEY and GENGO_SANDBOX_PRIVATE_KEY
-    set up. If you don't, then they're made blank and the tests will
-    fail and we will all freeze in an ice storm of biblical
-    proportions!
-
-    """
-    public_key = getattr(settings, 'GENGO_SANDBOX_PUBLIC_KEY', '')
-    private_key = getattr(settings, 'GENGO_SANDBOX_PRIVATE_KEY', '')
-
-    return override_settings(
-        GENGO_PUBLIC_KEY=public_key,
-        GENGO_PRIVATE_KEY=private_key,
-        GENGO_USE_SANDBOX=True
-    )(fun)
-
-
 @pytest.mark.skipif(not has_gengo_creds(),
                     reason='no gengo creds')
 class LiveGengoTestCase(TestCase):
@@ -878,23 +772,3 @@ class LiveGengoTestCase(TestCase):
         text = u'Facebook no se puede enlazar con peru'
         gengo_api = gengo_utils.FjordGengo()
         eq_(gengo_api.guess_language(text), u'es')
-
-    @pytest.mark.skipif(getattr(settings, 'GENGO_USE_SANDBOX', True),
-                        reason='GENGO_USE_SANDBOX=False')
-    def test_gengo_machine_translation(self):
-        # Note: This doesn't work in the sandbox, so we skip it if
-        # we're in sandbox mode. That is some happy horseshit, but so
-        # it goes.
-
-        # Note: This test might be brittle since it's calling out to
-        # Gengo to do a machine translation and it's entirely possible
-        # that they might return a different translation some day.
-        obj = SuperModel(
-            locale='es',
-            desc=u'Facebook no se puede enlazar con peru'
-        )
-        obj.save()
-
-        eq_(obj.trans_desc, u'')
-        translate(obj, 'gengo_machine', 'es', 'desc', 'en', 'trans_desc')
-        eq_(obj.trans_desc, u'Facebook can bind with peru')

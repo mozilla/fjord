@@ -12,8 +12,6 @@ import waffle
 
 from .gengo_utils import (
     FjordGengo,
-    GengoAPIFailure,
-    GengoMachineTranslationFailure,
     GengoUnknownLanguage,
     GengoUnsupportedLanguage,
 )
@@ -205,93 +203,7 @@ class DennisTranslator(TranslationSystem):
 
 
 # ---------------------------------------------------------
-# Gengo machine translator system AI 9000 of doom
-# ---------------------------------------------------------
-
-class GengoMachineTranslator(TranslationSystem):
-    """Translates using Gengo machine translation"""
-    name = 'gengo_machine'
-
-    def translate(self, instance, src_lang, src_field, dst_lang, dst_field):
-        # If gengosystem is disabled, we just return immediately. We
-        # can backfill later.
-        if not waffle.switch_is_active('gengosystem'):
-            return
-
-        text = getattr(instance, src_field)
-        metadata = {
-            'locale': instance.locale,
-            'length': len(text),
-            'body': text[:50].encode('utf-8')
-        }
-
-        gengo_api = FjordGengo()
-        try:
-            lc_src = gengo_api.guess_language(text)
-            if lc_src not in gengo_api.get_languages():
-                raise GengoUnsupportedLanguage(
-                    'unsupported language: {0}'.format(lc_src))
-
-            if not locale_equals_language(instance.locale, lc_src):
-                # Log this for metrics-purposes
-                self.log_error(
-                    instance,
-                    action='guess-language',
-                    msg='locale "{0}" != guessed language "{1}"'.format(
-                        instance.locale, lc_src),
-                    metadata=metadata)
-
-            if locale_equals_language(dst_lang, lc_src):
-                # If the source language is english, we just copy it over.
-                setattr(instance, dst_field, text)
-                instance.save()
-                self.log_info(
-                    instance, action='translate',
-                    msg=u'lc_src == dst_lang, so we copy src to dst',
-                    metadata=metadata)
-                return
-
-            translated = gengo_api.machine_translate(
-                instance.id, lc_src, dst_lang, text)
-
-            if translated:
-                setattr(instance, dst_field, translated)
-                instance.save()
-                self.log_info(instance, action='translate', msg='success',
-                              metadata=metadata)
-                statsd.incr('translation.gengo_machine.success')
-
-            else:
-                self.log_error(instance, action='translate',
-                               msg='did not translate', metadata=metadata)
-                statsd.incr('translation.gengo_machine.failure')
-
-        except GengoUnknownLanguage as exc:
-            # FIXME: This might be an indicator that this response is
-            # spam. At some point p, we can write code to account for
-            # that.
-            self.log_error(instance, action='guess-language', msg=unicode(exc),
-                           metadata=metadata)
-            statsd.incr('translation.gengo_machine.unknown')
-
-        except GengoUnsupportedLanguage as exc:
-            # FIXME: This is a similar boat to GengoUnknownLanguage
-            # where for now, we're just going to ignore it because I'm
-            # not sure what to do about it and I'd like more data.
-            self.log_error(instance, action='translate', msg=unicode(exc),
-                           metadata=metadata)
-            statsd.incr('translation.gengo_machine.unsupported')
-
-        except (GengoAPIFailure, GengoMachineTranslationFailure) as exc:
-            # FIXME: For now, if we have a machine translation
-            # failure, we're just going to ignore it and move on.
-            self.log_error(instance, action='translate', msg=unicode(exc),
-                           metadata=metadata)
-            statsd.incr('translation.gengo_machine.failure')
-
-
-# ---------------------------------------------------------
-# Gengo human translator system
+# Gengo translator system
 # ---------------------------------------------------------
 
 STATUS_CREATED = 'created'
@@ -311,6 +223,8 @@ class GengoJob(ModelBase):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey()
+
+    tier = models.CharField(max_length=10, default=u'')
 
     # Source and destination fields for the translation
     src_field = models.CharField(max_length=50)
@@ -444,15 +358,16 @@ class GengoOrder(ModelBase):
         return Record.objects.records(self)
 
 
-class GengoHumanTranslator(TranslationSystem):
-    """Translates using Gengo human translation
-
-    Note: This costs real money!
-
-    """
-    name = 'gengo_human'
+class GengoTranslationSystem(TranslationSystem):
+    """Superclass for GengoHumanTranslator and GengoMachineTranslator"""
     use_push_and_pull = True
     use_daily = True
+
+    # Which translation tier to use
+    gengo_tier = None
+
+    # Whether to should watch the balance when creating jobs
+    gengo_watch_balance = False
 
     def translate(self, instance, src_lang, src_field, dst_lang, dst_field):
         # If gengosystem is disabled, we just return immediately. We
@@ -462,6 +377,7 @@ class GengoHumanTranslator(TranslationSystem):
 
         text = getattr(instance, src_field)
         metadata = {
+            'tier': self.gengo_tier,
             'locale': instance.locale,
             'length': len(text),
             'body': text[:50].encode('utf-8')
@@ -473,14 +389,9 @@ class GengoHumanTranslator(TranslationSystem):
         # don't create a GengoJob.
         try:
             lc_src = gengo_api.guess_language(text)
-            if not locale_equals_language(instance.locale, lc_src):
-                # Log this for metrics purposes
-                self.log_error(
-                    instance,
-                    action='guess-language',
-                    msg='locale "{0}" != guessed language "{1}"'.format(
-                        instance.locale, lc_src),
-                    metadata=metadata)
+            if lc_src not in gengo_api.get_languages():
+                raise GengoUnsupportedLanguage(
+                    'unsupported language: {0}'.format(lc_src))
 
         except GengoUnknownLanguage as exc:
             # FIXME: This might be an indicator that this response is
@@ -500,7 +411,20 @@ class GengoHumanTranslator(TranslationSystem):
             statsd.incr('translation.gengo_machine.unsupported')
             return
 
-        # If the source language is english, we just copy it over.
+        # If the locale doesn't equal the guessed language, then
+        # that's interesting since the user is writing feedback in a
+        # language other than what the ui is showing. We want to log
+        # that for metrics purposes.
+        if not locale_equals_language(instance.locale, lc_src):
+            self.log_error(
+                instance,
+                action='guess-language',
+                msg='locale "{0}" != guessed language "{1}"'.format(
+                    instance.locale, lc_src),
+                metadata=metadata)
+
+        # If the source language is English, we just copy it over and
+        # we're done.
         if locale_equals_language(dst_lang, lc_src):
             setattr(instance, dst_field, text)
             instance.save()
@@ -510,9 +434,13 @@ class GengoHumanTranslator(TranslationSystem):
                 metadata=metadata)
             return
 
-        # If the src -> dst isn't a supported pair, log an issue for
-        # metrics purposes and move on.
-        if (lc_src, dst_lang) not in gengo_api.get_language_pairs():
+        # If this is 'standard' tier and if the src -> dst isn't a
+        # supported pair, log an issue for metrics purposes and move
+        # on. We only do this for 'standard' tier since the 'machine'
+        # tier has a different set of pairs which aren't available to
+        # us.
+        if ((self.gengo_tier == 'standard'
+             and (lc_src, dst_lang) not in gengo_api.get_language_pairs())):
             self.log_error(
                 instance, action='translate',
                 msg=u'(lc_src {0}, dst_lang {1}) not supported'.format(
@@ -521,6 +449,7 @@ class GengoHumanTranslator(TranslationSystem):
             return
 
         job = GengoJob(
+            tier=self.gengo_tier,
             content_object=instance,
             src_lang=lc_src,
             src_field=src_field,
@@ -574,23 +503,29 @@ class GengoHumanTranslator(TranslationSystem):
             # than raise a GengoConfig error.
             return
 
-        balance = gengo_api.get_balance()
-        threshold = settings.GENGO_ACCOUNT_BALANCE_THRESHOLD
+        if self.gengo_watch_balance:
+            balance = gengo_api.get_balance()
+            threshold = settings.GENGO_ACCOUNT_BALANCE_THRESHOLD
 
-        # statsd the balance so we can track it with graphite
-        statsd.gauge('translation.gengo.balance', balance)
+            # statsd the balance so we can track it with graphite.
+            statsd.gauge('translation.gengo.balance', balance)
 
-        if not self.balance_good_to_continue(balance, threshold):
-            # If we don't have enough balance, stop.
-            return
+            if not self.balance_good_to_continue(balance, threshold):
+                # If we don't have enough balance, stop.
+                return
 
-        # Create language buckets for the jobs
-        jobs = GengoJob.objects.filter(status=STATUS_CREATED)
+        # Create language buckets for the jobs for this translator.
+        # We bucket by language because this makes it easier for a
+        # single Gengo translator to translate all the jobs in an
+        # order.
+        jobs = GengoJob.objects.filter(
+            tier=self.gengo_tier, status=STATUS_CREATED)
+
         lang_buckets = {}
         for job in jobs:
             lang_buckets.setdefault(job.src_lang, []).append(job)
 
-        # For each bucket, assemble and order and post it.
+        # For each bucket, assemble an order and post it.
         for lang, jobs in lang_buckets.items():
             batch = []
             for job in jobs:
@@ -598,35 +533,36 @@ class GengoHumanTranslator(TranslationSystem):
                     'id': job.id,
                     'lc_src': job.src_lang,
                     'lc_dst': job.dst_lang,
+                    'tier': self.gengo_tier,
                     'text': getattr(job.content_object, job.src_field),
                     'unique_id': job.unique_id
                 })
 
-            # This will kick up a GengoAPIFailure which has the
+            # This can kick up a GengoAPIFailure which has the
             # complete response in the exception message. We want that
             # to propagate that and end processing in cases where
             # something bad happened because then we can learn more
             # about the state things are in. Thus we don't catch
             # exceptions here.
-            resp = gengo_api.human_translate_bulk(batch)
+            resp = gengo_api.translate_bulk(batch)
 
-            # We should have an order_id at this point, so we create a
+            # We should have an `order_id` at this point, so we create a
             # GengoOrder with it.
             order = GengoOrder(order_id=resp['order_id'])
             order.save()
             order.log('created', metadata={'response': resp})
 
-            # Persist the order on all the jobs and change their
-            # status.
+            # Update all the jobs in the order.
             for job in jobs:
                 job.assign_to_order(order)
 
-            # Update the balance and see if we're below the threshold.
-            balance = balance - float(resp['credits_used'])
+            if self.gengo_watch_balance:
+                # Update the balance and see if we're below the threshold.
+                balance = balance - float(resp['credits_used'])
 
-            if not self.balance_good_to_continue(balance, threshold):
-                # If we don't have enough balance, stop.
-                return
+                if not self.balance_good_to_continue(balance, threshold):
+                    # If we don't have enough balance, stop.
+                    return
 
     def pull_translations(self):
         # If gengosystem is disabled, we just return immediately. We
@@ -676,6 +612,23 @@ class GengoHumanTranslator(TranslationSystem):
 
             if outstanding == 0:
                 order.mark_complete()
+
+
+class GengoMachineTranslator(GengoTranslationSystem):
+    """Translates using Gengo machine translation"""
+    name = 'gengo_machine'
+    gengo_tier = 'machine'
+
+
+class GengoHumanTranslator(GengoTranslationSystem):
+    """Translates using Gengo human translation
+
+    Note: This costs real money!
+
+    """
+    name = 'gengo_human'
+    gengo_tier = 'standard'
+    gengo_watch_balance = True
 
     def run_daily_activities(self):
         # If gengosystem is disabled, we don't want to do anything.
