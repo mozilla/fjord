@@ -64,8 +64,7 @@ def update_locales(ctx):
 @task
 def update_assets(ctx):
     with ctx.lcd(settings.SRC_DIR):
-        ctx.local(PYTHON + ' manage.py collectstatic --noinput')
-        ctx.local(PYTHON + ' manage.py compress_assets')
+        ctx.local(PYTHON + " manage.py collectstatic --noinput")
 
 
 @task
@@ -130,6 +129,9 @@ def setup_dependencies(ctx):
     with ctx.lcd(settings.SRC_DIR):
         # Test npm version
         ctx.local('npm -v')
+
+        # Install Node dependencies
+        ctx.local('npm install --production --unsafe-perm')
 
 
 @task

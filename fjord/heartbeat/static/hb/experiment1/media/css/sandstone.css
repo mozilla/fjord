@@ -2007,17 +2007,6 @@ label.error {
   position: relative;
   float: left;
 }
-.title-shadow-box:after {
-  content: "";
-  display: block;
-  width: 100%;
-  padding: 0;
-  height: 40px;
-  position: absolute;
-  bottom: -40px;
-  left: 0;
-  background: url(../img/mission/title-banner-shadow.png) no-repeat;
-}
 /* }}} */
 /* {{{ Menu Bars */
 .billboard {

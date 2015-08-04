@@ -8,7 +8,7 @@
     <![endif]-->
 
     {% block site_css %}
-      {{ css('base') }}
+      {% stylesheet 'base' %}
     {% endblock %}
 
     <link rel="shortcut icon" type="image/png" sizes="512x512" href="{{ settings.STATIC_URL }}img/firefox-512.png?v=1">
@@ -79,7 +79,7 @@
     {% endblock %}
 
     {% block site_js %}
-      {{ js('base') }}
+      {% javascript 'base' %}
       <script type="text/javascript" src="https://login.persona.org/include.js"></script>
     {% endblock %}
   </body>

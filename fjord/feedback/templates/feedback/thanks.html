@@ -3,7 +3,7 @@
 {% block page_title %}{{ _('Thanks') }}{% endblock %}
 
 {% block site_js %}
-  {{ js('singlecard') }}
+  {% javascript 'singlecard' %}
 {% endblock %}
 
 {% set extra_body_attrs = {'data-ga-push': '[["_trackEvent", "FeedbackFlow", "generic-thanks"]]'} %}

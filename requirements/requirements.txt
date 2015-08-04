@@ -12,10 +12,6 @@ https://github.com/jbalogh/jingo/archive/fce09043542e71d972cc97d2ae703740741f80d
 # sha256: tLy18AIevr3_Rd7saf4cKuq_W1M3zpKFVOLBmggiCck
 https://github.com/mozilla/django-product-details/archive/d168ab2e689a1b54a30a923386fe7948a74ff334.tar.gz#egg=django-product-details==0.6.0.1
 
-# jingo-minify: soemthing post 0.6
-# sha256: YC0TzKkqNb0FtwYn_JjRFeZIhKiVBW86zAdTo_N5v0E
-https://github.com/jsocol/jingo-minify/archive/d2ffefbd31e5035873083107e86893be302ce452.tar.gz#egg=jingo-minify==0.6.0.1
-
 # Do we use this? We have no passwords.
 # django-sha2: master~1
 # sha256: TBUJueJfjaBHp4GeUtY0o_IaGHk4DOUf0ZbJZ4YXPPM
@@ -97,6 +93,9 @@ django-multidb-router==0.6
 
 # sha256: 2ZQmvkb9kv5rZLn1xZJuqYWTlOROw--eH3xkfTomZX8
 django-picklefield==0.3.1
+
+# sha256: fbWOrZW00d6lrdpJOczbmF-OynsUKntdX0nOWDzWX2U
+django-pipeline==1.5.2
 
 # sha256: -thF7ifqqSii7RbAEh4rtd0TzN6V0cAUTSP5pCUMGmw
 django-ratelimit==0.4.0

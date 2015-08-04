@@ -5,8 +5,15 @@
         "type": "git",
         "url": "git://github.com/mozilla/fjord.git"
     },
+    "scripts": {
+        "preinstall": "./bin/lockdown.js"
+    },
+    "devDependencies": {
+        "lockdown": "0.0.8-dev"
+    },
     "dependencies": {
-        "less": "1.7.0"
+        "cssmin": "0.4.3",
+        "less": "1.7.0",
+        "uglify-js": "2.4.13"
     }
-
 }
