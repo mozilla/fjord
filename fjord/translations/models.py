@@ -11,6 +11,7 @@ from statsd import statsd
 import waffle
 
 from .gengo_utils import (
+    GengoError,
     FjordGengo,
     GengoUnknownLanguage,
     GengoUnsupportedLanguage,
@@ -539,13 +540,15 @@ class GengoTranslationSystem(TranslationSystem):
                     'unique_id': job.unique_id
                 })
 
-            # This can kick up a GengoAPIFailure which has the
-            # complete response in the exception message. We want that
-            # to propagate that and end processing in cases where
-            # something bad happened because then we can learn more
-            # about the state things are in. Thus we don't catch
-            # exceptions here.
-            resp = gengo_api.translate_bulk(batch)
+            try:
+                resp = gengo_api.translate_bulk(batch)
+            except GengoError as exc:
+                self.log_error(
+                    instance=None, action='push-translations',
+                    msg=unicode(exc),
+                    metadata={
+                        'batch': batch
+                    })
 
             # We should have an `order_id` at this point, so we create a
             # GengoOrder with it.

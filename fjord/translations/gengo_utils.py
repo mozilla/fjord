@@ -4,7 +4,7 @@ from django.conf import settings
 
 import json
 import requests
-from gengo import Gengo
+from gengo import Gengo, GengoError  # noqa
 
 
 # Cache of supported languages from Gengo. Theoretically, these don't
@@ -137,7 +137,7 @@ class FjordGengo(object):
 
     @requires_keys
     def get_language_pairs(self):
-        """Returns the list of supported language pairs
+        """Returns the list of supported language pairs for human translation
 
         .. Note::
 
@@ -216,8 +216,9 @@ class FjordGengo(object):
     def translate_bulk(self, jobs):
         """Performs translation through Gengo on multiple jobs
 
-        This method is asynchronous--it creates the request, posts it,
-        and returns the order information.
+        Translation is asynchronous--this method posts the translation
+        jobs and then returns the order information for those jobs
+        to be polled at a later time.
 
         :arg jobs: a list of dicts with ``id``, ``lc_src``, ``lc_dst``
             ``tier``, ``text`` and (optional) ``unique_id`` keys
