@@ -15,6 +15,7 @@ from .gengo_utils import (
     FjordGengo,
     GengoUnknownLanguage,
     GengoUnsupportedLanguage,
+    GENGO_UNSUPPORTED_MACHINE_LC_SRC
 )
 from .utils import locale_equals_language
 from fjord.base.models import ModelBase
@@ -374,6 +375,10 @@ class GengoTranslationSystem(TranslationSystem):
     # translation systems care about this
     gengo_check_supported_language_pair = False
 
+    # This is a ridiculous flag for whether to check if the lc_src is
+    # supported for machine translations
+    gengo_check_supported_machine_lc_dst = False
+
     def translate(self, instance, src_lang, src_field, dst_lang, dst_field):
         # If gengosystem is disabled, we just return immediately. We
         # can backfill later.
@@ -404,7 +409,7 @@ class GengoTranslationSystem(TranslationSystem):
             # that.
             self.log_error(instance, action='guess-language', msg=unicode(exc),
                            metadata=metadata)
-            statsd.incr('translation.gengo_machine.unknown')
+            statsd.incr('translation.{0}.unknown'.format(self.name))
             return
 
         except GengoUnsupportedLanguage as exc:
@@ -413,7 +418,7 @@ class GengoTranslationSystem(TranslationSystem):
             # not sure what to do about it and I'd like more data.
             self.log_error(instance, action='translate', msg=unicode(exc),
                            metadata=metadata)
-            statsd.incr('translation.gengo_machine.unsupported')
+            statsd.incr('translation.{0}.unsupported'.format(self.name))
             return
 
         # If the locale doesn't equal the guessed language, then
@@ -437,6 +442,10 @@ class GengoTranslationSystem(TranslationSystem):
                 instance, action='translate',
                 msg=u'lc_src == dst_lang, so we copy src to dst',
                 metadata=metadata)
+            return
+
+        if ((self.gengo_check_supported_machine_lc_dst
+             and lc_src in GENGO_UNSUPPORTED_MACHINE_LC_SRC)):
             return
 
         # If src/dst isn't a supported pair, log an issue for metrics
@@ -622,6 +631,8 @@ class GengoMachineTranslator(GengoTranslationSystem):
     """Translates using Gengo machine translation"""
     name = 'gengo_machine'
     gengo_tier = 'machine'
+
+    gengo_check_supported_machine_lc_dst = True
 
 
 class GengoHumanTranslator(GengoTranslationSystem):

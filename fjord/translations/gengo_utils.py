@@ -15,6 +15,16 @@ GENGO_LANGUAGE_CACHE = None
 # Cache of supported language pairs.
 GENGO_LANGUAGE_PAIRS_CACHE = None
 
+# List of manually-curated languages that don't work for machine
+# translation src
+# Note: Gengo doesn't have an API that tells us these, so we have
+# to add them as we hit them. :(
+GENGO_UNSUPPORTED_MACHINE_LC_SRC = [
+    'cs',
+    'hu',
+    'tr'
+]
+
 # The comment we send to Gengo with the jobs to give some context for
 # the job.
 GENGO_COMMENT = """\
