@@ -21,6 +21,7 @@ class GengoJobAdmin(admin.ModelAdmin):
         'content_type',
         'object_id',
         'content_object',
+        'tier',
         'src_lang',
         'src_field',
         'dst_lang',
