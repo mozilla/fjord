@@ -4,7 +4,7 @@ from django.conf import settings
 
 import json
 import requests
-from gengo import Gengo, GengoError
+from gengo import Gengo
 
 
 # Cache of supported languages from Gengo. Theoretically, these don't
@@ -14,12 +14,6 @@ GENGO_LANGUAGE_CACHE = None
 
 # Cache of supported language pairs.
 GENGO_LANGUAGE_PAIRS_CACHE = None
-
-# List of unsupported source languages. Theoretically, these don't
-# change often and there's no way to discover them via the Gengo API
-# that I can see, so we're going to manually curate them. If this
-# turns out to be problematic, we can change how we do things then.
-GENGO_MACHINE_UNSUPPORTED = ['zh-cn', 'zh-tw']
 
 # The comment we send to Gengo with the jobs to give some context for
 # the job.
@@ -219,79 +213,14 @@ class FjordGengo(object):
         raise GengoUnknownLanguage('request failure: {0}'.format(resp.content))
 
     @requires_keys
-    def machine_translate(self, id_, lc_src, lc_dst, text):
-        """Performs a machine translation through Gengo
-
-        This method is synchronous--it creates the request, posts it,
-        waits for it to finish and then returns the translated text.
-
-        :arg id_: instance id
-        :arg lc_src: source language
-        :arg lc_dst: destination language
-        :arg text: the text to translate
-
-        :returns: text
-
-        :raises GengoUnsupportedLanguage: if the guesser guesses a
-            language that Gengo doesn't support
-
-        :raises GengoMachineTranslationFailure: if calling machine
-            translation fails
-
-        """
-        if lc_src in GENGO_MACHINE_UNSUPPORTED:
-            raise GengoUnsupportedLanguage(
-                'unsupported language (translater; hc)): {0} -> {1}'.format(
-                    lc_src, lc_dst))
-
-        data = {
-            'jobs': {
-                'job_1': {
-                    'custom_data': str(id_),
-                    'body_src': text,
-                    'lc_src': lc_src,
-                    'lc_tgt': lc_dst,
-                    'tier': 'machine',
-                    'type': 'text',
-                    'slug': 'Mozilla Input feedback response',
-                }
-            }
-        }
-
-        try:
-            resp = self.gengo_api.postTranslationJobs(jobs=data)
-        except GengoError as ge:
-            # It's possible for the guesser to guess a language that's
-            # in the list of supported languages, but for some reason
-            # it's not actually supported which can throw a 1551
-            # GengoError. In that case, we treat it as an unsupported
-            # language.
-            if ge.error_code == 1551:
-                raise GengoUnsupportedLanguage(
-                    'unsupported language (translater)): {0} -> {1}'.format(
-                        lc_src, lc_dst))
-            raise
-
-        if resp['opstat'] == 'ok':
-            job = resp['response']['jobs']['job_1']
-            if 'body_tgt' not in job:
-                raise GengoMachineTranslationFailure(
-                    'no body_tgt: {0} -> {1}'.format(lc_src, lc_dst))
-
-            return job['body_tgt']
-
-        raise GengoAPIFailure(
-            'opstat: {0}, response: {1}'.format(resp['opstat'], resp))
-
-    @requires_keys
-    def human_translate_bulk(self, jobs):
-        """Performs human translation through Gengo on multiple jobs
+    def translate_bulk(self, jobs):
+        """Performs translation through Gengo on multiple jobs
 
         This method is asynchronous--it creates the request, posts it,
         and returns the order information.
 
         :arg jobs: a list of dicts with ``id``, ``lc_src``, ``lc_dst``
-            ``text`` and (optional) ``unique_id`` keys
+            ``tier``, ``text`` and (optional) ``unique_id`` keys
 
         Response dict includes:
 
@@ -308,7 +237,7 @@ class FjordGengo(object):
                 'body_src': job['text'],
                 'lc_src': job['lc_src'],
                 'lc_tgt': job['lc_dst'],
-                'tier': 'standard',
+                'tier': job['tier'],
                 'type': 'text',
                 'slug': 'Mozilla Input feedback response',
                 'force': 1,
