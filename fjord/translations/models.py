@@ -369,6 +369,10 @@ class GengoTranslationSystem(TranslationSystem):
     # Whether to should watch the balance when creating jobs
     gengo_watch_balance = False
 
+    # Whether to check if the src/dst is a supported pair--not all Gengo
+    # translation systems care about this
+    gengo_check_supported_language_pair = False
+
     def translate(self, instance, src_lang, src_field, dst_lang, dst_field):
         # If gengosystem is disabled, we just return immediately. We
         # can backfill later.
@@ -434,12 +438,9 @@ class GengoTranslationSystem(TranslationSystem):
                 metadata=metadata)
             return
 
-        # If this is 'standard' tier and if the src -> dst isn't a
-        # supported pair, log an issue for metrics purposes and move
-        # on. We only do this for 'standard' tier since the 'machine'
-        # tier has a different set of pairs which aren't available to
-        # us.
-        if ((self.gengo_tier == 'standard'
+        # If src/dst isn't a supported pair, log an issue for metrics
+        # purposes and move on.
+        if ((self.gengo_check_supported_language_pair
              and (lc_src, dst_lang) not in gengo_api.get_language_pairs())):
             self.log_error(
                 instance, action='translate',
@@ -629,6 +630,7 @@ class GengoHumanTranslator(GengoTranslationSystem):
     name = 'gengo_human'
     gengo_tier = 'standard'
     gengo_watch_balance = True
+    gengo_check_supported_language_pair = True
 
     def run_daily_activities(self):
         # If gengosystem is disabled, we don't want to do anything.
