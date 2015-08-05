@@ -9,7 +9,12 @@ from django.contrib.auth.models import Group
 from django.http import QueryDict
 
 from fjord.analytics import views
-from fjord.base.tests import eq_, LocalizingClient, ProfileFactory, reverse
+from fjord.base.tests import (
+    eq_,
+    LocalizingClient,
+    AnalyzerProfileFactory,
+    reverse,
+)
 from fjord.feedback.tests import ResponseFactory, ProductFactory
 from fjord.search.tests import ElasticTestCase
 
@@ -377,8 +382,7 @@ class TestResponseview(ElasticTestCase):
         secretarea = pq('dl.secret')
         eq_(len(secretarea), 0)
 
-        jane = ProfileFactory(user__email='jane@example.com').user
-        jane.groups.add(Group.objects.get(name='analyzers'))
+        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
 
         self.client_login_user(jane)
         r = self.client.get(reverse('response_view', args=(resp.id,)))

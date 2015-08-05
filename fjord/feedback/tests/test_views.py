@@ -8,7 +8,7 @@ from django.test.utils import override_settings
 from fjord.base.tests import (
     eq_,
     LocalizingClient,
-    ProfileFactory,
+    AnalyzerProfileFactory,
     reverse,
     TestCase,
     with_waffle
@@ -146,8 +146,8 @@ class TestFeedback(TestCase):
     def test_thankyou_flag_and_response_id_in_qs_authenticated(self):
         """Verify response_id in querystring overrides session id"""
         # Create analyzer and log in.
-        jane = ProfileFactory(user__email='jane@example.com').user
-        jane.groups.add(Group.objects.get(name='analyzers'))
+
+        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
         self.client_login_user(jane)
 
         # Create some feedback which sets the response_id in the

@@ -10,7 +10,7 @@ from fjord.base.tests import (
     eq_,
     LocalizingClient,
     TestCase,
-    ProfileFactory,
+    AnalyzerProfileFactory,
     reverse
 )
 from fjord.base.views import IntentionalException
@@ -121,8 +121,7 @@ class TestContribute(TestCase):
 class TestNewUserView(ElasticTestCase):
     def setUp(self):
         super(TestNewUserView, self).setUp()
-        jane = ProfileFactory(user__email='jane@example.com').user
-        jane.groups.add(Group.objects.get(name='analyzers'))
+        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
         self.jane = jane
 
     def test_redirect_to_dashboard_if_anonymous(self):

@@ -3,7 +3,7 @@ import os
 from functools import total_ordering, wraps
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core.cache import cache
 from django.test import TestCase as OriginalTestCase
 from django.test.client import Client
@@ -209,3 +209,13 @@ class UserFactory(factory.django.DjangoModelFactory):
     # just-generated User This will call
     # ProfileFactory(user=our_new_user), thus skipping the SubFactory.
     profile = factory.RelatedFactory(ProfileFactory, 'user')
+
+
+class AnalyzerProfileFactory(ProfileFactory):
+
+    @factory.post_generation
+    def groups(self, create, extracted, **kwargs):
+        if not create:
+            return
+
+        self.user.groups.add(Group.objects.get(name='analyzers'))

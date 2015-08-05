@@ -9,7 +9,7 @@ from fjord.base.tests import (
     eq_,
     ok_,
     LocalizingClient,
-    ProfileFactory,
+    AnalyzerProfileFactory,
     reverse
 )
 from fjord.feedback.tests import ResponseFactory, ResponseEmailFactory
@@ -34,8 +34,7 @@ class TestAnalyticsDashboardView(ElasticTestCase):
         eq_(403, resp.status_code)
 
         # Verify analyzers can see analytics dashboard link
-        jane = ProfileFactory(user__email='jane@example.com').user
-        jane.groups.add(Group.objects.get(name='analyzers'))
+        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
 
         self.client_login_user(jane)
 
@@ -84,8 +83,7 @@ class TestSearchView(ElasticTestCase):
         self.refresh()
 
         # Create analyzer and log analyzer in
-        jane = ProfileFactory(user__email='jane@example.com').user
-        jane.groups.add(Group.objects.get(name='analyzers'))
+        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
 
         self.client_login_user(jane)
 
