@@ -20,9 +20,15 @@ GENGO_LANGUAGE_PAIRS_CACHE = None
 # Note: Gengo doesn't have an API that tells us these, so we have
 # to add them as we hit them. :(
 GENGO_UNSUPPORTED_MACHINE_LC_SRC = [
+    'ar',
     'cs',
     'hu',
-    'tr'
+    'id',
+    'ro',
+    'sv',
+    'th',
+    'tr',
+    'vi',
 ]
 
 # The comment we send to Gengo with the jobs to give some context for
