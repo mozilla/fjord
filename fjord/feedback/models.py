@@ -52,8 +52,15 @@ class Product(ModelBase):
     # Used internally for notes to make it easier to manage products
     notes = models.CharField(max_length=255, blank=True, default=u'')
 
-    # This is the name we display everywhere
+    # l10n: This is the name we display everywhere
     display_name = models.CharField(max_length=50)
+
+    # l10n: This is the description on the product picker
+    display_description = models.TextField(
+        default=u'', blank=True,
+        help_text=(u'Displayed description of the product. This will be '
+                   u'localized. Should be short.')
+    )
 
     # We're not using foreign keys, so when we save something to the
     # database, we use this name
