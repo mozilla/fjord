@@ -363,7 +363,6 @@ class GengoOrder(ModelBase):
 class GengoTranslationSystem(TranslationSystem):
     """Superclass for GengoHumanTranslator and GengoMachineTranslator"""
     use_push_and_pull = True
-    use_daily = True
 
     # Which translation tier to use
     gengo_tier = None
@@ -558,6 +557,7 @@ class GengoTranslationSystem(TranslationSystem):
                     metadata={
                         'batch': batch
                     })
+                continue
 
             # We should have an `order_id` at this point, so we create a
             # GengoOrder with it.
@@ -630,8 +630,8 @@ class GengoTranslationSystem(TranslationSystem):
 class GengoMachineTranslator(GengoTranslationSystem):
     """Translates using Gengo machine translation"""
     name = 'gengo_machine'
-    gengo_tier = 'machine'
 
+    gengo_tier = 'machine'
     gengo_check_supported_machine_lc_dst = True
 
 
@@ -642,6 +642,8 @@ class GengoHumanTranslator(GengoTranslationSystem):
 
     """
     name = 'gengo_human'
+    use_daily = True
+
     gengo_tier = 'standard'
     gengo_watch_balance = True
     gengo_check_supported_language_pair = True
