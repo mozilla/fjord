@@ -22,6 +22,7 @@ GENGO_LANGUAGE_PAIRS_CACHE = None
 GENGO_UNSUPPORTED_MACHINE_LC_SRC = [
     'ar',
     'cs',
+    'fi',
     'hu',
     'id',
     'ro',
