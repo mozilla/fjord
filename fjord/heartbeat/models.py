@@ -89,11 +89,13 @@ class Answer(ModelBase):
 
     # Data about the user's browser. Use '' for no value.
     platform = models.CharField(max_length=50, blank=True, default=u'')
-    channel = models.CharField(max_length=50, blank=True, default=u'')
+    channel = models.CharField(max_length=50, blank=True, default=u'',
+                               db_index=True)
     version = models.CharField(max_length=50, blank=True, default=u'')
-    locale = models.CharField(max_length=50, blank=True, default=u'')
+    locale = models.CharField(max_length=50, blank=True, default=u'',
+                              db_index=True)
     country = models.CharField(max_length=4, blank=True, null=True,
-                               default=u'')
+                               default=u'', db_index=True)
     build_id = models.CharField(max_length=50, blank=True, default=u'')
     partner_id = models.CharField(max_length=50, blank=True, default=u'')
 
@@ -115,7 +117,8 @@ class Answer(ModelBase):
 
     received_ts = models.DateTimeField(
         auto_now=True,
-        help_text=u'Time the server received the last update packet')
+        help_text=u'Time the server received the last update packet',
+        db_index=True)
 
     class Meta:
         unique_together = (
