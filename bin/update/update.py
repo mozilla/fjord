@@ -64,7 +64,10 @@ def update_locales(ctx):
 @task
 def update_assets(ctx):
     with ctx.lcd(settings.SRC_DIR):
-        ctx.local(PYTHON + " manage.py collectstatic --noinput")
+        # Delete existing static files so that django-pipeline rebuilds
+        # them correctly.
+        ctx.local('git clean -fxd -- static')
+        ctx.local(PYTHON + ' manage.py collectstatic --noinput')
 
 
 @task
