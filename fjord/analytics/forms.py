@@ -3,6 +3,7 @@ from django import forms
 from fjord.feedback.models import Product
 from fjord.heartbeat.models import Survey
 
+
 class OccurrencesComparisonForm(forms.Form):
     """Form for denoting parameters for the Occurrences Comparison report"""
     product = forms.CharField()
@@ -40,6 +41,7 @@ class ProductsUpdateForm(forms.ModelForm):
         fields = [
             'enabled',
             'display_name',
+            'display_description',
             'db_name',
             'slug',
             'on_dashboard',
@@ -48,6 +50,7 @@ class ProductsUpdateForm(forms.ModelForm):
             'browser_data_browser',
             'notes'
         ]
+
 
 class SurveyCreateForm(forms.ModelForm):
     class Meta:

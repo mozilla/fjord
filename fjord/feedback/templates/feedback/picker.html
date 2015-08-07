@@ -35,19 +35,19 @@
                 Select a product to leave feedback for.
               {% endtrans %}
             </div>
-            <ul class="content">
-              {% for prod in products %}
-                <a href="{{ url('feedback', product=prod.slug) }}?{{ request.GET.urlencode() }}"
-                   {% if prod.image_file %}
-                     style="background-image: url({{ settings.STATIC_URL }}img/{{ prod.image_file }})"
-                   {% endif %}
-                   class="product-card">
+            <div class="content">
+              <ul id="product-cards" class="card-grid cf">
+                {% for prod in products %}
                   <li>
-                    <h3>{{ prod.display_name }}</h3>
+                    <a class="cf" href="{{ url('feedback', product=prod.slug) }}?{{ request.GET.urlencode() }}">
+                      <img class="logo-sprite" src="{{ settings.STATIC_URL }}img/{{ prod.image_file or 'blank.png' }}" alt="" />
+                      <span class="title">{{ prod.display_name }}</span>
+                      <span class="description">{{ prod.display_description }}</span>
+                    </a>
                   </li>
-                </a>
-              {% endfor %}
-            </ul>
+                {% endfor %}
+              </ul>
+            </div>
           {% endif %}
         </section>
       </div>
