@@ -174,5 +174,21 @@
     "platform": "Windows",
     "platform_version": "XP",
     "mobile": false
+  },
+  {
+    "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 8_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) FxiOS/1.0 Mobile/12F69 Safari/600.1.4",
+    "browser": "Firefox for iOS",
+    "browser_version": "1.0",
+    "platform": "iPhone OS",
+    "platform_version": "8_3",
+    "mobile": true
+  },
+  {
+    "user_agent": "Mozilla/5.0 (iPad; CPU iPhone OS 8_3 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) FxiOS/1.0 Mobile/12F69 Safari/600.1.4",
+    "browser": "Firefox for iOS",
+    "browser_version": "1.0",
+    "platform": "iPhone OS",
+    "platform_version": "8_3",
+    "mobile": true
   }
 ]
