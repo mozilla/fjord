@@ -66,11 +66,11 @@ def parse_ua(ua):
     no_browser = Browser(UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN,
                          mobile or None)
 
-    if 'firefox' not in ua.lower():
+    # Firefox browsers have either "Firefox" or "FxiOS" in the UA.
+    if 'firefox' not in ua.lower() and 'fxios' not in ua.lower():
         return no_browser
 
-    # For reference, a normal Firefox on android user agent looks like
-    # Mozilla/5.0 (Android; Mobile; rv:14.0) Gecko/14.0 Firefox/14.0.2
+    # See fjord/base/tests/user_agent_data.json for valid user agents.
 
     # Extract the part within the parenthesis, and the part after the
     # parenthesis. Inside has information about the platform, and
@@ -98,11 +98,14 @@ def parse_ua(ua):
             browser_version = part[1]
         elif 'Iceweasel' in part:
             browser = 'Iceweasel'
+        elif 'FxiOS' in part:
+            browser = 'Firefox for iOS'
+            browser_version = part[1]
 
     platform = platform_parts.pop(0)
     platform_version = UNKNOWN
 
-    while platform in ['X11', 'Ubuntu', 'U']:
+    while platform in ['X11', 'Ubuntu', 'U', 'iPad', 'iPhone']:
         platform = platform_parts.pop(0)
 
     if platform == 'Windows':
@@ -120,6 +123,11 @@ def parse_ua(ua):
         platform = 'Linux'
     elif platform.startswith('FreeBSD'):
         platform = 'FreeBSD'
+    elif platform.startswith('CPU iPhone'):
+        # Looks like "CPU iPhone OS 8_3 like Mac OS X" and we want
+        # the "8_3" part. Then we switch it to "8.3"
+        platform_version = platform.split(' ')[3].replace('_', '.')
+        platform = 'iPhone OS'
     elif platform in ('OS X', 'Macintosh'):
         for part in platform_parts:
             if 'OS X' in part:
