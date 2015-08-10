@@ -179,23 +179,20 @@ Posting product feedback: POST /api/v1/feedback/
 Testing clients using the API
 -----------------------------
 
-.. Warning::
-
-   **DO NOT TEST YOUR CLIENT AGAINST OUR PRODUCTION SERVER. IT WILL
-   MAKE CHENG, MATT, TYLER AND I CROSS.**
-
-
-Seriously. Please don't test your client against our production
-server.
-
-Test your client against our stage server which runs the same code
-that our production server does. The url for the our stage server is::
+You can test early stages of your code against our -stage server at::
 
     https://input.allizom.org/
+
+But you want to make sure you test against production at some point since
+that's where the product you're using will be set up. Production is::
+
+    https://input.mozilla.org/
                   ^^^^^^^
 
+.. Note::
 
-Please make sure to use the correct domain!
+   If you're building automated testing, you can use our -prod server,
+   but include the word ``TEST`` at the beginning of the description.
 
 
 Required fields
