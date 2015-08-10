@@ -12,17 +12,14 @@ class TestUserAgentDetection(object):
     def check_ua(self, case):
         """Check and individual user agent test case."""
         parsed = browsers.parse_ua(case['user_agent'])
-        assert(parsed is not None)
+        assert parsed is not None
 
         expected = tuple(case[key] for key in
                          ['browser', 'browser_version',
                           'platform', 'platform_version',
                           'mobile'])
 
-        msg = ('UA Detection failed. UA="{0}", parsed="{1}" '
-               'expected="{2}"'.format(
-                   case['user_agent'], parsed, expected))
-        assert parsed == expected, msg
+        assert parsed == expected
 
     def test_parse_ua(self):
         """Test that a suite of should-work user agents work."""
