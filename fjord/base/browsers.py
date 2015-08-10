@@ -125,8 +125,8 @@ def parse_ua(ua):
         platform = 'FreeBSD'
     elif platform.startswith('CPU iPhone'):
         # Looks like "CPU iPhone OS 8_3 like Mac OS X" and we want
-        # the "8_3" part.
-        platform_version = platform.split(' ')[3]
+        # the "8_3" part. Then we switch it to "8.3"
+        platform_version = platform.split(' ')[3].replace('_', '.')
         platform = 'iPhone OS'
     elif platform in ('OS X', 'Macintosh'):
         for part in platform_parts:

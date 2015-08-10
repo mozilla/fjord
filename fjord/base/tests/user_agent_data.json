@@ -180,7 +180,7 @@
     "browser": "Firefox for iOS",
     "browser_version": "1.0",
     "platform": "iPhone OS",
-    "platform_version": "8_3",
+    "platform_version": "8.3",
     "mobile": true
   },
   {
@@ -188,7 +188,7 @@
     "browser": "Firefox for iOS",
     "browser_version": "1.0",
     "platform": "iPhone OS",
-    "platform_version": "8_3",
+    "platform_version": "8.3",
     "mobile": true
   }
 ]
