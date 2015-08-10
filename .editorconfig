@@ -16,6 +16,6 @@ indent_size = 4
 indent_style = space
 indent_size = 2
 
-[{package.json,.travis.yml}]
+[{package.json,.travis.yml,user_agent_data.json}]
 indent_style = space
 indent_size = 2

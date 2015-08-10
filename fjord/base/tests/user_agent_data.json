@@ -1,178 +1,178 @@
 [
-   {
-       "user_agent": "Mozilla/5.0 (Android; Mobile; rv:14.0) Gecko/14.0 Firefox/14.0.2",
-       "browser": "Firefox for Android",
-       "browser_version": "14.0.2",
-       "platform": "Android",
-       "platform_version": "",
-       "mobile": true
-   },
-   {
-       "user_agent": "Mozilla/5.0 (OS X; Intel Mac OS X 10.5; rv:10.0.1) Gecko/20100101 Firefox/10.0.1 SeaMonkey/2.7.1",
-       "browser": "Firefox",
-       "browser_version": "10.0.1",
-       "platform": "OS X",
-       "platform_version": "10.5",
-       "mobile": false
-   },
-   {
-       "user_agent": "Mozilla/5.0 (OS X; Intel Mac OS X 10.6; rv:9.0) Gecko/20100101 Firefox/9.0",
-       "browser": "Firefox",
-       "browser_version": "9.0",
-       "platform": "OS X",
-       "platform_version": "10.6",
-       "mobile": false
-   },
-   {
-       "user_agent": "Mozilla/5.0 (OS X; Intel Mac OS X 10_7_2; rv:10.0.1) Gecko/20100101 Firefox/10.0.1",
-       "browser": "Firefox",
-       "browser_version": "10.0.1",
-       "platform": "OS X",
-       "platform_version": "10.7.2",
-       "mobile": false
-   },
-   {
-       "user_agent": "Mozilla/5.0 (Windows NT 5.2; rv:10.0.1) Gecko/20100101 Firefox/10.0.1 SeaMonkey/2.7.1",
-       "browser": "Firefox",
-       "browser_version": "10.0.1",
-       "platform": "Windows",
-       "platform_version": "XP",
-       "mobile": false
-   },
-   {
-       "user_agent": "Mozilla/5.0 (Windows NT 6.0; rv:14.0) Gecko/20100101 Firefox/14.0.1",
-       "browser": "Firefox",
-       "browser_version": "14.0.1",
-       "platform": "Windows",
-       "platform_version": "Vista",
-       "mobile": false
-   },
-   {
-       "user_agent": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:10.0.1) Gecko/20100101 Firefox/10.0.1",
-       "browser": "Firefox",
-       "browser_version": "10.0.1",
-       "platform": "Windows",
-       "platform_version": "7",
-       "mobile": false
-   },
-   {
-       "user_agent": "Mozilla/5.0 (Windows NT 6.1; rv:12.0) Gecko/20120403211507 Firefox/12.0",
-       "browser": "Firefox",
-       "browser_version": "12.0",
-       "platform": "Windows",
-       "platform_version": "7",
-       "mobile": false
-   },
-   {
-       "user_agent": "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0",
-       "browser": "Firefox",
-       "browser_version": "24.0",
-       "platform": "Windows",
-       "platform_version": "8.1",
-       "mobile": false
-   },
-   {
-       "user_agent": "Mozilla/5.0 (X11; FreeBSD amd64; rv:5.0) Gecko/20100101 Firefox/5.0",
-       "browser": "Firefox",
-       "browser_version": "5.0",
-       "platform": "FreeBSD",
-       "platform_version": "",
-       "mobile": false
-   },
-   {
-       "user_agent": "Mozilla/5.0 (X11; Linux i686 on x86_64; rv:2.0.1) Gecko/20100101 Firefox/4.0.1",
-       "browser": "Firefox",
-       "browser_version": "4.0.1",
-       "platform": "Linux",
-       "platform_version": "",
-       "mobile": false
-   },
-   {
-       "user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:10.0.1) Gecko/20100101 Firefox/10.0.1",
-       "browser": "Firefox",
-       "browser_version": "10.0.1",
-       "platform": "Linux",
-       "platform_version": "",
-       "mobile": false
-   },
-   {
-       "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:14.0) Gecko/20100101 Firefox/14.0.1",
-       "browser": "Firefox",
-       "browser_version": "14.0.1",
-       "platform": "Linux",
-       "platform_version": "",
-       "mobile": false
-   },
-   {
-       "user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:5.0) Gecko/20100101 Firefox/5.0 Iceweasel/5.0",
-       "browser": "Iceweasel",
-       "browser_version": "5.0",
-       "platform": "Linux",
-       "platform_version": "",
-       "mobile": false
-   },
-   {
-       "user_agent": "Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0",
-       "browser": "Firefox OS",
-       "browser_version": "1.0",
-       "platform": "Firefox OS",
-       "platform_version": "1.0",
-       "mobile": true
-   },
-   {
-       "user_agent": "Mozilla/5.0 (Mobile; rv:18.1) Gecko/18.1 Firefox/18.1",
-       "browser": "Firefox OS",
-       "browser_version": "1.1",
-       "platform": "Firefox OS",
-       "platform_version": "1.1",
-       "mobile": true
-   },
-   {
-       "user_agent": "Mozilla/5.0 (Mobile; rv:26.0) Gecko/26.0 Firefox/26.0",
-       "browser": "Firefox OS",
-       "browser_version": "1.2",
-       "platform": "Firefox OS",
-       "platform_version": "1.2",
-       "mobile": true
-   },
-   {
-       "user_agent": "Mozilla/5.0 (Mobile; rv:22.0) Gecko/22.0 Firefox/22.0",
-       "browser": "Firefox OS",
-       "browser_version": "",
-       "platform": "Firefox OS",
-       "platform_version": "",
-       "mobile": true
-   },
-   {
-      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:20.0) Gecko/20130208 Firefox/20.0",
-      "browser": "Firefox",
-      "browser_version": "20.0",
-      "platform": "OS X",
-      "platform_version": "10.7",
-      "mobile": false
-    },
-    {
-      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:18.0) Gecko/20100101 Firefox/18.0",
-      "browser": "Firefox",
-      "browser_version": "18.0",
-      "platform": "OS X",
-      "platform_version": "10.8",
-      "mobile": false
-    },
-    {
-      "user_agent": "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9.2.17) Gecko/20110420 Firefox/3.6.17 GTB7.1 ( .NET CLR 3.5.30729; .NET4.0C) FBSMTWB",
-      "browser": "Firefox",
-      "browser_version": "3.6.17",
-      "platform": "Windows",
-      "platform_version": "Vista",
-      "mobile": false
-    },
-    {
-      "user_agent":  "Mozilla/5.0 (Windows; U; Windows NT 5.1; es-ES; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11 (.NET CLR 3.5.30729)",
-      "browser": "Firefox",
-      "browser_version": "3.6.11",
-      "platform": "Windows",
-      "platform_version": "XP",
-      "mobile": false
-    }
+  {
+    "user_agent": "Mozilla/5.0 (Android; Mobile; rv:14.0) Gecko/14.0 Firefox/14.0.2",
+    "browser": "Firefox for Android",
+    "browser_version": "14.0.2",
+    "platform": "Android",
+    "platform_version": "",
+    "mobile": true
+  },
+  {
+    "user_agent": "Mozilla/5.0 (OS X; Intel Mac OS X 10.5; rv:10.0.1) Gecko/20100101 Firefox/10.0.1 SeaMonkey/2.7.1",
+    "browser": "Firefox",
+    "browser_version": "10.0.1",
+    "platform": "OS X",
+    "platform_version": "10.5",
+    "mobile": false
+  },
+  {
+    "user_agent": "Mozilla/5.0 (OS X; Intel Mac OS X 10.6; rv:9.0) Gecko/20100101 Firefox/9.0",
+    "browser": "Firefox",
+    "browser_version": "9.0",
+    "platform": "OS X",
+    "platform_version": "10.6",
+    "mobile": false
+  },
+  {
+    "user_agent": "Mozilla/5.0 (OS X; Intel Mac OS X 10_7_2; rv:10.0.1) Gecko/20100101 Firefox/10.0.1",
+    "browser": "Firefox",
+    "browser_version": "10.0.1",
+    "platform": "OS X",
+    "platform_version": "10.7.2",
+    "mobile": false
+  },
+  {
+    "user_agent": "Mozilla/5.0 (Windows NT 5.2; rv:10.0.1) Gecko/20100101 Firefox/10.0.1 SeaMonkey/2.7.1",
+    "browser": "Firefox",
+    "browser_version": "10.0.1",
+    "platform": "Windows",
+    "platform_version": "XP",
+    "mobile": false
+  },
+  {
+    "user_agent": "Mozilla/5.0 (Windows NT 6.0; rv:14.0) Gecko/20100101 Firefox/14.0.1",
+    "browser": "Firefox",
+    "browser_version": "14.0.1",
+    "platform": "Windows",
+    "platform_version": "Vista",
+    "mobile": false
+  },
+  {
+    "user_agent": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:10.0.1) Gecko/20100101 Firefox/10.0.1",
+    "browser": "Firefox",
+    "browser_version": "10.0.1",
+    "platform": "Windows",
+    "platform_version": "7",
+    "mobile": false
+  },
+  {
+    "user_agent": "Mozilla/5.0 (Windows NT 6.1; rv:12.0) Gecko/20120403211507 Firefox/12.0",
+    "browser": "Firefox",
+    "browser_version": "12.0",
+    "platform": "Windows",
+    "platform_version": "7",
+    "mobile": false
+  },
+  {
+    "user_agent": "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0",
+    "browser": "Firefox",
+    "browser_version": "24.0",
+    "platform": "Windows",
+    "platform_version": "8.1",
+    "mobile": false
+  },
+  {
+    "user_agent": "Mozilla/5.0 (X11; FreeBSD amd64; rv:5.0) Gecko/20100101 Firefox/5.0",
+    "browser": "Firefox",
+    "browser_version": "5.0",
+    "platform": "FreeBSD",
+    "platform_version": "",
+    "mobile": false
+  },
+  {
+    "user_agent": "Mozilla/5.0 (X11; Linux i686 on x86_64; rv:2.0.1) Gecko/20100101 Firefox/4.0.1",
+    "browser": "Firefox",
+    "browser_version": "4.0.1",
+    "platform": "Linux",
+    "platform_version": "",
+    "mobile": false
+  },
+  {
+    "user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:10.0.1) Gecko/20100101 Firefox/10.0.1",
+    "browser": "Firefox",
+    "browser_version": "10.0.1",
+    "platform": "Linux",
+    "platform_version": "",
+    "mobile": false
+  },
+  {
+    "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:14.0) Gecko/20100101 Firefox/14.0.1",
+    "browser": "Firefox",
+    "browser_version": "14.0.1",
+    "platform": "Linux",
+    "platform_version": "",
+    "mobile": false
+  },
+  {
+    "user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:5.0) Gecko/20100101 Firefox/5.0 Iceweasel/5.0",
+    "browser": "Iceweasel",
+    "browser_version": "5.0",
+    "platform": "Linux",
+    "platform_version": "",
+    "mobile": false
+  },
+  {
+    "user_agent": "Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0",
+    "browser": "Firefox OS",
+    "browser_version": "1.0",
+    "platform": "Firefox OS",
+    "platform_version": "1.0",
+    "mobile": true
+  },
+  {
+    "user_agent": "Mozilla/5.0 (Mobile; rv:18.1) Gecko/18.1 Firefox/18.1",
+    "browser": "Firefox OS",
+    "browser_version": "1.1",
+    "platform": "Firefox OS",
+    "platform_version": "1.1",
+    "mobile": true
+  },
+  {
+    "user_agent": "Mozilla/5.0 (Mobile; rv:26.0) Gecko/26.0 Firefox/26.0",
+    "browser": "Firefox OS",
+    "browser_version": "1.2",
+    "platform": "Firefox OS",
+    "platform_version": "1.2",
+    "mobile": true
+  },
+  {
+    "user_agent": "Mozilla/5.0 (Mobile; rv:22.0) Gecko/22.0 Firefox/22.0",
+    "browser": "Firefox OS",
+    "browser_version": "",
+    "platform": "Firefox OS",
+    "platform_version": "",
+    "mobile": true
+  },
+  {
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:20.0) Gecko/20130208 Firefox/20.0",
+    "browser": "Firefox",
+    "browser_version": "20.0",
+    "platform": "OS X",
+    "platform_version": "10.7",
+    "mobile": false
+  },
+  {
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:18.0) Gecko/20100101 Firefox/18.0",
+    "browser": "Firefox",
+    "browser_version": "18.0",
+    "platform": "OS X",
+    "platform_version": "10.8",
+    "mobile": false
+  },
+  {
+    "user_agent": "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US; rv:1.9.2.17) Gecko/20110420 Firefox/3.6.17 GTB7.1 ( .NET CLR 3.5.30729; .NET4.0C) FBSMTWB",
+    "browser": "Firefox",
+    "browser_version": "3.6.17",
+    "platform": "Windows",
+    "platform_version": "Vista",
+    "mobile": false
+  },
+  {
+    "user_agent":  "Mozilla/5.0 (Windows; U; Windows NT 5.1; es-ES; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11 (.NET CLR 3.5.30729)",
+    "browser": "Firefox",
+    "browser_version": "3.6.11",
+    "platform": "Windows",
+    "platform_version": "XP",
+    "mobile": false
+  }
 ]
