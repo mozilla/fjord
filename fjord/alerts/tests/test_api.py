@@ -8,7 +8,7 @@ from django.test.utils import override_settings
 from . import AlertFlavorFactory, AlertFactory, LinkFactory
 from fjord.alerts.models import Alert, Link
 from fjord.api_auth.tests import TokenFactory
-from fjord.base.tests import eq_, ok_, reverse, TestCase, WHATEVER
+from fjord.base.tests import reverse, TestCase, WHATEVER
 
 
 class AlertsGetAPIAuthTest(TestCase):
@@ -20,8 +20,9 @@ class AlertsGetAPIAuthTest(TestCase):
             reverse('alerts-api') + '?' + urllib.urlencode(qs)
         )
 
-        eq_(resp.status_code, 400)
-        eq_(json.loads(resp.content),
+        assert resp.status_code == 400
+        assert (
+            json.loads(resp.content) ==
             {'detail': {'flavors': ['Flavor "fooflavor" does not exist.']}}
         )
 
@@ -32,8 +33,9 @@ class AlertsGetAPIAuthTest(TestCase):
             reverse('alerts-api') + '?' + urllib.urlencode(qs)
         )
 
-        eq_(resp.status_code, 400)
-        eq_(json.loads(resp.content),
+        assert resp.status_code == 400
+        assert (
+            json.loads(resp.content) ==
             {'detail': {'flavors': [
                 'Flavor "fooflavor" does not exist.',
                 'Flavor "barflavor" does not exist.'
@@ -49,8 +51,9 @@ class AlertsGetAPIAuthTest(TestCase):
             reverse('alerts-api') + '?' + urllib.urlencode(qs)
         )
 
-        eq_(resp.status_code, 400)
-        eq_(json.loads(resp.content),
+        assert resp.status_code == 400
+        assert (
+            json.loads(resp.content) ==
             {'detail': {'flavors': ['Flavor "barflavor" does not exist.']}}
         )
 
@@ -64,8 +67,9 @@ class AlertsGetAPIAuthTest(TestCase):
             reverse('alerts-api') + '?' + urllib.urlencode(qs)
         )
 
-        eq_(resp.status_code, 401)
-        eq_(json.loads(resp.content),
+        assert resp.status_code == 401
+        assert (
+            json.loads(resp.content) ==
             {'detail': 'Authentication credentials were not provided.'}
         )
 
@@ -80,8 +84,9 @@ class AlertsGetAPIAuthTest(TestCase):
             HTTP_AUTHORIZATION=''
         )
 
-        eq_(resp.status_code, 401)
-        eq_(json.loads(resp.content),
+        assert resp.status_code == 401
+        assert (
+            json.loads(resp.content) ==
             {'detail': 'Authentication credentials were not provided.'}
         )
 
@@ -90,8 +95,9 @@ class AlertsGetAPIAuthTest(TestCase):
             HTTP_AUTHORIZATION='token'
         )
 
-        eq_(resp.status_code, 401)
-        eq_(json.loads(resp.content),
+        assert resp.status_code == 401
+        assert (
+            json.loads(resp.content) ==
             {'detail': 'Invalid token header. No token provided.'}
         )
 
@@ -100,8 +106,9 @@ class AlertsGetAPIAuthTest(TestCase):
             HTTP_AUTHORIZATION='token token token'
         )
 
-        eq_(resp.status_code, 401)
-        eq_(json.loads(resp.content),
+        assert resp.status_code == 401
+        assert (
+            json.loads(resp.content) ==
             {'detail': ('Invalid token header. Token string should not '
                         'contain spaces.')}
         )
@@ -118,8 +125,9 @@ class AlertsGetAPIAuthTest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 403)
-        eq_(json.loads(resp.content),
+        assert resp.status_code == 403
+        assert (
+            json.loads(resp.content) ==
             {'detail': 'You do not have permission to perform this action.'}
         )
 
@@ -137,8 +145,9 @@ class AlertsGetAPIAuthTest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 403)
-        eq_(json.loads(resp.content),
+        assert resp.status_code == 403
+        assert (
+            json.loads(resp.content) ==
             {'detail': 'You do not have permission to perform this action.'}
         )
 
@@ -151,8 +160,9 @@ class AlertsGetAPIAuthTest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 403)
-        eq_(json.loads(resp.content),
+        assert resp.status_code == 403
+        assert (
+            json.loads(resp.content) ==
             {'detail': 'You do not have permission to perform this action.'}
         )
 
@@ -170,8 +180,9 @@ class AlertsGetAPIAuthTest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 400)
-        eq_(json.loads(resp.content),
+        assert resp.status_code == 400
+        assert (
+            json.loads(resp.content) ==
             {'detail': {'flavors': ['Flavor "fooflavor" is disabled.']}}
         )
 
@@ -192,9 +203,11 @@ class AlertsGetAPIAuthTest(TestCase):
             HTTP_FJORD_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 200)
-        eq_(json.loads(resp.content),
-            {u'count': 0, u'total': 0, u'alerts': []})
+        assert resp.status_code == 200
+        assert (
+            json.loads(resp.content) ==
+            {u'count': 0, u'total': 0, u'alerts': []}
+        )
 
 
 class AlertsGetAPITest(TestCase):
@@ -214,13 +227,15 @@ class AlertsGetAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 400)
-        eq_(json.loads(resp.content),
+        assert resp.status_code == 400
+        assert (
+            json.loads(resp.content) ==
             {
                 'detail': {
                     'non_field_errors': ['"foo" is not a valid argument.']
                 }
-            })
+            }
+        )
 
     def test_get_one_flavor(self):
         token = TokenFactory()
@@ -239,9 +254,9 @@ class AlertsGetAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 200)
-        eq_(
-            json.loads(resp.content),
+        assert resp.status_code == 200
+        assert (
+            json.loads(resp.content) ==
             {
                 u'count': 3,
                 u'total': 3,
@@ -306,9 +321,9 @@ class AlertsGetAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 200)
-        eq_(
-            json.loads(resp.content),
+        assert resp.status_code == 200
+        assert (
+            json.loads(resp.content) ==
             {
                 u'count': 2,
                 u'total': 2,
@@ -364,9 +379,9 @@ class AlertsGetAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 200)
-        eq_(
-            json.loads(resp.content),
+        assert resp.status_code == 200
+        assert (
+            json.loads(resp.content) ==
             {
                 u'count': 1,
                 u'total': 2,
@@ -402,8 +417,9 @@ class AlertsGetAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 400)
-        eq_(json.loads(resp.content),
+        assert resp.status_code == 400
+        assert (
+            json.loads(resp.content) ==
             {'detail': {'max': ['A valid integer is required.']}}
         )
 
@@ -416,14 +432,17 @@ class AlertsGetAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 400)
-        eq_(json.loads(resp.content), {
-            'detail': {
-                'max': [
-                    'Ensure this value is greater than or equal to 1.'
-                ]
+        assert resp.status_code == 400
+        assert (
+            json.loads(resp.content) ==
+            {
+                'detail': {
+                    'max': [
+                        'Ensure this value is greater than or equal to 1.'
+                    ]
+                }
             }
-        })
+        )
 
     def test_start_time(self):
         token = TokenFactory()
@@ -459,10 +478,12 @@ class AlertsGetAPITest(TestCase):
                 HTTP_AUTHORIZATION='token ' + token.token
             )
 
-            eq_(resp.status_code, 200)
+            assert resp.status_code == 200
             data = json.loads(resp.content)
-            eq_(sorted([alert['summary'] for alert in data['alerts']]),
-                sorted(expected))
+            assert (
+                sorted([alert['summary'] for alert in data['alerts']]) ==
+                sorted(expected)
+            )
 
         # Start yesterday at 00:00
         test_scenario(
@@ -514,12 +535,16 @@ class AlertsGetAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 400)
+        assert resp.status_code == 400
         data = json.loads(resp.content)
-        ok_(data['detail']['start_time_start'][0]
-            .startswith('Datetime has wrong format'))
-        ok_(data['detail']['start_time_end'][0]
-            .startswith('Datetime has wrong format'))
+        assert (
+            data['detail']['start_time_start'][0]
+            .startswith('Datetime has wrong format')
+        )
+        assert (
+            data['detail']['start_time_end'][0]
+            .startswith('Datetime has wrong format')
+        )
 
         qs = {
             'flavors': flavor.slug,
@@ -533,9 +558,10 @@ class AlertsGetAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 400)
+        assert resp.status_code == 400
         data = json.loads(resp.content)
-        eq_(data['detail'],
+        assert (
+            data['detail'] ==
             {'non_field_errors': [
                 u'start_time_start must occur before start_time_end.'
             ]}
@@ -575,10 +601,12 @@ class AlertsGetAPITest(TestCase):
                 HTTP_AUTHORIZATION='token ' + token.token
             )
 
-            eq_(resp.status_code, 200)
+            assert resp.status_code == 200
             data = json.loads(resp.content)
-            eq_(sorted([alert['summary'] for alert in data['alerts']]),
-                sorted(expected))
+            assert (
+                sorted([alert['summary'] for alert in data['alerts']]) ==
+                sorted(expected)
+            )
 
         # Start yesterday at 00:00
         test_scenario(
@@ -630,12 +658,16 @@ class AlertsGetAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 400)
+        assert resp.status_code == 400
         data = json.loads(resp.content)
-        ok_(data['detail']['end_time_start'][0]
-            .startswith('Datetime has wrong format'))
-        ok_(data['detail']['end_time_end'][0]
-            .startswith('Datetime has wrong format'))
+        assert (
+            data['detail']['end_time_start'][0]
+            .startswith('Datetime has wrong format')
+        )
+        assert (
+            data['detail']['end_time_end'][0]
+            .startswith('Datetime has wrong format')
+        )
 
         qs = {
             'flavors': flavor.slug,
@@ -649,9 +681,10 @@ class AlertsGetAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 400)
+        assert resp.status_code == 400
         data = json.loads(resp.content)
-        eq_(data['detail'],
+        assert (
+            data['detail'] ==
             {'non_field_errors': [
                 u'end_time_start must occur before end_time_end.'
             ]}
@@ -688,10 +721,12 @@ class AlertsGetAPITest(TestCase):
                 HTTP_AUTHORIZATION='token ' + token.token
             )
 
-            eq_(resp.status_code, 200)
+            assert resp.status_code == 200
             data = json.loads(resp.content)
-            eq_(sorted([alert['summary'] for alert in data['alerts']]),
-                sorted(expected))
+            assert (
+                sorted([alert['summary'] for alert in data['alerts']]) ==
+                sorted(expected)
+            )
 
         # Start yesterday at 00:00 yields alert1.
         test_scenario(
@@ -744,12 +779,16 @@ class AlertsGetAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 400)
+        assert resp.status_code == 400
         data = json.loads(resp.content)
-        ok_(data['detail']['created_start'][0]
-            .startswith('Datetime has wrong format'))
-        ok_(data['detail']['created_end'][0]
-            .startswith('Datetime has wrong format'))
+        assert (
+            data['detail']['created_start'][0]
+            .startswith('Datetime has wrong format')
+        )
+        assert (
+            data['detail']['created_end'][0]
+            .startswith('Datetime has wrong format')
+        )
 
         qs = {
             'flavors': flavor.slug,
@@ -763,9 +802,10 @@ class AlertsGetAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 400)
+        assert resp.status_code == 400
         data = json.loads(resp.content)
-        eq_(data['detail'],
+        assert (
+            data['detail'] ==
             {'non_field_errors': [
                 u'created_start must occur before created_end.'
             ]}
@@ -787,9 +827,9 @@ class AlertsGetAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 200)
-        eq_(
-            json.loads(resp.content),
+        assert resp.status_code == 200
+        assert (
+            json.loads(resp.content) ==
             {
                 u'count': 1,
                 u'total': 1,
@@ -838,14 +878,14 @@ class AlertsPostAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 201)
+        assert resp.status_code == 201
         alert = Alert.objects.latest('id')
-        eq_(json.loads(resp.content), {'detail': {'id': alert.id}})
-        eq_(alert.flavor.slug, flavor.slug)
-        eq_(alert.severity, data['severity'])
-        eq_(alert.summary, data['summary'])
-        eq_(alert.emitter_name, data['emitter_name'])
-        eq_(alert.emitter_version, data['emitter_version'])
+        assert json.loads(resp.content) == {'detail': {'id': alert.id}}
+        assert alert.flavor.slug == flavor.slug
+        assert alert.severity == data['severity']
+        assert alert.summary == data['summary']
+        assert alert.emitter_name == data['emitter_name']
+        assert alert.emitter_version == data['emitter_version']
 
     @override_settings(TIME_ZONE='America/Los_Angeles')
     def test_post_with_dates(self):
@@ -873,11 +913,11 @@ class AlertsPostAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 201)
+        assert resp.status_code == 201
         alert = Alert.objects.latest('id')
-        eq_(json.loads(resp.content), {'detail': {'id': alert.id}})
-        eq_(alert.start_time, datetime.datetime(2015, 3, 2, 8, 22, 0))
-        eq_(alert.end_time, datetime.datetime(2015, 3, 2, 9, 23, 0))
+        assert json.loads(resp.content) == {'detail': {'id': alert.id}}
+        assert alert.start_time == datetime.datetime(2015, 3, 2, 8, 22, 0)
+        assert alert.end_time == datetime.datetime(2015, 3, 2, 9, 23, 0)
 
     def test_post_invalid_start_time(self):
         token = TokenFactory()
@@ -902,10 +942,12 @@ class AlertsPostAPITest(TestCase):
             content_type='application/json',
             HTTP_AUTHORIZATION='token ' + token.token
         )
-        eq_(resp.status_code, 400)
+        assert resp.status_code == 400
         content = json.loads(resp.content)
-        ok_(content['detail']['start_time'][0].startswith(
-            u'Datetime has wrong format.'))
+        assert (
+            content['detail']['start_time'][0]
+            .startswith(u'Datetime has wrong format.')
+        )
 
     @override_settings(TIME_ZONE='America/Los_Angeles')
     def test_post_start_time_timezone_change(self):
@@ -933,11 +975,11 @@ class AlertsPostAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 201)
+        assert resp.status_code == 201
         alert = Alert.objects.latest('id')
-        eq_(json.loads(resp.content), {'detail': {'id': alert.id}})
-        eq_(alert.start_time, datetime.datetime(2015, 3, 2, 14, 22, 0))
-        eq_(alert.end_time, datetime.datetime(2015, 3, 2, 15, 23, 0))
+        assert json.loads(resp.content) == {'detail': {'id': alert.id}}
+        assert alert.start_time == datetime.datetime(2015, 3, 2, 14, 22, 0)
+        assert alert.end_time == datetime.datetime(2015, 3, 2, 15, 23, 0)
 
     @override_settings(TIME_ZONE='America/Los_Angeles')
     def test_post_date_roundtrip(self):
@@ -967,10 +1009,10 @@ class AlertsPostAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 201)
+        assert resp.status_code == 201
         alert = Alert.objects.latest('id')
-        eq_(json.loads(resp.content), {'detail': {'id': alert.id}})
-        eq_(alert.start_time, datetime.datetime(2015, 3, 2, 8, 22, 0))
+        assert json.loads(resp.content) == {'detail': {'id': alert.id}}
+        assert alert.start_time == datetime.datetime(2015, 3, 2, 8, 22, 0)
 
         qs = {
             'flavors': flavor.slug
@@ -980,9 +1022,9 @@ class AlertsPostAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 200)
-        eq_(
-            json.loads(resp.content),
+        assert resp.status_code == 200
+        assert (
+            json.loads(resp.content) ==
             {
                 u'count': 1,
                 u'total': 1,
@@ -1028,14 +1070,14 @@ class AlertsPostAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 201)
+        assert resp.status_code == 201
         alert = Alert.objects.latest('id')
-        eq_(json.loads(resp.content), {'detail': {'id': alert.id}})
+        assert json.loads(resp.content) == {'detail': {'id': alert.id}}
 
         links = Link.objects.filter(alert=alert)
-        eq_(len(links), 1)
-        eq_(links[0].name, 'link')
-        eq_(links[0].url, 'http://example.com/')
+        assert len(links) == 1
+        assert links[0].name == 'link'
+        assert links[0].url == 'http://example.com/'
 
     def test_invalid_links(self):
         token = TokenFactory()
@@ -1062,8 +1104,9 @@ class AlertsPostAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 400)
-        eq_(json.loads(resp.content),
+        assert resp.status_code == 400
+        assert (
+            json.loads(resp.content) ==
             {
                 u'detail': {
                     u'links': [
@@ -1074,7 +1117,7 @@ class AlertsPostAPITest(TestCase):
             }
         )
 
-        eq_(Alert.objects.filter(summary=data['summary']).count(), 0)
+        assert Alert.objects.filter(summary=data['summary']).count() == 0
 
         # Missing link url
         data = {
@@ -1096,8 +1139,9 @@ class AlertsPostAPITest(TestCase):
             HTTP_AUTHORIZATION='token ' + token.token
         )
 
-        eq_(resp.status_code, 400)
-        eq_(json.loads(resp.content),
+        assert resp.status_code == 400
+        assert (
+            json.loads(resp.content) ==
             {
                 u'detail': {
                     u'links': [
@@ -1107,4 +1151,4 @@ class AlertsPostAPITest(TestCase):
                 }
             }
         )
-        eq_(Alert.objects.filter(summary=data['summary']).count(), 0)
+        assert Alert.objects.filter(summary=data['summary']).count() == 0
