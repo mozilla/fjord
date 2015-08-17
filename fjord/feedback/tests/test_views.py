@@ -1,6 +1,5 @@
 import json
 
-from django.contrib.auth.models import Group
 from django.core.cache import cache
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
@@ -11,7 +10,6 @@ from fjord.base.tests import (
     AnalyzerProfileFactory,
     reverse,
     TestCase,
-    with_waffle
 )
 from fjord.feedback import models
 from fjord.feedback.tests import ProductFactory, ResponseFactory
@@ -115,22 +113,7 @@ class TestFeedback(TestCase):
         eq_(u'Firefox', feedback.product)
         eq_(u'14.0.1', feedback.version)
 
-    @with_waffle('thankyou', True)
-    def test_thankyou_flag_active(self):
-        """Verify response and suggestions when thankyou flag is active"""
-        url = reverse('feedback', args=(u'firefox',), locale='en-US')
-        r = self.client.post(url, {
-            'happy': 0,
-            'description': u'Why Firefox not make me sandwiches!',
-        }, follow=True)
-
-        feedback = models.Response.objects.latest(field_name='id')
-        eq_(r.status_code, 200)
-        eq_(r.context['feedback'].id, feedback.id)
-        eq_(r.context['suggestions'], [])
-
-    @with_waffle('thankyou', True)
-    def test_thankyou_flag_and_response_id_in_qs_unauthenticated(self):
+    def test_response_id_in_qs_unauthenticated(self):
         """Verify response_id in querystring is ignored if user is not
         authenticated
         """
@@ -142,8 +125,7 @@ class TestFeedback(TestCase):
         eq_(r.context['feedback'], None)
         eq_(r.context['suggestions'], None)
 
-    @with_waffle('thankyou', True)
-    def test_thankyou_flag_and_response_id_in_qs_authenticated(self):
+    def test_response_id_in_qs_authenticated(self):
         """Verify response_id in querystring overrides session id"""
         # Create analyzer and log in.
 
@@ -170,18 +152,6 @@ class TestFeedback(TestCase):
         eq_(r.status_code, 200)
         eq_(r.context['feedback'].id, feedback.id)
         eq_(r.context['suggestions'], [])
-
-    @with_waffle('thankyou', False)
-    def test_thankyou_flag_inactive(self):
-        """Verify no suggestions when thankyou flag is inactive"""
-        url = reverse('feedback', args=(u'firefox',), locale='en-US')
-        r = self.client.post(url, {
-            'happy': 0,
-            'description': u'Why Firefox not make me sandwiches!',
-        }, follow=True)
-
-        eq_(r.status_code, 200)
-        eq_(r.context['suggestions'], None)
 
     def test_happy_prefill_in_querystring_is_ignored(self):
         url = reverse('feedback', args=(u'firefox',), locale='en-US')
