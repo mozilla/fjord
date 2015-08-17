@@ -11,7 +11,6 @@ from fjord.base.tests import (
     LocalizingClient,
     reverse,
     TestCase,
-    with_waffle
 )
 from fjord.feedback.tests import ResponseFactory
 from fjord.suggest.providers.sumosuggest import (
@@ -114,7 +113,6 @@ class SuggestWithRequestTestCase(SuggesterTestMixin, RedirectorTestMixin,
         'fjord.suggest.providers.sumosuggest.SUMOSuggestRedirector'
     ]
 
-    @with_waffle('thankyou', True)
     def test_mocked_get_suggestions(self):
         """Tests the whole thing with mocked API calls"""
         sumo_api_ret = {
@@ -242,7 +240,6 @@ class LiveSUMOSuggestProviderTestCase(SuggesterTestMixin, TestCase):
         'fjord.suggest.providers.sumosuggest.SUMOSuggest'
     ]
 
-    @with_waffle('thankyou', True)
     def test_get_suggestions(self):
         url = reverse('feedback', args=(u'firefox',))
         desc = u'slow browser please speed improve i am wait speed improv 2'

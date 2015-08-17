@@ -73,8 +73,7 @@ def thanks(request):
 
     if feedback:
         product = feedback.product
-        if waffle.flag_is_active(request, 'thankyou'):
-            suggestions = get_suggestions(feedback, request)
+        suggestions = get_suggestions(feedback, request)
 
     return render(request, 'feedback/thanks.html', {
         'product': product,
