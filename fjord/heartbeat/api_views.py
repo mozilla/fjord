@@ -41,6 +41,12 @@ class HeartbeatV2API(rest_framework.views.APIView):
     def post(self, request):
         post_data = dict(request.data)
 
+        # Stopgap fix for 1195747 where the hb client is sending
+        # "unknown" which fails validation because the column has
+        # max_length 4.
+        if post_data.get('country', '') == 'unknown':
+            post_data['country'] = 'UNK'
+
         serializer = AnswerSerializer(data=post_data)
         if not serializer.is_valid():
             return self.rest_error(post_data, serializer.errors)
