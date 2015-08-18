@@ -154,6 +154,32 @@ class HeartbeatPostAPITest(TestCase):
 
         eq_(ans.is_test, False)
 
+    def test_country_unknown(self):
+        """This is a stopgap fix for handling 'unknown' value for country"""
+        survey = SurveyFactory.create()
+
+        data = {
+            'experiment_version': '1',
+            'response_version': 1,
+            'person_id': 'joemamma',
+            'survey_id': survey.name,
+            'flow_id': '20141113',
+            'question_id': '1',
+            'updated_ts': self.timestamp(),
+
+            'question_text': 'ou812?',
+            'variation_id': '1',
+            'country': 'unknown'
+        }
+        resp = self.client.post(
+            reverse('heartbeat-api'),
+            content_type='application/json',
+            data=json.dumps(data))
+
+        eq_(resp.status_code, 201)
+        ans = Answer.objects.latest('id')
+        eq_(ans.country, 'UNK')
+
     def test_survey_doesnt_exist(self):
         """If the survey doesn't exist, kick up an error"""
         data = {
