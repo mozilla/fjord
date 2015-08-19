@@ -74,23 +74,10 @@
     {% endif %}
     <h2>{% if update %}Update{% else %}Create{% endif %} Survey</h2>
     <p><span>{% if update %}<a href="{{ url('hb_surveys') }}">&lt; Back to surveys</a>{% endif %}</span></p>
-    <form action='' method='POST'>
+    <form class="analyzer-form" action="" method="POST">
       {{ csrf() }}
-      {% for field in form %}
-        <p>
-          {{ field.label_tag() }}
-          {{ field }}
-          {{ field.help_text }}
-        </p>
-        {% if field.errors %}
-          <ul class="errorlist">
-            {% for error in field.errors %}
-              <li>{{ error }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-      {% endfor %}
-      <input type="submit">
+      {{ form.as_p() }}
+      <input type="submit" value="Save">
     </form>
   </div>
 {% endblock %}
