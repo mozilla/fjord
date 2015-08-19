@@ -318,10 +318,10 @@ SUPPORTED_NONLOCALES = [
 ]
 
 SUGGEST_PROVIDERS = [
-    'fjord.suggest.providers.sumosuggest.SUMOSuggest'
+    'fjord.suggest.providers.sumo.SUMOSuggest'
 ]
 REDIRECTOR_PROVIDERS = [
-    'fjord.suggest.providers.sumosuggest.SUMOSuggestRedirector'
+    'fjord.suggest.providers.sumo.SUMOSuggestRedirector'
 ]
 
 ## Media and templates.
