@@ -369,3 +369,41 @@ table.flagged {
     }
   }
 }
+
+.analyzer-form {
+  p {
+    display: block;
+    label {
+      display: block;
+      font-weight: bold;
+      padding: 5px 0;
+    }
+    input {
+      display: block;
+    }
+    input[type=text],
+    input[type=url],
+    textarea,
+    select {
+      width: 80%;
+    }
+    .helptext {
+      display: block;
+      color: #888;
+      padding: 5px 0;
+    }
+  }
+  input[type=submit] {
+    padding: 4px 8px;
+    width: 80%;
+  }
+  .errorlist {
+    border: 1px solid red;
+    li {
+      color: red;
+      font-weight: bold;
+      list-style: none;
+      padding: 5px;
+    }
+  }
+}

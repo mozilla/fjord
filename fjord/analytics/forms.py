@@ -56,7 +56,7 @@ class SurveyCreateForm(forms.ModelForm):
     class Meta:
         model = Survey
         fields = [
+            'enabled',
             'name',
             'description',
-            'enabled',
         ]

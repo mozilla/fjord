@@ -47,10 +47,10 @@
       db_name, it will create a new product. You can't change the
       db_name for an existing product since it'll orphan responses.
     </p>
-    <form action='' method='POST'>
+    <form class="analyzer-form" action="" method="POST">
       {{ csrf() }}
       {{ form.as_p() }}
-      <input type="submit">
+      <input type="submit" value="Save">
     </form>
   </div>
 {% endblock %}
