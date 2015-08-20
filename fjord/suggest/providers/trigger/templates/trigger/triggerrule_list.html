@@ -1,0 +1,46 @@
+{% extends "analytics/analyzer/dashboard.html" %}
+{# Note: This is not l10n-ized since it's only available to analyzers for now. #}
+
+{% block content_middle %}
+  <div class="block feedback">
+    <h2>Trigger Rules</h2>
+    <p>
+      <a href="{{ url('triggerrules-create') }}">Create new rule</a>
+    </p>
+    <p>Total trigger rules: {{ object_list.count() }}</p>
+    <table class="summarytable">
+      <tr>
+        <th></th>
+        <th>id</th>
+        <th>enabled?</th>
+        <th>title</th>
+        <th>locales</th>
+        <th>products</th>
+        <th>versions</th>
+        <th>url exists</th>
+        <th>keywords</th>
+      </tr>
+      {% for obj in object_list %}
+        <tr>
+          <td>
+            <a href="{{ url('triggerrules-update', pk=obj.id) }}">edit</a>
+          </td>
+          <td>{{ obj.id }}</td>
+          <td>{{ obj.is_enabled }}</td>
+          <td>{{ obj.title }}</td>
+          <td>{{ '\n'.join(obj.locales)|nl2br or '--' }}</td>
+          <td>
+            {% for prod in obj.products.all() %}
+              {{ prod.db_name }}{% if not loop.last %}<br>{% endif %}
+            {% else %}
+              --
+            {% endfor %}
+          </td>
+          <td>{{ '\n'.join(obj.versions)|nl2br or '--' }}</td>
+          <td>{% if obj.url_exists is none %}--{% else %}{{ obj.url_exists }}{% endif %}</td>
+          <td>{{ '\n'.join(obj.keywords)|nl2br or '--' }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+{% endblock %}

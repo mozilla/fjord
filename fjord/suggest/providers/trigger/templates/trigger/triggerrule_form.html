@@ -1,0 +1,23 @@
+{% extends "analytics/analyzer/dashboard.html" %}
+{# Note: This is not l10n-ized since it's only available to analyzers for now. #}
+
+{% block content_middle %}
+  <div class="block feedback">
+    {% if object %}
+      {% set action_url = url('triggerrules-update', pk=object.id) %}
+      <h2>Trigger Rules - Update</h2>
+    {% else %}
+      {% set action_url = url('triggerrules-create') %}
+      <h2>Trigger Rules - Create</h2>
+    {% endif %}
+    <p>
+      <a href="{{ url('triggerrules') }}">Back to trigger rules</a>
+    </p>
+    <form class="analyzer-form" action="{{ action_url }}" method="post">
+      <input type="submit" value="Save">
+      {{ csrf() }}
+      {{ form.as_p() }}
+      <input type="submit" value="Save">
+    </form>
+  </div>
+{% endblock %}

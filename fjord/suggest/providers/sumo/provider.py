@@ -7,7 +7,11 @@ import requests
 
 from fjord.base.google_utils import ga_track_event
 from fjord.suggest import Link, Suggester
-from fjord.redirector import Redirector, build_redirect_url
+from fjord.redirector import (
+    Redirector,
+    RedirectParseError,
+    build_redirect_url
+)
 
 
 PROVIDER = 'sumosuggest'
@@ -66,10 +70,6 @@ def get_kb_articles(locale, product, text):
         }
         for doc in docs
     ]
-
-
-class RedirectParseError(Exception):
-    pass
 
 
 def format_redirect(rank):
