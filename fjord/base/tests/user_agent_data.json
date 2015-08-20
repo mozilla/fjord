@@ -190,5 +190,13 @@
     "platform": "iPhone OS",
     "platform_version": "8.3",
     "mobile": true
+  },
+  {
+    "user_agent": "Mozilla/5.0 (iPod touch; CPU iPhone OS 8_4 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) FxiOS/1.0 Mobile/12H143 Safari/600.1.4",
+    "browser": "Firefox for iOS",
+    "browser_version": "1.0",
+    "platform": "iPhone OS",
+    "platform_version": "8.4",
+    "mobile": true
   }
 ]
