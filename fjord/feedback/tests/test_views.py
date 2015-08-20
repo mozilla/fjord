@@ -377,6 +377,44 @@ class TestFeedback(TestCase):
         eq_(u'Firefox dev', feedback.product)
         eq_(u'Windows Vista', feedback.browser_platform)
 
+    def test_urls_product_inferred_platform_fxios(self):
+        """Test firefoxdev platform gets inferred"""
+        ProductFactory(
+            enabled=True,
+            display_name=u'Firefox for iOS',
+            db_name=u'Firefox for iOS',
+            slug=u'fxios',
+            on_dashboard=False,
+            on_picker=False,
+            browser=u'Firefox for iOS',
+        )
+
+        # Test that we infer the platform if the products are the
+        # same.
+        ua = (
+            'Mozilla/5.0 (iPod touch; CPU iPhone OS 8_4 like Mac OS X) '
+            'AppleWebKit/600.1.4 (KHTML, like Gecko) FxiOS/1.0 '
+            'Mobile/12H143 Safari/600.1.4'
+        )
+        url = reverse('feedback', args=('fxios',))
+        resp = self.client.post(
+            url,
+            {
+                'happy': 1,
+                'description': u'Firefox for iOS rocks!',
+                'url': u'http://mozilla.org/'
+            },
+            HTTP_USER_AGENT=ua)
+
+        self.assertRedirects(resp, reverse('thanks'))
+        assert models.Response.objects.count() == 1
+        feedback = models.Response.objects.latest(field_name='id')
+        assert feedback.locale == 'en-US'
+        assert feedback.product == 'Firefox for iOS'
+        assert feedback.browser == 'Firefox for iOS'
+        assert feedback.browser_version == '1.0'
+        assert feedback.browser_platform == 'iPhone OS'
+
     def test_urls_product_not_inferred_platform_firefoxdev(self):
         """Test firefoxdev platform doesn't get inferred if not Firefox"""
         amount = models.Response.objects.count()

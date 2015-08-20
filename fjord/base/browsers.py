@@ -105,7 +105,7 @@ def parse_ua(ua):
     platform = platform_parts.pop(0)
     platform_version = UNKNOWN
 
-    while platform in ['X11', 'Ubuntu', 'U', 'iPad', 'iPhone']:
+    while platform in ['X11', 'Ubuntu', 'U', 'iPod touch', 'iPad', 'iPhone']:
         platform = platform_parts.pop(0)
 
     if platform == 'Windows':
