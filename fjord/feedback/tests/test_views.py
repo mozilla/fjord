@@ -411,6 +411,7 @@ class TestFeedback(TestCase):
         feedback = models.Response.objects.latest(field_name='id')
         assert feedback.locale == 'en-US'
         assert feedback.product == 'Firefox for iOS'
+        assert feedback.platform == 'iPhone OS 8.4'
         assert feedback.browser == 'Firefox for iOS'
         assert feedback.browser_version == '1.0'
         assert feedback.browser_platform == 'iPhone OS'

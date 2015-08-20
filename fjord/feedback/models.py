@@ -403,6 +403,9 @@ class Response(ModelBase):
                 return browser.platform + ' ' + browser.platform_version
             return browser.platform
 
+        elif product == u'Firefox for iOS':
+            return browser.platform + ' ' + browser.platform_version
+
         return u''
 
 
