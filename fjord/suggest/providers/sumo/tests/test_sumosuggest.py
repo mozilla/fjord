@@ -13,18 +13,18 @@ from fjord.base.tests import (
     TestCase,
 )
 from fjord.feedback.tests import ResponseFactory
-from fjord.suggest.providers.sumosuggest import (
+from fjord.suggest.providers.sumo import SUMOSuggest
+from fjord.suggest.providers.sumo.provider import (
     SUMO_AAQ_URL,
     SUMO_HOST,
     SUMO_SUGGEST_API_URL,
     SUMO_SUGGEST_SESSION_KEY,
-    SUMOSuggest
 )
 from fjord.suggest.tests import SuggesterTestMixin
 from fjord.redirector.tests import RedirectorTestMixin
 
 
-class SUMOSuggestTestCase(TestCase):
+class SUMOTestCase(TestCase):
     suggester = SUMOSuggest()
 
     def test_not_sad(self):
@@ -78,7 +78,7 @@ class SUMOSuggestTestCase(TestCase):
         with requests_mock.Mocker() as m:
             m.get(SUMO_SUGGEST_API_URL, text='Gah! Something bad happened')
 
-            patch_point = 'fjord.suggest.providers.sumosuggest.logger'
+            patch_point = 'fjord.suggest.providers.sumo.provider.logger'
             with patch(patch_point) as logger_patch:
                 # Create a mock that we can call .exception() on and
                 # it makes sure it got called.
@@ -107,10 +107,10 @@ class SuggestWithRequestTestCase(SuggesterTestMixin, RedirectorTestMixin,
                                  TestCase):
     client_class = LocalizingClient
     suggesters = [
-        'fjord.suggest.providers.sumosuggest.SUMOSuggest'
+        'fjord.suggest.providers.sumo.SUMOSuggest'
     ]
     redirectors = [
-        'fjord.suggest.providers.sumosuggest.SUMOSuggestRedirector'
+        'fjord.suggest.providers.sumo.SUMOSuggestRedirector'
     ]
 
     def test_mocked_get_suggestions(self):
@@ -225,7 +225,7 @@ class SuggestWithRequestTestCase(SuggesterTestMixin, RedirectorTestMixin,
 
 @pytest.mark.skipif('LIVE_API' not in os.environ,
                     reason='LIVE_API not in environ')
-class LiveSUMOSuggestProviderTestCase(SuggesterTestMixin, TestCase):
+class LiveSUMOProviderTestCase(SuggesterTestMixin, TestCase):
     """Test it LIVE!
 
     This only executes if LIVE_API is defined in the environment.
@@ -237,7 +237,7 @@ class LiveSUMOSuggestProviderTestCase(SuggesterTestMixin, TestCase):
     """
     client_class = LocalizingClient
     suggesters = [
-        'fjord.suggest.providers.sumosuggest.SUMOSuggest'
+        'fjord.suggest.providers.sumo.SUMOSuggest'
     ]
 
     def test_get_suggestions(self):
