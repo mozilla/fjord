@@ -16,8 +16,11 @@ pep8==1.6.1
 # sha256: Y6KG6ssDzV9kPX60WMbGK3DBEbRjT9jVnyfMrKS3yDo
 django-sslserver==0.14
 
-# sha256: jnbbT3Kv6QCHxHRntYjQ3j2_hvbj7nYqok7KqmyhuwM
-pre-commit==0.4.4
+# If you are updating this, you might want to update
+# the hashes of the hooks repositories listed in the
+# .pre-commit-config.yaml file as well.
+# sha256: -mMJMMHa-COxV46yDJP5LfCZAEElNKZjdx_wrcJLjg8
+pre-commit==0.5.4
 
 # sha256: qRNwGDrqY8h9hIfns5ntLZmnwvFLEI0nwLyK2e9ZXZo
 aspy.yaml==0.2.1
