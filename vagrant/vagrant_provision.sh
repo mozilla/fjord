@@ -25,14 +25,13 @@ ln -sf /usr/bin/nodejs /usr/local/bin/node
 # Install node modules from package.json
 sudo -H -u vagrant npm install
 
-# Install Python development-related things:
+# Install Python development-related things
 apt-get install -y -q libapache2-mod-wsgi python-pip python-virtualenv libpython-dev
-pip install nose Sphinx
 
-# Install git:
+# Install git
 apt-get install -y -q git
 
-# Install MySQL:
+# Install MySQL
 # But first, we have to tell it to not prompt us about the password
 # because we want it to be "password" and the prompt messes up the
 # vagrant output.
@@ -49,17 +48,17 @@ mysql -uroot -ppassword -hlocalhost \
 mysql -uroot -ppassword -hlocalhost \
     -e "GRANT ALL ON test_fjord.* TO 'fjord'@'localhost' IDENTIFIED BY 'password'"
 
+# Build virtual environment
 VENV=/home/vagrant/.virtualenvs/fjordvagrant
-
-# Build virtual environment and activate it
 sudo -H -u vagrant virtualenv $VENV
 
 # Install bits we need for compiled requirements
 apt-get install -y -q libxml2 libxml2-dev libxslt1.1 libxslt1-dev libyaml-dev
 
-# Install Fjord requirements
+# Update pip and install Fjord requirements
 sudo -H -u vagrant -s -- <<EOF
 source $VENV/bin/activate
+pip install -U "pip<7"
 cd ~/fjord
 ./peep.sh install -r requirements/requirements.txt
 ./peep.sh install -r requirements/compiled.txt
