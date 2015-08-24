@@ -6,8 +6,6 @@ from pyquery import PyQuery
 from django.contrib.auth.models import Group
 
 from fjord.base.tests import (
-    eq_,
-    ok_,
     LocalizingClient,
     AnalyzerProfileFactory,
     reverse
@@ -26,12 +24,12 @@ class TestAnalyticsDashboardView(ElasticTestCase):
         # Verifies that only analyzers can see the analytics dashboard
         # link
         resp = self.client.get(reverse('dashboard'))
-        eq_(200, resp.status_code)
+        assert 200 == resp.status_code
         assert 'adashboard' not in resp.content
 
         # Verifies that only analyzers can see the analytics dashboard
         resp = self.client.get(reverse('analytics_dashboard'))
-        eq_(403, resp.status_code)
+        assert 403 == resp.status_code
 
         # Verify analyzers can see analytics dashboard link
         jane = AnalyzerProfileFactory(user__email='jane@example.com').user
@@ -39,12 +37,12 @@ class TestAnalyticsDashboardView(ElasticTestCase):
         self.client_login_user(jane)
 
         resp = self.client.get(reverse('dashboard'))
-        eq_(200, resp.status_code)
+        assert 200 == resp.status_code
         assert 'adashboard' in resp.content
 
         # Verify analyzers can see analytics dashboard
         resp = self.client.get(reverse('analytics_dashboard'))
-        eq_(200, resp.status_code)
+        assert 200 == resp.status_code
 
 
 class TestSearchView(ElasticTestCase):
@@ -118,71 +116,71 @@ class TestSearchView(ElasticTestCase):
 
     def test_front_page(self):
         r = self.client.get(self.url)
-        eq_(200, r.status_code)
+        assert 200 == r.status_code
         self.assertTemplateUsed(r, 'analytics/analyzer/search.html')
 
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 7)
+        assert len(pq('li.opinion')) == 7
 
     def test_search(self):
         # Happy
         r = self.client.get(self.url, {'happy': 1})
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 4)
+        assert len(pq('li.opinion')) == 4
 
         # Sad
         r = self.client.get(self.url, {'happy': 0})
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 3)
+        assert len(pq('li.opinion')) == 3
 
         # Locale
         r = self.client.get(self.url, {'locale': 'es'})
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 2)
+        assert len(pq('li.opinion')) == 2
 
         # Platform and happy
         r = self.client.get(self.url, {'happy': 1, 'platform': 'Linux'})
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 2)
+        assert len(pq('li.opinion')) == 2
 
         # Product
         r = self.client.get(self.url, {'product': 'Firefox'})
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 7)
+        assert len(pq('li.opinion')) == 7
 
         # Product
         r = self.client.get(self.url, {'product': 'Firefox for Android'})
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 0)
+        assert len(pq('li.opinion')) == 0
 
         # Product version
         r = self.client.get(
             self.url, {'product': 'Firefox', 'version': '17.0'})
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 7)
+        assert len(pq('li.opinion')) == 7
 
         # Product version
         r = self.client.get(
             self.url, {'product': 'Firefox', 'version': '18.0'})
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 0)
+        assert len(pq('li.opinion')) == 0
 
         # Empty search
         r = self.client.get(self.url, {'platform': 'Atari'})
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 0)
+        assert len(pq('li.opinion')) == 0
 
     def test_has_email(self):
         # Test before we create a responsemail
         r = self.client.get(self.url, {'has_email': '0'})
-        eq_(r.status_code, 200)
+        assert r.status_code == 200
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 7)
+        assert len(pq('li.opinion')) == 7
 
         r = self.client.get(self.url, {'has_email': '1'})
-        eq_(r.status_code, 200)
+        assert r.status_code == 200
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 0)
+        assert len(pq('li.opinion')) == 0
 
         ResponseEmailFactory(
             opinion__happy=True,
@@ -196,16 +194,16 @@ class TestSearchView(ElasticTestCase):
         self.setup_indexes()
 
         r = self.client.get(self.url, {'has_email': '0'})
-        eq_(r.status_code, 200)
+        assert r.status_code == 200
         pq = PyQuery(r.content)
-        ok_('ou812' not in r.content)
-        eq_(len(pq('li.opinion')), 7)
+        assert 'ou812' not in r.content
+        assert len(pq('li.opinion')) == 7
 
         r = self.client.get(self.url, {'has_email': '1'})
-        eq_(r.status_code, 200)
+        assert r.status_code == 200
         pq = PyQuery(r.content)
-        ok_('ou812' in r.content)
-        eq_(len(pq('li.opinion')), 1)
+        assert 'ou812' in r.content
+        assert len(pq('li.opinion')) == 1
 
     def test_country(self):
         ResponseEmailFactory(
@@ -221,23 +219,23 @@ class TestSearchView(ElasticTestCase):
 
         r = self.client.get(self.url, {
             'product': 'Firefox OS', 'country': 'ES'})
-        eq_(r.status_code, 200)
+        assert r.status_code == 200
         pq = PyQuery(r.content)
-        ok_('ou812' in r.content)
-        eq_(len(pq('li.opinion')), 1)
+        assert 'ou812' in r.content
+        assert len(pq('li.opinion')) == 1
 
     def test_empty_and_unknown(self):
         # Empty value should work
         r = self.client.get(self.url, {'platform': ''})
-        eq_(r.status_code, 200)
+        assert r.status_code == 200
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 1)
+        assert len(pq('li.opinion')) == 1
 
         # "Unknown" value should also work
         r = self.client.get(self.url, {'platform': 'Unknown'})
-        eq_(r.status_code, 200)
+        assert r.status_code == 200
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 1)
+        assert len(pq('li.opinion')) == 1
 
     def test_version_noop(self):
         """version has no effect if product isn't set"""
@@ -246,31 +244,31 @@ class TestSearchView(ElasticTestCase):
         r = self.client.get(
             self.url, {'product': 'Firefox', 'version': '18.0'})
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 0)
+        assert len(pq('li.opinion')) == 0
 
         # Filter on version--filter has no effect on results
         r = self.client.get(
             self.url, {'version': '18.0'})
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 7)
+        assert len(pq('li.opinion')) == 7
 
     def test_text_search(self):
         # Text search
         r = self.client.get(self.url, {'q': 'apple'})
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 3)
+        assert len(pq('li.opinion')) == 3
 
         # Text and filter
         r = self.client.get(
             self.url, {'q': 'apple', 'happy': 1, 'locale': 'en-US'})
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 2)
+        assert len(pq('li.opinion')) == 2
 
     def test_text_search_unicode(self):
         """Unicode in the search field shouldn't kick up errors"""
         # Text search
         r = self.client.get(self.url, {'q': u'\u2713'})
-        eq_(r.status_code, 200)
+        assert r.status_code == 200
 
     def test_date_search(self):
         # These start and end dates will give known slices of the data.
@@ -283,14 +281,14 @@ class TestSearchView(ElasticTestCase):
             'date_end': end,
         })
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 5)
+        assert len(pq('li.opinion')) == 5
 
         # Unspecified end => [start, +infin)
         r = self.client.get(self.url, {
             'date_start': start
         })
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 6)
+        assert len(pq('li.opinion')) == 6
 
         # Both start and end => [start, end]
         r = self.client.get(self.url, {
@@ -298,27 +296,27 @@ class TestSearchView(ElasticTestCase):
             'date_end': end,
         })
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 4)
+        assert len(pq('li.opinion')) == 4
 
     def test_date_start_valueerror(self):
         # https://bugzilla.mozilla.org/show_bug.cgi?id=898584
         r = self.client.get(self.url, {
             'date_start': '0001-01-01',
         })
-        eq_(r.status_code, 200)
+        assert r.status_code == 200
 
     def test_invalid_search(self):
         # Invalid values for happy shouldn't filter
         r = self.client.get(self.url, {'happy': 'fish'})
-        eq_(r.status_code, 200)
+        assert r.status_code == 200
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 7)
+        assert len(pq('li.opinion')) == 7
 
         # Unknown parameters should be ignored.
         r = self.client.get(self.url, {'apples': 'oranges'})
-        eq_(r.status_code, 200)
+        assert r.status_code == 200
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 7)
+        assert len(pq('li.opinion')) == 7
 
         # A broken date range search shouldn't affect anything
         # Why this? Because this is the thing the fuzzer found.
@@ -326,16 +324,16 @@ class TestSearchView(ElasticTestCase):
             'date_end': '/etc/shadow\x00',
             'date_start': '/etc/passwd\x00'
         })
-        eq_(r.status_code, 200)
+        assert r.status_code == 200
         pq = PyQuery(r.content)
-        eq_(len(pq('li.opinion')), 7)
+        assert len(pq('li.opinion')) == 7
 
     def test_search_export_csv(self):
         r = self.client.get(self.url, {'format': 'csv'})
-        eq_(r.status_code, 200)
+        assert r.status_code == 200
 
         # Check that it parses in csv with n rows.
         lines = r.content.splitlines()
 
         # URL row, params row, header row and one row for every opinion
-        eq_(len(lines), 10)
+        assert len(lines) == 10

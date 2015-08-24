@@ -2,7 +2,6 @@ from datetime import datetime
 from unittest import TestCase
 
 from fjord.analytics.utils import counts_to_options, zero_fill
-from fjord.base.tests import eq_
 from fjord.base.utils import epoch_milliseconds
 
 
@@ -14,30 +13,30 @@ class TestCountsHelper(TestCase):
         """Correct options should be set and values should be sorted.
         """
         options = counts_to_options(self.counts, 'fruit', 'Fruit')
-        eq_(options['name'], 'fruit')
-        eq_(options['display'], 'Fruit')
+        assert options['name'] == 'fruit'
+        assert options['display'] == 'Fruit'
 
-        eq_(options['options'][0], {
+        assert options['options'][0] == {
             'name': 'bananas',
             'display': 'bananas',
             'value': 'bananas',
             'count': 10,
             'checked': False,
-        })
-        eq_(options['options'][1], {
+        }
+        assert options['options'][1] == {
             'name': 'oranges',
             'display': 'oranges',
             'value': 'oranges',
             'count': 6,
             'checked': False,
-        })
-        eq_(options['options'][2], {
+        }
+        assert options['options'][2] == {
             'name': 'apples',
             'display': 'apples',
             'value': 'apples',
             'count': 5,
             'checked': False,
-        })
+        }
 
     def test_map_dict(self):
         options = counts_to_options(self.counts, 'fruit', display_map={
@@ -46,17 +45,17 @@ class TestCountsHelper(TestCase):
             'oranges': 'Oranges',
         })
         # Note that options get sorted by count.
-        eq_(options['options'][0]['display'], 'Bananas')
-        eq_(options['options'][1]['display'], 'Oranges')
-        eq_(options['options'][2]['display'], 'Apples')
+        assert options['options'][0]['display'] == 'Bananas'
+        assert options['options'][1]['display'] == 'Oranges'
+        assert options['options'][2]['display'] == 'Apples'
 
     def test_map_func(self):
         options = counts_to_options(self.counts, 'fruit',
                                     value_map=lambda s: s.upper())
         # Note that options get sorted by count.
-        eq_(options['options'][0]['value'], 'BANANAS')
-        eq_(options['options'][1]['value'], 'ORANGES')
-        eq_(options['options'][2]['value'], 'APPLES')
+        assert options['options'][0]['value'] == 'BANANAS'
+        assert options['options'][1]['value'] == 'ORANGES'
+        assert options['options'][2]['value'] == 'APPLES'
 
     def test_checked(self):
         options = counts_to_options(self.counts, 'fruit', checked='apples')
