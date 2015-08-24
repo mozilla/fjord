@@ -5,7 +5,7 @@ import requests_mock
 from mock import MagicMock, patch
 
 from fjord.base.google_utils import GOOGLE_API_URL, ga_track_event
-from fjord.base.tests import eq_, TestCase
+from fjord.base.tests import TestCase
 
 
 def set_sys_argv(sys_argv):
@@ -86,7 +86,7 @@ class GoogleUtilsTestCase(TestCase):
             with patch(d) as delay_patch:
                 params = {'cid': 'xxx', 'ec': 'ou812'}
                 ga_track_event(params, async=True)
-                eq_(delay_patch.call_count, 1)
+                assert delay_patch.call_count == 1
 
     def test_ga_track_event_async_false(self):
         """async=False, then delay() never gets called"""
@@ -97,4 +97,4 @@ class GoogleUtilsTestCase(TestCase):
             with patch(d) as delay_patch:
                 params = {'cid': 'xxx', 'ec': 'ou812'}
                 ga_track_event(params, async=False)
-                eq_(delay_patch.call_count, 0)
+                assert delay_patch.call_count == 0

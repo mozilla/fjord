@@ -4,7 +4,6 @@ import os
 from django import test
 
 from fjord.base import browsers, middleware
-from fjord.base.tests import eq_
 
 
 class TestUserAgentDetection(object):
@@ -58,4 +57,4 @@ class TestUserAgentDetection(object):
         assert(hasattr(request, 'BROWSER'))
         for k, v in checks.items():
             assert(hasattr(request.BROWSER, k))
-            eq_(getattr(request.BROWSER, k), v)
+            assert getattr(request.BROWSER, k) == v

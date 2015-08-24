@@ -5,7 +5,6 @@ from django.test.client import RequestFactory
 from fjord.base.browserid import FjordVerify
 from fjord.base.tests import (
     BaseTestCase,
-    eq_,
     ProfileFactory,
     reverse,
     UserFactory
@@ -35,9 +34,9 @@ class TestAuth(BaseTestCase):
         fv.request = post_request
 
         resp = fv.login_success()
-        eq_(200, resp.status_code)
+        assert resp.status_code == 200
         body = json.loads(resp.content)
-        eq_(body['redirect'], reverse('new-user-view'))
+        assert body['redirect'] == reverse('new-user-view')
 
     def test_existing_user(self):
         """Tests that existing users get redirected to right place"""
@@ -60,9 +59,9 @@ class TestAuth(BaseTestCase):
         fv.request = post_request
 
         resp = fv.login_success()
-        eq_(200, resp.status_code)
+        assert resp.status_code == 200
         body = json.loads(resp.content)
-        eq_(body['redirect'], '/')
+        assert body['redirect'] == '/'
 
         # Now do it with next!
         post_request = RequestFactory().post(
@@ -76,6 +75,6 @@ class TestAuth(BaseTestCase):
         fv.request = post_request
 
         resp = fv.login_success()
-        eq_(200, resp.status_code)
+        assert resp.status_code == 200
         body = json.loads(resp.content)
-        eq_(body['redirect'], '/foo')
+        assert body['redirect'] == '/foo'
