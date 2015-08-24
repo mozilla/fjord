@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from fjord.feedback.models import purge_data
+from fjord.base.data import purge_data
 
 
 class Command(BaseCommand):
