@@ -2,7 +2,6 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from fjord.base.forms import EnhancedURLField
-from fjord.base.tests import eq_
 
 
 class EnhancedURLFieldTests(TestCase):
@@ -33,7 +32,7 @@ class EnhancedURLFieldTests(TestCase):
 
         for expected, url in test_data:
             try:
-                eq_(f.clean(url), expected)
+                assert f.clean(url) == expected
             except ValidationError:
                 print url
                 raise
@@ -64,4 +63,4 @@ class EnhancedURLFieldTests(TestCase):
             try:
                 f.clean(url)
             except ValidationError as exc:
-                eq_(exc.messages, [msg])
+                assert exc.messages == [msg]

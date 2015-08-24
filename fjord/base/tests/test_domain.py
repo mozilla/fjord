@@ -1,5 +1,5 @@
 from fjord.base.domain import get_domain
-from fjord.base.tests import eq_, TestCase
+from fjord.base.tests import TestCase
 
 
 class TestGetDomain(TestCase):
@@ -36,4 +36,4 @@ class TestGetDomain(TestCase):
         ]
 
         for data, expected in testdata:
-            eq_(get_domain(data), expected)
+            assert get_domain(data) == expected

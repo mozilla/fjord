@@ -1,5 +1,5 @@
 from fjord.base.helpers import locale_name
-from fjord.base.tests import eq_, TestCase
+from fjord.base.tests import TestCase
 
 
 class TestLocaleName(TestCase):
@@ -11,7 +11,7 @@ class TestLocaleName(TestCase):
             (u'xx', u'Unknown')
         ]
         for name, expected in data:
-            eq_(unicode(locale_name(name)), expected)
+            assert unicode(locale_name(name)) == expected
 
     def test_native(self):
         data = [
@@ -21,4 +21,4 @@ class TestLocaleName(TestCase):
             (u'xx', u'Unknown')
         ]
         for name, expected in data:
-            eq_(unicode(locale_name(name, native=True)), expected)
+            assert unicode(locale_name(name, native=True)) == expected

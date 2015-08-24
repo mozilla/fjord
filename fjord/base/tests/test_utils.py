@@ -3,7 +3,7 @@ import datetime
 
 from django.test.client import RequestFactory
 
-from fjord.base.tests import eq_, ok_, reverse, TestCase
+from fjord.base.tests import reverse, TestCase
 from fjord.base.utils import (
     actual_ip_plus_context,
     instance_to_key,
@@ -19,68 +19,68 @@ from fjord.base.utils import (
 
 
 def test_smart_truncate():
-    eq_(smart_truncate(u''), u'')
-    eq_(smart_truncate(u'abc'), u'abc')
-    eq_(smart_truncate(u'abc def', length=4), u'abc...')
-    eq_(smart_truncate(u'abcdef', length=4), u'abcd...')
-    eq_(smart_truncate(u'ééé ééé', length=4), u'ééé...')
+    assert smart_truncate(u'') == u''
+    assert smart_truncate(u'abc') == u'abc'
+    assert smart_truncate(u'abc def', length=4) == u'abc...'
+    assert smart_truncate(u'abcdef', length=4) == u'abcd...'
+    assert smart_truncate(u'ééé ééé', length=4) == u'ééé...'
 
 
 class SmartStrTestCase(TestCase):
     def test_str(self):
-        eq_('a', smart_str('a'))
-        eq_(u'a', smart_str(u'a'))
+        assert 'a' == smart_str('a')
+        assert u'a' == smart_str(u'a')
 
     def test_not_str(self):
-        eq_(u'', smart_str(1))
-        eq_(u'', smart_str(1.1))
-        eq_(u'', smart_str(True))
-        eq_(u'', smart_str(['a']))
+        assert u'' == smart_str(1)
+        assert u'' == smart_str(1.1)
+        assert u'' == smart_str(True)
+        assert u'' == smart_str(['a'])
 
-        eq_(u'', smart_str(None))
+        assert u'' == smart_str(None)
 
 
 class SmartIntTestCase(TestCase):
     def test_sanity(self):
-        eq_(10, smart_int('10'))
-        eq_(10, smart_int('10.5'))
+        assert 10 == smart_int('10')
+        assert 10 == smart_int('10.5')
 
     def test_int(self):
-        eq_(10, smart_int(10))
+        assert 10 == smart_int(10)
 
     def test_invalid_string(self):
-        eq_(0, smart_int('invalid'))
+        assert 0 == smart_int('invalid')
 
     def test_empty_string(self):
-        eq_(0, smart_int(''))
+        assert 0 == smart_int('')
 
     def test_wrong_type(self):
-        eq_(0, smart_int(None))
-        eq_(10, smart_int([], 10))
+        assert 0 == smart_int(None)
+        assert 10 == smart_int([], 10)
 
     def test_overflow(self):
-        eq_(0, smart_int('1e309'))
+        assert 0 == smart_int('1e309')
 
 
 class SmartDateTest(TestCase):
     def test_sanity(self):
-        eq_(datetime.date(2012, 1, 1), smart_date('2012-01-01'))
-        eq_(None, smart_date('1742-11-05'))
-        eq_(None, smart_date('0001-01-01'))
+        assert datetime.date(2012, 1, 1) == smart_date('2012-01-01')
+        assert None == smart_date('1742-11-05')
+        assert None == smart_date('0001-01-01')
 
     def test_empty_string(self):
-        eq_(None, smart_date(''))
+        assert None == smart_date('')
 
     def test_date(self):
-        eq_(datetime.date(2012, 1, 1), smart_date('2012-01-01'))
-        eq_(datetime.date(2012, 1, 1), smart_date('2012-1-1'))
+        assert datetime.date(2012, 1, 1) == smart_date('2012-01-01')
+        assert datetime.date(2012, 1, 1) == smart_date('2012-1-1')
 
     def test_fallback(self):
-        eq_('Hullaballo', smart_date('', fallback='Hullaballo'))
+        assert 'Hullaballo' == smart_date('', fallback='Hullaballo')
 
     def test_null_bytes(self):
         # strptime likes to barf on null bytes in strings, so test it.
-        eq_(None, smart_date('/etc/passwd\x00'))
+        assert None == smart_date('/etc/passwd\x00')
 
 
 class SmartBoolTest(TestCase):
@@ -108,13 +108,13 @@ class SmartBoolTest(TestCase):
 
 class SmartTimeDeltaTest(TestCase):
     def test_valid(self):
-        eq_(smart_timedelta('1d'), datetime.timedelta(days=1))
-        eq_(smart_timedelta('14d'), datetime.timedelta(days=14))
+        assert smart_timedelta('1d') == datetime.timedelta(days=1)
+        assert smart_timedelta('14d') == datetime.timedelta(days=14)
 
     def test_invalid(self):
-        eq_(smart_timedelta('0d', 'fallback'), 'fallback')
-        eq_(smart_timedelta('foo', 'fallback'), 'fallback')
-        eq_(smart_timedelta('d', 'fallback'), 'fallback')
+        assert smart_timedelta('0d', 'fallback') == 'fallback'
+        assert smart_timedelta('foo', 'fallback') == 'fallback'
+        assert smart_timedelta('d', 'fallback') == 'fallback'
 
 
 class WrapWithParagraphsTest(TestCase):
@@ -128,7 +128,7 @@ class WrapWithParagraphsTest(TestCase):
         ]
 
         for arg, width, expected in test_data:
-            eq_(wrap_with_paragraphs(arg, width), expected)
+            assert wrap_with_paragraphs(arg, width) == expected
 
     def test_edge_cases(self):
         test_data = [
@@ -137,7 +137,7 @@ class WrapWithParagraphsTest(TestCase):
         ]
 
         for arg, width, expected in test_data:
-            eq_(wrap_with_paragraphs(arg, width), expected)
+            assert wrap_with_paragraphs(arg, width) == expected
 
 
 _foo_cache = {}
@@ -165,12 +165,13 @@ class TestKeys(TestCase):
 
     def test_instance_to_key(self):
         foo = FakeModel(15)
-        eq_(instance_to_key(foo), 'fjord.base.tests.test_utils:FakeModel:15')
+        key = 'fjord.base.tests.test_utils:FakeModel:15'
+        assert instance_to_key(foo) == key
 
     def test_key_to_instance(self):
         foo = FakeModel(15)
         key = 'fjord.base.tests.test_utils:FakeModel:15'
-        eq_(key_to_instance(key), foo)
+        assert key_to_instance(key) == foo
 
 
 class TestActualIPPlusContext(TestCase):
@@ -192,10 +193,10 @@ class TestActualIPPlusContext(TestCase):
 
         # Key can't exceed memcached 250 character max
         length = len(key)
-        ok_(length < 250)
+        assert length < 250
 
         # Key must be a string
-        ok_(isinstance(key, str))
+        assert isinstance(key, str)
 
         # create a request with this as the description
         second_desc = u'\u62e9\u201c\u5728\u65b0\u6807\u7b7e\u9875\u4e2d' * 16
@@ -227,4 +228,4 @@ class TestActualIPPlusContext(TestCase):
 
         # Key can't exceed memcached 250 character max
         length = len(key)
-        ok_(length < 250)
+        assert length < 250

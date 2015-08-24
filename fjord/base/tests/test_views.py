@@ -7,7 +7,6 @@ from pyquery import PyQuery
 
 from fjord.base import views
 from fjord.base.tests import (
-    eq_,
     LocalizingClient,
     TestCase,
     AnalyzerProfileFactory,
@@ -22,18 +21,18 @@ class TestAbout(TestCase):
 
     def test_about_view(self):
         r = self.client.get(reverse('about-view'))
-        eq_(200, r.status_code)
+        assert 200 == r.status_code
         self.assertTemplateUsed(r, 'about.html')
 
 
 class TestLoginFailure(TestCase):
     def test_login_failure_view(self):
         r = self.client.get(reverse('login-failure'))
-        eq_(200, r.status_code)
+        assert 200 == r.status_code
         self.assertTemplateUsed(r, 'login_failure.html')
 
         r = self.client.get(reverse('login-failure'), {'mobile': 1})
-        eq_(200, r.status_code)
+        assert 200 == r.status_code
         self.assertTemplateUsed(r, 'mobile/login_failure.html')
 
 
@@ -73,8 +72,8 @@ class MonitorViewTest(ElasticTestCase):
                 errors = [line for line in resp.content.splitlines()
                           if 'ERROR' in line]
 
-                eq_(resp.status_code, 200, '%s != %s (%s)' % (
-                    resp.status_code, 200, repr(errors)))
+                assert resp.status_code == 200, '%s != %s (%s)' % (
+                    resp.status_code, 200, repr(errors))
 
         finally:
             views.test_memcached = test_memcached
@@ -85,7 +84,7 @@ class FileNotFoundTesting(TestCase):
 
     def test_404(self):
         request = self.client.get('/a/path/that/should/never/exist')
-        eq_(request.status_code, 404)
+        assert request.status_code == 404
         self.assertTemplateUsed(request, '404.html')
 
 
@@ -95,13 +94,13 @@ class ServerErrorTesting(TestCase):
         with self.assertRaises(IntentionalException) as cm:
             self.client.get('/services/throw-error')
 
-        eq_(type(cm.exception), IntentionalException)
+        assert type(cm.exception) == IntentionalException
 
 
 class TestRobots(TestCase):
     def test_robots(self):
         resp = self.client.get('/robots.txt')
-        eq_(resp.status_code, 200)
+        assert resp.status_code == 200
         self.assertTemplateUsed(resp, 'robots.txt')
 
 
@@ -109,7 +108,7 @@ class TestContribute(TestCase):
 
     def test_contribute(self):
         resp = self.client.get('/contribute.json')
-        eq_(resp.status_code, 200)
+        assert resp.status_code == 200
         self.assertTemplateUsed(resp, 'contribute.json')
 
     def test_contribute_if_valid_json(self):
@@ -128,20 +127,20 @@ class TestNewUserView(ElasticTestCase):
         # AnonymousUser shouldn't get to the new-user-view, so make
         # sure they get redirected to the dashboard.
         resp = self.client.get(reverse('new-user-view'), follow=True)
-        eq_(resp.status_code, 200)
+        assert resp.status_code == 200
         self.assertTemplateNotUsed('new_user.html')
         self.assertTemplateUsed('analytics/dashboard.html')
 
     def test_default_next_url(self):
         self.client_login_user(self.jane)
         resp = self.client.get(reverse('new-user-view'))
-        eq_(resp.status_code, 200)
+        assert resp.status_code == 200
         self.assertTemplateUsed('new_user.html')
 
         # Pull out next link
         pq = PyQuery(resp.content)
         next_url = pq('#next-url-link')
-        eq_(next_url.attr['href'], '/en-US/')  # this is the dashboard
+        assert next_url.attr['href'] == '/en-US/'  # this is the dashboard
 
     def test_valid_next_url(self):
         self.client_login_user(self.jane)
@@ -149,14 +148,14 @@ class TestNewUserView(ElasticTestCase):
         resp = self.client.get(url, {
             'next': '/ou812'  # stretches the meaning of 'valid'
         })
-        eq_(resp.status_code, 200)
+        assert resp.status_code == 200
         self.assertTemplateUsed('new_user.html')
 
         # Pull out next link which is naughty, so it should have been
         # replaced with a dashboard link.
         pq = PyQuery(resp.content)
         next_url = pq('#next-url-link')
-        eq_(next_url.attr['href'], '/ou812')
+        assert next_url.attr['href'] == '/ou812'
 
     def test_sanitized_next_url(self):
         self.client_login_user(self.jane)
@@ -164,11 +163,11 @@ class TestNewUserView(ElasticTestCase):
         resp = self.client.get(url, {
             'next': 'javascript:prompt%28document.cookie%29'
         })
-        eq_(resp.status_code, 200)
+        assert resp.status_code == 200
         self.assertTemplateUsed('new_user.html')
 
         # Pull out next link which is naughty, so it should have been
         # replaced with a dashboard link.
         pq = PyQuery(resp.content)
         next_url = pq('#next-url-link')
-        eq_(next_url.attr['href'], '/en-US/')  # this is the dashboard
+        assert next_url.attr['href'] == '/en-US/'  # this is the dashboard
