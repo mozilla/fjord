@@ -1,4 +1,5 @@
-__all__ = ['build_redirect_url', 'get_redirectors', 'Redirector']
+__all__ = ['build_redirect_url', 'get_redirectors', 'Redirector',
+           'RedirectParseError']
 
 
 default_app_config = 'fjord.redirector.apps.RedirectorConfig'
@@ -17,4 +18,4 @@ def get_redirectors():
     return list(_REDIRECTORS)
 
 
-from .base import build_redirect_url, Redirector
+from .base import build_redirect_url, Redirector, RedirectParseError

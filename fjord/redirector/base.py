@@ -3,6 +3,11 @@ import urllib
 from fjord.base.urlresolvers import reverse
 
 
+class RedirectParseError(Exception):
+    """Exception for when a redirect link doesn't parse"""
+    pass
+
+
 class Redirector(object):
     def load(self):
         """Implement this to perform any startup work"""

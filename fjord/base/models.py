@@ -1,6 +1,8 @@
+import ast
 import json
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _lazy
 
@@ -14,6 +16,56 @@ ModelBase = models.Model
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+
+class ListField(models.TextField):
+    description = _lazy('List of values')
+
+    __metaclass__ = models.SubfieldBase
+
+    def __init__(self, *args, **kwargs):
+        super(ListField, self).__init__(*args, **kwargs)
+
+    def to_python(self, value):
+        """Converts the value to a Python value
+
+        :arg value: None, list or unicode from the db
+
+        :returns: list of things
+
+        """
+        if not value:
+            value = []
+
+        if isinstance(value, list):
+            return value
+
+        try:
+            # This takes a unicode and reconsistutes it into Python base
+            # types.
+            value = ast.literal_eval(value)
+            assert isinstance(value, list)
+            return value
+        except Exception as exc:
+            # Need to return a ValidationError, but this throws a
+            # SyntaxError, so we (poorly) wrap it.
+            raise ValidationError(repr(exc))
+
+    def get_prep_value(self, value):
+        """Perform preliminary non-db specific value checks and conversions"""
+        if value is None:
+            return value
+
+        return unicode(value)
+
+    def value_to_string(self, obj):
+        """Returns a string value of this field from the passed obj
+
+        Used by the serialization framework.
+
+        """
+        value = self._get_val_from_obj(obj)
+        return self.get_db_prep_value(value)
 
 
 class EnhancedURLField(models.CharField):

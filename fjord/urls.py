@@ -19,6 +19,7 @@ urlpatterns = patterns(
     (r'', include('fjord.feedback.urls')),
     (r'', include('fjord.heartbeat.urls')),
     (r'', include('fjord.redirector.urls')),
+    (r'', include('fjord.suggest.providers.trigger.urls')),
 
     (r'', include('django_browserid.urls')),
 

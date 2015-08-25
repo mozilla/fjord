@@ -1,10 +1,35 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from fjord.base.forms import EnhancedURLField
+from fjord.base.forms import EnhancedURLField, StringListField
 
 
-class EnhancedURLFieldTests(TestCase):
+class StringListTestCase(TestCase):
+    def test_prepare_value(self):
+        test_data = [
+            # test data, expected
+            ([], u''),
+            ([u'a'], u'a'),
+            ([u'a', u'b'], u'a\nb'),
+        ]
+        field = StringListField(required=False)
+        for testcase, expected in test_data:
+            assert field.prepare_value(testcase) == expected
+
+    def test_clean(self):
+        test_data = [
+            # test data, expected
+            (u'', []),
+            (u'a', [u'a']),
+            (u'a\nb', [u'a', u'b']),
+            (u'  a  \n b\n\n', [u'a', u'b'])
+        ]
+        field = StringListField(required=False)
+        for testcase, expected in test_data:
+            assert field.clean(testcase) == expected
+
+
+class EnhancedURLFieldTestCase(TestCase):
     def test_valid(self):
         test_data = [
             # expected, url

@@ -273,6 +273,7 @@ INSTALLED_APPS = (
     'fjord.journal',
     'fjord.search',
     'fjord.suggest',
+    'fjord.suggest.providers.trigger',
     'fjord.redirector',
     'fjord.translations',
 )
@@ -318,10 +319,12 @@ SUPPORTED_NONLOCALES = [
 ]
 
 SUGGEST_PROVIDERS = [
-    'fjord.suggest.providers.sumo.SUMOSuggest'
+    'fjord.suggest.providers.sumo.SUMOSuggest',
+    'fjord.suggest.providers.trigger.provider.TriggerSuggester',
 ]
 REDIRECTOR_PROVIDERS = [
-    'fjord.suggest.providers.sumo.SUMOSuggestRedirector'
+    'fjord.suggest.providers.sumo.SUMOSuggestRedirector',
+    'fjord.suggest.providers.trigger.provider.TriggerRedirector',
 ]
 
 ## Media and templates.
