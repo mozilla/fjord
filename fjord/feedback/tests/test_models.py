@@ -18,7 +18,6 @@ from fjord.feedback.tests import (
     ResponsePIFactory
 )
 from fjord.feedback.utils import compute_grams
-from fjord.journal.models import Record
 from fjord.search.tests import ElasticTestCase
 
 
@@ -254,11 +253,9 @@ class TestComputeGrams(TestCase):
 class TestParseData(ElasticTestCase):
     def test_purge(self):
         now = datetime.datetime.now()
-        cutoff = now - datetime.timedelta(days=5)
 
-        # Create 10 objs of each type--one for each day for the last
-        # 10 days.
-        for i in range(10):
+        # Create 5 objs of each type at various date ranges.
+        for i in [1, 160, 180, 200, 220]:
             ResponseEmailFactory(
                 opinion__created=(now - datetime.timedelta(days=i))
             )
@@ -269,7 +266,7 @@ class TestParseData(ElasticTestCase):
                 opinion__created=(now - datetime.timedelta(days=i))
             )
 
-        # Note that this creates 30 Response objects.
+        # Note: This creates 3 * 5 = 15 Response objects.
 
         # Since creating the objects and indexing them happens very
         # quickly in tests, we hit a race condition and the has_email
@@ -278,47 +275,32 @@ class TestParseData(ElasticTestCase):
         self.setup_indexes()
 
         # Make sure everything is in the db
-        eq_(Response.objects.count(), 30)
-        eq_(ResponseEmail.objects.count(), 10)
-        eq_(ResponseContext.objects.count(), 10)
-        eq_(ResponsePI.objects.count(), 10)
+        eq_(Response.objects.count(), 15)
+        eq_(ResponseEmail.objects.count(), 5)
+        eq_(ResponseContext.objects.count(), 5)
+        eq_(ResponsePI.objects.count(), 5)
 
         # Make sure everything is in the index
         resp_s = ResponseDocType.docs.search()
-        eq_(resp_s.count(), 30)
-        eq_(resp_s.filter('term', has_email=True).count(), 10)
+        eq_(resp_s.count(), 15)
+        eq_(resp_s.filter('term', has_email=True).count(), 5)
 
-        # Now purge everything older than 5 days and make sure things
-        # got removed that should have gotten removed. Also check if
-        # there is a journal entry for the purge operation.
-        cutoff = now - datetime.timedelta(days=5)
-        purge_data(cutoff=cutoff)
+        # Now purge everything older than 180 days and make sure
+        # things got removed that should have gotten removed.
+        purge_data()
 
         self.refresh()
 
-        eq_(Response.objects.count(), 30)
-        eq_(ResponseEmail.objects.count(), 5)
-        eq_(ResponseEmail.objects.filter(
-            opinion__created__gte=cutoff).count(),
-            5)
-        eq_(ResponseContext.objects.count(), 5)
-        eq_(ResponseContext.objects.filter(
-            opinion__created__gte=cutoff).count(),
-            5)
-        eq_(ResponsePI.objects.count(), 5)
-        eq_(ResponsePI.objects.filter(
-            opinion__created__gte=cutoff).count(),
-            5)
-        eq_(1,
-            Record.objects.filter(action='purge_data').count())
-        expected_msg = ('feedback_responseemail: 5, '
-                        'feedback_responsecontext: 5, '
-                        'feedback_responsepi: 5')
-        eq_(expected_msg,
-            Record.objects.get(action='purge_data').msg)
+        # All the Response objects should still be there
+        eq_(Response.objects.count(), 15)
+
+        # For the other objects, 2 should be there for each type
+        eq_(ResponseEmail.objects.count(), 2)
+        eq_(ResponseContext.objects.count(), 2)
+        eq_(ResponsePI.objects.count(), 2)
 
         # Everything should still be in the index, but the number of
         # things with has_email=True should go down
         resp_s = ResponseDocType.docs.search()
-        eq_(resp_s.count(), 30)
-        eq_(resp_s.filter('term', has_email=True).count(), 5)
+        eq_(resp_s.count(), 15)
+        eq_(resp_s.filter('term', has_email=True).count(), 2)

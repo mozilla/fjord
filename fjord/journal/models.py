@@ -4,6 +4,7 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
+from fjord.base.data import register_purger
 from fjord.base.models import JSONObjectField
 
 
@@ -86,3 +87,19 @@ class Record(models.Model):
         return u'<Record {key} {msg}>'.format(
             key=u':'.join([self.src, self.type, self.action]),
             msg=self.msg)
+
+
+@register_purger
+def purge_data():
+    """Purges journal data
+
+    * Record >= 180 days
+
+    """
+    cutoff = datetime.now() - timedelta(days=180)
+
+    objs = Record.objects.filter(created__lte=cutoff)
+    count = objs.count()
+    objs.delete()
+
+    return 'journal_record: %d' % count

@@ -9,6 +9,7 @@ from rest_framework import serializers
 from statsd import statsd
 
 from fjord.base.browsers import parse_ua
+from fjord.base.data import register_purger
 from fjord.base.domain import get_domain
 from fjord.base.models import ModelBase, JSONObjectField, EnhancedURLField
 from fjord.base.utils import smart_truncate, instance_to_key, is_url
@@ -18,7 +19,6 @@ from fjord.feedback.config import (
     TRUNCATE_LENGTH
 )
 from fjord.feedback.utils import compute_grams
-from fjord.journal.utils import j_info
 from fjord.search.index import (
     FjordDocType,
     FjordDocTypeManager,
@@ -765,13 +765,18 @@ class PostResponseSerializer(serializers.Serializer):
         return obj
 
 
-def purge_data(cutoff=None, verbose=False):
-    """Implements data purging per our data retention policy"""
-    responses_to_update = set()
+@register_purger
+def purge_data():
+    """Purges feedback data
 
-    if cutoff is None:
-        # Default to wiping out 180 days ago which is roughly 6 months.
-        cutoff = datetime.now() - timedelta(days=180)
+    * ResponseEmail >= 180 days
+    * ResponseContext >= 180 days
+    * ResponsePI >= 180 days
+
+    """
+    cutoff = datetime.now() - timedelta(days=180)
+
+    responses_to_update = set()
 
     # First, ResponseEmail.
     objs = ResponseEmail.objects.filter(opinion__created__lte=cutoff)
@@ -795,10 +800,7 @@ def purge_data(cutoff=None, verbose=False):
     objs.delete()
     msg += 'feedback_responsepi: %d' % (count, )
 
-    j_info(app='feedback',
-           src='purge_data',
-           action='purge_data',
-           msg=msg)
-
     if responses_to_update:
         index_chunk(ResponseDocType, list(responses_to_update))
+
+    return msg
