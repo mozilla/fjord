@@ -1,6 +1,6 @@
 import datetime
 
-from fjord.base.tests import eq_, TestCase
+from fjord.base.tests import TestCase
 from fjord.feedback.tests import ResponseFactory
 from fjord.suggest import get_suggesters
 from fjord.suggest.utils import get_suggestions
@@ -16,7 +16,7 @@ class DummySuggesterLoadingTestCase(SuggesterTestMixin, TestCase):
             prov for prov in get_suggesters()
             if isinstance(prov, DummySuggester)
         ]
-        eq_(len(dummy_providers), 0)
+        assert len(dummy_providers) == 0
 
 
 class DummySuggesterTestCase(SuggesterTestMixin, TestCase):
@@ -29,7 +29,7 @@ class DummySuggesterTestCase(SuggesterTestMixin, TestCase):
             prov for prov in get_suggesters()
             if isinstance(prov, DummySuggester)
         ]
-        eq_(len(dummy_providers), 1)
+        assert len(dummy_providers) == 1
 
     def test_get_suggestions(self):
         now = u'ts_{0}'.format(datetime.datetime.now())
@@ -47,20 +47,20 @@ class DummySuggesterTestCase(SuggesterTestMixin, TestCase):
 
         # Try with just the feedback
         links = get_suggestions(feedback)
-        eq_(len(links), 1)
-        eq_(links[0].provider, 'dummy')
-        eq_(links[0].provider_version, 1)
-        eq_(links[0].cssclass, u'document')
-        eq_(links[0].summary, u'summary {0}'.format(now)),
-        eq_(links[0].description, u'description {0}'.format(now))
-        eq_(links[0].url, feedback.url)
+        assert len(links) == 1
+        assert links[0].provider == 'dummy'
+        assert links[0].provider_version == 1
+        assert links[0].cssclass == u'document'
+        assert links[0].summary == u'summary {0}'.format(now)
+        assert links[0].description == u'description {0}'.format(now)
+        assert links[0].url == feedback.url
 
         # Now with the feedback and request
         links = get_suggestions(feedback, req)
-        eq_(len(links), 1)
-        eq_(links[0].provider, 'dummy')
-        eq_(links[0].provider_version, 1)
-        eq_(links[0].cssclass, u'document')
-        eq_(links[0].summary, u'summary {0}'.format(now)),
-        eq_(links[0].description, u'description {0}'.format(now))
-        eq_(links[0].url, feedback.url)
+        assert len(links) == 1
+        assert links[0].provider == 'dummy'
+        assert links[0].provider_version == 1
+        assert links[0].cssclass == u'document'
+        assert links[0].summary == u'summary {0}'.format(now)
+        assert links[0].description == u'description {0}'.format(now)
+        assert links[0].url == feedback.url
