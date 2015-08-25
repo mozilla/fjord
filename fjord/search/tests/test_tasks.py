@@ -1,4 +1,3 @@
-from fjord.base.tests import eq_
 from fjord.feedback.models import ResponseDocType
 from fjord.feedback.tests import ResponseFactory
 from fjord.search.index import get_index_name
@@ -18,7 +17,7 @@ class IndexChunkTaskTest(ElasticTestCase):
         self.setup_indexes(empty=True)
 
         # Verify there's nothing in the index.
-        eq_(ResponseDocType.docs.search().count(), 0)
+        assert ResponseDocType.docs.search().count() == 0
 
         # Create the record and the chunk and then run it through
         # celery.
@@ -34,8 +33,8 @@ class IndexChunkTaskTest(ElasticTestCase):
         self.refresh()
 
         # Verify everything is in the index now.
-        eq_(ResponseDocType.docs.search().count(), 10)
+        assert ResponseDocType.docs.search().count() == 10
 
         # Verify the record was marked succeeded.
         rec = Record.objects.get(pk=rec.id)
-        eq_(rec.status, Record.STATUS_SUCCESS)
+        assert rec.status == Record.STATUS_SUCCESS
