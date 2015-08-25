@@ -7,7 +7,7 @@ from mock import MagicMock, patch
 import requests_mock
 import pytest
 
-from fjord.base.tests import eq_, TestCase
+from fjord.base.tests import TestCase
 from fjord.translations import gengo_utils
 from fjord.translations.models import (
     GengoHumanTranslator,
@@ -133,7 +133,7 @@ class GuessLanguageTest(BaseGengoTestCase):
     def test_guess_language_returns_language(self):
         gengo_api = gengo_utils.FjordGengo()
         text = u'Facebook no se puede enlazar con peru'
-        eq_(gengo_api.guess_language(text), u'es')
+        assert gengo_api.guess_language(text) == u'es'
 
     def test_guess_language_unintelligible_response(self):
         # If the gengo api returns some crazy non-json response, make sure
@@ -176,15 +176,15 @@ class GetLanguagesTestCase(BaseGengoTestCase):
             instance.getServiceLanguages.return_value = response
 
             # Make sure the cache is empty
-            eq_(gengo_utils.GENGO_LANGUAGE_CACHE, None)
+            assert gengo_utils.GENGO_LANGUAGE_CACHE == None
 
             # Test that we generate a list based on what we think the
             # response is.
             gengo_api = gengo_utils.FjordGengo()
-            eq_(gengo_api.get_languages(), (u'es',))
+            assert gengo_api.get_languages() == (u'es',)
 
             # Test that the new list is cached.
-            eq_(gengo_utils.GENGO_LANGUAGE_CACHE, (response, (u'es',)))
+            assert gengo_utils.GENGO_LANGUAGE_CACHE == (response, (u'es',))
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
@@ -213,17 +213,21 @@ class GetLanguagePairsTestCase(BaseGengoTestCase):
             instance.getServiceLanguagePairs.return_value = resp
 
             # Make sure the cache is empty
-            eq_(gengo_utils.GENGO_LANGUAGE_PAIRS_CACHE, None)
+            assert gengo_utils.GENGO_LANGUAGE_PAIRS_CACHE == None
 
             # Test that we generate a list based on what we think the
             # response is.
             gengo_api = gengo_utils.FjordGengo()
-            eq_(gengo_api.get_language_pairs(),
-                [(u'en', u'es-la'), (u'de', u'pl')])
+            assert (
+                gengo_api.get_language_pairs() ==
+                [(u'en', u'es-la'), (u'de', u'pl')]
+                )
 
             # Test that the new list is cached.
-            eq_(gengo_utils.GENGO_LANGUAGE_PAIRS_CACHE,
-                [(u'en', u'es-la'), (u'de', u'pl')])
+            assert (
+                gengo_utils.GENGO_LANGUAGE_PAIRS_CACHE ==
+                [(u'en', u'es-la'), (u'de', u'pl')]
+                )
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
@@ -231,7 +235,7 @@ class GetBalanceTestCase(BaseGengoTestCase):
     @account_balance(20.0)
     def test_get_balance(self):
         gengo_api = gengo_utils.FjordGengo()
-        eq_(gengo_api.get_balance(), 20.0)
+        assert gengo_api.get_balance() == 20.0
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
@@ -246,12 +250,12 @@ class MachineTranslateTestCase(BaseGengoTestCase):
         )
         obj.save()
 
-        eq_(obj.trans_desc, u'')
+        assert obj.trans_desc == u''
         translate(obj, 'gengo_machine', 'es', 'desc', 'en', 'trans_desc')
         # Nothing should be translated
-        eq_(obj.trans_desc, u'')
+        assert obj.trans_desc == u''
 
-        eq_(len(GengoJob.objects.all()), 1)
+        assert len(GengoJob.objects.all()) == 1
 
     def test_gengo_push_translations(self):
         """Tests GengoOrders get created"""
@@ -296,7 +300,7 @@ class MachineTranslateTestCase(BaseGengoTestCase):
 
             ght.push_translations()
 
-            eq_(GengoOrder.objects.count(), 2)
+            assert GengoOrder.objects.count() == 2
 
             order_by_id = dict(
                 [(order.id, order) for order in GengoOrder.objects.all()]
@@ -319,12 +323,12 @@ class HumanTranslationTestCase(BaseGengoTestCase):
         )
         obj.save()
 
-        eq_(obj.trans_desc, u'')
+        assert obj.trans_desc == u''
         translate(obj, 'gengo_human', 'es', 'desc', 'en', 'trans_desc')
         # Nothing should be translated
-        eq_(obj.trans_desc, u'')
+        assert obj.trans_desc == u''
 
-        eq_(len(GengoJob.objects.all()), 1)
+        assert len(GengoJob.objects.all()) == 1
 
     @guess_language('es')
     def test_no_translate_if_disabled(self):
@@ -341,15 +345,15 @@ class HumanTranslationTestCase(BaseGengoTestCase):
                 )
                 obj.save()
 
-                eq_(obj.trans_desc, u'')
+                assert obj.trans_desc == u''
                 translate(obj, 'gengo_human', 'es', 'desc', 'en', 'trans_desc')
-                eq_(obj.trans_desc, u'')
+                assert obj.trans_desc == u''
 
                 # Verify no jobs were created
-                eq_(len(GengoJob.objects.all()), 0)
+                assert len(GengoJob.objects.all()) == 0
 
                 # Verify we didn't call the API at all.
-                eq_(GengoMock.called, False)
+                assert GengoMock.called == False
 
     @guess_language('en')
     def test_translate_gengo_human_english_copy_over(self):
@@ -359,10 +363,10 @@ class HumanTranslationTestCase(BaseGengoTestCase):
         )
         obj.save()
 
-        eq_(obj.trans_desc, u'')
+        assert obj.trans_desc == u''
         translate(obj, 'gengo_human', 'es', 'desc', 'en', 'trans_desc')
         # If the guesser guesses English, then we just copy it over.
-        eq_(obj.trans_desc, u'This is English.')
+        assert obj.trans_desc == u'This is English.'
 
     @guess_language('el')
     def test_translate_gengo_human_unsupported_pair(self):
@@ -372,10 +376,10 @@ class HumanTranslationTestCase(BaseGengoTestCase):
         )
         obj.save()
 
-        eq_(obj.trans_desc, u'')
+        assert obj.trans_desc == u''
         translate(obj, 'gengo_human', 'el', 'desc', 'en', 'trans_desc')
         # el -> en is not a supported pair, so it shouldn't get translated.
-        eq_(obj.trans_desc, u'')
+        assert obj.trans_desc == u''
 
     @override_settings(
         ADMINS=(('Jimmy Discotheque', 'jimmy@example.com'),),
@@ -385,7 +389,7 @@ class HumanTranslationTestCase(BaseGengoTestCase):
     def test_push_translations_low_balance_mails_admin(self):
         """Tests that a low balance sends email and does nothing else"""
         # Verify nothing is in the outbox
-        eq_(len(mail.outbox), 0)
+        assert len(mail.outbox) == 0
 
         # Call push_translation which should balk and email the
         # admin
@@ -393,8 +397,8 @@ class HumanTranslationTestCase(BaseGengoTestCase):
         ght.push_translations()
 
         # Verify an email got sent and no jobs were created
-        eq_(len(mail.outbox), 1)
-        eq_(GengoJob.objects.count(), 0)
+        assert len(mail.outbox) == 1
+        assert GengoJob.objects.count() == 0
 
     @override_settings(GENGO_ACCOUNT_BALANCE_THRESHOLD=20.0)
     def test_gengo_push_translations(self):
@@ -446,7 +450,7 @@ class HumanTranslationTestCase(BaseGengoTestCase):
 
             ght.push_translations()
 
-            eq_(GengoOrder.objects.count(), 2)
+            assert GengoOrder.objects.count() == 2
 
             order_by_id = dict(
                 [(order.id, order) for order in GengoOrder.objects.all()]
@@ -509,9 +513,9 @@ class HumanTranslationTestCase(BaseGengoTestCase):
 
             ght.push_translations()
 
-            eq_(GengoOrder.objects.count(), 1)
+            assert GengoOrder.objects.count() == 1
             # The "it's too low" email only.
-            eq_(len(mail.outbox), 1)
+            assert len(mail.outbox) == 1
 
         with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:
             # FIXME: This returns the same thing both times, but to
@@ -540,9 +544,9 @@ class HumanTranslationTestCase(BaseGengoTestCase):
             # create any new jobs, but should send an email.
             ght.push_translations()
 
-            eq_(GengoOrder.objects.count(), 1)
+            assert GengoOrder.objects.count() == 1
             # This generates one more email.
-            eq_(len(mail.outbox), 2)
+            assert len(mail.outbox) == 2
 
     @override_settings(
         ADMINS=(('Jimmy Discotheque', 'jimmy@example.com'),),
@@ -570,7 +574,7 @@ class HumanTranslationTestCase(BaseGengoTestCase):
             ght.run_daily_activities()
 
             # The "balance is low warning" email only.
-            eq_(len(mail.outbox), 1)
+            assert len(mail.outbox) == 1
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
@@ -602,7 +606,7 @@ class CompletedJobsForOrderTestCase(BaseGengoTestCase):
 
             gengo_api = gengo_utils.FjordGengo()
             jobs = gengo_api.completed_jobs_for_order('263413')
-            eq_(jobs, [])
+            assert jobs == []
 
     def test_approved_jobs(self):
         gtoj_resp = {
@@ -658,8 +662,10 @@ class CompletedJobsForOrderTestCase(BaseGengoTestCase):
 
             gengo_api = gengo_utils.FjordGengo()
             jobs = gengo_api.completed_jobs_for_order('263413')
-            eq_([item['custom_data'] for item in jobs],
-                [u'localhost||GengoJob||7'])
+            assert(
+                [item['custom_data'] for item in jobs] ==
+                [u'localhost||GengoJob||7']
+                )
 
     def test_pull_translations(self):
         ght = GengoHumanTranslator()
@@ -737,12 +743,12 @@ class CompletedJobsForOrderTestCase(BaseGengoTestCase):
             ght.pull_translations()
 
             jobs = GengoJob.objects.all()
-            eq_(len(jobs), 1)
-            eq_(jobs[0].status, 'complete')
+            assert len(jobs) == 1
+            assert jobs[0].status == 'complete'
 
             orders = GengoOrder.objects.all()
-            eq_(len(orders), 1)
-            eq_(orders[0].status, 'complete')
+            assert len(orders) == 1
+            assert orders[0].status == 'complete'
 
 
 @pytest.mark.skipif(not has_gengo_creds(),
@@ -771,4 +777,4 @@ class LiveGengoTestCase(TestCase):
     def test_get_language(self):
         text = u'Facebook no se puede enlazar con peru'
         gengo_api = gengo_utils.FjordGengo()
-        eq_(gengo_api.guess_language(text), u'es')
+        assert gengo_api.guess_language(text) == u'es'
