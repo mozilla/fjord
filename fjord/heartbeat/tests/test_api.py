@@ -3,7 +3,7 @@ import time
 
 from . import SurveyFactory
 from ..models import Answer
-from fjord.base.tests import eq_, TestCase, reverse
+from fjord.base.tests import TestCase, reverse
 from fjord.journal.models import Record
 
 
@@ -41,7 +41,7 @@ class HeartbeatPostAPITest(TestCase):
             content_type='application/json',
             data=json.dumps(data))
 
-        eq_(resp.status_code, 201)
+        assert resp.status_code == 201
 
     def test_initial_answer(self):
         """Initial answer using "non values" for many fields"""
@@ -83,7 +83,7 @@ class HeartbeatPostAPITest(TestCase):
             content_type='application/json',
             data=json.dumps(data))
 
-        eq_(resp.status_code, 201)
+        assert resp.status_code == 201
 
         ans = Answer.objects.latest('id')
 
@@ -93,10 +93,10 @@ class HeartbeatPostAPITest(TestCase):
                 # This looks goofy because it's not the normal way to
                 # do things, but the "survey_id" attribute is a
                 # Survey rather than the pk for a Survey.
-                eq_(ans.survey_id.name, data[field])
+                assert ans.survey_id.name == data[field]
                 continue
 
-            eq_(getattr(ans, field), data[field])
+            assert getattr(ans, field) == data[field]
 
     def test_complete_answer(self):
         """Complete answer using sane values for everything"""
@@ -137,7 +137,7 @@ class HeartbeatPostAPITest(TestCase):
             content_type='application/json',
             data=json.dumps(data))
 
-        eq_(resp.status_code, 201)
+        assert resp.status_code == 201
 
         ans = Answer.objects.latest('id')
 
@@ -147,12 +147,12 @@ class HeartbeatPostAPITest(TestCase):
                 # This looks goofy because it's not the normal way to
                 # do things, but the "survey_id" attribute is a
                 # Survey rather than the pk for a Survey.
-                eq_(ans.survey_id.name, data[field])
+                assert ans.survey_id.name == data[field]
                 continue
 
-            eq_(getattr(ans, field), data[field])
+            assert getattr(ans, field) == data[field]
 
-        eq_(ans.is_test, False)
+        assert ans.is_test == False
 
     def test_country_unknown(self):
         """This is a stopgap fix for handling 'unknown' value for country"""
@@ -176,9 +176,9 @@ class HeartbeatPostAPITest(TestCase):
             content_type='application/json',
             data=json.dumps(data))
 
-        eq_(resp.status_code, 201)
+        assert resp.status_code == 201
         ans = Answer.objects.latest('id')
-        eq_(ans.country, 'UNK')
+        assert ans.country == 'UNK'
 
     def test_survey_doesnt_exist(self):
         """If the survey doesn't exist, kick up an error"""
@@ -199,10 +199,12 @@ class HeartbeatPostAPITest(TestCase):
             content_type='application/json',
             data=json.dumps(data))
 
-        eq_(resp.status_code, 400)
+        assert resp.status_code == 400
         errors = json.loads(resp.content)['errors']
-        eq_(errors['survey_id'],
-            [u'Object with name=foosurvey does not exist.'])
+        assert (
+            errors['survey_id'] ==
+            [u'Object with name=foosurvey does not exist.']
+            )
 
     def test_survey_disabled(self):
         """If the survey is disabled, kick up an error"""
@@ -225,10 +227,12 @@ class HeartbeatPostAPITest(TestCase):
             content_type='application/json',
             data=json.dumps(data))
 
-        eq_(resp.status_code, 400)
+        assert resp.status_code == 400
         errors = json.loads(resp.content)['errors']
-        eq_(errors['survey_id'],
-            ['survey "%s" is not enabled' % survey.name])
+        assert (
+            errors['survey_id'] ==
+            ['survey "%s" is not enabled' % survey.name]
+            )
 
     def test_missing_data(self):
         """Missing required data kicks up an error"""
@@ -255,14 +259,14 @@ class HeartbeatPostAPITest(TestCase):
                 content_type='application/json',
                 data=json.dumps(data))
 
-            eq_(resp.status_code, 400)
+            assert resp.status_code == 400
             resp_data = json.loads(resp.content)
             assert key in resp_data['errors']
 
     def test_error_logging(self):
         """Errors in the packet should be logged in the journal"""
         # Verify nothing in the journal
-        eq_(len(Record.objects.recent('heartbeat')), 0)
+        assert len(Record.objects.recent('heartbeat')) == 0
 
         data = {
             'experiment_version': '1',
@@ -281,12 +285,12 @@ class HeartbeatPostAPITest(TestCase):
             content_type='application/json',
             data=json.dumps(data))
 
-        eq_(resp.status_code, 400)
+        assert resp.status_code == 400
         errors = json.loads(resp.content)['errors']
         assert len(errors) > 0
 
         # Verify there's one entry now.
-        eq_(len(Record.objects.recent('heartbeat')), 1)
+        assert len(Record.objects.recent('heartbeat')) == 1
 
     def test_updated_ts_greater(self):
         """If the updated_ts > existing, then update the Answer"""
@@ -309,20 +313,20 @@ class HeartbeatPostAPITest(TestCase):
             content_type='application/json',
             data=json.dumps(data))
 
-        eq_(resp.status_code, 201)
+        assert resp.status_code == 201
 
         # Make sure the answer made it to the db and that the data
         # matches.
         ans = Answer.objects.latest('id')
-        eq_(ans.person_id, data['person_id'])
-        eq_(ans.survey_id.name, data['survey_id'])
-        eq_(ans.flow_id, data['flow_id'])
-        eq_(ans.question_id, data['question_id'])
-        eq_(ans.updated_ts, data['updated_ts'])
-        eq_(ans.question_text, data['question_text'])
-        eq_(ans.variation_id, data['variation_id'])
-        eq_(ans.score, None)
-        eq_(ans.max_score, None)
+        assert ans.person_id ==  data['person_id']
+        assert ans.survey_id.name == data['survey_id']
+        assert ans.flow_id ==  data['flow_id']
+        assert ans.question_id ==  data['question_id']
+        assert ans.updated_ts ==  data['updated_ts']
+        assert ans.question_text ==  data['question_text']
+        assert ans.variation_id ==  data['variation_id']
+        assert ans.score ==  None
+        assert ans.max_score == None
 
         ans_id = ans.id
 
@@ -345,19 +349,19 @@ class HeartbeatPostAPITest(TestCase):
             content_type='application/json',
             data=json.dumps(data))
 
-        eq_(resp.status_code, 201)
+        assert resp.status_code == 201
 
         ans = Answer.objects.get(id=ans_id)
         ans = Answer.objects.latest('id')
-        eq_(ans.person_id, data['person_id'])
-        eq_(ans.survey_id.name, data['survey_id'])
-        eq_(ans.flow_id, data['flow_id'])
-        eq_(ans.question_id, data['question_id'])
-        eq_(ans.updated_ts, data['updated_ts'])
-        eq_(ans.question_text, data['question_text'])
-        eq_(ans.variation_id, data['variation_id'])
-        eq_(ans.score, 5.0)
-        eq_(ans.max_score, 10.0)
+        assert ans.person_id == data['person_id']
+        assert ans.survey_id.name == data['survey_id']
+        assert ans.flow_id == data['flow_id']
+        assert ans.question_id == data['question_id']
+        assert ans.updated_ts == data['updated_ts']
+        assert ans.question_text == data['question_text']
+        assert ans.variation_id == data['variation_id']
+        assert ans.score == 5.0
+        assert ans.max_score == 10.0
 
     def test_updated_ts_lessthan_equal(self):
         """If the updated_ts <= existing, then update the Answer"""
@@ -380,7 +384,7 @@ class HeartbeatPostAPITest(TestCase):
             content_type='application/json',
             data=json.dumps(data))
 
-        eq_(resp.status_code, 201)
+        assert resp.status_code == 201
 
         # Test the less-than case.
         data['updated_ts'] = self.timestamp(offset=-10)
@@ -389,10 +393,12 @@ class HeartbeatPostAPITest(TestCase):
             content_type='application/json',
             data=json.dumps(data))
 
-        eq_(resp.status_code, 400)
+        assert resp.status_code == 400
         resp_data = json.loads(resp.content)
-        eq_(resp_data['errors']['updated_ts'],
-            'updated timestamp is same or older than existing data')
+        assert (
+            resp_data['errors']['updated_ts'] ==
+            'updated timestamp is same or older than existing data'
+            )
 
         # Test the equal case.
         data['updated_ts'] = self.timestamp()
@@ -401,10 +407,12 @@ class HeartbeatPostAPITest(TestCase):
             content_type='application/json',
             data=json.dumps(data))
 
-        eq_(resp.status_code, 400)
+        assert resp.status_code == 400
         resp_data = json.loads(resp.content)
-        eq_(resp_data['errors']['updated_ts'],
-            'updated timestamp is same or older than existing data')
+        assert (
+            resp_data['errors']['updated_ts'] ==
+            'updated timestamp is same or older than existing data'
+            )
 
     def test_cors(self):
         """Verify the CORS headers in the OPTIONS response."""
@@ -412,8 +420,8 @@ class HeartbeatPostAPITest(TestCase):
             reverse('heartbeat-api'),
             HTTP_ACCESS_CONTROL_REQUEST_METHOD='',
             HTTP_ACCESS_CONTROL_REQUEST_HEADERS='')
-        eq_(resp['Access-Control-Allow-Methods'], 'POST')
-        eq_(resp['Access-Control-Allow-Origin'], '*')
+        assert resp['Access-Control-Allow-Methods'] =='POST'
+        assert resp['Access-Control-Allow-Origin'] == '*'
 
     # FIXME: test bad types and validation so we can suss out
     # exception handling issues
