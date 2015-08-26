@@ -84,6 +84,7 @@ class TriggerRuleMatchTests(TestCase):
             ([u'\xca'], u'abcd \xca abcd', True),
             ([u'my-cat'], u'my-cat has fleas', True),
             ([u'(my cat)'], u'(my cat) has fleas', True),
+            ([u'cat'], u'i love my cat!', True),
         ]
         for tr_keywords, description, expected in tests:
             tr = TriggerRuleFactory(keywords=tr_keywords)

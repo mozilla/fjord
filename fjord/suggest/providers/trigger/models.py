@@ -54,8 +54,8 @@ def _generate_keywords_regex(keywords):
         u'|'.join(keywords) +
         u')'
     )
-    regex = ur'((?:^|\s)' + middle + ur'(?:\s|$))'
-    return re.compile(regex, re.LOCALE | re.IGNORECASE | re.UNICODE)
+    regex = ur'((?:^|\W)' + middle + ur'(?:\W|$))'
+    return re.compile(regex, re.IGNORECASE | re.UNICODE)
 
 
 class TriggerRule(ModelBase):
