@@ -54,7 +54,9 @@ def _generate_keywords_regex(keywords):
         u'|'.join(keywords) +
         u')'
     )
-    regex = ur'((?:^|\W)' + middle + ur'(?:\W|$))'
+    # Note: Can't use \b here because we need to be able to find
+    # arbitrary strings--not just alphanumeric ones.
+    regex = ur'(?:^|\W)' + middle + ur'(?:\W|$)'
     return re.compile(regex, re.IGNORECASE | re.UNICODE)
 
 
