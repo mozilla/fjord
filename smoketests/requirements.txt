@@ -1,5 +1,4 @@
 PyYAML==3.11
-UnittestZero
 certifi==14.05.14
 chardet==2.2.1
 execnet==1.2.0

@@ -4,7 +4,6 @@
 
 import pytest
 import requests
-from unittestzero import Assert
 
 
 FIREFOX_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.5; rv:5.0) Gecko/20100101 Firefox/5.0'
@@ -17,14 +16,14 @@ class RedirectsBase(object):
         expected_url = testsetup.base_url + expected_url
         if testsetup.selenium:
             testsetup.selenium.get(url)
-            Assert.equal(testsetup.selenium.current_url, expected_url)
+            assert testsetup.selenium.current_url == expected_url
         else:
             headers = {
                 'user-agent': user_agent,
                 'accept-language': locale
             }
             r = requests.get(url, headers=headers)
-            Assert.equal(r.url, expected_url)
+            assert r.url == expected_url
 
 
 class TestDashboardRedirects(RedirectsBase):

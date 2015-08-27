@@ -4,9 +4,6 @@
 
 import time
 
-from unittestzero import Assert
-
-
 from tests import TestCase
 from pages.dashboard import DashboardPage
 from pages.fxos_feedback_form import FxOSFeedbackFormPage
@@ -35,9 +32,9 @@ class TestFeedback(TestCase):
 
         # 5. fill in description
         feedback_pg.has_privacy_link
-        Assert.false(feedback_pg.is_submit_enabled)
+        assert feedback_pg.is_submit_enabled is False
         feedback_pg.set_description(desc)
-        Assert.true(feedback_pg.is_submit_enabled)
+        assert feedback_pg.is_submit_enabled is True
 
         # 6. fill in url
         feedback_pg.set_url('http://example.com/foo')
@@ -51,16 +48,16 @@ class TestFeedback(TestCase):
         # 8. submit
         feedback_pg.submit(expect_success=True)
         self.take_a_breather()
-        Assert.equal(feedback_pg.current_card, 'thanks')
+        assert feedback_pg.current_card == 'thanks'
 
         # 9. verify
         dashboard_pg = DashboardPage(mozwebqa)
         dashboard_pg.go_to_dashboard_page()
         dashboard_pg.search_for(desc)
         resp = dashboard_pg.messages[0]
-        Assert.equal(resp.type.strip(), 'Happy')
-        Assert.equal(resp.body.strip(), desc.strip())
-        Assert.equal(resp.locale.strip(), 'English (US)')
+        assert resp.type.strip() == 'Happy'
+        assert resp.body.strip() == desc.strip()
+        assert resp.locale.strip() == 'English (US)'
         # FIXME: test email (can't because it's hidden when not authenticated)
         # FIXME: test url (can't because it's hidden when not authenticated)
 
@@ -87,16 +84,16 @@ class TestFeedback(TestCase):
         # 6. submit
         feedback_pg.submit(expect_success=True)
         self.take_a_breather()
-        Assert.equal(feedback_pg.current_card, 'thanks')
+        assert feedback_pg.current_card == 'thanks'
 
         # 7. verify
         dashboard_pg = DashboardPage(mozwebqa)
         dashboard_pg.go_to_dashboard_page()
         dashboard_pg.search_for(desc)
         resp = dashboard_pg.messages[0]
-        Assert.equal(resp.type.strip(), 'Sad')
-        Assert.equal(resp.body.strip(), desc.strip())
-        Assert.equal(resp.locale.strip(), 'English (US)')
+        assert resp.type.strip() == 'Sad'
+        assert resp.body.strip() == desc.strip()
+        assert resp.locale.strip() == 'English (US)'
 
     # FIXME: Test back and forth
 

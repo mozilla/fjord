@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
-from unittestzero import Assert
 
 from pages.dashboard import DashboardPage
 
@@ -24,25 +23,25 @@ class TestPagination:
 
         # Check the total message count. If it's less than 50 (two
         # pages worth), then we will fail with a helpful message.
-        assert dashboard_pg.total_message_count > 50, 'Not enough data to test. Add more data.'
+        assert dashboard_pg.total_message_count >= 50, 'Not enough data to test. Add more data.'
 
         assert dashboard_pg.is_older_messages_link_visible is True
         assert dashboard_pg.is_newer_messages_link_visible is False
         assert dashboard_pg.older_messages_link == 'Older Messages'
 
         dashboard_pg.click_older_messages()
-        Assert.equal(dashboard_pg.search_term_from_url, self.SEARCH_TERM)
+        assert dashboard_pg.search_term_from_url == self.SEARCH_TERM
 
-        Assert.true(dashboard_pg.is_older_messages_link_visible)
-        Assert.true(dashboard_pg.is_newer_messages_link_visible)
-        Assert.equal(dashboard_pg.older_messages_link, 'Older Messages')
-        Assert.equal(dashboard_pg.newer_messages_link, 'Newer Messages')
-        Assert.equal(dashboard_pg.page_from_url, 2)
+        assert dashboard_pg.is_older_messages_link_visible is True
+        assert dashboard_pg.is_newer_messages_link_visible is True
+        assert dashboard_pg.older_messages_link == 'Older Messages'
+        assert dashboard_pg.newer_messages_link == 'Newer Messages'
+        assert dashboard_pg.page_from_url == 2
 
         dashboard_pg.click_newer_messages()
-        Assert.equal(dashboard_pg.search_term_from_url, self.SEARCH_TERM)
+        assert dashboard_pg.search_term_from_url == self.SEARCH_TERM
 
-        Assert.true(dashboard_pg.is_older_messages_link_visible)
-        Assert.false(dashboard_pg.is_newer_messages_link_visible)
-        Assert.equal(dashboard_pg.older_messages_link, 'Older Messages')
-        Assert.equal(dashboard_pg.page_from_url, 1)
+        assert dashboard_pg.is_older_messages_link_visible is True
+        assert dashboard_pg.is_newer_messages_link_visible is False
+        assert dashboard_pg.older_messages_link == 'Older Messages'
+        assert dashboard_pg.page_from_url == 1

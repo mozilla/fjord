@@ -8,7 +8,6 @@ import random
 from datetime import date, timedelta
 
 import pytest
-from unittestzero import Assert
 
 from pages.dashboard import DashboardPage
 
@@ -25,13 +24,13 @@ class TestSearchDates(object):
 
         # Defaults to 7d.
         dashboard_pg.go_to_dashboard_page()
-        Assert.equal(dashboard_pg.date_filter.current_days, '7d')
+        assert dashboard_pg.date_filter.current_days == '7d'
 
         # Last day filter
         dashboard_pg.date_filter.click_last_day()
-        Assert.equal(dashboard_pg.date_filter.current_days, '1d')
+        assert dashboard_pg.date_filter.current_days == '1d'
         start_date = date.today() - timedelta(days=1)
-        Assert.equal(dashboard_pg.date_start_from_url, start_date.strftime('%Y-%m-%d'))
+        assert dashboard_pg.date_start_from_url == start_date.strftime('%Y-%m-%d')
         # TODO: Check results are within the expected date range,
         # possibly by navigating to the last page and checking the
         # final result is within range. Currently blocked by bug
@@ -39,9 +38,9 @@ class TestSearchDates(object):
 
         # Last seven days filter
         dashboard_pg.date_filter.click_last_seven_days()
-        Assert.equal(dashboard_pg.date_filter.current_days, '7d')
+        assert dashboard_pg.date_filter.current_days == '7d'
         start_date = date.today() - timedelta(days=7)
-        Assert.equal(dashboard_pg.date_start_from_url, start_date.strftime('%Y-%m-%d'))
+        assert dashboard_pg.date_start_from_url == start_date.strftime('%Y-%m-%d')
         # TODO: Check results are within the expected date range,
         # possibly by navigating to the last page and checking the
         # final result is within range. Currently blocked by bug
@@ -49,9 +48,9 @@ class TestSearchDates(object):
 
         # Last thirty days filter
         dashboard_pg.date_filter.click_last_thirty_days()
-        Assert.equal(dashboard_pg.date_filter.current_days, '30d')
+        assert dashboard_pg.date_filter.current_days == '30d'
         start_date = date.today() - timedelta(days=30)
-        Assert.equal(dashboard_pg.date_start_from_url, start_date.strftime('%Y-%m-%d'))
+        assert dashboard_pg.date_start_from_url == start_date.strftime('%Y-%m-%d')
         # TODO: Check results are within the expected date range,
         # possibly by navigating to the last page and checking the
         # final result is within range. Currently blocked by bug
@@ -73,8 +72,8 @@ class TestSearchDates(object):
         end_date = date.today() - timedelta(days=1)
 
         dashboard_pg.date_filter.filter_by_custom_dates_using_datepicker(start_date, end_date)
-        Assert.equal(dashboard_pg.date_start_from_url, start_date.strftime('%Y-%m-%d'))
-        Assert.equal(dashboard_pg.date_end_from_url, end_date.strftime('%Y-%m-%d'))
+        assert dashboard_pg.date_start_from_url == start_date.strftime('%Y-%m-%d')
+        assert dashboard_pg.date_end_from_url == end_date.strftime('%Y-%m-%d')
 
         # TODO: Check results are within the expected date range,
         # possibly by navigating to the first/last pages and checking
@@ -85,9 +84,9 @@ class TestSearchDates(object):
         for days in day_filters:
             start_date = date.today() - timedelta(days=days[0])
             dashboard_pg.date_filter.filter_by_custom_dates_using_datepicker(start_date, date.today())
-            Assert.false(dashboard_pg.date_filter.is_custom_date_filter_visible)
-            Assert.equal(dashboard_pg.date_start_from_url, start_date.strftime('%Y-%m-%d'))
-            Assert.equal(dashboard_pg.date_end_from_url, self.default_end_date)
+            assert dashboard_pg.date_filter.is_custom_date_filter_visible is False
+            assert dashboard_pg.date_start_from_url == start_date.strftime('%Y-%m-%d')
+            assert dashboard_pg.date_end_from_url == self.default_end_date
 
     @pytest.mark.nondestructive
     def test_feedback_custom_date_filter_with_random_alphabet(self, mozwebqa):
@@ -104,12 +103,12 @@ class TestSearchDates(object):
         end_date = ''.join(random.sample(letters, 8))
 
         dashboard_pg.date_filter.filter_by_custom_dates_using_keyboard(start_date, end_date)
-        Assert.equal(dashboard_pg.date_start_from_url, '')
-        Assert.equal(dashboard_pg.date_end_from_url, '')
+        assert dashboard_pg.date_start_from_url == ''
+        assert dashboard_pg.date_end_from_url == ''
 
         dashboard_pg.date_filter.enable_custom_dates()
-        Assert.equal(dashboard_pg.date_filter.custom_start_date, self.default_start_date)
-        Assert.equal(dashboard_pg.date_filter.custom_end_date, self.default_end_date)
+        assert dashboard_pg.date_filter.custom_start_date == self.default_start_date
+        assert dashboard_pg.date_filter.custom_end_date == self.default_end_date
 
     @pytest.mark.nondestructive
     def test_feedback_custom_date_filter_with_bad_dates(self, mozwebqa):
@@ -133,14 +132,14 @@ class TestSearchDates(object):
 
         for start_date, end_date in data:
             dashboard_pg.date_filter.filter_by_custom_dates_using_keyboard(start_date, end_date)
-            Assert.equal(dashboard_pg.date_start_from_url, str(start_date))
-            Assert.equal(dashboard_pg.date_end_from_url, str(end_date))
+            assert dashboard_pg.date_start_from_url == str(start_date)
+            assert dashboard_pg.date_end_from_url == str(end_date)
 
-            Assert.equal(len(dashboard_pg.messages), 20)
+            assert len(dashboard_pg.messages) == 20
 
             dashboard_pg.date_filter.enable_custom_dates()
-            Assert.equal(dashboard_pg.date_filter.custom_start_date, self.default_start_date)
-            Assert.equal(dashboard_pg.date_filter.custom_end_date, self.default_end_date)
+            assert dashboard_pg.date_filter.custom_start_date == self.default_start_date
+            assert dashboard_pg.date_filter.custom_end_date == self.default_end_date
 
     @pytest.mark.nondestructive
     def test_feedback_custom_date_filter_future_dates(self, mozwebqa):
@@ -152,15 +151,15 @@ class TestSearchDates(object):
         end_date = "2031-01-01"
 
         dashboard_pg.date_filter.filter_by_custom_dates_using_keyboard(start_date, end_date)
-        Assert.equal(dashboard_pg.date_start_from_url, start_date)
-        Assert.equal(dashboard_pg.date_end_from_url, end_date)
+        assert dashboard_pg.date_start_from_url == start_date
+        assert dashboard_pg.date_end_from_url == end_date
 
-        Assert.true(dashboard_pg.no_messages)
-        Assert.equal(dashboard_pg.no_messages_message, 'No feedback matches that criteria.')
+        assert dashboard_pg.no_messages is True
+        assert dashboard_pg.no_messages_message == 'No feedback matches that criteria.'
 
         dashboard_pg.date_filter.enable_custom_dates()
-        Assert.equal(dashboard_pg.date_filter.custom_start_date, start_date)
-        Assert.equal(dashboard_pg.date_filter.custom_end_date, end_date)
+        assert dashboard_pg.date_filter.custom_start_date == start_date
+        assert dashboard_pg.date_filter.custom_end_date == end_date
 
     @pytest.mark.nondestructive
     def test_feedback_custom_date_filter_with_future_start_date(self, mozwebqa):
@@ -175,16 +174,16 @@ class TestSearchDates(object):
         dashboard_pg.date_filter.filter_by_custom_dates_using_keyboard(start_date, end_date)
 
         # No messages!
-        Assert.equal(dashboard_pg.total_message_count, 0)
+        assert dashboard_pg.total_message_count == 0
 
         # Check the url bits are correct
-        Assert.equal(dashboard_pg.date_start_from_url, start_date)
-        Assert.equal(dashboard_pg.date_end_from_url, end_date)
+        assert dashboard_pg.date_start_from_url == start_date
+        assert dashboard_pg.date_end_from_url == end_date
 
         # Verify the dates
         dashboard_pg.date_filter.enable_custom_dates()
-        Assert.equal(dashboard_pg.date_filter.custom_start_date, start_date)
-        Assert.equal(dashboard_pg.date_filter.custom_end_date, end_date)
+        assert dashboard_pg.date_filter.custom_start_date == start_date
+        assert dashboard_pg.date_filter.custom_end_date == end_date
 
     @pytest.mark.nondestructive
     def test_feedback_custom_date_filter_with_end_date_lower_than_start_date(self, mozwebqa):
@@ -200,8 +199,8 @@ class TestSearchDates(object):
         end_date = date.today() - timedelta(days=3)
 
         dashboard_pg.date_filter.filter_by_custom_dates_using_datepicker(start_date, end_date)
-        Assert.equal(dashboard_pg.date_start_from_url, start_date.strftime('%Y-%m-%d'))
-        Assert.equal(dashboard_pg.date_end_from_url, end_date.strftime('%Y-%m-%d'))
+        assert dashboard_pg.date_start_from_url == start_date.strftime('%Y-%m-%d')
+        assert dashboard_pg.date_end_from_url == end_date.strftime('%Y-%m-%d')
         # TODO: Check results are within the expected date range,
         # possibly by navigating to the first/last pages and checking
         # the final result is within range. Currently blocked by bug
@@ -209,5 +208,5 @@ class TestSearchDates(object):
 
         # Test that the dates in the date filter are reordered chronologically
         dashboard_pg.date_filter.enable_custom_dates()
-        Assert.equal(dashboard_pg.date_filter.custom_start_date, end_date.strftime('%Y-%m-%d'))
-        Assert.equal(dashboard_pg.date_filter.custom_end_date, start_date.strftime('%Y-%m-%d'))
+        assert dashboard_pg.date_filter.custom_start_date == end_date.strftime('%Y-%m-%d')
+        assert dashboard_pg.date_filter.custom_end_date == start_date.strftime('%Y-%m-%d')

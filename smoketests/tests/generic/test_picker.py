@@ -2,8 +2,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from unittestzero import Assert
-
 from pages.picker import PickerPage
 
 
@@ -19,7 +17,7 @@ class TestPicker(object):
         # sure it's greater than one and hope "Firefox" is one of
         # them
         products = picker_pg.products
-        Assert.greater(len(products), 0)
+        assert len(products) > 0
         names = [prod.name for prod in products]
         assert 'Firefox' in names
 
@@ -29,12 +27,12 @@ class TestPicker(object):
         product_name = product.name
         feedback_pg = product.click()
 
-        Assert.true(feedback_pg.is_the_current_page)
+        assert feedback_pg.is_the_current_page
 
         # Verify this feedback form is for the product we chose
-        Assert.true(feedback_pg.is_product(product_name))
+        assert feedback_pg.is_product(product_name)
 
         # Go back to the product picker
         picker_pg = feedback_pg.go_to_picker_page()
         products = picker_pg.products
-        Assert.greater(len(products), 0)
+        assert len(products) > 0

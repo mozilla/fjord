@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
-from unittestzero import Assert
 
 from pages.dashboard import DashboardPage
 
@@ -30,7 +29,7 @@ class TestProductFilter(object):
         total_messages = dashboard_pg.total_message_count
 
         products = dashboard_pg.product_filter.products
-        Assert.greater(len(products), 0)
+        assert len(products) > 0
 
         for product in products[:2]:
             if not product:
@@ -38,9 +37,9 @@ class TestProductFilter(object):
                 continue
 
             dashboard_pg.product_filter.select_product(product)
-            Assert.greater(total_messages, dashboard_pg.total_message_count)
+            assert total_messages > dashboard_pg.total_message_count
             versions = dashboard_pg.product_filter.versions
-            Assert.greater(len(versions), 0)
+            assert len(versions) > 0
 
             for version in versions[:2]:
                 if not version:
@@ -49,12 +48,12 @@ class TestProductFilter(object):
 
                 dashboard_pg.product_filter.select_version(version)
 
-                Assert.greater(total_messages, dashboard_pg.total_message_count)
-                Assert.equal(dashboard_pg.product_filter.selected_product, product)
-                Assert.equal(dashboard_pg.product_filter.selected_version, version)
-                Assert.equal(dashboard_pg.product_from_url, product)
-                Assert.equal(dashboard_pg.version_from_url, version)
-                Assert.greater(len(dashboard_pg.messages), 0)
+                assert total_messages > dashboard_pg.total_message_count
+                assert dashboard_pg.product_filter.selected_product == product
+                assert dashboard_pg.product_filter.selected_version == version
+                assert dashboard_pg.product_from_url == product
+                assert dashboard_pg.version_from_url == version
+                assert len(dashboard_pg.messages) > 0
                 dashboard_pg.product_filter.unselect_version(version)
 
             dashboard_pg.product_filter.unselect_product(product)
