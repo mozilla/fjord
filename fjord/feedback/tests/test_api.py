@@ -7,7 +7,7 @@ from datetime import date, datetime, timedelta
 from django.core.cache import get_cache
 from django.test.client import Client
 
-from fjord.base.tests import eq_, ok_, TestCase, reverse
+from fjord.base.tests import TestCase, reverse
 from fjord.feedback import models
 from fjord.feedback.tests import ResponseFactory
 from fjord.search.tests import ElasticTestCase
@@ -33,8 +33,8 @@ class PublicFeedbackAPITest(ElasticTestCase):
         resp = self.client.get(reverse('feedback-api'))
         # FIXME: test headers
         json_data = json.loads(resp.content)
-        eq_(json_data['count'], 3)
-        eq_(len(json_data['results']), 3)
+        assert json_data['count'] == 3
+        assert len(json_data['results']) == 3
 
     def test_id(self):
         feedback = ResponseFactory()
@@ -42,9 +42,9 @@ class PublicFeedbackAPITest(ElasticTestCase):
 
         resp = self.client.get(reverse('feedback-api'), {'id': feedback.id})
         json_data = json.loads(resp.content)
-        eq_(json_data['count'], 1)
-        eq_(len(json_data['results']), 1)
-        eq_(json_data['results'][0]['id'], feedback.id)
+        assert json_data['count'] == 1
+        assert len(json_data['results']) == 1
+        assert json_data['results'][0]['id'] == feedback.id
 
     def test_multiple_ids(self):
         # Create some responses that we won't ask for
@@ -62,10 +62,10 @@ class PublicFeedbackAPITest(ElasticTestCase):
             {'id': ','.join([str(int(f.id)) for f in resps])}
         )
         json_data = json.loads(resp.content)
-        eq_(json_data['count'], 5)
-        eq_(len(json_data['results']), 5)
-        eq_(
-            sorted([item['id'] for item in json_data['results']]),
+        assert json_data['count'] == 5
+        assert len(json_data['results']) == 5
+        assert(
+            sorted([item['id'] for item in json_data['results']]) ==
             sorted([feedback.id for feedback in resps])
         )
 
@@ -79,31 +79,31 @@ class PublicFeedbackAPITest(ElasticTestCase):
             {'id': str(feedback.id) + ',foo'}
         )
         json_data = json.loads(resp.content)
-        eq_(json_data['count'], 1)
-        eq_(len(json_data['results']), 1)
-        eq_(json_data['results'][0]['id'], feedback.id)
+        assert json_data['count'] == 1
+        assert len(json_data['results']) == 1
+        assert json_data['results'][0]['id'] == feedback.id
 
     def test_happy(self):
         self.create_basic_data()
 
         resp = self.client.get(reverse('feedback-api'), {'happy': '1'})
         json_data = json.loads(resp.content)
-        eq_(json_data['count'], 2)
-        eq_(len(json_data['results']), 2)
+        assert json_data['count'] == 2
+        assert len(json_data['results']) == 2
 
     def test_platforms(self):
         self.create_basic_data()
 
         resp = self.client.get(reverse('feedback-api'), {'platforms': 'Linux'})
         json_data = json.loads(resp.content)
-        eq_(json_data['count'], 1)
-        eq_(len(json_data['results']), 1)
+        assert json_data['count'] == 1
+        assert len(json_data['results']) == 1
 
         resp = self.client.get(reverse('feedback-api'),
                                {'platforms': 'Linux,Windows'})
         json_data = json.loads(resp.content)
-        eq_(json_data['count'], 2)
-        eq_(len(json_data['results']), 2)
+        assert json_data['count'] == 2
+        assert len(json_data['results']) == 2
 
     def test_products_and_versions(self):
         self.create_basic_data()
@@ -111,42 +111,42 @@ class PublicFeedbackAPITest(ElasticTestCase):
         resp = self.client.get(reverse('feedback-api'),
                                {'products': 'Firefox'})
         json_data = json.loads(resp.content)
-        eq_(json_data['count'], 2)
-        eq_(len(json_data['results']), 2)
+        assert json_data['count'] == 2
+        assert len(json_data['results']) == 2
 
         resp = self.client.get(reverse('feedback-api'),
                                {'products': 'Firefox,Firefox for Android'})
         json_data = json.loads(resp.content)
-        eq_(json_data['count'], 3)
-        eq_(len(json_data['results']), 3)
+        assert json_data['count'] == 3
+        assert len(json_data['results']) == 3
 
         # version without product gets ignored
         resp = self.client.get(reverse('feedback-api'),
                                {'versions': '30.0'})
         json_data = json.loads(resp.content)
-        eq_(json_data['count'], 3)
-        eq_(len(json_data['results']), 3)
+        assert json_data['count'] == 3
+        assert len(json_data['results']) == 3
 
         resp = self.client.get(reverse('feedback-api'),
                                {'products': 'Firefox',
                                 'versions': '30.0'})
         json_data = json.loads(resp.content)
-        eq_(json_data['count'], 1)
-        eq_(len(json_data['results']), 1)
+        assert json_data['count'] == 1
+        assert len(json_data['results']) == 1
 
     def test_locales(self):
         self.create_basic_data()
 
         resp = self.client.get(reverse('feedback-api'), {'locales': 'en-US'})
         json_data = json.loads(resp.content)
-        eq_(json_data['count'], 2)
-        eq_(len(json_data['results']), 2)
+        assert json_data['count'] == 2
+        assert len(json_data['results']) == 2
 
         resp = self.client.get(reverse('feedback-api'),
                                {'locales': 'en-US,de'})
         json_data = json.loads(resp.content)
-        eq_(json_data['count'], 3)
-        eq_(len(json_data['results']), 3)
+        assert json_data['count'] == 3
+        assert len(json_data['results']) == 3
 
     def test_multi_filter(self):
         self.create_basic_data()
@@ -156,16 +156,16 @@ class PublicFeedbackAPITest(ElasticTestCase):
             'locales': 'de', 'happy': 1
         })
         json_data = json.loads(resp.content)
-        eq_(json_data['count'], 0)
-        eq_(len(json_data['results']), 0)
+        assert json_data['count'] == 0
+        assert len(json_data['results']) == 0
 
     def test_query(self):
         self.create_basic_data()
 
         resp = self.client.get(reverse('feedback-api'), {'q': 'desc'})
         json_data = json.loads(resp.content)
-        eq_(json_data['count'], 2)
-        eq_(len(json_data['results']), 2)
+        assert json_data['count'] == 2
+        assert len(json_data['results']) == 2
 
     def test_old_responses(self):
         # Make sure we can't see responses from > 180 days ago
@@ -182,7 +182,7 @@ class PublicFeedbackAPITest(ElasticTestCase):
         })
         json_data = json.loads(resp.content)
         results = json_data['results']
-        eq_(len(results), 1)
+        assert len(results) == 1
 
         assert 'Young enough--Party!' in resp.content
         assert 'Too old--Get off my lawn!' not in resp.content
@@ -199,8 +199,9 @@ class PublicFeedbackAPITest(ElasticTestCase):
 
         resp = self.client.get(reverse('feedback-api'))
         json_data = json.loads(resp.content)
-        eq_(json_data['count'], 1)
-        eq_(sorted(json_data['results'][0].keys()),
+        assert json_data['count'] == 1
+        assert(
+            sorted(json_data['results'][0].keys()) ==
             sorted(models.ResponseDocType.public_fields()))
 
     def test_max(self):
@@ -210,16 +211,16 @@ class PublicFeedbackAPITest(ElasticTestCase):
 
         resp = self.client.get(reverse('feedback-api'))
         json_data = json.loads(resp.content)
-        eq_(json_data['count'], 10)
+        assert json_data['count'] == 10
 
         resp = self.client.get(reverse('feedback-api'), {'max': '5'})
         json_data = json.loads(resp.content)
-        eq_(json_data['count'], 5)
+        assert json_data['count'] == 5
 
         # FIXME: For now, nonsense values get ignored.
         resp = self.client.get(reverse('feedback-api'), {'max': 'foo'})
         json_data = json.loads(resp.content)
-        eq_(json_data['count'], 10)
+        assert json_data['count'] == 10
 
 
 class PublicFeedbackAPIDateTest(ElasticTestCase):
@@ -247,9 +248,9 @@ class PublicFeedbackAPIDateTest(ElasticTestCase):
         resp = self.client.get(reverse('feedback-api'), params)
         json_data = json.loads(resp.content)
         results = json_data['results']
-        eq_(len(json_data['results']), len(expected))
+        assert len(json_data['results']) == len(expected)
         for result, expected in zip(results, expected):
-            eq_(result['created'], expected + 'T00:00:00')
+            assert result['created'] == expected + 'T00:00:00'
 
     def test_date_start(self):
         """date_start returns responses from that day forward"""
@@ -365,27 +366,27 @@ class FeedbackHistogramAPITest(ElasticTestCase):
         self.refresh()
 
         resp = self.client.get(reverse('feedback-histogram-api'))
-        eq_(resp.status_code, 200)
+        assert resp.status_code == 200
         json_data = json.loads(resp.content)
 
         # Default is the last 7 days.
-        eq_(len(json_data['results']), 7)
+        assert len(json_data['results']) == 7
 
         # Last item in the list should be yesterday.
-        eq_(
-            self.to_date_string(json_data['results'][-1][0]),
+        assert(
+            self.to_date_string(json_data['results'][-1][0]) ==
             (today - timedelta(days=1)).strftime('%Y-%m-%d 00:00:00')
         )
         # Count is 2.
-        eq_(json_data['results'][-1][1], 2)
+        assert json_data['results'][-1][1] == 2
 
         # First item is 7 days ago.
-        eq_(
-            self.to_date_string(json_data['results'][0][0]),
+        assert(
+            self.to_date_string(json_data['results'][0][0]) ==
             (today - timedelta(days=7)).strftime('%Y-%m-%d 00:00:00')
         )
         # Count is 2.
-        eq_(json_data['results'][0][1], 2)
+        assert json_data['results'][0][1] == 2
 
     def test_q(self):
         """Test q argument"""
@@ -397,12 +398,12 @@ class FeedbackHistogramAPITest(ElasticTestCase):
         resp = self.client.get(reverse('feedback-histogram-api'), {
             'q': 'pocket'
         })
-        eq_(resp.status_code, 200)
+        assert resp.status_code == 200
         json_data = json.loads(resp.content)
 
         # Default range ends yesterday. Only one response with
         # "pocket" in it yesterday, so this is 1.
-        eq_(json_data['results'][-1][1], 1)
+        assert json_data['results'][-1][1] == 1
 
     # FIXME: Test date_start, date_end and date_delta
     # FIXME: Test products, versions
@@ -429,17 +430,17 @@ class PostFeedbackAPITest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 201)
+        assert r.status_code == 201
 
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(feedback.happy, True)
-        eq_(feedback.description, data['description'])
-        eq_(feedback.product, data['product'])
+        assert feedback.happy == True
+        assert feedback.description == data['description']
+        assert feedback.product == data['product']
 
         # Fills in defaults
-        eq_(feedback.url, u'')
-        eq_(feedback.api, 1)
-        eq_(feedback.user_agent, u'')
+        assert feedback.url == u''
+        assert feedback.api == 1
+        assert feedback.user_agent == u''
 
     def test_maximal(self):
         """Tests an API call with all possible data"""
@@ -479,15 +480,15 @@ class PostFeedbackAPITest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 201)
+        assert r.status_code == 201
 
         feedback = models.Response.objects.latest(field_name='id')
         for field in prs.fields.keys():
             if field == 'email':
                 email = models.ResponseEmail.objects.latest(field_name='id')
-                eq_(email.email, data['email'])
+                assert email.email == data['email']
             else:
-                eq_(getattr(feedback, field), data[field])
+                assert getattr(feedback, field) == data[field]
 
     def test_missing_happy_defaults_to_sad(self):
         # We want to require "happy" to be in the values, but for
@@ -505,10 +506,10 @@ class PostFeedbackAPITest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 201)
+        assert r.status_code == 201
 
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(feedback.happy, False)
+        assert feedback.happy == False
 
     def test_whitespace_description_is_invalid(self):
         data = {
@@ -521,7 +522,7 @@ class PostFeedbackAPITest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 400)
+        assert r.status_code == 400
 
     def test_blank_category_is_fine_we_suppose(self):
         data = {
@@ -535,7 +536,7 @@ class PostFeedbackAPITest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 201)
+        assert r.status_code == 201
 
     def test_invalid_unicode_url(self):
         """Tests an API call with invalid unicode URL"""
@@ -564,10 +565,10 @@ class PostFeedbackAPITest(TestCase):
             content_type='application/json',
             data=json.dumps(data))
 
-        eq_(r.status_code, 400)
+        assert r.status_code == 400
         content = json.loads(r.content)
-        ok_(u'url' in content)
-        ok_(content['url'][0].endswith(u'is not a valid url'))
+        assert u'url' in content
+        assert content['url'][0].endswith(u'is not a valid url')
 
     def test_with_email(self):
         data = {
@@ -585,23 +586,23 @@ class PostFeedbackAPITest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 201)
+        assert r.status_code == 201
 
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(feedback.happy, True)
-        eq_(feedback.description, data['description'])
-        eq_(feedback.platform, data['platform'])
-        eq_(feedback.product, data['product'])
-        eq_(feedback.channel, data['channel'])
-        eq_(feedback.version, data['version'])
+        assert feedback.happy == True
+        assert feedback.description == data['description']
+        assert feedback.platform == data['platform']
+        assert feedback.product == data['product']
+        assert feedback.channel == data['channel']
+        assert feedback.version == data['version']
 
         # Fills in defaults
-        eq_(feedback.url, u'')
-        eq_(feedback.user_agent, u'')
-        eq_(feedback.api, 1)
+        assert feedback.url == u''
+        assert feedback.user_agent == u''
+        assert feedback.api == 1
 
         email = models.ResponseEmail.objects.latest(field_name='id')
-        eq_(email.email, data['email'])
+        assert email.email == data['email']
 
     def test_with_context(self):
         data = {
@@ -620,10 +621,10 @@ class PostFeedbackAPITest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 201)
+        assert r.status_code == 201
 
         context = models.ResponseContext.objects.latest(field_name='id')
-        eq_(context.data, {'slopmenow': 'bar'})
+        assert context.data == {'slopmenow': 'bar'}
 
     def test_with_context_truncate_key(self):
         data = {
@@ -642,10 +643,10 @@ class PostFeedbackAPITest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 201)
+        assert r.status_code == 201
 
         context = models.ResponseContext.objects.latest(field_name='id')
-        eq_(context.data, {'foo01234567890123456': 'bar'})
+        assert context.data, {'foo01234567890123456': 'bar'}
 
     def test_with_context_truncate_value(self):
         data = {
@@ -664,10 +665,10 @@ class PostFeedbackAPITest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 201)
+        assert r.status_code == 201
 
         context = models.ResponseContext.objects.latest(field_name='id')
-        eq_(context.data, {'foo': ('a' * 100)})
+        assert context.data == {'foo': ('a' * 100)}
 
     def test_with_context_20_pairs(self):
         data = {
@@ -688,13 +689,13 @@ class PostFeedbackAPITest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 201)
+        assert r.status_code == 201
 
         context = models.ResponseContext.objects.latest(field_name='id')
         data = sorted(context.data.items())
-        eq_(len(data), 20)
-        eq_(data[0], ('foo00', '0'))
-        eq_(data[-1], ('foo19', '19'))
+        assert len(data) == 20
+        assert data[0] == ('foo00', '0')
+        assert data[-1] == ('foo19', '19')
 
     def test_null_device_returns_400(self):
         data = {
@@ -708,7 +709,7 @@ class PostFeedbackAPITest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 400)
+        assert r.status_code == 400
         assert 'device' in r.content
 
     def test_invalid_email_address_returns_400(self):
@@ -727,7 +728,7 @@ class PostFeedbackAPITest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 400)
+        assert r.status_code == 400
         assert 'email' in r.content
 
     def test_missing_description_returns_400(self):
@@ -744,7 +745,7 @@ class PostFeedbackAPITest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 400)
+        assert r.status_code == 400
         assert 'description' in r.content
 
     def test_missing_product_returns_400(self):
@@ -761,7 +762,7 @@ class PostFeedbackAPITest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 400)
+        assert r.status_code == 400
         assert 'product' in r.content
 
     def test_invalid_product_returns_400(self):
@@ -779,7 +780,7 @@ class PostFeedbackAPITest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 400)
+        assert r.status_code == 400
         assert 'product' in r.content
 
     def test_url_max_length(self):
@@ -801,7 +802,7 @@ class PostFeedbackAPITest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 201)
+        assert r.status_code == 201
 
         # 200th character is not fine.
         data = {
@@ -819,7 +820,7 @@ class PostFeedbackAPITest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 400)
+        assert r.status_code == 400
 
     def test_valid_urls(self):
         test_data = [
@@ -854,8 +855,9 @@ class PostFeedbackAPITest(TestCase):
                 reverse('feedback-api'),
                 content_type='application/json',
                 data=json.dumps(data))
-            eq_(r.status_code, 201,
-                msg=('%s != 201 (%s)' % (r.status_code, url)))
+            assert (r.status_code == 201,
+                ('%s != 201 (%s)' % (r.status_code, url))
+                )
 
             get_cache('default').clear()
 
@@ -886,12 +888,12 @@ class PostFeedbackAPITest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 201)
+        assert r.status_code == 201
 
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(feedback.browser, u'Firefox OS')
-        eq_(feedback.browser_version, u'1.0')
-        eq_(feedback.browser_platform, u'Firefox OS')
+        assert feedback.browser == u'Firefox OS'
+        assert feedback.browser_version == u'1.0'
+        assert feedback.browser_platform == u'Firefox OS'
 
 
 class PostFeedbackAPIThrottleTest(TestCase):
@@ -932,14 +934,14 @@ class PostFeedbackAPIThrottleTest(TestCase):
                 reverse('feedback-api'),
                 content_type='application/json',
                 data=json.dumps(data.next()))
-            eq_(r.status_code, 201)
+            assert r.status_code == 201
 
         # This one should trip the throttle trigger
         r = self.client.post(
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data.next()))
-        eq_(r.status_code, 429)
+        assert r.status_code == 429
 
     def test_double_submit_throttle(self):
         # We disallow two submits in a row of the same description
@@ -959,11 +961,11 @@ class PostFeedbackAPIThrottleTest(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 201)
+        assert r.status_code == 201
 
         # Second time and back off!
         r = self.client.post(
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        eq_(r.status_code, 429)
+        assert r.status_code == 429

@@ -5,7 +5,6 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
 from fjord.base.tests import (
-    eq_,
     LocalizingClient,
     AnalyzerProfileFactory,
     reverse,
@@ -39,8 +38,8 @@ class TestFeedback(TestCase):
         """
         url = reverse('feedback', args=(u'firefox',))
         resp = self.client.get(url)
-        eq_(resp.status_code, 200)
-        eq_(resp['X-Frame-Options'], 'DENY')
+        assert resp.status_code == 200
+        assert resp['X-Frame-Options'] == 'DENY'
 
     def test_valid_happy(self):
         """Submitting a valid happy form creates an item in the DB.
@@ -57,24 +56,24 @@ class TestFeedback(TestCase):
         })
 
         self.assertRedirects(r, reverse('thanks'))
-        eq_(amount + 1, models.Response.objects.count())
+        assert amount + 1 == models.Response.objects.count()
 
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(u'Firefox rocks!', feedback.description)
-        eq_(u'http://mozilla.org/', feedback.url)
-        eq_(True, feedback.happy)
+        assert u'Firefox rocks!' == feedback.description
+        assert u'http://mozilla.org/' == feedback.url
+        assert True == feedback.happy
 
         # This comes from the client.post url.
-        eq_(u'en-US', feedback.locale)
+        assert u'en-US' == feedback.locale
         # Note: This comes from the user agent from the LocalizingClient
-        eq_(u'Firefox', feedback.product)
-        eq_(u'14.0.1', feedback.version)
+        assert u'Firefox' == feedback.product
+        assert u'14.0.1' == feedback.version
 
         # Make sure it doesn't create an email record
-        eq_(models.ResponseEmail.objects.count(), 0)
+        assert models.ResponseEmail.objects.count() == 0
 
         # Make sure it doesn't create a context record
-        eq_(models.ResponseContext.objects.count(), 0)
+        assert models.ResponseContext.objects.count() == 0
 
     def test_response_id_in_session(self):
         url = reverse('feedback', args=(u'firefox',))
@@ -84,7 +83,7 @@ class TestFeedback(TestCase):
             'url': u'http://mozilla.org/'
         })
         response = models.Response.objects.order_by('-id')[0]
-        eq_(self.client.session['response_id'], response.id)
+        assert self.client.session['response_id'] == response.id
 
     def test_valid_sad(self):
         """Submitting a valid sad form creates an item in the DB.
@@ -100,18 +99,18 @@ class TestFeedback(TestCase):
         })
 
         self.assertRedirects(r, reverse('thanks'))
-        eq_(amount + 1, models.Response.objects.count())
+        assert amount + 1 == models.Response.objects.count()
 
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(u"Firefox doesn't make me sandwiches. :(", feedback.description)
-        eq_(u'', feedback.url)
-        eq_(False, feedback.happy)
+        assert u"Firefox doesn't make me sandwiches. :(" == feedback.description
+        assert u'' == feedback.url
+        assert False == feedback.happy
 
         # This comes from the client.post url.
-        eq_(u'en-US', feedback.locale)
+        assert u'en-US' == feedback.locale
         # Note: This comes from the user agent from the LocalizingClient
-        eq_(u'Firefox', feedback.product)
-        eq_(u'14.0.1', feedback.version)
+        assert u'Firefox' == feedback.product
+        assert u'14.0.1' == feedback.version
 
     def test_response_id_in_qs_unauthenticated(self):
         """Verify response_id in querystring is ignored if user is not
@@ -121,9 +120,9 @@ class TestFeedback(TestCase):
         url = reverse('thanks') + '?response_id={0}'.format(feedback.id)
         r = self.client.get(url)
 
-        eq_(r.status_code, 200)
-        eq_(r.context['feedback'], None)
-        eq_(r.context['suggestions'], None)
+        assert r.status_code == 200
+        assert r.context['feedback'] == None
+        assert r.context['suggestions'] == None
 
     def test_response_id_in_qs_authenticated(self):
         """Verify response_id in querystring overrides session id"""
@@ -149,9 +148,9 @@ class TestFeedback(TestCase):
         url = reverse('thanks') + '?response_id={0}'.format(feedback.id)
         r = self.client.get(url)
 
-        eq_(r.status_code, 200)
-        eq_(r.context['feedback'].id, feedback.id)
-        eq_(r.context['suggestions'], [])
+        assert r.status_code == 200
+        assert r.context['feedback'].id == feedback.id
+        assert r.context['suggestions'] == []
 
     def test_happy_prefill_in_querystring_is_ignored(self):
         url = reverse('feedback', args=(u'firefox',), locale='en-US')
@@ -161,17 +160,17 @@ class TestFeedback(TestCase):
             'description': u"Firefox is the best browser I've ever used!",
         })
 
-        eq_(resp.status_code, 302)
+        assert resp.status_code == 302
 
         # The url has 0, but the form data is 1, so it should end up as 1.
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(feedback.happy, 1)
+        assert feedback.happy == 1
 
         # "happy=0" should be removed from the querystring before
         # figuring out the context. So "foo=bar" should be in the
         # context, but not "happy=0".
         context = models.ResponseContext.objects.latest(field_name='id')
-        eq_(context.data, {'foo': 'bar'})
+        assert context.data == {'foo': 'bar'}
 
     def test_firefox_os_view(self):
         """Firefox OS returns correct view"""
@@ -213,11 +212,11 @@ class TestFeedback(TestCase):
             })
 
             self.assertRedirects(resp, reverse('thanks'))
-            eq_(count + 1, models.Response.objects.count())
+            assert count + 1 == models.Response.objects.count()
             feedback = models.Response.objects.latest(field_name='id')
-            eq_(u'es', feedback.locale)
-            eq_(u'Firefox', feedback.product)
-            eq_(u'14.0.1', feedback.version)
+            assert u'es' == feedback.locale
+            assert u'Firefox' == feedback.product
+            assert u'14.0.1' == feedback.version
 
         finally:
             # FIXME - We have to do another request to set the
@@ -239,15 +238,15 @@ class TestFeedback(TestCase):
         }
         resp = self.client.post(url, data, HTTP_USER_AGENT=ua)
         self.assertRedirects(resp, reverse('thanks'))
-        eq_(amount + 1, models.Response.objects.count())
+        assert amount + 1 == models.Response.objects.count()
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(u'en-US', feedback.locale)
+        assert u'en-US' == feedback.locale
         # Product comes from the url
-        eq_(u'Firefox for Android', feedback.product)
+        assert u'Firefox for Android' == feedback.product
         # Since product in user agent matches url, we set the version,
         # too.
-        eq_(u'24.0', feedback.version)
-        eq_(u'', feedback.channel)
+        assert u'24.0' == feedback.version
+        assert u'' == feedback.channel
 
     def test_urls_product_version(self):
         """Test setting version from the url"""
@@ -261,12 +260,12 @@ class TestFeedback(TestCase):
         })
 
         self.assertRedirects(resp, reverse('thanks'))
-        eq_(amount + 1, models.Response.objects.count())
+        assert amount + 1 == models.Response.objects.count()
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(u'en-US', feedback.locale)
-        eq_(u'Firefox for Android', feedback.product)
-        eq_(u'29', feedback.version)
-        eq_(u'', feedback.channel)
+        assert u'en-US' == feedback.locale
+        assert u'Firefox for Android' == feedback.product
+        assert u'29' == feedback.version
+        assert u'' == feedback.channel
 
     def test_urls_product_version_channel(self):
         """Test setting channel from url"""
@@ -280,12 +279,12 @@ class TestFeedback(TestCase):
         })
 
         self.assertRedirects(resp, reverse('thanks'))
-        eq_(amount + 1, models.Response.objects.count())
+        assert amount + 1 == models.Response.objects.count()
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(u'en-US', feedback.locale)
-        eq_(u'Firefox for Android', feedback.product)
-        eq_(u'29', feedback.version)
-        eq_(u'nightly', feedback.channel)
+        assert u'en-US' == feedback.locale
+        assert u'Firefox for Android' == feedback.product
+        assert u'29' == feedback.version
+        assert u'nightly' == feedback.channel
 
     def test_urls_product_version_uppercased_channel(self):
         """Test setting uppercase channel from the url gets lowercased"""
@@ -299,12 +298,12 @@ class TestFeedback(TestCase):
         })
 
         self.assertRedirects(resp, reverse('thanks'))
-        eq_(amount + 1, models.Response.objects.count())
+        assert amount + 1 == models.Response.objects.count()
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(u'en-US', feedback.locale)
-        eq_(u'Firefox for Android', feedback.product)
-        eq_(u'29', feedback.version)
-        eq_(u'nightly', feedback.channel)
+        assert u'en-US' == feedback.locale
+        assert u'Firefox for Android' == feedback.product
+        assert u'29' == feedback.version
+        assert u'nightly' == feedback.channel
 
     def test_urls_product_version_channel_android_ua(self):
         """Test setting everything with a Fennec user agent"""
@@ -322,12 +321,12 @@ class TestFeedback(TestCase):
             HTTP_USER_AGENT=ua)
 
         self.assertRedirects(resp, reverse('thanks'))
-        eq_(amount + 1, models.Response.objects.count())
+        assert amount + 1 == models.Response.objects.count()
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(u'en-US', feedback.locale)
-        eq_(u'Firefox for Android', feedback.product)
-        eq_(u'29', feedback.version)
-        eq_(u'nightly', feedback.channel)
+        assert u'en-US' == feedback.locale
+        assert u'Firefox for Android' == feedback.product
+        assert u'29' == feedback.version
+        assert u'nightly' == feedback.channel
 
     def test_urls_product_inferred_platform(self):
         """Test setting product from the url and platform inference"""
@@ -347,11 +346,11 @@ class TestFeedback(TestCase):
             HTTP_USER_AGENT=ua)
 
         self.assertRedirects(resp, reverse('thanks'))
-        eq_(amount + 1, models.Response.objects.count())
+        assert amount + 1 == models.Response.objects.count()
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(u'en-US', feedback.locale)
-        eq_(u'Firefox', feedback.product)
-        eq_(u'Windows Vista', feedback.browser_platform)
+        assert u'en-US' == feedback.locale
+        assert u'Firefox' == feedback.product
+        assert u'Windows Vista' == feedback.browser_platform
 
     def test_urls_product_inferred_platform_firefoxdev(self):
         """Test firefoxdev platform gets inferred"""
@@ -371,11 +370,11 @@ class TestFeedback(TestCase):
             HTTP_USER_AGENT=ua)
 
         self.assertRedirects(resp, reverse('thanks'))
-        eq_(amount + 1, models.Response.objects.count())
+        assert amount + 1 == models.Response.objects.count()
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(u'en-US', feedback.locale)
-        eq_(u'Firefox dev', feedback.product)
-        eq_(u'Windows Vista', feedback.browser_platform)
+        assert u'en-US' == feedback.locale
+        assert u'Firefox dev' == feedback.product
+        assert u'Windows Vista' == feedback.browser_platform
 
     def test_urls_product_inferred_platform_fxios(self):
         """Test firefoxdev platform gets inferred"""
@@ -433,11 +432,11 @@ class TestFeedback(TestCase):
             HTTP_USER_AGENT=ua)
 
         self.assertRedirects(resp, reverse('thanks'))
-        eq_(amount + 1, models.Response.objects.count())
+        assert amount + 1 == models.Response.objects.count()
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(u'en-US', feedback.locale)
-        eq_(u'Firefox dev', feedback.product)
-        eq_(u'', feedback.browser_platform)
+        assert u'en-US' == feedback.locale
+        assert u'Firefox dev' == feedback.product
+        assert u'' == feedback.browser_platform
 
     def test_urls_product_no_inferred_platform(self):
         """Test setting product from the url and platform non-inference"""
@@ -464,11 +463,11 @@ class TestFeedback(TestCase):
             HTTP_USER_AGENT=ua)
 
         self.assertRedirects(resp, reverse('thanks'))
-        eq_(amount + 1, models.Response.objects.count())
+        assert amount + 1 == models.Response.objects.count()
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(u'en-US', feedback.locale)
-        eq_(u'Someprod', feedback.product)
-        eq_(u'', feedback.platform)
+        assert u'en-US' == feedback.locale
+        assert u'Someprod' == feedback.product
+        assert u'' == feedback.platform
 
     def test_infer_version_if_product_matches(self):
         """Infer the version from the user agent if products match"""
@@ -486,12 +485,12 @@ class TestFeedback(TestCase):
         resp = self.client.post(url, data, HTTP_USER_AGENT=ua)
 
         self.assertRedirects(resp, reverse('thanks'))
-        eq_(amount + 1, models.Response.objects.count())
+        assert amount + 1 == models.Response.objects.count()
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(u'en-US', feedback.locale)
-        eq_(u'Firefox', feedback.product)
-        eq_(u'14.0.1', feedback.version)
-        eq_(u'Windows Vista', feedback.platform)
+        assert u'en-US' == feedback.locale
+        assert u'Firefox' == feedback.product
+        assert u'14.0.1' == feedback.version
+        assert u'Windows Vista' == feedback.platform
 
     def test_dont_infer_version_if_product_doesnt_match(self):
         """Don't infer version from the user agent if product doesn't match"""
@@ -509,12 +508,12 @@ class TestFeedback(TestCase):
         resp = self.client.post(url, data, HTTP_USER_AGENT=ua)
 
         self.assertRedirects(resp, reverse('thanks'))
-        eq_(amount + 1, models.Response.objects.count())
+        assert amount + 1, models.Response.objects.count()
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(u'en-US', feedback.locale)
-        eq_(u'Firefox', feedback.product)
-        eq_(u'', feedback.version)
-        eq_(u'', feedback.platform)
+        assert u'en-US' == feedback.locale
+        assert u'Firefox' == feedback.product
+        assert u'' == feedback.version
+        assert u'' == feedback.platform
 
     def test_invalid_form(self):
         """Bad data gets ignored. Thanks!"""
@@ -526,7 +525,7 @@ class TestFeedback(TestCase):
         })
 
         self.assertRedirects(r, reverse('thanks'))
-        eq_(models.Response.objects.count(), 0)
+        assert models.Response.objects.count() == 0
 
     def test_invalid_form_happy(self):
         """Bad data gets ignored. Thanks!"""
@@ -538,7 +537,7 @@ class TestFeedback(TestCase):
         })
 
         self.assertRedirects(r, reverse('thanks'))
-        eq_(models.Response.objects.count(), 0)
+        assert models.Response.objects.count() == 0
 
     def test_invalid_form_sad(self):
         """Bad data gets ignored. Thanks!"""
@@ -550,7 +549,7 @@ class TestFeedback(TestCase):
         })
 
         self.assertRedirects(r, reverse('thanks'))
-        eq_(models.Response.objects.count(), 0)
+        assert models.Response.objects.count() == 0
 
     def test_whitespace_description(self):
         """Descriptions with just whitespace get thrown out"""
@@ -562,7 +561,7 @@ class TestFeedback(TestCase):
         })
 
         self.assertRedirects(r, reverse('thanks'))
-        eq_(models.Response.objects.count(), 0)
+        assert models.Response.objects.count() == 0
 
     def test_unicode_in_description(self):
         """Description should accept unicode data"""
@@ -574,7 +573,7 @@ class TestFeedback(TestCase):
         })
 
         self.assertRedirects(r, reverse('thanks'))
-        eq_(models.Response.objects.count(), 1)
+        assert models.Response.objects.count() == 1
 
     def test_unicode_in_url(self):
         """URL should accept unicode data"""
@@ -586,7 +585,7 @@ class TestFeedback(TestCase):
         })
 
         self.assertRedirects(r, reverse('thanks'))
-        eq_(models.Response.objects.count(), 1)
+        assert models.Response.objects.count() == 1
 
     def test_valid_urls(self):
         """Test valid url field values"""
@@ -612,7 +611,7 @@ class TestFeedback(TestCase):
 
             self.assertRedirects(r, reverse('thanks'))
             latest = models.Response.objects.latest('pk')
-            eq_(latest.url, expected)
+            assert latest.url == expected
 
     def test_url_cleaning(self):
         """Clean urls before saving"""
@@ -623,7 +622,7 @@ class TestFeedback(TestCase):
             'description': u'foo'
         })
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(feedback.url, u'http://mozilla.org/path/')
+        assert feedback.url == u'http://mozilla.org/path/'
 
     def test_url_leading_trailing_whitespace_removal(self):
         """Leading/trailing whitespace in urls is stripped"""
@@ -634,7 +633,7 @@ class TestFeedback(TestCase):
             'description': u'foo'
         })
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(feedback.url, u'')
+        assert feedback.url == u''
 
     def test_email_collection(self):
         """If the user enters an email and checks the box, collect email."""
@@ -646,8 +645,8 @@ class TestFeedback(TestCase):
             'email': 'bob@example.com',
             'email_ok': 'on',
         })
-        eq_(models.ResponseEmail.objects.count(), 1)
-        eq_(r.status_code, 302)
+        assert models.ResponseEmail.objects.count() == 1
+        assert r.status_code == 302
 
     def test_email_privacy(self):
         """If an email is entered, but box is not checked, don't collect."""
@@ -661,8 +660,8 @@ class TestFeedback(TestCase):
             'email': 'bob@example.com',
             'email_ok': '',
         })
-        eq_(email_count, models.ResponseEmail.objects.count())
-        eq_(r.status_code, 302)
+        assert email_count == models.ResponseEmail.objects.count()
+        assert r.status_code == 302
 
     def test_email_missing(self):
         """If no email, ignore it."""
@@ -673,10 +672,10 @@ class TestFeedback(TestCase):
             'description': u'Can you fix it?',
             'email_ok': 'on',
         })
-        eq_(models.Response.objects.count(), 1)
-        eq_(models.ResponseEmail.objects.count(), 0)
+        assert models.Response.objects.count() == 1
+        assert models.ResponseEmail.objects.count() == 0
         assert not models.ResponseEmail.objects.exists()
-        eq_(r.status_code, 302)
+        assert r.status_code == 302
 
     def test_email_invalid(self):
         """If email_ok box is checked, but bad email or no email, ignore it."""
@@ -691,7 +690,7 @@ class TestFeedback(TestCase):
             'email': '/dev/sda1\0',
         })
         assert not models.ResponseEmail.objects.exists()
-        eq_(r.status_code, 302)
+        assert r.status_code == 302
 
         # Invalid email address is ignored if email_ok box is not
         # checked.
@@ -703,7 +702,7 @@ class TestFeedback(TestCase):
         })
         assert not models.ResponseEmail.objects.exists()
         # Bad email if the box is not checked is not an error.
-        eq_(r.status_code, 302)
+        assert r.status_code == 302
 
     def test_browser_data_collection(self):
         """If the user checks the box, collect the browser data."""
@@ -716,10 +715,10 @@ class TestFeedback(TestCase):
             'browser_ok': 'on',
             'browser_data': json.dumps(browser_data)
         })
-        eq_(r.status_code, 302)
-        eq_(models.ResponsePI.objects.count(), 1)
+        assert r.status_code == 302
+        assert models.ResponsePI.objects.count() == 1
         rti = models.ResponsePI.objects.latest('id')
-        eq_(rti.data, browser_data)
+        assert rti.data == browser_data
 
     def test_browser_data_not_ok(self):
         """If the user doesn't check the box, don't collect data."""
@@ -736,8 +735,8 @@ class TestFeedback(TestCase):
             'browser_ok': '',
             'browser_data': json.dumps(browser_data)
         })
-        eq_(r.status_code, 302)
-        eq_(models.ResponsePI.objects.count(), 0)
+        assert r.status_code == 302
+        assert models.ResponsePI.objects.count() == 0
 
     def test_browser_data_invalid(self):
         """If browser_data is not valid json, don't collect it."""
@@ -749,8 +748,8 @@ class TestFeedback(TestCase):
             'browser_ok': 'on',
             'browser_data': 'invalid json'
         })
-        eq_(r.status_code, 302)
-        eq_(models.ResponsePI.objects.count(), 0)
+        assert r.status_code == 302
+        assert models.ResponsePI.objects.count() == 0
 
     def test_browser_data_there_for_product_as_firefox(self):
         # Feedback for ProductFoo should collect browser data if the browser
@@ -817,7 +816,7 @@ class TestFeedback(TestCase):
         self.assertRedirects(r, reverse('thanks'))
 
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(feedback.source, u'newsletter')
+        assert feedback.source == u'newsletter'
 
     def test_utm_source_to_source(self):
         """We capture the utm_source querystring arg in the source column"""
@@ -831,7 +830,7 @@ class TestFeedback(TestCase):
         self.assertRedirects(r, reverse('thanks'))
 
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(feedback.source, u'newsletter')
+        assert feedback.source == u'newsletter'
 
     def test_utm_campaign_to_source(self):
         """We capture the utm_campaign querystring arg in the source column"""
@@ -845,7 +844,7 @@ class TestFeedback(TestCase):
         self.assertRedirects(r, reverse('thanks'))
 
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(feedback.campaign, u'20140220_email')
+        assert feedback.campaign == u'20140220_email'
 
     def test_save_context_basic(self):
         """We capture any querystring vars as context"""
@@ -859,7 +858,7 @@ class TestFeedback(TestCase):
         self.assertRedirects(r, reverse('thanks'))
 
         context = models.ResponseContext.objects.latest(field_name='id')
-        eq_(context.data, {'foo': 'bar'})
+        assert context.data == {'foo': 'bar'}
 
     def test_save_context_long_key(self):
         """Long keys are truncated"""
@@ -873,7 +872,7 @@ class TestFeedback(TestCase):
         self.assertRedirects(r, reverse('thanks'))
 
         context = models.ResponseContext.objects.latest(field_name='id')
-        eq_(context.data, {'foo12345678901234567': 'bar'})
+        assert context.data == {'foo12345678901234567': 'bar'}
 
     def test_save_context_long_val(self):
         """Long values are truncated"""
@@ -887,7 +886,7 @@ class TestFeedback(TestCase):
         self.assertRedirects(r, reverse('thanks'))
 
         context = models.ResponseContext.objects.latest(field_name='id')
-        eq_(context.data, {'foo': ('a' * 100)})
+        assert context.data == {'foo': ('a' * 100)}
 
     def test_save_context_maximum_pairs(self):
         """Only save 20 pairs"""
@@ -904,9 +903,9 @@ class TestFeedback(TestCase):
 
         context = models.ResponseContext.objects.latest(field_name='id')
         data = sorted(context.data.items())
-        eq_(len(data), 20)
-        eq_(data[0], (u'foo00', '0'))
-        eq_(data[-1], (u'foo19', '19'))
+        assert len(data) == 20
+        assert data[0] == (u'foo00', '0')
+        assert data[-1] == (u'foo19', '19')
 
 
 class TestDeprecatedAndroidFeedback(TestCase):
@@ -926,19 +925,19 @@ class TestDeprecatedAndroidFeedback(TestCase):
         ua = 'Mozilla/5.0 (Android; Tablet; rv:24.0) Gecko/24.0 Firefox/24.0'
 
         r = self.client.post(reverse('feedback'), data, HTTP_USER_AGENT=ua)
-        eq_(r.status_code, 302)
+        assert r.status_code == 302
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(feedback.happy, True)
-        eq_(feedback.url, data['url'])
-        eq_(feedback.description, data['description'])
-        eq_(feedback.device, data['device'])
-        eq_(feedback.manufacturer, data['manufacturer'])
+        assert feedback.happy == True
+        assert feedback.url == data['url']
+        assert feedback.description == data['description']
+        assert feedback.device == data['device']
+        assert feedback.manufacturer == data['manufacturer']
 
         # This comes from the client.post url.
-        eq_(u'en-US', feedback.locale)
+        assert u'en-US' == feedback.locale
         # Note: This comes from the user agent from the LocalizingClient
-        eq_(u'Firefox for Android', feedback.product)
-        eq_(u'24.0', feedback.version)
+        assert u'Firefox for Android' == feedback.product
+        assert u'24.0' == feedback.version
 
     def test_deprecated_firefox_for_android_sad_is_sad(self):
         data = {
@@ -953,17 +952,17 @@ class TestDeprecatedAndroidFeedback(TestCase):
         ua = 'Mozilla/5.0 (Android; Tablet; rv:24.0) Gecko/24.0 Firefox/24.0'
 
         r = self.client.post(reverse('feedback'), data, HTTP_USER_AGENT=ua)
-        eq_(r.status_code, 302)
+        assert r.status_code == 302
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(feedback.happy, False)
-        eq_(feedback.url, data['url'])
-        eq_(feedback.description, data['description'])
+        assert feedback.happy == False
+        assert feedback.url == data['url']
+        assert feedback.description == data['description']
 
         # This comes from the client.post url.
-        eq_(u'en-US', feedback.locale)
+        assert u'en-US' == feedback.locale
         # Note: This comes from the user agent from the LocalizingClient
-        eq_(u'Firefox for Android', feedback.product)
-        eq_(u'24.0', feedback.version)
+        assert u'Firefox for Android' == feedback.product
+        assert u'24.0' == feedback.version
 
     def test_deprecated_firefox_for_android_ideas_are_sad(self):
         """We treat "sad" and "ideas" as sad feedback now."""
@@ -979,17 +978,17 @@ class TestDeprecatedAndroidFeedback(TestCase):
         ua = 'Mozilla/5.0 (Android; Tablet; rv:24.0) Gecko/24.0 Firefox/24.0'
 
         r = self.client.post(reverse('feedback'), data, HTTP_USER_AGENT=ua)
-        eq_(r.status_code, 302)
+        assert r.status_code == 302
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(feedback.happy, False)
-        eq_(feedback.url, data['url'])
-        eq_(feedback.description, data['description'])
+        assert feedback.happy == False
+        assert feedback.url == data['url']
+        assert feedback.description == data['description']
 
         # This comes from the client.post url.
-        eq_(u'en-US', feedback.locale)
+        assert u'en-US' == feedback.locale
         # Note: This comes from the user agent from the LocalizingClient
-        eq_(u'Firefox for Android', feedback.product)
-        eq_(u'24.0', feedback.version)
+        assert u'Firefox for Android' == feedback.product
+        assert u'24.0' == feedback.version
 
     def test_deprecated_firefox_for_android_minimal(self):
         """Test the minimal post data from FfA works."""
@@ -1003,17 +1002,17 @@ class TestDeprecatedAndroidFeedback(TestCase):
         ua = 'Mozilla/5.0 (Android; Tablet; rv:24.0) Gecko/24.0 Firefox/24.0'
 
         r = self.client.post(reverse('feedback'), data, HTTP_USER_AGENT=ua)
-        eq_(r.status_code, 302)
+        assert r.status_code == 302
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(feedback.happy, True)
-        eq_(feedback.url, u'')
-        eq_(feedback.description, data['description'])
+        assert feedback.happy == True
+        assert feedback.url == u''
+        assert feedback.description == data['description']
 
         # This comes from the client.post url.
-        eq_(u'en-US', feedback.locale)
+        assert u'en-US' == feedback.locale
         # Note: This comes from the user agent from the LocalizingClient
-        eq_(u'Firefox for Android', feedback.product)
-        eq_(u'24.0', feedback.version)
+        assert u'Firefox for Android' == feedback.product
+        assert u'24.0' == feedback.version
 
     def test_deprecated_firefox_for_android_phony_ua(self):
         """Test that phony user agents works. bug 855671."""
@@ -1030,18 +1029,18 @@ class TestDeprecatedAndroidFeedback(TestCase):
 
         r = self.client.post(reverse('feedback'), data,
                              HTTP_USER_AGENT=ua)
-        eq_(r.status_code, 302)
+        assert r.status_code == 302
         feedback = models.Response.objects.latest(field_name='id')
-        eq_(feedback.browser, u'')
-        eq_(feedback.browser_version, u'')
-        eq_(feedback.platform, u'')
+        assert feedback.browser == u''
+        assert feedback.browser_version == u''
+        assert feedback.platform == u''
 
         # This comes from the client.post url.
-        eq_(u'en-US', feedback.locale, u'en-US')
+        assert ( u'en-US' == feedback.locale, u'en-US')
         # This comes from the user agent from the LocalizingClient
-        eq_(feedback.product, u'')
-        eq_(feedback.channel, u'')
-        eq_(feedback.version, u'')
+        assert feedback.product == u''
+        assert feedback.channel == u''
+        assert feedback.version == u''
 
 
 class TestPicker(TestCase):
@@ -1055,7 +1054,7 @@ class TestPicker(TestCase):
     def test_picker_no_products(self):
         resp = self.client.get(reverse('feedback'))
 
-        eq_(resp.status_code, 200)
+        assert resp.status_code == 200
         self.assertTemplateUsed(resp, 'feedback/picker.html')
         assert 'No products available.' in resp.content
 
@@ -1067,7 +1066,7 @@ class TestPicker(TestCase):
 
         resp = self.client.get(reverse('feedback'))
 
-        eq_(resp.status_code, 200)
+        assert resp.status_code == 200
 
         self.assertContains(resp, 'ProductFoo')
         self.assertContains(resp, 'productfoo')
@@ -1084,7 +1083,7 @@ class TestPicker(TestCase):
 
         resp = self.client.get(reverse('feedback'))
 
-        eq_(resp.status_code, 200)
+        assert resp.status_code == 200
 
         # This is on the picker
         self.assertContains(resp, 'ProductFoo')
@@ -1104,7 +1103,7 @@ class TestPicker(TestCase):
 
         resp = self.client.get(reverse('feedback'))
 
-        eq_(resp.status_code, 200)
+        assert resp.status_code == 200
 
         # This is on the picker
         self.assertContains(resp, 'ProductFoo')
@@ -1130,7 +1129,7 @@ class TestCSRF(TestCase):
             'url': u'http://mozilla.org/'
         })
 
-        eq_(r.status_code, 403)
+        assert r.status_code == 403
 
     def test_firefox_for_android(self):
         """No csrf token for a FfA post works fine."""
@@ -1141,7 +1140,7 @@ class TestCSRF(TestCase):
             'add_url': 1,
             'url': u'http://mozilla.org/'
         })
-        eq_(r.status_code, 302)
+        assert r.status_code == 302
 
 
 class TestWebFormThrottling(TestCase):
@@ -1152,7 +1151,7 @@ class TestWebFormThrottling(TestCase):
         # Make sure there are no responses in the db because we're
         # basing our test on response counts.
         initial_amount = models.Response.objects.count()
-        eq_(initial_amount, 0)
+        assert initial_amount == 0
 
         url = reverse('feedback', args=(u'firefox',))
 
@@ -1163,7 +1162,7 @@ class TestWebFormThrottling(TestCase):
                 'description': u'{0} Firefox rocks! {0}'.format(i),
                 'url': u'http://mozilla.org/'
             })
-        eq_(models.Response.objects.count(), 50)
+        assert models.Response.objects.count() == 50
 
         # The 101st should be throttled, so there should only be 100
         # responses in the db.
@@ -1172,7 +1171,7 @@ class TestWebFormThrottling(TestCase):
             'description': u'Firefox rocks!',
             'url': u'http://mozilla.org/'
         })
-        eq_(models.Response.objects.count(), 50)
+        assert models.Response.objects.count() == 50
 
         # Make sure we still went to the Thanks page.
         self.assertRedirects(r, reverse('thanks'))
@@ -1182,7 +1181,7 @@ class TestWebFormThrottling(TestCase):
         # Make sure there are no responses in the db because we're
         # basing our test on response counts.
         initial_amount = models.Response.objects.count()
-        eq_(initial_amount, 0)
+        assert initial_amount == 0
 
         url = reverse('feedback', args=(u'firefox',))
 
@@ -1195,15 +1194,15 @@ class TestWebFormThrottling(TestCase):
         # Post it!
         r = self.client.post(url, data)
         self.assertRedirects(r, reverse('thanks'))
-        eq_(models.Response.objects.count(), 1)
+        assert models.Response.objects.count() == 1
 
         # Post it again! This time it doesn't get to the db.
         r = self.client.post(url, data)
         self.assertRedirects(r, reverse('thanks'))
-        eq_(models.Response.objects.count(), 1)
+        assert models.Response.objects.count() == 1
 
         # Post something different from the same ip address.
         data['description'] = u'Not a double-submit!'
         r = self.client.post(url, data)
         self.assertRedirects(r, reverse('thanks'))
-        eq_(models.Response.objects.count(), 2)
+        assert models.Response.objects.count() == 2
