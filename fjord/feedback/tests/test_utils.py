@@ -1,4 +1,4 @@
-from fjord.base.tests import eq_, TestCase
+from fjord.base.tests import TestCase
 from fjord.feedback.utils import clean_url, compute_grams
 
 
@@ -17,7 +17,7 @@ class Testclean_url(TestCase):
         ]
 
         for url, expected in data:
-            eq_(clean_url(url), expected)
+            assert clean_url(url) == expected
 
 
 class TestComputeGrams(TestCase):
@@ -59,4 +59,4 @@ class TestComputeGrams(TestCase):
         ]
 
         for text, expected in test_data:
-            eq_(sorted(compute_grams(text)), sorted(expected))
+            assert sorted(compute_grams(text)) == sorted(expected)
