@@ -6,8 +6,6 @@ import requests_mock
 
 from fjord.base.google_utils import GOOGLE_API_URL
 from fjord.base.tests import (
-    eq_,
-    ok_,
     LocalizingClient,
     reverse,
     TestCase,
@@ -36,7 +34,7 @@ class SUMOTestCase(TestCase):
                 description=u'Firefox does not make good sandwiches. Srsly.'
             )
             links = self.suggester.get_suggestions(feedback)
-            eq_(len(links), 0)
+            assert len(links) == 0
 
     def test_not_en_us(self):
         with requests_mock.Mocker():
@@ -47,7 +45,7 @@ class SUMOTestCase(TestCase):
                 description=u'Firefox does not make good sandwiches. Srsly.'
             )
             links = self.suggester.get_suggestions(feedback)
-            eq_(len(links), 0)
+            assert len(links) == 0
 
     def test_not_firefox(self):
         with requests_mock.Mocker():
@@ -58,7 +56,7 @@ class SUMOTestCase(TestCase):
                 description=u'Firefox does not make good sandwiches. Srsly.'
             )
             links = self.suggester.get_suggestions(feedback)
-            eq_(len(links), 0)
+            assert len(links) == 0
 
     def test_too_short(self):
         with requests_mock.Mocker():
@@ -69,7 +67,7 @@ class SUMOTestCase(TestCase):
                 description=u'Firefox is bad.'
             )
             links = self.suggester.get_suggestions(feedback)
-            eq_(len(links), 0)
+            assert len(links) == 0
 
     def test_not_json(self):
         # If we get back text and not JSON, then the sumo search
@@ -97,10 +95,10 @@ class SUMOTestCase(TestCase):
                 links = self.suggester.get_suggestions(feedback)
 
                 # Make sure we get back no links.
-                eq_(len(links), 0)
+                assert len(links) == 0
 
                 # Make sure logger.exception() got called once.
-                eq_(logger_patch.exception.call_count, 1)
+                assert logger_patch.exception.call_count == 1
 
 
 class SuggestWithRequestTestCase(SuggesterTestMixin, RedirectorTestMixin,
@@ -180,9 +178,9 @@ class SuggestWithRequestTestCase(SuggesterTestMixin, RedirectorTestMixin,
             for i in range(3):
                 doc = docs[i]
                 ret_doc = sumo_api_ret['documents'][i]
-                eq_(doc['url'], SUMO_HOST + ret_doc['url'])
-                eq_(doc['summary'], ret_doc['title'])
-                eq_(doc['description'], ret_doc['summary'])
+                assert doc['url'] == SUMO_HOST + ret_doc['url']
+                assert doc['summary'] == ret_doc['title']
+                assert doc['description'] == ret_doc['summary']
 
             links = resp.context['suggestions']
 
@@ -191,36 +189,36 @@ class SuggestWithRequestTestCase(SuggesterTestMixin, RedirectorTestMixin,
             for i, link in enumerate(links):
                 if i == 3:
                     # This is the aaq link.
-                    eq_(link.cssclass, u'support')
-                    eq_(link.provider, 'sumosuggest')
-                    eq_(link.provider_version, 1)
-                    eq_(link.url, '/redirect?r=sumosuggest.aaq')
+                    assert link.cssclass == u'support'
+                    assert link.provider == 'sumosuggest'
+                    assert link.provider_version == 1
+                    assert link.url == '/redirect?r=sumosuggest.aaq'
 
                     # Fetch the link and make sure it redirects to the
                     # right place.
                     resp = self.client.get(link.url)
                     # Temporary redirect.
-                    eq_(resp.status_code, 302)
+                    assert resp.status_code == 302
                     # Redirects to the actual SUMO url.
-                    eq_(resp['Location'], SUMO_AAQ_URL)
+                    assert resp['Location'] == SUMO_AAQ_URL
 
                 else:
                     # This is a kb link.
                     ret_doc = sumo_api_ret['documents'][i]
-                    eq_(link.provider, 'sumosuggest')
-                    eq_(link.provider_version, 1)
-                    eq_(link.cssclass, u'document')
-                    eq_(link.url, '/redirect?r=sumosuggest.{0}'.format(i))
-                    eq_(link.summary, ret_doc['title'])
-                    eq_(link.description, ret_doc['summary'])
+                    assert link.provider == 'sumosuggest'
+                    assert link.provider_version == 1
+                    assert link.cssclass == u'document'
+                    assert link.url == '/redirect?r=sumosuggest.{0}'.format(i)
+                    assert link.summary == ret_doc['title']
+                    assert link.description == ret_doc['summary']
 
                     # Fetch the link and make sure it redirects to the
                     # right place.
                     resp = self.client.get(link.url)
                     # Temporary redirect.
-                    eq_(resp.status_code, 302)
+                    assert resp.status_code == 302
                     # Redirects to the actual SUMO url.
-                    eq_(resp['Location'], docs[i]['url'])
+                    assert resp['Location'] == docs[i]['url']
 
 
 @pytest.mark.skipif('LIVE_API' not in os.environ,
@@ -259,20 +257,20 @@ class LiveSUMOProviderTestCase(SuggesterTestMixin, TestCase):
         # Verify we get the right number of docs from the SUMO Suggest
         # API and that the urls start with SUMO_HOST.
         docs = self.client.session[session_key]
-        ok_(0 < len(docs) <= 3)
+        assert 0 < len(docs) <= 3
         for doc in docs:
-            ok_(doc['url'].startswith(SUMO_HOST))
+            assert doc['url'].startswith(SUMO_HOST)
 
         # Note: Since SUMO content changes, we can't check specific
         # strings since we don't really know what it's going to
         # return.
 
         links = resp.context['suggestions']
-        eq_(links[0].provider, 'sumosuggest')
-        eq_(links[0].provider_version, 1)
+        assert links[0].provider == 'sumosuggest'
+        assert links[0].provider_version == 1
 
         # Verify that the first link has non-empty summary, url and
         # description.
-        ok_(links[0].summary)
-        ok_(links[0].url)
-        ok_(links[0].description)
+        assert links[0].summary
+        assert links[0].url
+        assert links[0].description
