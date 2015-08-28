@@ -4,7 +4,7 @@
 
 from unittestzero import Assert
 
-from pages.generic_feedback_picker import PickerPage
+from pages.picker import PickerPage
 
 
 class TestPicker(object):

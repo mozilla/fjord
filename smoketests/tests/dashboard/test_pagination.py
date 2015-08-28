@@ -24,11 +24,11 @@ class TestPagination:
 
         # Check the total message count. If it's less than 50 (two
         # pages worth), then we will fail with a helpful message.
-        Assert.greater(dashboard_pg.total_message_count, 50, "Search term didn't kick up enough messages. Please prime the server with more data!")
+        assert dashboard_pg.total_message_count > 50, 'Not enough data to test. Add more data.'
 
-        Assert.true(dashboard_pg.is_older_messages_link_visible)
-        Assert.false(dashboard_pg.is_newer_messages_link_visible)
-        Assert.equal(dashboard_pg.older_messages_link, 'Older Messages')
+        assert dashboard_pg.is_older_messages_link_visible is True
+        assert dashboard_pg.is_newer_messages_link_visible is False
+        assert dashboard_pg.older_messages_link == 'Older Messages'
 
         dashboard_pg.click_older_messages()
         Assert.equal(dashboard_pg.search_term_from_url, self.SEARCH_TERM)

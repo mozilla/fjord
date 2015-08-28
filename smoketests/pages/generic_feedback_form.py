@@ -8,7 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.feedback import FeedbackPage
-from pages.generic_feedback_picker import PickerPage
+from pages.picker import PickerPage
 from pages.generic_feedback_thanks import ThanksPage
 
 
