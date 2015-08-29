@@ -4,8 +4,6 @@
 
 import time
 
-from unittestzero import Assert
-
 from pages.dashboard import DashboardPage
 from pages.generic_feedback_form import GenericFeedbackFormPage
 
@@ -36,17 +34,17 @@ class TestSubmit(object):
 
         # 4. submit
         thanks_pg = feedback_pg.submit(expect_success=True)
-        Assert.true(thanks_pg.is_the_current_page)
+        assert thanks_pg.is_the_current_page
 
         # 5. verify
         dashboard_pg = DashboardPage(mozwebqa)
         dashboard_pg.go_to_dashboard_page()
         dashboard_pg.search_for(desc)
         resp = dashboard_pg.messages[0]
-        Assert.equal(resp.type.strip(), 'Happy')
-        Assert.equal(resp.body.strip(), desc.strip())
-        Assert.equal(resp.locale.strip(), 'English (US)')
-        Assert.equal(resp.site.strip(), 'example.com')
+        assert resp.type.strip() == 'Happy'
+        assert resp.body.strip() == desc.strip()
+        assert resp.locale.strip() == 'English (US)'
+        assert resp.site.strip() == 'example.com'
 
     def test_submit_sad_feedback(self, mozwebqa):
         timestamp = str(time.time())
@@ -69,17 +67,17 @@ class TestSubmit(object):
 
         # 4. submit
         thanks_pg = feedback_pg.submit(expect_success=True)
-        Assert.true(thanks_pg.is_the_current_page)
+        assert thanks_pg.is_the_current_page
 
         # 5. verify
         dashboard_pg = DashboardPage(mozwebqa)
         dashboard_pg.go_to_dashboard_page()
         dashboard_pg.search_for(desc)
         resp = dashboard_pg.messages[0]
-        Assert.equal(resp.type.strip(), 'Sad')
-        Assert.equal(resp.body.strip(), desc.strip())
-        Assert.equal(resp.locale.strip(), 'English (US)')
-        Assert.equal(resp.site.strip(), 'example.com')
+        assert resp.type.strip() == 'Sad'
+        assert resp.body.strip() == desc.strip()
+        assert resp.locale.strip() == 'English (US)'
+        assert resp.site.strip() == 'example.com'
 
     def test_submit_sad_feedback_using_prefill(self, mozwebqa):
         timestamp = str(time.time())
@@ -94,16 +92,16 @@ class TestSubmit(object):
 
         # 3. submit
         thanks_pg = feedback_pg.submit(expect_success=True)
-        Assert.true(thanks_pg.is_the_current_page)
+        assert thanks_pg.is_the_current_page
 
         # 4. verify
         dashboard_pg = DashboardPage(mozwebqa)
         dashboard_pg.go_to_dashboard_page()
         dashboard_pg.search_for(desc)
         resp = dashboard_pg.messages[0]
-        Assert.equal(resp.type.strip(), 'Sad')
-        Assert.equal(resp.body.strip(), desc.strip())
-        Assert.equal(resp.locale.strip(), 'English (US)')
+        assert resp.type.strip() == 'Sad'
+        assert resp.body.strip() == desc.strip()
+        assert resp.locale.strip() == 'English (US)'
 
     def test_submitting_same_feedback_twice(self, mozwebqa):
         """Submitting the same feedback twice ignores the second"""
@@ -116,13 +114,13 @@ class TestSubmit(object):
         feedback_pg.click_happy_feedback()
         feedback_pg.set_description(desc)
         thanks_pg = feedback_pg.submit(expect_success=True)
-        Assert.true(thanks_pg.is_the_current_page)
+        assert thanks_pg.is_the_current_page
 
         dashboard_pg = DashboardPage(mozwebqa)
         dashboard_pg.go_to_dashboard_page()
         dashboard_pg.search_for(desc)
         resp = dashboard_pg.messages[0]
-        Assert.equal(resp.body.strip(), desc.strip())
+        assert resp.body.strip() == desc.strip()
         first_id = resp.response_id.strip()
 
         # Submit it a second time--we get the Thank You page again and
@@ -132,7 +130,7 @@ class TestSubmit(object):
         feedback_pg.click_happy_feedback()
         feedback_pg.set_description(desc)
         thanks_pg = feedback_pg.submit(expect_success=True)
-        Assert.true(thanks_pg.is_the_current_page)
+        assert thanks_pg.is_the_current_page
 
         # Check the dashboard again and make sure the most recent
         # response has the same created time as the first time. If it
@@ -141,12 +139,12 @@ class TestSubmit(object):
         dashboard_pg.go_to_dashboard_page()
         dashboard_pg.search_for(desc)
         resp = dashboard_pg.messages[0]
-        Assert.equal(resp.body.strip(), desc.strip())
+        assert resp.body.strip() == desc.strip()
         second_id = resp.response_id.strip()
 
         # The two ids should be the same because the second response
         # didn't go through.
-        Assert.equal(first_id, second_id)
+        assert first_id == second_id
 
     def test_submit_happy_feedback_with_unicode(self, mozwebqa):
         """Fill out happy feedback with unicode description"""
@@ -166,12 +164,12 @@ class TestSubmit(object):
 
         # 4. submit
         thanks_pg = feedback_pg.submit(expect_success=True)
-        Assert.true(thanks_pg.is_the_current_page)
+        assert thanks_pg.is_the_current_page
 
         # 5. verify
         dashboard_pg = DashboardPage(mozwebqa)
         dashboard_pg.go_to_dashboard_page()
         dashboard_pg.search_for(desc)
         resp = dashboard_pg.messages[0]
-        Assert.equal(resp.type.strip(), 'Happy')
-        Assert.equal(resp.body.strip(), desc.strip())
+        assert resp.type.strip() == 'Happy'
+        assert resp.body.strip() == desc.strip()

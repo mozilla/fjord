@@ -8,11 +8,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
 from pages.base import Page
-from pages.feedback import FeedbackPage
 
 
 class Product(Page):
-    _name_locator = (By.CSS_SELECTOR, 'h3')
+    _name_locator = (By.CSS_SELECTOR, '.title')
+
+    _link_locator = (By.CSS_SELECTOR, 'a')
 
     def __init__(self, testsetup, element):
         Page.__init__(self, testsetup)
@@ -28,15 +29,15 @@ class Product(Page):
 
         # Clicks on the product which goes to the feedback page.
         feedback_pg = GenericFeedbackFormPage(self.testsetup)
-        self._root_element.click()
+        self._root_element.find_element(*self._link_locator).click()
         WebDriverWait(self.selenium, 10).until(lambda s: feedback_pg.is_the_current_page)
         return feedback_pg
 
 
-class PickerPage(FeedbackPage):
+class PickerPage(Page):
     _page_title = 'Select A Product :: Firefox Input'
 
-    _products_locator = (By.CSS_SELECTOR, '.product-card')
+    _products_locator = (By.CSS_SELECTOR, '#product-cards li')
 
     _privacy_locator = (By.CSS_SELECTOR, 'footer #privacy-policy')
 

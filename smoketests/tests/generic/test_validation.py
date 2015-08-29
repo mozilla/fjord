@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
-from unittestzero import Assert
 
 from pages.generic_feedback_form import GenericFeedbackFormPage
 from tests import TestCase
@@ -17,26 +16,26 @@ class TestValidation(TestCase):
 
         feedback_pg.click_happy_feedback()
 
-        Assert.equal(feedback_pg.remaining_character_count, 10000)
+        assert feedback_pg.remaining_character_count == 10000
 
         feedback_pg.set_description('aaaaa')
-        Assert.equal(feedback_pg.remaining_character_count, 9995)
+        assert feedback_pg.remaining_character_count == 9995
 
         feedback_pg.update_description('a' * 100)
-        Assert.equal(feedback_pg.remaining_character_count, 9895)
+        assert feedback_pg.remaining_character_count == 9895
 
         # Doing setvalue clears the text, so we do that for 9998 of
         # them and then add one more for 9999.
         feedback_pg.set_description_execute_script('a' * 9998)
         # Update to kick off "input" event.
         feedback_pg.update_description('a')
-        Assert.equal(feedback_pg.remaining_character_count, 1)
+        assert feedback_pg.remaining_character_count == 1
 
         feedback_pg.update_description('a')
-        Assert.equal(feedback_pg.remaining_character_count, 0)
+        assert feedback_pg.remaining_character_count == 0
 
         feedback_pg.update_description('a')
-        Assert.equal(feedback_pg.remaining_character_count, -1)
+        assert feedback_pg.remaining_character_count == -1
 
     @pytest.mark.nondestructive
     def test_url_verification(self, mozwebqa):
@@ -62,10 +61,7 @@ class TestValidation(TestCase):
         ]
         for url in valid:
             feedback_pg.set_url(url)
-            Assert.true(
-                feedback_pg.is_url_valid,
-                msg=('failed url "%s"' % url)
-            )
+            assert feedback_pg.is_url_valid, url
 
         invalid = [
             'a',
@@ -73,10 +69,7 @@ class TestValidation(TestCase):
         ]
         for url in invalid:
             feedback_pg.set_url(url)
-            Assert.false(
-                feedback_pg.is_url_valid,
-                msg=('failed url "%s"' % url)
-            )
+            assert feedback_pg.is_url_valid is False, url
 
     @pytest.mark.nondestructive
     def test_email_verification(self, mozwebqa):
@@ -95,10 +88,7 @@ class TestValidation(TestCase):
         ]
         for email in valid:
             feedback_pg.set_email(email)
-            Assert.true(
-                feedback_pg.is_email_valid,
-                msg=('failed email "%s"' % email)
-            )
+            assert feedback_pg.is_email_valid, email
 
         invalid = [
             'foo@',
@@ -106,7 +96,4 @@ class TestValidation(TestCase):
         ]
         for email in invalid:
             feedback_pg.set_email(email)
-            Assert.false(
-                feedback_pg.is_email_valid,
-                msg=('failed email "%s"' % email)
-            )
+            assert feedback_pg.is_email_valid is False, email

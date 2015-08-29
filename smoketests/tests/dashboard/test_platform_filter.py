@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
-from unittestzero import Assert
 
 from pages.dashboard import DashboardPage
 
@@ -27,7 +26,7 @@ class TestPlatformFilter(object):
         platforms = dashboard_pg.platform_filter.platforms
         platform_names = [platform.name for platform in platforms]
 
-        Assert.greater(len(platforms), 0)
+        assert len(platforms) > 0
 
         for name in platform_names[:2]:
             platform = dashboard_pg.platform_filter.platform(name)
@@ -36,16 +35,16 @@ class TestPlatformFilter(object):
             platform_code = platform.code
 
             platform_count = platform.message_count
-            Assert.greater(total_messages, platform_count)
+            assert total_messages > platform_count
 
             dashboard_pg.platform_filter.select_platform(platform_code)
 
-            Assert.greater(total_messages, dashboard_pg.total_message_count)
-            Assert.equal(len(dashboard_pg.platform_filter.platforms), 1)
-            Assert.equal(dashboard_pg.platform_filter.selected_platform.name, platform_name)
-            Assert.equal(dashboard_pg.platform_from_url, platform_code)
+            assert total_messages > dashboard_pg.total_message_count
+            assert len(dashboard_pg.platform_filter.platforms) == 1
+            assert dashboard_pg.platform_filter.selected_platform.name == platform_name
+            assert dashboard_pg.platform_from_url == platform_code
 
             for message in dashboard_pg.messages:
-                Assert.equal(message.platform, platform_name)
+                assert message.platform == platform_name
 
             dashboard_pg.platform_filter.unselect_platform(platform_code)

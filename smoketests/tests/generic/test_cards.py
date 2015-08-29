@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
-from unittestzero import Assert
 
 from pages.generic_feedback_form import GenericFeedbackFormPage
 
@@ -26,8 +25,8 @@ class TestCards(object):
         feedback_pg.click_sad_feedback()
 
         # 4. verify submit button is disabled
-        Assert.false(feedback_pg.is_submit_enabled)
+        assert feedback_pg.is_submit_enabled is False
 
         # 5. fill out description, check submit button enabled
         feedback_pg.set_description(desc)
-        Assert.true(feedback_pg.is_submit_enabled)
+        assert feedback_pg.is_submit_enabled

@@ -10,7 +10,6 @@ from selenium.common.exceptions import (
 )
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from unittestzero import Assert
 
 
 class Page(object):
@@ -25,8 +24,7 @@ class Page(object):
         if self._page_title:
             WebDriverWait(self.selenium, self.timeout).until(lambda s: s.title)
 
-        Assert.equal(self.selenium.title, self._page_title,
-            "Expected page title: %s. Actual page title: %s" % (self._page_title, self.selenium.title))
+        assert self.selenium.title == self._page_title
         return True
 
     def is_element_visible_no_wait(self, locator):
