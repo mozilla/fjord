@@ -90,7 +90,7 @@ class TriggerSuggester(Suggester):
         # Go through the rules and accrue links until we're done.
         # FIXME: Can we do one ga_track_event call for all the rules?
         for rule in rules:
-            if rule.match(feedback):
+            if rule.get_matcher().match(feedback):
                 links.append(
                     Link(
                         provider=PROVIDER,

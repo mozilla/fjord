@@ -32,24 +32,24 @@ class ResponseFactory(factory.DjangoModelFactory):
     class Meta:
         model = Response
 
-    happy = True,
+    happy = True
     url = u''
     description = u'So awesome!'
 
     user_agent = USER_AGENT
     browser = factory.LazyAttribute(
-        lambda a: browsers.parse_ua(a.user_agent).browser)
+        lambda a: unicode(browsers.parse_ua(a.user_agent).browser))
     browser_version = factory.LazyAttribute(
-        lambda a: browsers.parse_ua(a.user_agent).browser_version)
+        lambda a: unicode(browsers.parse_ua(a.user_agent).browser_version))
     platform = factory.LazyAttribute(
-        lambda a: browsers.parse_ua(a.user_agent).platform)
+        lambda a: unicode(browsers.parse_ua(a.user_agent).platform))
 
     product = factory.LazyAttribute(
-        lambda a: Response.infer_product(
-            browsers.parse_ua(a.user_agent)))
+        lambda a: unicode(Response.infer_product(
+            browsers.parse_ua(a.user_agent))))
     channel = u'stable'
     version = factory.LazyAttribute(
-        lambda a: browsers.parse_ua(a.user_agent).browser_version)
+        lambda a: unicode(browsers.parse_ua(a.user_agent).browser_version))
     locale = u'en-US'
     api = None
 
