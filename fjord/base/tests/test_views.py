@@ -1,6 +1,5 @@
 import json
 
-from django.contrib.auth.models import Group
 from django.test.utils import override_settings
 
 from pyquery import PyQuery
@@ -91,10 +90,8 @@ class FileNotFoundTesting(TestCase):
 class ServerErrorTesting(TestCase):
     @override_settings(SHOW_STAGE_NOTICE=True)
     def test_500(self):
-        with self.assertRaises(IntentionalException) as cm:
+        with self.assertRaises(IntentionalException):
             self.client.get('/services/throw-error')
-
-        assert type(cm.exception) == IntentionalException
 
 
 class TestRobots(TestCase):

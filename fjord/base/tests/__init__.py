@@ -212,7 +212,6 @@ class UserFactory(factory.django.DjangoModelFactory):
 
 
 class AnalyzerProfileFactory(ProfileFactory):
-
     @factory.post_generation
     def groups(self, create, extracted, **kwargs):
         if not create:
