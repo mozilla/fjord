@@ -15,9 +15,10 @@ class StringListField(fields.CharField):
         :returns: unicode string
 
         """
+
         if not value:
             value = u''
-        else:
+        elif isinstance(value, (tuple, list)):
             value = u'\n'.join(value)
         return value
 
