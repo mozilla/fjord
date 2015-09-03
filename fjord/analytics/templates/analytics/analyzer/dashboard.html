@@ -4,55 +4,55 @@
 {% block body_id %}adashboard{% endblock %}
 
 {% block content %}
+  <div class="col">
+    {% block content_leftside %}
+      <div class="block">
+        <h2>Analytics things:</h2>
+        <dl>
+          <dt>Useful things</dt>
+          <dd>
+            <p>
+              <a href="{{ url('analytics_search') }}">Search</a>
+            </p>
+            <p>
+              <a href="{{ url('addproducts') }}">Manage Products</a>
+            </p>
+          </dd>
 
-<div class="col">
-{% block content_leftside %}
-  <div class="block">
-    <h2>Analytics things:</h2>
-    <dl>
-      <dt>Useful things</dt>
-      <dd>
-        <p>
-          <a href="{{ url('analytics_search') }}">Search</a>
-        </p>
-        <p>
-          <a href="{{ url('addproducts') }}">Manage Products</a>
-        </p>
-      </dd>
+          <dt>Heartbeat things</dt>
+          <dd>
+            <p>
+              <a href="{{ url('hb_data') }}">Heartbeat v2 data</a>
+            </p>
+            <p>
+              <a href="{{ url('hb_surveys') }}">Heartbeat v2 surveys</a>
+            </p>
+            <p>
+              <a href="{{ url('hb_errorlog') }}">Heartbeat v2 errorlog</a>
+            </p>
+          </dd>
 
-      <dt>Heartbeat things</dt>
-      <dd>
-        <p>
-          <a href="{{ url('hb_data') }}">Heartbeat v2 data</a>
-        </p>
-        <p>
-          <a href="{{ url('hb_surveys') }}">Heartbeat v2 surveys</a>
-        </p>
-        <p>
-          <a href="{{ url('hb_errorlog') }}">Heartbeat v2 errorlog</a>
-        </p>
-      </dd>
-
-      <dt>Thank you suggestion things</dt>
-      <dd>
-        <p>
-          <a href="{{ url('triggerrules') }}">Manage Trigger Rules</a>
-        </p>
-      </dd>
-    </dl>
+          <dt>Thank you suggestion things</dt>
+          <dd>
+            <p>
+              <a href="{{ url('triggerrules') }}">Manage Trigger Rules</a>
+            </p>
+          </dd>
+        </dl>
+      </div>
+    {% endblock %}
   </div>
-{% endblock %}
-</div>
 
-<div class="col doublewide">
-{% block content_middle %}
-  <div class="block feedback">
-    <h2>Welcome Analyzer {{ displayname(user) }}!</h2>
-    <p>
-      This dashboard holds analysis-related reports for Analyzers.
-    </p>
-  </div>
-{% endblock %}
-</div>
-
+  {% block content_main %}
+    <div class="col doublewide">
+      {% block content_middle %}
+        <div class="block feedback">
+          <h2>Welcome Analyzer {{ displayname(user) }}!</h2>
+          <p>
+            This dashboard holds analysis-related reports for Analyzers.
+          </p>
+        </div>
+      {% endblock %}
+    </div>
+  {% endblock %}
 {% endblock %}
