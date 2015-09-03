@@ -109,7 +109,7 @@
             var productVals = $('#id_products').val();
             if (productVals !== null && productVals.length > 0) {
                 var productOptions = $('#id_products option');
-                data.products = $.map(productVals, function(index) {
+                data.products = productVals.map(function(index) {
                     index = parseInt(index, 10) - 1;
                     return productOptions[index].text;
                 });
@@ -132,7 +132,7 @@
             apiCall(data)
                 .then(function (matches) {
                     addCount(matches.count);
-                    $.map(matches.results, addMatch);
+                    matches.results.map(addMatch);
                     endWork();
                 });
             // FIXME: Handle failure?
