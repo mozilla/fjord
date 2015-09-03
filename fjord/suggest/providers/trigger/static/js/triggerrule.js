@@ -134,8 +134,11 @@
                     addCount(matches.count);
                     matches.results.map(addMatch);
                     endWork();
+                })
+                .fail(function () {
+                    window.alert('Unknown error when fetching matches. Sorry this is unhelpful.');
+                    endWork();
                 });
-            // FIXME: Handle failure?
         }
 
         $('button.testBtn').on('click', function() {
