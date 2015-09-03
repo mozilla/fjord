@@ -4,7 +4,7 @@ from fjord.suggest.providers.trigger.models import _generate_keywords_regex
 from fjord.suggest.providers.trigger.tests import TriggerRuleFactory
 
 
-class TriggerRuleMatchTests(TestCase):
+class TriggerRuleMatchTestCase(TestCase):
     def test_match_locale(self):
         tests = [
             # tr locales, feedback locale, expected
@@ -23,7 +23,8 @@ class TriggerRuleMatchTests(TestCase):
         ]
         for tr_locales, feedback_locale, expected in tests:
             tr = TriggerRuleFactory(locales=tr_locales)
-            assert tr.match_locale(feedback_locale) == expected
+            trm = tr.get_matcher()
+            assert trm.match_locale(feedback_locale) == expected
 
     def test_match_versions(self):
         tests = [
@@ -48,23 +49,26 @@ class TriggerRuleMatchTests(TestCase):
         ]
         for tr_versions, feedback_version, expected in tests:
             tr = TriggerRuleFactory(versions=tr_versions)
-            assert tr.match_version(feedback_version) == expected
+            trm = tr.get_matcher()
+            assert trm.match_version(feedback_version) == expected
 
     def test_match_product(self):
         # Test match all products
         tr = TriggerRuleFactory()
+        trm = tr.get_matcher()
 
-        assert tr.match_product('') is True
-        assert tr.match_product('sprocket') is True
+        assert trm.match_product_name('') is True
+        assert trm.match_product_name('sprocket') is True
 
         # Test match specific product
         prod = ProductFactory()
         tr = TriggerRuleFactory()
         tr.products.add(prod)
+        trm = tr.get_matcher()
 
-        assert tr.match_product('') is False
-        assert tr.match_product('sprocket') is False
-        assert tr.match_product(prod.db_name) is True
+        assert trm.match_product_name('') is False
+        assert trm.match_product_name('sprocket') is False
+        assert trm.match_product_name(prod.db_name) is True
 
     def test_match_keywords(self):
         tests = [
@@ -89,7 +93,8 @@ class TriggerRuleMatchTests(TestCase):
         ]
         for tr_keywords, description, expected in tests:
             tr = TriggerRuleFactory(keywords=tr_keywords)
-            assert tr.match_description(description) == expected
+            trm = tr.get_matcher()
+            assert trm.match_description(description) == expected
 
     def test_match_url_exists(self):
         tests = [
@@ -103,7 +108,8 @@ class TriggerRuleMatchTests(TestCase):
         ]
         for tr_url_exists, url, expected in tests:
             tr = TriggerRuleFactory(url_exists=tr_url_exists)
-            assert tr.match_url_exists(url) == expected
+            trm = tr.get_matcher()
+            assert trm.match_url_exists(url) == expected
 
     def test_match(self):
         # Note: This isn't an exhaustive test. Just a rough cursory check.
@@ -115,9 +121,10 @@ class TriggerRuleMatchTests(TestCase):
             keywords=[],
             products=[],
         )
+        trm = tr.get_matcher()
 
         resp = ResponseFactory()
-        assert tr.match(resp) is True
+        assert trm.match(resp) is True
 
         tr = TriggerRuleFactory(
             versions=[u'38*'],
@@ -127,6 +134,8 @@ class TriggerRuleMatchTests(TestCase):
         )
         prod = ProductFactory()
         tr.products.add(prod)
+        trm = tr.get_matcher()
+
         resp = ResponseFactory(
             version=u'38.0.5',
             locale=u'en-US',
@@ -134,17 +143,19 @@ class TriggerRuleMatchTests(TestCase):
             description=u'rc4 is awesome',
             url=u'https://example.com/'
         )
-        assert tr.match(resp) is True
+        assert trm.match(resp) is True
         resp.locale = 'es'
-        assert tr.match(resp) is False
+        assert trm.match(resp) is False
 
     def test_keyword_regexes_are_cached(self):
         for text in [u'cat', u'dog', u'mouse']:
             tr = TriggerRuleFactory(keywords=[text])
-            tr.match_description(text)
+            trm = tr.get_matcher()
+            trm.match_description(text)
 
             tr = TriggerRuleFactory(keywords=[text])
-            tr.match_description(text)
+            trm = tr.get_matcher()
+            trm.match_description(text)
 
         cache_info = _generate_keywords_regex.cache_info()
         assert cache_info.hits >= 3

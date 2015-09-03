@@ -442,6 +442,24 @@ PIPELINE_JS = {
         ),
         'output_filename': 'dashboard.js'
     },
+    'triggerrule': {
+        'source_filenames': (
+            'js/lib/jquery.min.js',
+            'js/lib/jquery-ui.min.js',
+            'js/init.js',
+            'js/fjord_utils.js',
+            'js/lib/excanvas.js',
+            'js/lib/jquery.flot.js',
+            'js/lib/jquery.flot.time.js',
+            'js/lib/jquery.flot.resize.js',
+            'js/dashboard.js',
+            'js/triggerrule.js',
+            'browserid/api.js',
+            'browserid/browserid.js',
+            'js/ga.js',
+        ),
+        'output_filename': 'triggerrule.js'
+    },
     'singlecard': {
         'source_filenames': (
             'js/lib/jquery.min.js',

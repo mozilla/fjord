@@ -1,3 +1,7 @@
+.hidden {
+  visibility: collapse;
+}
+
 .block.count {
   font-weight: bold;
 
@@ -30,53 +34,54 @@
   }
 }
 
+.opinion {
+  @opinion_border: 1px dotted #B6BCC0;
+  border-top: @opinion_border;
+  display: block;
+  list-style: none;
+  padding: 10px 40px;
+  position: relative;
+
+  &:last-child {
+    border-bottom: @opinion_border;
+  }
+
+  .sprite {
+    position: absolute;
+    top: 15px;
+    left: 5px;
+  }
+
+  p {
+    margin: 0 0 3px 0;
+    font-size: 14px;
+    line-height: 18px;
+    word-wrap: break-word;
+    word-break: normal;
+    white-space: normal;
+  }
+
+  ul.meta {
+    padding: 0;
+
+    li {
+      display: inline;
+      font-size: 11px;
+      color: #888;
+
+      &:not(:first-child):before {
+        content: "•";
+        padding-right: 0.5em;
+      }
+    }
+  }
+}
+
 .block.feedback {
   ul {
     padding: 0;
   }
 
-  .opinion {
-    @opinion_border: 1px dotted #B6BCC0;
-    border-top: @opinion_border;
-    display: block;
-    list-style: none;
-    padding: 10px 40px;
-    position: relative;
-
-    &:last-child {
-      border-bottom: @opinion_border;
-    }
-
-    .sprite {
-      position: absolute;
-      top: 15px;
-      left: 5px;
-    }
-
-    p {
-      margin: 0 0 3px 0;
-      font-size: 14px;
-      line-height: 18px;
-      word-wrap: break-word;
-      word-break: normal;
-      white-space: normal;
-    }
-
-    ul.meta {
-      padding: 0;
-
-      li {
-        display: inline;
-        font-size: 11px;
-        color: #888;
-
-        &:not(:first-child):before {
-          content: "•";
-          padding-right: 0.5em;
-        }
-      }
-    }
-  }
 
   #feedback_search {
     position: absolute;
@@ -384,7 +389,8 @@ table.flagged {
     input[type=url],
     textarea,
     select {
-      width: 80%;
+      padding: 0;
+      width: 100%;
     }
     .helptext {
       display: block;
@@ -392,9 +398,18 @@ table.flagged {
       padding: 5px 0;
     }
   }
+
   input[type=submit] {
-    padding: 4px 8px;
-    width: 80%;
+    padding: 4px 0;
+    width: 100%;
+  }
+  button {
+    padding: 4px 0;
+    width: 100%;
+
+    &.half {
+      width: 49%;
+    }
   }
   .errorlist {
     border: 1px solid red;

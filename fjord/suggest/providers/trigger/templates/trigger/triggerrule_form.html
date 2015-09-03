@@ -1,23 +1,41 @@
 {% extends "analytics/analyzer/dashboard.html" %}
 {# Note: This is not l10n-ized since it's only available to analyzers for now. #}
 
-{% block content_middle %}
-  <div class="block feedback">
-    {% if object %}
-      {% set action_url = url('triggerrules-update', pk=object.id) %}
-      <h2>Trigger Rules - Update</h2>
-    {% else %}
-      {% set action_url = url('triggerrules-create') %}
-      <h2>Trigger Rules - Create</h2>
-    {% endif %}
-    <p>
-      <a href="{{ url('triggerrules') }}">Back to trigger rules</a>
-    </p>
-    <form class="analyzer-form" action="{{ action_url }}" method="post">
-      <input type="submit" value="Save">
-      {{ csrf() }}
-      {{ form.as_p() }}
-      <input type="submit" value="Save">
-    </form>
+{% block content_main %}
+  <div class="col wide">
+    <div class="block feedback">
+      {% if object %}
+        {% set action_url = url('triggerrules-update', pk=object.id) %}
+        <h2>Trigger Rules - Update</h2>
+      {% else %}
+        {% set action_url = url('triggerrules-create') %}
+        <h2>Trigger Rules - Create</h2>
+      {% endif %}
+      <p>
+        <a href="{{ url('triggerrules') }}">Back to trigger rules</a>
+      </p>
+      <form id="trigger-form" class="analyzer-form" action="{{ action_url }}" method="post">
+        <button class="submitBtn half">Save</button>
+        <button class="testBtn half">Test</button>
+        {{ csrf() }}
+        {{ form.as_p() }}
+        <button class="submitBtn half">Save</button>
+        <button class="testBtn half">Test</button>
+      </form>
+    </div>
   </div>
+
+  <div class="col">
+    <div class="block">
+      <h2>Matches in recent feedback</h2>
+      <div class="hidden" id="matched-working">Working...</div>
+      <div id="matched-feedback">
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block site_js %}
+  {% javascript 'triggerrule' %}
+  <script type="text/javascript" src="https://login.persona.org/include.js"></script>
 {% endblock %}

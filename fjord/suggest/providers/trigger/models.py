@@ -60,6 +60,80 @@ def _generate_keywords_regex(keywords):
     return re.compile(regex, re.IGNORECASE | re.UNICODE)
 
 
+class TriggerRuleMatcher(object):
+    def __init__(self, locales, product_names, versions, keywords, url_exists):
+        self.locales = locales
+        self.product_names = product_names
+        self.versions = versions
+        self.keywords = keywords
+        self.url_exists = url_exists
+
+    def match_locale(self, locale):
+        # Check if this rule matches all locales
+        if not self.locales:
+            return True
+
+        # Check if there was a locale supplied
+        if not locale:
+            return False
+
+        # Check if the locale was in the rule
+        return locale in self.locales
+
+    def match_version(self, version):
+        # Check if this rule matches all versions
+        if not self.versions:
+            return True
+
+        # Check if there was a version supplied
+        if not version:
+            return False
+
+        # Check if the version was in the rule accounting for prefixes
+        for vers in self.versions:
+            if version == vers:
+                return True
+            if vers.endswith('*') and version.startswith(vers[:-1]):
+                return True
+        return False
+
+    def match_product_name(self, product_name):
+        # Check if this rule matches all products
+        if not self.product_names:
+            return True
+
+        # Check if there was a product supplied
+        if not product_name:
+            return False
+
+        return product_name in self.product_names
+
+    def match_description(self, description):
+        if not self.keywords:
+            return True
+
+        if not description:
+            return False
+
+        regex = _generate_keywords_regex(tuple(self.keywords))
+        return regex.search(description) is not None
+
+    def match_url_exists(self, url):
+        if self.url_exists is None:
+            return True
+        return bool(self.url_exists) == bool(url)
+
+    def match(self, feedback):
+        """Returns True if specified feedback matches this rule"""
+        return (
+            self.match_version(feedback.version)
+            and self.match_locale(feedback.locale)
+            and self.match_product_name(feedback.product)
+            and self.match_description(feedback.description)
+            and self.match_url_exists(feedback.url)
+        )
+
+
 class TriggerRule(ModelBase):
     # Trigger properties
     slug = models.SlugField(
@@ -128,71 +202,13 @@ class TriggerRule(ModelBase):
 
     objects = TriggerRuleManager()
 
-    def match_locale(self, locale):
-        # Check if this rule matches all locales
-        if not self.locales:
-            return True
-
-        # Check if there was a locale supplied
-        if not locale:
-            return False
-
-        # Check if the locale was in the rule
-        return locale in self.locales
-
-    def match_version(self, version):
-        # Check if this rule matches all versions
-        if not self.versions:
-            return True
-
-        # Check if there was a version supplied
-        if not version:
-            return False
-
-        # Check if the version was in the rule accounting for prefixes
-        for vers in self.versions:
-            if version == vers:
-                return True
-            if vers.endswith('*') and version.startswith(vers[:-1]):
-                return True
-        return False
-
-    def match_product(self, product_name):
-        # Check if this rule matches all products
-        if not self.products.count():
-            return True
-
-        # Check if there was a product supplied
-        if not product_name:
-            return False
-
-        # Check if this product was in the rule
-        product_db_names = [prod.db_name for prod in self.products.all()]
-        return product_name in product_db_names
-
-    def match_description(self, description):
-        if not self.keywords:
-            return True
-
-        if not description:
-            return False
-
-        regex = _generate_keywords_regex(tuple(self.keywords))
-        return regex.search(description) is not None
-
-    def match_url_exists(self, url):
-        if self.url_exists is None:
-            return True
-        return bool(self.url_exists) == bool(url)
-
-    def match(self, feedback):
-        """Returns True if specified feedback matches this rule"""
-        return (
-            self.match_version(feedback.version)
-            and self.match_locale(feedback.locale)
-            and self.match_product(feedback.product)
-            and self.match_description(feedback.description)
-            and self.match_url_exists(feedback.url)
+    def get_matcher(self):
+        return TriggerRuleMatcher(
+            locales=self.locales,
+            product_names=[prod.db_name for prod in self.products.all()],
+            versions=self.versions,
+            keywords=self.keywords,
+            url_exists=self.url_exists
         )
 
     def __unicode__(self):
