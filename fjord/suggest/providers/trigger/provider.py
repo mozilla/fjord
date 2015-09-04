@@ -1,6 +1,8 @@
 import logging
+import urllib
 
 from fjord.base.google_utils import ga_track_event
+from fjord.feedback.models import Response as FeedbackResponse
 from fjord.redirector import (
     Redirector,
     RedirectParseError,
@@ -37,6 +39,20 @@ def build_ga_category(rule):
     return 'trigger_{rule.slug}_{rule.id}'.format(rule=rule)
 
 
+def interpolate_url(url, response):
+    if '{' not in url:
+        return url
+
+    data = {
+        'LOCALE': urllib.quote_plus(response.locale.encode('utf-8')),
+        'PRODUCT': urllib.quote_plus(response.product.encode('utf-8')),
+        'VERSION': urllib.quote_plus(response.version.encode('utf-8')),
+        'PLATFORM': urllib.quote_plus(response.platform.encode('utf-8')),
+        'HAPPY': 'happy' if response.happy else 'sad',
+    }
+    return url.format(**data)
+
+
 class TriggerRedirector(Redirector):
     """Provides redirection urls"""
     def handle_redirect(self, request, redirect):
@@ -61,15 +77,25 @@ class TriggerRedirector(Redirector):
         except TriggerRule.DoesNotExist:
             return
 
+        # Interpolate the url.
+        destination_url = rule.url
+        if '{' in destination_url:
+            # Fetch the response so we can interpolate the url.
+            try:
+                response = FeedbackResponse.objects.get(id=response_id)
+            except FeedbackResponse.DoesNotExist:
+                return
+            destination_url = interpolate_url(destination_url, response)
+
         # Track the event and then return the new url.
         ga_track_event({
             'cid': str(response_id),
             'ec': build_ga_category(rule),
             'ea': 'view',
-            'el': rule.url
+            'el': destination_url,
         }, async=True)
 
-        return rule.url
+        return destination_url
 
 
 class TriggerSuggester(Suggester):
