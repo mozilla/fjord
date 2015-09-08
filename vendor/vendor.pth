@@ -6,9 +6,8 @@ packages/certifi
 packages/django-picklefield/src
 packages/html5lib
 packages/importlib
-packages/mock-1.3.0
+packages/mock-1.0.1
 packages/ordereddict
-packages/pbr-1.6.0
 packages/polib-1.0.7
 packages/python-dateutil
 packages/python-memcached
