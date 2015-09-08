@@ -60,8 +60,8 @@ celery==3.1.18
 # sha256: 1PjonJ5wn2ciG_ISMdD6ZqANNxK8tp1LWu83BTOcjc0
 certifi==1.0.0
 
-# sha256: 8ZZPc_Xum34DCQmLlRLVh_u6bdXR83l7HJVSnlJBvwk
-chardet==2.2.1
+# sha256: 5T44s6Sv5tETLeYrdACkrDY0Utxd_PjYjo4MzmY8aKo
+chardet==2.3.0
 
 # sha256: Z4yYJ1Qx-tMkJ13sY3keShdVi0DloRDiCoKGYTmoWlo
 click==5.1
@@ -90,8 +90,8 @@ django-browserid==1.0
 # sha256: F3KVsUQkAMks22fo4Y-f9ZRvtEL4WBO50IN4I3IuoI0
 django-cronjobs==0.2.3
 
-# sha256: Xq3Xc16Qo9r3fzPFVMWo4pMCdDKQIWk2QedPlXqvnfw
-django-extensions==1.3.3
+# sha256: ZfstcU_VvbmwiDKZPCyEeLJdmMKj54dpbP52KsrmRUQ
+django-extensions==1.5.6
 
 # sha256: KBZYpZ2o6Kzqe_nK0TriNgqazbM-NGzwILCUknI-h10
 django-grappelli==2.6.3
@@ -102,8 +102,8 @@ django-multidb-router==0.6
 # sha256: 2ZQmvkb9kv5rZLn1xZJuqYWTlOROw--eH3xkfTomZX8
 django-picklefield==0.3.1
 
-# sha256: fbWOrZW00d6lrdpJOczbmF-OynsUKntdX0nOWDzWX2U
-django-pipeline==1.5.2
+# sha256: xxHohhXvN7I1nOMJeOrnxl5UkkrrBDIpZWxeI5Bl5ZY
+django-pipeline==1.5.4
 
 # sha256: -thF7ifqqSii7RbAEh4rtd0TzN6V0cAUTSP5pCUMGmw
 django-ratelimit==0.4.0
@@ -177,8 +177,8 @@ six==1.9.0
 # sha256: HhLNQXx94_wcl9EUouRNXDA8OuXMnS_YihiktArLd5o
 statsd==2.0.3
 
-# sha256: z0dpJMkIHJHdEK4W4zguZil9xNlZkaheDVvQYwZL9TA
-tldextract==1.3.1
+# sha256: fBfxgT4FanY_8qG5AI3R29jfjI4Z17TfZmgOMXzLPr8
+tldextract==1.7.1
 
 # sha256: 3Lv0kFjkGWoG6YjZ3B52IyGrDQV8S-A1uE48ETU_wvg
 translate-toolkit==1.13.0
