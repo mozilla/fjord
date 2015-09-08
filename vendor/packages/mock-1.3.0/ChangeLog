@@ -1,0 +1,1035 @@
+CHANGES
+=======
+
+1.3.0
+-----
+
+* Update sync point
+* Issue #21750: Further fixup to be styled like other mock APIs
+* Typo fix in mock.patch
+
+1.2.0
+-----
+
+* Revert "Issue #21750: mock_open.read_data can now be read from each instance, as it"
+
+1.1.4
+-----
+
+* Add 2.6 back to classifiers
+* Record sync point
+* Issue #21750: mock_open.read_data can now be read from each instance, as it could in Python 3.3
+* Issue #18622: unittest.mock.mock_open().reset_mock would recurse infinitely
+* Folk should test 2.6 locally too
+* Closes #279: setuptools.version is too new
+* Support python 2.6
+
+1.1.3
+-----
+
+* Update sync point and sync docs
+* Issue #23661: unittest.mock side_effects can now be exceptions again
+* Abort installation if the installer is using setuptools<17.1
+
+1.1.2
+-----
+
+* Closes #269: setup_requires pbr 1.3
+
+1.1.1
+-----
+
+* Closes #257: version the dependency on six
+* Rename README.txt to README.rst
+
+1.1.0
+-----
+
+* Make reproducing travis behaviour somewhat easier
+* Cleanup version number handling
+* Overhaul docs
+* Update docs
+* Remove stale MANIFEST.in, ignore pbr outputs
+* Convert to a package, use pbr, update metadata
+* Bump versions
+* Officially drop 2.6 support
+* Issue #23310: Fix MagicMock's initializer to work with __methods__. Behavior equivalent to m.configure_mock(). Patch by Kasia Jachim
+* Issue #23568: Add rdivmod support to MagicMock() objects
+* Issue #23581: Add matmul support to MagicMock
+* Issue #23326: Removed __ne__ implementations. Since fixing default __ne__ implementation in issue #21408 they are redundant
+* Issue #22823: Use set literals instead of creating a set from a list. Fixed an output of sets in examples
+* Closes #21270 : We now override tuple methods in mock.call objects
+* Suppress a couple more DeprecationWarnings in the test suite
+* Closes #21256: Printout of keyword args in deterministic order in mock calls
+* Removes unused varargs and varkwargs from assert_not_called()
+* Closes Issue 21262: New method assert_not_called for Mock
+* Closes Issue 21238: New keyword argument `unsafe` to Mock
+* Closes issue 21239. unittest.mock.patch.stopall() did not work deterministically when the same name was patched multiple times
+* Closes Issue 21222
+* Closes issue 17660. You no longer need to explicitly pass create=True when patching builtin names
+* Issue 17826. Setting an iterable side_effect on a mock created by create_autospec now works
+* Issue 20968. unittest.mock.MagicMock now supports division
+* Issue #20189: Four additional builtin types (PyTypeObject, PyMethodDescr_Type, _PyMethodWrapper_Type, and PyWrapperDescr_Type) have been modified to provide introspection information for builtins. Also: many additional Lib, test suite, and Argument Clinic fixes
+* Issue #19594: Use specific asserts in unittest tests
+* Remove shadowed test
+* Adjust comment
+* Issue #19013: add a __main__ to unittest.test.testmock to ease CLI invocation
+* Issue #19013: add unittest.main() epilogs to unittest.mock's own test modules
+* Process DEFAULT values in mock side_effect that returns iterator
+* Closes issue 17467. Add readline and readlines support to unittest.mock.mock_open
+* Issue #17047: remove doubled words added in 3.3 as reported by Serhiy Storchaka and Matthew Barnett
+* Issue #17015: When it has a spec, a Mock object now inspects its signature when matching calls, so that arguments can be matched positionally or by name
+* Closes issue 15323. Improve failure message of Mock.assert_called_once_with
+* Close #14857: fix regression in references to PEP 3135 implicit __class__ closure variable. Reopens issue #12370, but also updates unittest.mock to workaround that issue
+* Remove incorrect comment
+* Closes issue 14634. unittest.mock.create_autospec now supports keyword only arguments
+* unittest.mock: removed another bit of Python 2 only code
+* Adding unittest.mock documentation
+* unittest.mock: remove another piece of Python 2 specific code
+* Remove more Python 2 code from unittest.mock (obsolete function attributes)
+* Support subclassing unittest.mock._patch and fix various obscure bugs around patcher spec arguments
+* unittest.mock.MagicMock objects are now unorderable by default
+* Removed XXX from unittest.mock docstring and switch to a nicer try...except...finally
+* Remove more Python 2 compatibility cruft from unittest.mock
+* PEP 417: Adding unittest.mock
+* Ignore patch rejects too
+* Add NEWS
+* Add PyPy to travis
+* Issue #20189: Four additional builtin types
+* Just hard-depend on unittest2
+* Fix typo in test name
+* Some basic release process notes
+* Ignore more editor files
+* Add testrepository configuration
+* We never need sudo. Containers FTW
+* Fixup ignores
+* Iterating on .travis.yml
+* Setup Travis-CI
+
+1.0.1
+-----
+
+* Attribution update
+* License update
+* Doc update
+* Typo fix
+* Remove XXXX from comment
+* Restore Python 2.4 warning in the changelog
+* Proper compatibility with functools.wraps
+* Fix for wraps - __wrapped__ was added in 3.2 not 3.3
+* Remove mention of Python 2.4 from PyPI page
+* Typo fixes
+* Add __wrapped__ to functions decorated with patch variants
+* Final doc updates for 1.0 release
+* Doc updates for 1.0
+* Updates for the 1.0 release
+* Minor doc tweak
+* Date update
+* README update
+* Updated version number
+* Doc update
+* Adding patch.stopall method
+* reset_mock now resets magic method mocks
+* MagicMock.reset_mock on an autospec created mock no longer crashes
+* CHANGELOG update
+* Minor doc changes for new alpha release
+* Add example of exceptions on attribute access to docs
+* Support keyword only arguments in Python 3
+* Exceptions in iterable side_effect will be raised
+* Committed failing test for pickling
+* Changelog update
+* Docstring update
+* Doc fixes
+* Move test and update code comment
+* create_autospec now works with attributes that can't be fetched
+* Minor update for mock_open docs
+* PropertyMock attributes and return values are standard MagicMocks
+* Doc typo fix
+* Update patch example in docs
+* Updated example to patch documentation
+* Add example to patch documentation
+* Doc / docstring improvement for patch
+* Bump version number
+* Changes for 1.0.0a1 release
+* A mock created by patch with a spec as the list argument will be callable if __call__ is in the spec
+* Minor cleanups
+* Some test fixes to always clean up patches
+* Update CHANGELOG
+* Fix various bugs around spec arguments to patchers
+* CHANGELOG update
+* Make using create=True with spec=True in patchers an error
+* Propagate exception info in _patch.__exit__
+* Set file_spec on first use
+* Remove obsolete comments
+* Minor doc and docstring updates
+* More documentation updates
+* Whitespace in doc changes
+* More documentation updates
+* Documentation updates
+* Change comparison methods on MagicMock to return NotImplemented
+* Further removal of mocksignature references
+* typo
+* Propogate exceptions in _patch.__exit__()
+* Adding PropertyMock
+* Make __class__ assignable
+* Removing mocksignature documentation
+* Adding mock_open helper
+* mocksignature and tests removed
+* Restore expectedFailure around test
+* Merge
+* Removed failing test for spec inheritance - should not be on by default
+* Doc updates
+* Version number change in comment
+* Failing test for create_autospec and unbound methods
+* Failing test and changelog entry for spec inheritance
+* Version update for 0.9 branch
+* Version update for maintenance branch
+* Merge
+* Minor doc wording change
+* merge
+* Update release date in docs
+* merge
+* Update release date in docs
+* Added tag 0.8.0 for changeset e074b39c3826
+
+0.8.0
+-----
+
+* Branch for 0.8 series development
+* Complete changes to getting started doc
+* Document change to MagicMock.__iter__
+* Improvement to handing of MagicMock.__iter__ return value
+* Further update to getting started
+* Further update to getting started
+* Minor doc update plus whitespace removal
+* doctest fix
+* Further update to getting started
+* Getting started updates
+* Minor doc updates
+* Index doc updates
+* Markup correction
+* Markup correction
+* Markup correction
+* Markup correction
+* Extended examples for mocksignature
+* Extended examples for side_effect and calling mocks
+* Oops 2
+* Oops
+* Minor doc update
+* Add attaching mock doc and examples
+* Docs and example for patch.TEST_PREFIX
+* Bump version number and minor doc updates
+* Minor doc update
+* Adding examples for call objects as tuples
+* Minor doc update
+* Minor doc update
+* Minor doc update
+* Minor doc update
+* Reformat Mock attribute docs
+* Add links to 0.8 changelog
+* Minor doc updates
+* Minor doc updates
+* Example for patch.dict with dictionary like object
+* Doc and docstring updates for patch
+* Switch more references to ~Mock
+* Switch to using ~Mock instead of Mock in documentation references
+* Add documentation for Mock.__dir__
+* Re-ordering of changelog
+* Minor optimisation
+* Fix ANY comparisons with call objects
+* Doc updates to helpers documentation
+* Doc update
+* Moc docs update
+* Doc and docstring update
+* Doc update
+* Minor doc update
+* Doc updates Improved repr for sentinel objects
+* Doc updates
+* Example update
+* Example update
+* Doc updates
+* Doctest global setup change
+* README update
+* Setting date of 0.8rc2 release
+* Extended test for ANY
+* Extended test for ANY
+* Fix ANY equality with some types in assert_called_with calls
+* Adding a new link to the index
+* Adding a note about resetting side_effect on a mock
+* Docs update
+* Docs update
+* Change Mock theme
+* Renamed parameter
+* Doc update
+* Doc update
+* Doc update
+* Doc update
+* Update tox.ini to use new sphinx environment for every build
+* Removing one expectedFailure and adding one
+* Note and expectedFailure test for autospec and unbound methods
+* Minor doc update
+* Minor doc update
+* Minor doc update
+* Merge
+* Update copyright years
+* Minor doc update
+* Doc updates
+* Doc updates
+* Docs update
+* Doc updates
+* Docs update
+* Doc updates, including global doctest setup
+* Docs update
+* Docs update
+* Remvove unused configure parameter from create_autospec More doc updates
+* Docs update
+* Doc updates
+* return_value (etc) arguments to patch work with autospec (again)
+* Doc update
+* Remove 'configure' keyword argument from create_autospec and accept arbitrary keyword arguments
+* Doc updates
+* Minor changelog update
+* Doc and setup.py update
+* Setting date of 0.8.0 rc1 release
+* Additional example of mocks and mutable arguments
+* Adding Python implementation trove classifiers
+* Minor performance improvements
+* Minor tweak
+* CHANGELOG update
+* Removing a lot of calls to __setattr__ in Mock construction
+* Index page docs update
+* CHANGELOG update
+* Added a docstring for configure mock
+* Remove MagicProxy cache optimisation
+* Micro optimisation
+* Use weakrefs to avoid circular references
+* Further optimisation for MagicMock instantiation
+* Move a variable out of a loop
+* Remove unused code for setting MagicProxy on instances
+* Remove micro optimisation
+* Further performance improvements instantiating MagicMock
+* Performance improvement instantiating MagicMock, Magic methods of mocks are no longer hard coded to MagicMock
+* Extending test for create_autospec and non-callable instances
+* create_autospec uses __call__ method for the signature of mocks that are the return value of classes
+* Documentation update and failing test for create_autospec
+* README update
+* Minor test change
+* Extend test for patch 'lazy importing'
+* Date of beta 4 release
+* Implementation of attach_mock
+* Setting a mock as a return value of itself no longer modifies repr of the mock
+* Fix setting a mock as its own return value, expose new issue of setting a return value of a child mock to the top level mock
+* Rename Sentinel and SentinelObject classes to make it clear they are private
+* Attribute deletion specified and tested
+* Calls to mocks attached as magic methods are recorded in mock calls
+* Test name refactor
+* patch imports lazily
+* Wing project file change
+* Link correction
+* CHANGELOG update
+* Added docstrings
+* changelog update
+* Mocks set as attributes and return values are attached correctly. Calls are recorded in method_calls and mock_calls of the parent
+* Implementation of mock_add_spec
+* Initial implementation of mock_add_spec
+* Test improvement
+* Extend some mock_calls tests for named mocks
+* Fix all doctests
+* Doctest fixes for repr changes
+* Doctest fixes for repr changes
+* Fixes for mock_calls on intermediate mocks in a call chain
+* Fix test for mock repr more
+* Fix test for mock repr
+* Mock uses new name for repr
+* Changelog update
+* Fix tests for call reprs
+* Fixing call repr
+* repr for call objects
+* Test improvements from pyflakes and removal of callargs
+* Start unification of callargs and _Call
+* mock_calls works on functions created by mocksignature
+* Changelog update
+* Changelog update
+* Update date in changelog
+* Tests for assert_any_call
+* Reducing markup in docstrings
+* Initial implementation of assert_any_call
+* Move assert_has_calls to Mock
+* Merge
+* Correct duplicate link in README
+* Merge
+* Update dev release README
+* ignore temporary script
+* Release data for 0.8 beta 2
+* Setting to an iterable will cause calls to the mock to return the next value from the iterable
+* Properly fix call_args, call_args_list issue
+* Fix regression in call_args and call_args_list behaviour
+* Minor changelog correction
+* Further updates to outstanding issues in the changelog
+* Update the outstanding issues in the changelog
+* Minor update to changelog
+* Adding full list of changes since 0.7 to changelog
+* Adding an example for mocker
+* Merge
+* Update the mock dev version link
+* Version number bump for beta 1 release
+* Minor changelog update
+* Addition of pretty-printed str to _CallList
+* patch.TEST_PREFIX controls the methods affected by patchers as class decorator
+* patch.multiple works with string subclasses
+* Tuples as well as lists allowed for specifying spec
+* Extend _CallList tests
+* Mock version bump
+* Extended test for callargs repr
+* Mock method_calls and mock_calls are now CallLists
+* Extended tests and improved docstring for callargs
+* Extending tests for callargs
+* _CallList.assert_has_calls handles duplicate call arguments correctly
+* Initial implementation of _CallList.assert_has_calls
+* Initial (partial) implementation of CallList for call_args_list
+* callargs now always have 3 members (name, args, kwargs)
+* Add docstring to Mock._get_child_mock
+* Implement __ne__ for callargs and call
+* Fix callargs call comparisons
+* Rename _new_name and _new_parent attributes
+* reset_mock includes mock_calls
+* Example update
+* Addition of subclassing example to the documentation
+* Test for overriding _get_child_mock in subclasses
+* Tests for call_list
+* Addition of 'call_list' method to call for chained call assertions
+* Extending test for mock_calls and call
+* Test rename
+* Extending callargs test
+* Extending call for mock_calls
+* Initial implementation of mock_calls
+* Start extending a test for mock_calls
+* Improved failure messages for the mock assert methods
+* Fixed bug with argument passing when patch.multiple is creating mocks
+* Fix testpatch so it can be run standalone
+* Support for java exceptions on Jython
+* Making public the instance argument to create_autospec
+* CHANGELOG update
+* Minor text change
+* Modifications to docs for 0.8 alpha 2 release
+* Placeholders for missing docstrings
+* Mock is now the baseclass for MagicMock again
+* Testing patching failures with patch.multiple
+* Initial attempt to fix unpatching with patch.multiple failures
+* Test for problem with patch.multiple and adding js to docs in package
+* Fix bug where a failure to create a nested patch could leave patches undone
+* Extend tests for patch.multiple
+* Fix error message for stopping a patcher without starting it. Test create argument to patch.multiple
+* Test cleanup
+* True div operator no longer available on mocks in Python 3
+* patch.object no longer has patch.multiple functionality. patch.multiple can work on objects as well as target specified by string
+* Test update
+* Update on outstanding tests needed for patch.multiple
+* Fixing patch.multiple for decorating classes
+* Fix tests for pypy
+* patch.multiple passes in created mocks to decorated functions as keyword arguments
+* Fix test for issue I'm not going to fix
+* Failing test for copying magic methods from builtins
+* Fix for Python 3
+* Comment updates
+* Initial implementation of patch.multiple
+* Initial test for patch.multiple
+* Testing new_callable with class decorating
+* Update index page
+* Test fix for Python 3
+* spec inheritance with patch and new_callable only happens for mocks
+* CHANGELOG update
+* Using new_callable with new or autospec is an error
+* Test new_callable with spec
+* new_callable argument to patch / patch.object
+* Remove __unittest marker, which caused traceback truncation
+* create_autospec creates mocks without a spec for slot descriptors
+* Comment change
+* Test improvement
+* Test autospec name in mock repr
+* CHANGELOG update
+* Removed 'inherit' argument from create_autospec
+* CHANGELOG update
+* CHANGELOG update
+* CHANGELOG update
+* autospec of a property doesn't use a spec
+* Test for autospec and properties
+* Temporary commit for shift code downstairs
+* spec / spec_set inheritance works correctly with patch and creating non-callable mocks for instances
+* Test extension
+* Changelog update
+* create_autospec can create non-callable mocks
+* Changelog markup fix
+* Changelog update
+* Test extension
+* Test extension
+* Wing project file change
+* patching a class with non callable instances creates a non-callable return value for the mock
+* Changelog update
+* Fix bugs around methods / functions using self as an arbitrary argument Return values of mocks patching classes are also MagicMocks by default
+* Fix autospec for functions / methods with a self argument that isn't the first argument
+* Fix for __class__ bug in Python 3
+* Minor changes
+* Test fixes
+* Test additions, currently failing
+* Test refactor and cleanup of issues reported by pyflakes
+* Addition of NonCallableMock and NonCallableMagicMock
+* New default inherit behaviour for create_autospec
+* Merge
+* Example modification
+* Merge
+* New example
+* Merge
+* Minor text update
+* Merge
+* Extending the mocking properties example
+* Minor change in doc
+* Change some rest styles on examples doc page
+* Minor changelog reformat
+* Minor changelog mod
+* Doc updates for 0.7.2 release
+* Doc updates for 0.7.2 release
+* Test extension
+* Minor text reformat
+* Extending import example
+* Further fixes for MagicMock equality
+* New example in getting started doc
+* Adding a new example to the docs
+* Minor changelog addition
+* Adding FILTER_DIR to configure private attribute filtering in __dir__
+* dir(mock) is less verbose. autospec with attributes of None creates non-specced mocks for those attributes
+* Preparation for 0.7.2
+* Tests for keyword arguments to patchers
+* Extend test to cover configure_mock
+* Test for passing keyword arguments to Mock / MagicMock constructor
+* Minor optimisation to configure_mock
+* MagicMock uses super instead of explicit upcall
+* Add **kwargs support to patchers and Mocks
+* Changelog update
+* Comment fix
+* autospec can now take arbitrary objects as well as True/False
+* Docstring typo fix
+* Improve test for equality / inequality
+* Remove incorrect comment
+* Fix tests for pypy and remove extraneous list call in Mock.__dir__
+* __dir__ implementation
+* Test refactor
+* Test name changes
+* Fix MagicMock equality tests
+* Adding custom __dir__ implementation
+* Updated changelog
+* patch creates a MagicMock instead of a Mock by default
+* Updated changelog
+* Updated changelog
+* Compile regex
+* Moving function definition
+* Functions created by _set_signature have the correct name
+* Make create_autospec public. Change the way autospec creates function signatures
+* Extend test for patchers and autospec argument
+* Test that combining autospec with new arguments to patch are invalid
+* Extending tests for Mock
+* Testing patch autospec argument
+* Testing signature mocking with _spec_signature
+* Testing signature mocking with _spec_signature
+* Testing signature mocking with _spec_signature
+* Test fix and minor cleanup
+* Remove use of apply from tests
+* Test name cleanup
+* patch autospec now creates a mocksignature for types and callables
+* Minor cleanup
+* Minor cleanup
+* Integrating _spec_signature with patch through the autospec keyword
+* Document limitations of auto-speccing in the changelog
+* Test fix
+* Test cleanup
+* Comment
+* Mocking with _spec_signature is now lazy. Two failing tests still to fix (those tests now out of date)
+* Avoid setting mock instance attributes unecessarily
+* Various minor fixes
+* Mocks used by _spec_signature are *always* created with a spec, instead of sometimes using standard mock attributes or allowing mocksignature to create them for us
+* Recursive function references work with _spec_signature
+* _spec_signature can mock a function
+* Comment
+* Fix _spec_signature with a spec of None
+* Fix for _spec_signature and builtin types
+* Extend tests for _spec_signature
+* id cache shared by _spec_signature for return values of mocked classes
+* Test for spec inheritance with _spec_signature
+* Extend tests for _spec_signature
+* Extend tests for _spec_signature
+* Minor cleanup
+* Extend tests for _spec_signature
+* _spec_signature can now cope with objects that reference themselves
+* Extend tests for _spec_signature
+* Extend tests for _spec_signature
+* Extend tests for _spec_signature
+* Extend tests for _spec_signature
+* Minor cleanup
+* _spec_signature works with classmethod and staticmethod for instances and types
+* Fix for classmethods and _spec_signature
+* Adding spec_set flag to _spec_signature
+* Extend tests for _spec_signature
+* Extend tests for _spec_signature
+* Extend tests for _spec_signature
+* Extend tests for _spec_signature
+* Correct an error message
+* Testing _spec_signature and builtin subclasses
+* _spec_signature is now recursive
+* Fix failing test for _spec_signature
+* Merge
+* Allowing tuples and list subclasses for _spec_signature
+* Issue 88: allow list subclass as a valid spec
+* Initial implementation of _spec_signature
+* Test cleanup
+* Test name cleanup
+* Test name cleanup
+* mocksignature reset_mock also resets return values
+* Adding mock API to mocksignature functions
+* Comment out failing test
+* Renamed private attributes to avoid clash. Test for mock_calls
+* Protocol methods on MagicMock are now MagicMocks, created lazily on first lookup
+* Testing call
+* Testing call
+* First changes towards 0.8.0 alpha 1
+* Merge
+* Typo fixes
+* Merge
+* Extended example for docs
+* Merge
+* Adding example to documentation
+* Fix examples.txt for recent versions of unittest2
+* Merge
+* Changelog for previous fixes
+* Use isolated binaries for tox config
+* Merge
+* Including templates in docs
+* Removing executable bit on docs
+* Converting getting-started to UNIX line endings
+* Update configure_mock recipe in docs
+* Adding link to pycon video to docs
+* Additional examples in docs
+* Remove unneeded line in docs
+* a typo, a formatting fix and an example added
+* Add fudge examples to mock comparison
+* Addition of note about patching django settings
+* Extending MagicMock as dictionary example
+* Doc tweak
+* Doc tweak
+* Doc tweak
+* Doc tweak
+* Doc tweak
+* Updating references in example
+* Adding example of mocking dictionary access with MagicMock
+* Further doctest improvements
+* Correct some doctests (to fail correctly). Adding example of nesting patches
+* Change trove status classifier to production
+* Create 0.7 branch
+* README changes for 0.7.0 release
+* Doc changes for 0.7.0 release
+* Doc changes for 0.7.0 release
+* Version number bump for 0.7.0 release
+* Doc updates
+* Doc updates
+* Doc updates
+* Doc updates
+* Doc updates
+* Doc updates
+* Doc updates
+* Doc updates
+* Doc updates
+* Remove unused _has_local_attr
+* Doc updates
+* Doc updates
+* Doc updates
+* Doc updates
+* Doc updates
+* Doc updates
+* Doc updates
+* Doc updates
+* Doc updates
+* Addition of note on terminology
+* Typo correction
+* Adding comparison document
+* Changelog update
+* Docs update
+* Doc updates
+* Doc updates
+* Doc updates
+* Docs update
+* Doc updates
+* Rename a function to make it private. Docs update
+* Doc updates
+* Doc updates
+* Doc updates
+* Doc updates
+* Doc updates
+* Doc updates
+* Doc updates
+* Doc updates
+* Theme change
+* Sphinx theme update
+* Doc updates
+* Doc updates
+* Doc updates
+* Sphinx config change
+* Docs update
+* Docs update
+* docs update
+* docs update
+* docs update
+* docs update
+* Doc updates
+* Documentation update
+* Minor changes
+* Minor doc updates
+* Sphinx markup correction in examples.txt
+* Changing more examples to doctests
+* Minor doc updates
+* Changing dates in copyright notices
+* Update mailing list link in the docs
+* Changes for rc1
+* Fix recursion problem with mock.reset_mock when a mock is its own return value
+* Default implementation of wraps for Python 2.4 copies more function attributes Bunch version number Change a few dates to 2011
+* Changelog updates
+* Fix use of mock.patch with proxy objects
+* Ignore compiled jython files
+* Use standard unittest for Python 3.2 tests
+* Update to changelog
+* Adding jython, python 3.2 and pypy to tox configuration
+* Adding a link to the docs
+* Adding link to documentation
+* Changelog changes
+* Changelog change
+* Changelog changes
+* Minor changelog tinkering
+* Docs and changelog updates
+* Doc improvement
+* CHANGELOG addition
+* Docstring correction
+* Ignore latex output directory for building pdf documentation
+* Ignore build and dist directories
+* Adding a link to the docs
+* Documentation updates for 0.7.0b4 release
+* setup.py tinkerage
+* patch.dict as a class decorator
+* Removed duplicated definition of class_types
+* Slightly improved patch.start / stop test
+* Adding start and stop methods to patchers
+* Cleanup testpatch
+* Adding a test for subclassing Mock with property
+* Enhanced mocksignature test
+* Changelog tweak
+* Extending mocksignature test for patch.object
+* Fix mocksignature for patch.object and instance methods
+* Fix spec and spec_set for old style classes
+* Whitespace changes
+* Docstring and documentation updates
+* Documentation and sphinx config updates
+* spec_set defaults to None rather than False
+* Blank line additions
+* Docstring updates
+* Test for isinstance and spec_set
+* Update version number in sphinx conf
+* repr of a class with a spec_set is different to a class with a spec
+* Additional tests for spec_set
+* spec_set can be an object
+* Setting a non-existent attribute on mock created with a spec will only raise an AttributeError if spec_set keyword argument is used MagicMock attributes and return value are now MagicMocks
+* Ignoring files
+* update tags
+* Addition of assert_called_once_with method to Mock
+* Minor test tweak, changelog update
+* Spec class name included in mock repr
+* Line length changes in test
+* assert_called_with now works with python -OO
+* Slightly more elegant way of detecting invalid attribute setting with spec
+* Attempting to *set* an attribute on a class with a spec will raise an if the spec doesn't have that attribute
+* Fix copy test for Python 2.7
+* Attempting to set an unsupported magic method now raises an AttributeError Change version number to 0.7.0 beta 4 Change copying test to work on Python 3 (no sys.maxint)
+* Allow mock objects to be copied
+* Change mock wing IDE project file to Wing 4 format
+* Corrected whitespace issue in README
+* Changelog formatting tweaks
+* Update PDF link in 0.7.0b3 docs
+* Changes for 0.7.0b3 release
+* Changes for 0.7.0b3 release
+* Updates for beta 3
+* Minor docs update
+* Simplified way MagicMock default methods are created
+* Updating docs for mocksignature
+* mocksignature works with classes and callable objects
+* Adding build_sphinx to setup.py Changing version number prior to a beta 3 release
+* docs update
+* docs update
+* Addition of sizeof to supported magic methods. Mocks can pass isinstance tests when a spec object is used
+* Added mock id to repr
+* Changed default numeric value of MagicMock to 1
+* repr to include name of mock
+* Modifying Wing ignored files
+* updating tests to use unittest2 on Python 2.7
+* Updates to config file
+* Update to wing project file and unittest config file
+* unittest.cfg update
+* Adding a unittest config file and ignoring other files
+* Enable with statement tests for Python 2.5
+* Remove unnecessary sphinx docs build for 2.7 (only need to test the docs build on one version of Python)
+* Update tox.ini for Python 3.1 (requires tox 0.7)
+* Adding commands to tox.ini
+* Change to tox configuration now that unittest2 0.5.1 is out
+* Project file update
+* Adding sphinx testing to tox.ini for Python 2.6 and 2.7
+* Modifying tox.ini for Windows compatibility
+* Minor tox.ini change
+* Adding tox config file and moving with tests to not see failures under Python 2.4
+* Fixing MANIFEST.in for Windows
+* Adding support for the setuptools 'setup.py test' command
+* CHANGELOG update
+* Adding __getformat__ and __setformat__ magic method support
+* Adding more supported magic methods
+* Code formatting issue
+* Fix issue with _mock_ as varargs or varkwargs and mocksignature
+* Adding another test for mock magic methods
+* Whitespace change
+* Adding an additional mocksignature test
+* Adding an additional mocksignature test
+* Minor change to the way instance methods are checked in mocksignature
+* Adding text version of docs to distribution
+* Remove unused URL from setup.py
+* Minor CHANGELOG changes
+* Docs improvement
+* Documentation improvement
+* Adding pickling magic methods to the supported-but-not-default set
+* Adding pickling magic methods to the supported-but-not-default set
+* Improved interaction of spec and magic methods
+* Setting a magic method on a mock with a spec can only be done if the spec includes that method
+* The created class for each Mock now inherits Mock.__doc__
+* Improved failure message for Mock.assert_called_with when the mock has not yet been called
+* all leftover whitespace cleaned
+* Docs improvements
+* CHANGELOG preparation for final release
+* Additional docstrings
+* Version number and doc changes
+* Link correction in docs
+* README update
+* Removing the TODO page from the documentation and adding 0.7b2 changelog
+* Rename withAvailable to with_available
+* Enable additional tests under Python 2.5
+* Cleaning up issues reported by pyflakes and adding a descriptor test that I won't yet fix
+* Docs improvements
+* Docs improvements
+* Docs improvements
+* Docs improvements
+* Minor doc tweak
+* Doc update for patch.dict()
+* patch.dict(...) works with dictionaries specified by name (string)
+* patch.dict(...) now works as context manager
+* Fix a bug in patch.dict(...) and checkin two failing tests for new functionality
+* Adding Python 3 trove classifiers
+* Docs improvements
+* Docs improvements
+* Docs improvements
+* Docs improvements
+* Docs improvements
+* Docs improvements
+* Docs improvements
+* mocksignature will now create a mock for you if you don't pass one in
+* Adding docs and tests to distribution
+* Docs changes
+* More doc changes
+* Updating index page for 0.7 release
+* CHANGELOG and TODO update
+* CHANGELOG update
+* Adding some docstrings
+* Test tinkering
+* mocksignature now adds the mock to the created function
+* More tinkering
+* More tinkering
+* Minor tinkering
+* Adding a test for the mocksignature argument to patch
+* Fixing test for __all__ and removing unused imports reported by pyflakes. Adding a test for the mocksignature argument to patch.oject
+* Version number change and test for __all__
+* Update copyright notices in code
+* Adding MagicMock to mock.__all__
+* Minor test improvement
+* Reorganise magic methods slightly
+* Comment change
+* Adding descriptor methods to non default magic methods
+* Reorganise magic methods slightly
+* Minor test improvement for MagicMock
+* More default values for magic methods in MagicMock
+* More default values for magic methods in MagicMock
+* Improved (again) handling of default return values for MagicMock
+* Improved way of supporting default return values in mock magic methods
+* Sensible defaults for *some* of the magic methods in MagicMock
+* Skipping the test for obsolete magic methods in Python 3
+* Add support of obsolete magic methods
+* Support for clear argument to patch.dict
+* Test patch.dict with list of tuples instead of dictionary for values
+* Support patch.dict for dictionary like objects
+* Support patch.dict for dictionary like objects
+* Preserve name of wrapped functions / methods
+* Replace *more* assertEquals with assertEqual
+* Initial implementation of patch.dict. Concerns that this overwrites the signature of wrapped functions / methods. Should we be using functools.wraps? Should patch.dict support the new mocksignature argument?
+* Ignoring build directories created by setuptools
+* regression test added
+* Making the import of unittest2 from tests.support
+* Getting rid of deprecation warning in Python 2.7 and removing some cruft from test modules
+* Changing test support code
+* made the tests slightly less evil (I couldn't sleep because of that :D )
+* ignored MANIFEST
+* Typo correction
+* changelog update
+* double patch bug fixed
+* setup.py fixes
+* removed unused import
+* Minor doc change
+* Minor docs update
+* Minor docs update around testing
+* Adding a couple more articles on mock to the references section
+* Minor comment update
+* Minor update to unittest test discovery in docs
+* docs updated
+* Removing unused imports / variables reported by pyflakes and adding minor code comments
+* Minor CHANGELOG change
+* Minor README update
+* added a note about deprecating patch_object
+* updated the docs
+* side_effect now works with BaseException exceptions
+* made tests 2.4 compatible (partly)
+* moved patch_object to patch.object, deprecated previous api
+* Removing the types import and using the internally defined ClassType
+* Changing more assertEquals to assertEqual
+* Version number change
+* Minor change to class decorator code
+* Text formatting in documentation
+* py3 compatibility for class decorator
+* patch class decorator documented
+* test update
+* changelog update
+* class decorator implemented (as destructive decorator)
+* Fix text formatting in patch.txt
+* Fix a couple of examples in documentation
+* Fix spec=True examples
+* Minor changelog addition. Change all use of assertEquals to assertEqual
+* Updated README
+* Updated README
+* Updated README
+* Updated README
+* Changelog additions
+* Test for MagicMock as a context manager
+* Changelog additions
+* Code comment
+* Testing MagicMock
+* Ignoring Python 3 __pycache__ files
+* Support for mocking method signatures in Python 3
+* Added support for __bool__ as a magic method under Python 3
+* First steps towards Python 3 compatibility
+* Use unittest2 TestCase features and remove custom testcase
+* removed leftover files
+* changelog updated
+* documentation for lenient comparisons
+* explicit test for call_args
+* simple call_args comparison
+* fixed doctests
+* documetation updated
+* method_calls now returns callargs objects
+* switched to unittest2
+* moved to unittest2 and marked testMagicMethodWrapping as expected failure
+* Addition of MagicMock. Needs testing
+* Ignoring distribution building artefacts
+* Updating setup.py
+* Doc correction
+* Fix for fetching magic methods from the instance
+* Adding another note
+* Typo correction
+* Addition of new test file
+* Refactoring tests
+* Extending tests for magic method wrapping
+* Bypass wrapping when setting a magic method to a Mock
+* Add note to extendmock that all functionality has been merged into Mock 0.7.0
+* Minor note in docs
+* Minor note in docs
+* __enter__ and __exit__ now handled
+* Wrapping in Mock.__setattr__ so that magic methods fetched from the instance still get self passed in as the first argument
+* More noting of what hasn't been done yet
+* Tests and docs updates
+* Date in docstring updated
+* Updating changelog
+* Improving tests
+* Merging extendmock into mock
+* docstring enhancement
+* Better implementation of MagicMock. MagicMock instances no longer have *all* magic methods
+* Minor code tinkerage
+* Minor test correction
+* Test completion for mocksignature
+* Correct horrible error accidentally left in previous commit (this message genuine as previous commit with spurious message was a slip of the fingers...)
+* Correct horrible error accidentally left in previous commit
+* Correct horrible error accidentally left in previous commit
+* Problem with the way default arguments arehandled in mocksignature
+* Test improvements for extendmock
+* Improvements to extendmock and tests
+* Adding extendmock
+* doc fix
+* Minor doc change
+* Doc change
+* Switching to using test discovery to run tests
+* Minor doc change
+* Fixing setup.py
+* Doc changes and removing dependency on setuptools in setup.py
+* Preparation for 0.6.0 release
+* Documentation updates
+* Documentation updates
+* Whitespace correction
+* Doc changes
+* Correct patching / unpatching of static methods
+* Fix syntax error - mock still not working
+* Implementation for safe_get_attribute but not wired in yet
+* Temporarily failing test..
+* Migrating tests to new layout
+* renaming test modules to be compatible with discovery
+* Adding call_count to the docs
+* date correction
+* 0.5.0 release
+* Removing magics support for 0.5 release
+
+release-0.5.0
+-------------
+
+* added empty latex directory for PDF doc builds
+* test changes for running under Wing
+* test changes for running under Wing
+* minor doc fix
+* more copyright year fixing
+* minor test fix
+* updating documentation and copyright year in sources
+* Changing the way side_effect is called
+* Changing the way side_effect is called
+* Adding wraps keyword argument
+* Adding wraps keyword argument
+* Making patch a context manager
+* Renamed .reset() to .reset_mock()
+* Docs update
+* Docs update
+* Addition of create argument to patch and inheritance of spec for patched classes
+* Doc update
+* Docs update
+* Docs update
+* Doc changes
+* Docs update
+* Docs update
+* Changes related to moving of tests
+* Changed 'UnitTests' to 'tests'
+* Doc update
+* Doc updates
+* Updated docs
+* Change docs to Sphinx
+* Spec changes
+* Merged spec / methods keyword arguments and added magics keyword argument
+* Spec changes
+* Typo fix in docs
+* Minor test change
+* Updated docs
+* Update
+* Update
+* Added EOL fixing
+* Initial checkin
+* Initial directory structure
