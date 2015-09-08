@@ -6,10 +6,10 @@ packages/certifi
 packages/django-picklefield/src
 packages/html5lib
 packages/importlib
+packages/mock-1.3.0
 packages/ordereddict
 packages/pbr-1.6.0
 packages/polib-1.0.7
-packages/pyquery
 packages/python-dateutil
 packages/python-memcached
 packages/pytz-2015.4
@@ -56,9 +56,9 @@ src/gengo-python
 src/jingo
 src/jingo-minify
 src/kombu
-src/mock
 src/nuggets
 src/py-amqp
+src/pyquery
 src/pystatsd
 src/spicedham
 src/translate
