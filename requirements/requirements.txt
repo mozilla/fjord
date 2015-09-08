@@ -48,8 +48,8 @@ Babel==2.0
 # sha256: aI-UZrHDrhQQY4Hm29MoEV51xSYMVC60jmxGkx9pKMw
 billiard==3.3.0.20
 
-# sha256: q2lHUVrCzC-4lOcYy6sb7rNChD_YFtTCondZndvvuns
-bleach==1.4
+# sha256: FSrynUWAsRL8UpZoZEknkclR5jgrVgcOleEoxrYUgzs
+bleach==1.4.1
 
 # sha256: y0Y3TzyIPFgNFCp50mCYg3E6hnzIbgUUFjrc54TOJGg
 carrot==0.10.7
