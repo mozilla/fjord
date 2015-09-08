@@ -4,7 +4,6 @@ packages/argparse-1.3.0
 packages/carrot
 packages/certifi-2015.9.6.1
 packages/django-picklefield/src
-packages/html5lib
 packages/importlib
 packages/mock-1.0.1
 packages/ordereddict
@@ -52,6 +51,7 @@ src/elasticsearch-dsl-py
 src/factory_boy
 src/funcsigs
 src/gengo-python
+src/html5lib-python
 src/jingo
 src/jingo-minify
 src/kombu

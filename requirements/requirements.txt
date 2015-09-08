@@ -132,8 +132,8 @@ gengo==0.1.19
 # sha256: A3VLx7JWOXwbZG5QSOIpFZD1CAFxrbiwD04tc4THbu4
 GitPython==0.1.7
 
-# sha256: pucH2csXyL8eVTcTrRSzEnSoHVwM4PziGwKTbQ79fbs
-html5lib==0.95
+# sha256: 43K2b0mX-OHelw6nVdClKNciLSqpvVWqwHjH7zm49sM
+html5lib==0.999999
 
 # sha256: fLtRSjUvghxpuOi9qmsuWXKFR6iWVQPHWGUsKCbRV7U
 importlib==1.0.3
