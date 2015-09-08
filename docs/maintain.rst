@@ -67,21 +67,22 @@ currently exist that probably should get closed out.
 
 Comment template::
 
+    Marking this as a mentored bug. If you're interested in working on it,
+    please read through our "Join this project" guide [1], complete the
+    list of things you need to do before contributing and then add a comment
+    to this bug asking to have it assigned to you.
+
+    [1] http://fjord.readthedocs.org/en/latest/welcome.html
+
+    If you have any questions, please ask on the mailing list or in the
+    #input channel on irc.mozilla.org.
+
     <required skills>
 
     <explanation of how to implement>
 
     <note any wry twists>
 
-    Marking this as a mentored bug. If you're interested in working on it,
-    please read through our "Join this project" guide [1], complete the
-    list of things you need to do before contributing and then add a comment
-    to this bug asking to have it assigned to you.
-
-    If you have any questions, please ask on the mailing list or in the
-    #input channel on irc.mozilla.org.
-
-    [1] http://fjord.readthedocs.org/en/latest/welcome.html
 
 Once a week, go through any assigned mentored bugs and ping them to
 see how they're coming along.
