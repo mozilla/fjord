@@ -37,8 +37,8 @@ amqp==1.4.6
 # sha256: N4Ethjya0-NcBzTELgvwMgzow77YLNIK1UyzTRWBV7o
 anyjson==0.3.3
 
-# sha256: nwLQNXGE3h8JPBABK1LnRUoQCL5qXBhat6Mwes6x0S4
-Babel==1.3
+# sha256: RJiN8ZESMGWvmFfspo6RUVJqkxwSZZyimQTk8R3n7Bs
+Babel==2.0
 
 # sha256: aI-UZrHDrhQQY4Hm29MoEV51xSYMVC60jmxGkx9pKMw
 billiard==3.3.0.20
@@ -58,14 +58,17 @@ certifi==1.0.0
 # sha256: 8ZZPc_Xum34DCQmLlRLVh_u6bdXR83l7HJVSnlJBvwk
 chardet==2.2.1
 
+# sha256: Z4yYJ1Qx-tMkJ13sY3keShdVi0DloRDiCoKGYTmoWlo
+click==5.1
+
 # sha256: OxNQQo3tQ4uqhTRD9zfPOTHrRggCTveBe2Dl3bp0nT8
 commonware==0.4.2
 
 # sha256: dPQRo0n8-2draDNvyuh5m6n7sKBEZWL1RN7gGfsOKuc
 cssselect==0.7.1
 
-# sha256: Sje0ncwClfVGz2spT9gNcc_ttQT-YhDNq3n5xx5Ocn8
-dennis==0.4.3
+# sha256: MxnZwEi7pMyJqWkRgdDgIYei8JtDQ_0vz2zL-EtO4Yo
+dennis==0.6.1
 
 # sha256: uTV9LOvmGZcFXUF9YH-cZQ6BfNGjg7mhuIvx7a15fHU
 Django==1.7.10
@@ -136,8 +139,8 @@ mock==1.0.1
 # sha256: HDW0rCBs7y0kgWyJ-Jzyid09OM98RJuz-re_bUPwGx8
 ordereddict==1.1
 
-# sha256: eygeXKeZ-QYb8Cny6RHpnfSDoaAu8v-q9z_oAiLyav8
-polib==1.0.3
+# sha256: Q85g0F_6RCup08VyIZOq25PDgXS5-0ccjqfMv4NJu8o
+polib==1.0.7
 
 # sha256: pgf4GmKIh-LPA9Xd3ubwkvr0EeUbiUEworTIOeYMQI8
 pyquery==1.2.1
@@ -148,8 +151,8 @@ python-dateutil==1.5
 # sha256: ZrvGLZUZ-dUxsfd-aH2fL15SHLkG8f1yMfQDmX4BEMQ
 python-memcached==1.48
 
-# sha256: QlIib6IOBxXU3NBfkjPwB2xEvKMOTxeTsv4DzftCLtQ
-pytz==2013.9
+# sha256: p4tITVRy3Yxoj4s-7hhkaiXGbORbLCZlKFD2r5zlKxc
+pytz==2015.4
 
 # sha256: OYo9ttYYmdJf1KBsbKEgUbDOFx1wXezX7VURUXtLuT0
 requests==2.7.0
@@ -166,8 +169,8 @@ statsd==2.0.3
 # sha256: z0dpJMkIHJHdEK4W4zguZil9xNlZkaheDVvQYwZL9TA
 tldextract==1.3.1
 
-# sha256: cImpIWoIdzSTZN4dwf1As6pLh0IqFHx4cRakz9A3Sfk
-translate-toolkit==1.11.0
+# sha256: 3Lv0kFjkGWoG6YjZ3B52IyGrDQV8S-A1uE48ETU_wvg
+translate-toolkit==1.13.0
 
 # sha256: Gon6G0PSd8-t8ijMkLnHXyVIGOo6Gqt7_7AiPLt7sV0
 urllib3==1.8
