@@ -124,3 +124,9 @@
 [submodule "vendor/src/pyquery"]
 	path = vendor/src/pyquery
 	url = https://github.com/gawel/pyquery.git
+[submodule "vendor/src/chardet"]
+	path = vendor/src/chardet
+	url = https://github.com/chardet/chardet.git
+[submodule "vendor/src/tldextract"]
+	path = vendor/src/tldextract
+	url = https://github.com/john-kurkowski/tldextract.git
