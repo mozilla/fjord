@@ -2,7 +2,7 @@ packages/GitPython/lib
 packages/anyjson
 packages/argparse-1.3.0
 packages/carrot
-packages/certifi
+packages/certifi-2015.9.6.1
 packages/django-picklefield/src
 packages/html5lib
 packages/importlib

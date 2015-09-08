@@ -57,8 +57,8 @@ carrot==0.10.7
 # sha256: CST5QHDG_FfUCLFphIxbOIMmaP_-Bg5ItIA_sj4OPq8
 celery==3.1.18
 
-# sha256: 1PjonJ5wn2ciG_ISMdD6ZqANNxK8tp1LWu83BTOcjc0
-certifi==1.0.0
+# sha256: -SRFe9iReOVl_huQNZ2QY59STn2hqZmIKSR09S3vvzQ
+certifi==2015.9.6.1
 
 # sha256: 5T44s6Sv5tETLeYrdACkrDY0Utxd_PjYjo4MzmY8aKo
 chardet==2.3.0
