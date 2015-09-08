@@ -1,4 +1,0 @@
-News
-=====
-
-.. include:: ../CHANGES.txt

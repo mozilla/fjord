@@ -112,3 +112,15 @@
 [submodule "vendor/src/translate"]
 	path = vendor/src/translate
 	url = https://github.com/translate/translate.git
+[submodule "vendor/src/cssselect"]
+	path = vendor/src/cssselect
+	url = https://github.com/SimonSapin/cssselect.git
+[submodule "vendor/src/funcsigs"]
+	path = vendor/src/funcsigs
+	url = https://github.com/aliles/funcsigs.git
+[submodule "vendor/src/mock"]
+	path = vendor/src/mock
+	url = https://github.com/testing-cabal/mock.git
+[submodule "vendor/src/pyquery"]
+	path = vendor/src/pyquery
+	url = https://github.com/gawel/pyquery.git

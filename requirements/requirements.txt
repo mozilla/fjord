@@ -1,3 +1,8 @@
+# Requirements that need to be updated first
+
+# sha256: L6IwcnEEsH5SLe7BeSnoTgQckEfjksBVNHoCsNXKh00
+setuptools==18.3.1
+
 # Requirements from github urls because we're using non-released things
 
 # django-mobility: no releases
@@ -64,8 +69,8 @@ click==5.1
 # sha256: OxNQQo3tQ4uqhTRD9zfPOTHrRggCTveBe2Dl3bp0nT8
 commonware==0.4.2
 
-# sha256: dPQRo0n8-2draDNvyuh5m6n7sKBEZWL1RN7gGfsOKuc
-cssselect==0.7.1
+# sha256: BTWn4nAUh0snrjpNM-h0njRb36YnZhlSCLeZa_EQBoI
+cssselect==0.9.1
 
 # sha256: MxnZwEi7pMyJqWkRgdDgIYei8JtDQ_0vz2zL-EtO4Yo
 dennis==0.6.1
@@ -109,14 +114,17 @@ django-statsd-mozilla==0.3.8.5
 # sha256: YPJ9jdB0c4sT7ZJqy7C9UbTnFn05Q6BFZkVxGuIrGrQ
 djangorestframework==3.1.3
 
-# sha256: l2KMyLgsDC-pUegX6DgRPSlB_wfc9sU-5QM566yTf5M
-eadred==0.2
+# sha256: 4o-THuB1Rpz5wPzTUfeAHqCqbXiNAc2-g54qs1a4yjY
+eadred==0.3
 
 # sha256: u5PYXKflDWjkGXhSu226YJi7dyUA-C9dsv9KgHEVBck
 elasticsearch==1.2.0
 
-# sha256: 1wEkmeUt5aRBPiKu1R34lIUzaFRS3-FrQQAfKPnOWxw
-factory-boy==2.4.1
+# sha256: zYMG5kw6EV3soTZoXpRduI_-FxOCAS7JOO0kGiDdfro
+factory-boy==2.5.2
+
+# sha256: 2Dzm3wsOpmGHAP4ds1NSY5Goo62ht6ulL-16Ydp3IDM
+funcsigs==0.4
 
 # sha256: QD1vswdD9scqnh9UG5xiOZiyI50PcALy-ZqyKn53UEo
 gengo==0.1.19
@@ -133,17 +141,20 @@ importlib==1.0.3
 # sha256: H1ZavUTEt9-qTdVD1S-YLS8AaroKKzgwVCtNJagB_gk
 kombu==3.0.26
 
-# sha256: uDndLZwRfHAUMMFJlWkYpCOphjtIsJyQ4wpgE-fS9E8
-mock==1.0.1
+# sha256: HiR9vsxs4FcpnrfuAZrWgxS7kxUugdmmEQ019NXsoPY
+mock==1.3.0
 
 # sha256: HDW0rCBs7y0kgWyJ-Jzyid09OM98RJuz-re_bUPwGx8
 ordereddict==1.1
 
+# sha256: Tq7o_1VEcD7dGVHtHcCyg9qZp090DZ-QVe7vzzKd4dE
+pbr==1.6.0
+
 # sha256: Q85g0F_6RCup08VyIZOq25PDgXS5-0ccjqfMv4NJu8o
 polib==1.0.7
 
-# sha256: pgf4GmKIh-LPA9Xd3ubwkvr0EeUbiUEworTIOeYMQI8
-pyquery==1.2.1
+# sha256: RsUeuHi3h-gU7o-XN7CmIREDSutNHAZFCsWo6lpw5gI
+pyquery==1.2.9
 
 # sha256: bxlzSLRvuM358_z8Kn1al9qV2z4uhmfPZXIWJ0_hsAk
 python-dateutil==1.5

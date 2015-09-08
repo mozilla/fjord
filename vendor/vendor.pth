@@ -4,12 +4,11 @@ packages/argparse-1.3.0
 packages/carrot
 packages/certifi
 packages/chardet
-packages/cssselect
 packages/django-picklefield/src
 packages/html5lib
 packages/importlib
-packages/mock
 packages/ordereddict
+packages/pbr-1.6.0
 packages/polib-1.0.7
 packages/pyquery
 packages/python-dateutil
@@ -25,6 +24,7 @@ src/bleach
 src/celery
 src/click
 src/commonware
+src/cssselect
 src/dennis
 src/django
 src/django-adminplus
@@ -51,10 +51,12 @@ src/django-waffle
 src/elasticsearch-py
 src/elasticsearch-dsl-py
 src/factory_boy
+src/funcsigs
 src/gengo-python
 src/jingo
 src/jingo-minify
 src/kombu
+src/mock
 src/nuggets
 src/py-amqp
 src/pystatsd
