@@ -73,7 +73,7 @@ def check_dependencies():
     unsatisfied_reqs = []
     unsatisfyable_reqs = []
     for req in reqs:
-        if req.url and 'github.com' in req.url:
+        if req.link and req.url and 'github.com' in req.url:
             unsatisfyable_reqs.append(req)
             continue
 
