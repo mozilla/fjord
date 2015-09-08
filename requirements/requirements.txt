@@ -174,8 +174,8 @@ requests-mock==0.6.0
 # sha256: 4kBSQR_E-9H2cmNVN8P8IzDZSBsYwDF2lbRiWVEskdU
 six==1.9.0
 
-# sha256: HhLNQXx94_wcl9EUouRNXDA8OuXMnS_YihiktArLd5o
-statsd==2.0.3
+# sha256: -65f6zOuk5TCdbyDSrlGhLlN4DrMjzY4e9C_DFHvKO4
+statsd==3.1
 
 # sha256: fBfxgT4FanY_8qG5AI3R29jfjI4Z17TfZmgOMXzLPr8
 tldextract==1.7.1

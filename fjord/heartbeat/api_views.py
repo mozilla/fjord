@@ -2,7 +2,7 @@ from django.db import IntegrityError, transaction
 
 import rest_framework.views
 import rest_framework.response
-from statsd import statsd
+from statsd.defaults.django import statsd
 
 from .models import Answer, AnswerSerializer
 from fjord.base.utils import cors_enabled

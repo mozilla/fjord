@@ -20,7 +20,7 @@ from django.utils.feedgenerator import Atom1Feed
 from product_details import product_details
 from ratelimit.helpers import is_ratelimited
 from rest_framework.throttling import BaseThrottle
-from statsd import statsd
+from statsd.defaults.django import statsd
 
 from fjord.base.urlresolvers import reverse
 

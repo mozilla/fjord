@@ -1,7 +1,7 @@
 from functools import wraps
 
 from elasticsearch import ElasticsearchException
-from statsd import statsd
+from statsd.defaults.django import statsd
 
 
 def es_error_statsd(fun):

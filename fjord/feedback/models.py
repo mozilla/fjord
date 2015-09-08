@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _lazy
 import elasticsearch_dsl as es_dsl
 from product_details import product_details
 from rest_framework import serializers
-from statsd import statsd
+from statsd.defaults.django import statsd
 
 from fjord.base.browsers import parse_ua
 from fjord.base.data import register_purger

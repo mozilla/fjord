@@ -7,7 +7,7 @@ from django.core.mail import mail_admins
 from django.db import models
 
 from dennis.translator import Translator
-from statsd import statsd
+from statsd.defaults.django import statsd
 import waffle
 
 from .gengo_utils import (
