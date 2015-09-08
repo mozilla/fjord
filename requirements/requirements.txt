@@ -108,8 +108,8 @@ django-pipeline==1.5.4
 # sha256: -thF7ifqqSii7RbAEh4rtd0TzN6V0cAUTSP5pCUMGmw
 django-ratelimit==0.4.0
 
-# sha256: 1_LzcE9lU8uG-6xLw0Z9LJp_xEkYgYxyNckQAK8rqYU
-django-statsd-mozilla==0.3.8.5
+# sha256: wOkPMEu_bxD2PgAZECmAyVDcaDMm0qTlDnGZ3sxDw2o
+django-statsd-mozilla==0.3.15
 
 # sha256: YPJ9jdB0c4sT7ZJqy7C9UbTnFn05Q6BFZkVxGuIrGrQ
 djangorestframework==3.1.3
