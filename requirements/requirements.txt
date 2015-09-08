@@ -66,8 +66,8 @@ chardet==2.3.0
 # sha256: Z4yYJ1Qx-tMkJ13sY3keShdVi0DloRDiCoKGYTmoWlo
 click==5.1
 
-# sha256: OxNQQo3tQ4uqhTRD9zfPOTHrRggCTveBe2Dl3bp0nT8
-commonware==0.4.2
+# sha256: p7AqX3bYmnn4YZJvs04CnMQ0PBOAJSXIGFQqOf54jM4
+commonware==0.4.3
 
 # sha256: BTWn4nAUh0snrjpNM-h0njRb36YnZhlSCLeZa_EQBoI
 cssselect==0.9.1
