@@ -40,6 +40,22 @@ def build_ga_category(rule):
 
 
 def interpolate_url(url, response):
+    """Takes a url and a response and interpolates variables
+
+    The following variables are interpolated:
+
+    * LOCALE
+    * PRODUCT
+    * VERSION
+    * PLATFORM
+    * HAPPY
+
+    :arg url: the url as a utf-8 encoded string
+    :arg response: a feedback Response instance
+
+    :returns: the interpolated url
+
+    """
     if '{' not in url:
         return url
 
@@ -50,7 +66,10 @@ def interpolate_url(url, response):
         'PLATFORM': urllib.quote_plus(response.platform.encode('utf-8')),
         'HAPPY': 'happy' if response.happy else 'sad',
     }
-    return url.format(**data)
+    for key, val in data.items():
+        url = url.replace('{' + key + '}', val)
+
+    return url
 
 
 class TriggerRedirector(Redirector):
