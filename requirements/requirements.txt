@@ -108,8 +108,8 @@ django-pipeline==1.5.4
 # sha256: -thF7ifqqSii7RbAEh4rtd0TzN6V0cAUTSP5pCUMGmw
 django-ratelimit==0.4.0
 
-# sha256: 1_LzcE9lU8uG-6xLw0Z9LJp_xEkYgYxyNckQAK8rqYU
-django-statsd-mozilla==0.3.8.5
+# sha256: wOkPMEu_bxD2PgAZECmAyVDcaDMm0qTlDnGZ3sxDw2o
+django-statsd-mozilla==0.3.15
 
 # sha256: YPJ9jdB0c4sT7ZJqy7C9UbTnFn05Q6BFZkVxGuIrGrQ
 djangorestframework==3.1.3
@@ -132,8 +132,8 @@ gengo==0.1.19
 # sha256: A3VLx7JWOXwbZG5QSOIpFZD1CAFxrbiwD04tc4THbu4
 GitPython==0.1.7
 
-# sha256: pucH2csXyL8eVTcTrRSzEnSoHVwM4PziGwKTbQ79fbs
-html5lib==0.95
+# sha256: 43K2b0mX-OHelw6nVdClKNciLSqpvVWqwHjH7zm49sM
+html5lib==0.999999
 
 # sha256: fLtRSjUvghxpuOi9qmsuWXKFR6iWVQPHWGUsKCbRV7U
 importlib==1.0.3
@@ -174,8 +174,8 @@ requests-mock==0.6.0
 # sha256: 4kBSQR_E-9H2cmNVN8P8IzDZSBsYwDF2lbRiWVEskdU
 six==1.9.0
 
-# sha256: HhLNQXx94_wcl9EUouRNXDA8OuXMnS_YihiktArLd5o
-statsd==2.0.3
+# sha256: -65f6zOuk5TCdbyDSrlGhLlN4DrMjzY4e9C_DFHvKO4
+statsd==3.1
 
 # sha256: fBfxgT4FanY_8qG5AI3R29jfjI4Z17TfZmgOMXzLPr8
 tldextract==1.7.1

@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.decorators.http import require_POST
 
 from mobility.decorators import mobile_template
-from statsd import statsd
+from statsd.defaults.django import statsd
 import waffle
 
 from fjord.base.browsers import UNKNOWN
