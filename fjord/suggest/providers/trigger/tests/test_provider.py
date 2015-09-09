@@ -3,15 +3,111 @@ from fjord.base.tests import (
     reverse,
     TestCase,
 )
+from fjord.feedback.tests import ResponseFactory
 from fjord.redirector import build_redirect_url
 from fjord.redirector.tests import RedirectorTestMixin
 from fjord.suggest.providers.trigger.provider import (
     format_redirect,
+    interpolate_url,
     PROVIDER,
     PROVIDER_VERSION
 )
 from fjord.suggest.providers.trigger.tests import TriggerRuleFactory
 from fjord.suggest.tests import SuggesterTestMixin
+
+
+class InterpolateTestCase(TestCase):
+    def test_no_interpolation(self):
+        resp = ResponseFactory()
+        url = interpolate_url('http://example.com', resp)
+        assert url == 'http://example.com'
+
+    def test_interpolation(self):
+        resp = ResponseFactory(
+            happy=True,
+            product=u'Firefox',
+            version=u'38.0',
+            platform=u'Windows 8.1',
+        )
+        url = interpolate_url(
+            'http://example.com?' +
+            'happy={HAPPY}&' +
+            'product={PRODUCT}&' +
+            'version={VERSION}&' +
+            'platform={PLATFORM}',
+            resp
+        )
+        assert (
+            url ==
+            ('http://example.com?' +
+             'happy=happy&' +
+             'product=Firefox&' +
+             'version=38.0&' +
+             'platform=Windows+8.1')
+        )
+
+    def test_empty_values(self):
+        resp = ResponseFactory(
+            happy=False,
+            product=u'',
+            version=u'',
+            platform=u'',
+        )
+        url = interpolate_url(
+            'http://example.com?' +
+            'happy={HAPPY}&' +
+            'product={PRODUCT}&' +
+            'version={VERSION}&' +
+            'platform={PLATFORM}',
+            resp
+        )
+        assert (
+            url ==
+            ('http://example.com?' +
+             'happy=sad&' +
+             'product=&' +
+             'version=&' +
+             'platform=')
+        )
+
+    def test_unicode(self):
+        resp = ResponseFactory(
+            happy=True,
+            platform=u'unicode \xca',
+        )
+        url = interpolate_url(
+            'http://example.com?platform={PLATFORM}',
+            resp
+        )
+        assert (
+            url ==
+            'http://example.com?platform=unicode+%C3%8A'
+        )
+
+    def test_quoting(self):
+        badchars = '?"\'&='
+        resp = ResponseFactory(
+            happy=False,
+            product=badchars,
+            version=badchars,
+            platform=badchars,
+        )
+        url = interpolate_url(
+            'http://example.com?' +
+            'happy={HAPPY}&' +
+            'product={PRODUCT}&' +
+            'version={VERSION}&' +
+            'platform={PLATFORM}',
+            resp
+        )
+        assert (
+            url ==
+            ('http://example.com?' +
+             'happy=sad&' +
+             'product=%3F%22%27%26%3D&'
+             'version=%3F%22%27%26%3D&'
+             'platform=%3F%22%27%26%3D')
+        )
 
 
 class TriggerTestCase(SuggesterTestMixin, RedirectorTestMixin, TestCase):
@@ -121,3 +217,38 @@ class TriggerTestCase(SuggesterTestMixin, RedirectorTestMixin, TestCase):
         assert (
             links[1].url == build_redirect_url(format_redirect(rules[0].slug))
         )
+
+    def test_redirector(self):
+        tr = TriggerRuleFactory(url=u'http://example.com/', is_enabled=True)
+        resp = self.post_feedback(
+            locale='en-US',
+            data={'happy': 0, 'description': u'rc4 is awesome'}
+        )
+
+        links = resp.context['suggestions']
+
+        assert len(links) == 1
+        assert links[0].url == build_redirect_url(format_redirect(tr.slug))
+
+        resp = self.client.get(links[0].url)
+        assert resp.status_code == 302
+        assert resp.url == 'http://example.com/'
+
+    def test_redirector_templated(self):
+        tr = TriggerRuleFactory(
+            url=u'http://example.com/?locale={LOCALE}',
+            is_enabled=True
+        )
+        resp = self.post_feedback(
+            locale='en-US',
+            data={'happy': 0, 'description': u'rc4 is awesome'}
+        )
+
+        links = resp.context['suggestions']
+
+        assert len(links) == 1
+        assert links[0].url == build_redirect_url(format_redirect(tr.slug))
+
+        resp = self.client.get(links[0].url)
+        assert resp.status_code == 302
+        assert resp.url == 'http://example.com/?locale=en-US'

@@ -20,6 +20,13 @@ class TriggerRuleForm(forms.ModelForm):
             'url_exists',
             'keywords',
         ]
+        help_texts = {
+            'url': (
+                u'Required. URL for the suggestion. Allows for interpolation '
+                u'for {PRODUCT}, {VERSION}, {PLATFORM}, {LOCALE}, and {HAPPY} '
+                u'feedback response data.'
+            )
+        }
         labels = {
             'url_exists': u'Require a url',
             'sortorder': u'Sort order'
