@@ -124,3 +124,6 @@
 [submodule "vendor/src/tldextract"]
 	path = vendor/src/tldextract
 	url = https://github.com/john-kurkowski/tldextract.git
+[submodule "vendor/src/dateutil"]
+	path = vendor/src/dateutil
+	url = https://github.com/dateutil/dateutil.git
