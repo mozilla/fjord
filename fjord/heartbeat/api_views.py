@@ -9,6 +9,14 @@ from fjord.base.utils import cors_enabled
 from fjord.journal.utils import j_error
 
 
+def log_error(post_data, errors):
+    j_error('heartbeat', 'HeartbeatV2API', 'post', 'packet errors',
+            metadata={
+                'post_data': post_data,
+                'errors': errors
+            })
+
+
 class HeartbeatV2API(rest_framework.views.APIView):
     @classmethod
     def as_view(cls, **initkwargs):
@@ -19,11 +27,7 @@ class HeartbeatV2API(rest_framework.views.APIView):
     def rest_error(self, post_data, errors, log_errors=True):
         statsd.incr('heartbeat.error')
         if log_errors:
-            j_error('heartbeat', 'HeartbeatV2API', 'post', 'packet errors',
-                    metadata={
-                        'post_data': post_data,
-                        'errors': errors
-                    })
+            log_error(post_data, errors)
         return rest_framework.response.Response(
             status=400,
             data={

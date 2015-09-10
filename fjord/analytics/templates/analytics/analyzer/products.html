@@ -20,7 +20,7 @@
       {% for prod in products %}
         <tr>
           <td>
-            <a href="{{ url('addproducts') }}?pk={{ prod.id }}">Edit</a>
+            <a href="{{ url('analytics_products') }}?pk={{ prod.id }}">Edit</a>
             {{ prod.id }}
           </td>
           <td>{{ prod.enabled }}</td>

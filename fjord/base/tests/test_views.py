@@ -102,7 +102,6 @@ class TestRobots(TestCase):
 
 
 class TestContribute(TestCase):
-
     def test_contribute(self):
         resp = self.client.get('/contribute.json')
         assert resp.status_code == 200
@@ -117,7 +116,7 @@ class TestContribute(TestCase):
 class TestNewUserView(ElasticTestCase):
     def setUp(self):
         super(TestNewUserView, self).setUp()
-        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
+        jane = AnalyzerProfileFactory().user
         self.jane = jane
 
     def test_redirect_to_dashboard_if_anonymous(self):
