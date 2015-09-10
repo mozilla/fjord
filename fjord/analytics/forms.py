@@ -1,7 +1,6 @@
 from django import forms
 
 from fjord.feedback.models import Product
-from fjord.heartbeat.models import Survey
 
 
 class ProductsUpdateForm(forms.ModelForm):
@@ -18,14 +17,4 @@ class ProductsUpdateForm(forms.ModelForm):
             'browser',
             'browser_data_browser',
             'notes'
-        ]
-
-
-class SurveyCreateForm(forms.ModelForm):
-    class Meta:
-        model = Survey
-        fields = [
-            'enabled',
-            'name',
-            'description',
         ]
