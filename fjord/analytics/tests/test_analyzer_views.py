@@ -1,20 +1,14 @@
-import logging
 from datetime import date, datetime, timedelta
 
 from pyquery import PyQuery
 
-from django.contrib.auth.models import Group
-
 from fjord.base.tests import (
-    LocalizingClient,
     AnalyzerProfileFactory,
+    LocalizingClient,
     reverse
 )
 from fjord.feedback.tests import ResponseFactory, ResponseEmailFactory
 from fjord.search.tests import ElasticTestCase
-
-
-logger = logging.getLogger(__name__)
 
 
 class TestAnalyticsDashboardView(ElasticTestCase):
