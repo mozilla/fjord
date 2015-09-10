@@ -147,9 +147,6 @@ mock==1.0.1
 # sha256: HDW0rCBs7y0kgWyJ-Jzyid09OM98RJuz-re_bUPwGx8
 ordereddict==1.1
 
-# sha256: Tq7o_1VEcD7dGVHtHcCyg9qZp090DZ-QVe7vzzKd4dE
-pbr==1.6.0
-
 # sha256: Q85g0F_6RCup08VyIZOq25PDgXS5-0ccjqfMv4NJu8o
 polib==1.0.7
 
