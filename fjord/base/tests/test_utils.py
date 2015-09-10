@@ -189,7 +189,7 @@ class TestActualIPPlusContext(TestCase):
         req = factory.post(url, {
             'description': desc
         })
-        key = actual_ip_plus_desc(req)
+        key = actual_ip_plus_desc('foogroup', req)
 
         # Key can't exceed memcached 250 character max
         length = len(key)
@@ -203,7 +203,7 @@ class TestActualIPPlusContext(TestCase):
         second_req = factory.post(url, {
             'description': second_desc
         })
-        second_key = actual_ip_plus_desc(second_req)
+        second_key = actual_ip_plus_desc('foogroup', second_req)
 
         # Two descriptions with the same ip address should produce
         # different keys.
@@ -224,7 +224,7 @@ class TestActualIPPlusContext(TestCase):
         req = factory.post(url, {
             'description': desc
         })
-        key = actual_ip_plus_desc(req)
+        key = actual_ip_plus_desc('foogroup', req)
 
         # Key can't exceed memcached 250 character max
         length = len(key)

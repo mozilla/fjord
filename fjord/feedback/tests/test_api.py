@@ -9,6 +9,7 @@ from django.test.client import Client
 
 from fjord.base.tests import TestCase, reverse
 from fjord.feedback import models
+from fjord.feedback.api_views import PER_HOUR_LIMIT
 from fjord.feedback.tests import ResponseFactory
 from fjord.search.tests import ElasticTestCase
 
@@ -433,7 +434,7 @@ class PostFeedbackAPITest(TestCase):
         assert r.status_code == 201
 
         feedback = models.Response.objects.latest(field_name='id')
-        assert feedback.happy == True
+        assert feedback.happy is True
         assert feedback.description == data['description']
         assert feedback.product == data['product']
 
@@ -509,7 +510,7 @@ class PostFeedbackAPITest(TestCase):
         assert r.status_code == 201
 
         feedback = models.Response.objects.latest(field_name='id')
-        assert feedback.happy == False
+        assert feedback.happy is False
 
     def test_whitespace_description_is_invalid(self):
         data = {
@@ -589,7 +590,7 @@ class PostFeedbackAPITest(TestCase):
         assert r.status_code == 201
 
         feedback = models.Response.objects.latest(field_name='id')
-        assert feedback.happy == True
+        assert feedback.happy is True
         assert feedback.description == data['description']
         assert feedback.platform == data['platform']
         assert feedback.product == data['product']
@@ -855,9 +856,7 @@ class PostFeedbackAPITest(TestCase):
                 reverse('feedback-api'),
                 content_type='application/json',
                 data=json.dumps(data))
-            assert (r.status_code == 201,
-                ('%s != 201 (%s)' % (r.status_code, url))
-                )
+            assert r.status_code == 201
 
             get_cache('default').clear()
 
@@ -903,8 +902,7 @@ class PostFeedbackAPIThrottleTest(TestCase):
         get_cache('default').clear()
 
     def test_throttle(self):
-        # We allow 50 posts per hour.
-        throttle_trigger = 50
+        throttle_trigger = PER_HOUR_LIMIT
 
         # Descriptions have to be unique otherwise we hit the
         # double-submit throttling. So we do this fancy thing here.
@@ -926,10 +924,12 @@ class PostFeedbackAPIThrottleTest(TestCase):
         # created
         for i in range(throttle_trigger):
             # django-ratelimit fails the throttling if we hit the url
-            # a fajillion times in rapid succession. For now, we add
-            # a sleep which means this test takes 5 seconds now.
+            # a fajillion times in rapid succession. For now, we add a
+            # sleep which makes this test run a little longer than it
+            # probably needs to.
+            #
             # FIXME: Look into this more for a better solution.
-            time.sleep(0.05)
+            time.sleep(0.01)
             r = self.client.post(
                 reverse('feedback-api'),
                 content_type='application/json',

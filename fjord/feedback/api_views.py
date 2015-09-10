@@ -225,6 +225,9 @@ class PublicFeedbackAPI(rest_framework.views.APIView):
         ]
 
 
+PER_HOUR_LIMIT = 50
+
+
 class PostFeedbackAPI(rest_framework.generics.CreateAPIView):
     serializer_class = models.PostResponseSerializer
 
@@ -235,8 +238,8 @@ class PostFeedbackAPI(rest_framework.generics.CreateAPIView):
 
         return [
             RatelimitThrottle(
-                rulename='api_post_50ph',
-                rate='50/h'),
+                rulename='api_post_{n}ph'.format(n=PER_HOUR_LIMIT),
+                rate='{n}/h'.format(n=PER_HOUR_LIMIT)),
             RatelimitThrottle(
                 rulename='api_post_doublesubmit_1p10m',
                 rate='1/10m',
