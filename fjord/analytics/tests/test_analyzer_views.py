@@ -5,9 +5,14 @@ from pyquery import PyQuery
 from fjord.base.tests import (
     AnalyzerProfileFactory,
     LocalizingClient,
-    reverse
+    reverse,
+    TestCase
 )
-from fjord.feedback.tests import ResponseFactory, ResponseEmailFactory
+from fjord.feedback.tests import (
+    ProductFactory,
+    ResponseFactory,
+    ResponseEmailFactory
+)
 from fjord.search.tests import ElasticTestCase
 
 
@@ -331,3 +336,68 @@ class TestSearchView(ElasticTestCase):
 
         # URL row, params row, header row and one row for every opinion
         assert len(lines) == 10
+
+
+class ProductsTestCase(TestCase):
+    client_class = LocalizingClient
+
+    def test_permissions_and_basic_view(self):
+        prod = ProductFactory(display_name='Rehan')
+        resp = self.client.get(reverse('analytics_products'))
+        assert resp.status_code == 403
+
+        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
+        self.client_login_user(jane)
+
+        resp = self.client.get(reverse('analytics_products'))
+        assert resp.status_code == 200
+        assert prod.display_name in resp.content
+
+    def test_add_product(self):
+        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
+        self.client_login_user(jane)
+
+        data = {
+            'enabled': True,
+            'display_name': 'Rehan',
+            'display_description': '*the* Rehan',
+            'db_name': 'rehan',
+            'slug': 'rehan',
+            'on_dashboard': True,
+            'on_picker': True,
+            'browser': '',
+            'browser_data_browser': '',
+            'notes': ''
+        }
+
+        resp = self.client.post(
+            reverse('analytics_products'), data, follow=True
+        )
+        assert resp.status_code == 200
+        assert data['display_name'] in resp.content
+
+    def test_update_product(self):
+        prod = ProductFactory(display_name='Rehan')
+
+        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
+        self.client_login_user(jane)
+
+        data = {
+            'id': prod.id,
+            'enabled': prod.enabled,
+            'display_name': 'Rehan v2',
+            'display_description': prod.display_description,
+            'db_name': prod.db_name,
+            'slug': prod.slug,
+            'on_dashboard': prod.on_dashboard,
+            'on_picker': prod.on_picker,
+            'borwser': '',
+            'browser_data_browser': '',
+            'notes': ''
+        }
+
+        resp = self.client.post(
+            reverse('analytics_products'), data, follow=True
+        )
+        assert resp.status_code == 200
+        assert data['display_name'] in resp.content

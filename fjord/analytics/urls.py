@@ -26,7 +26,7 @@ urlpatterns += patterns(
     url(r'^analytics/?$', 'analytics_dashboard',
         name='analytics_dashboard'),
     url(r'^analytics/products/?$', ProductsUpdateView.as_view(),
-        name='addproducts'),
+        name='analytics_products'),
     url(r'^analytics/search/?$', 'analytics_search',
         name='analytics_search'),
 )

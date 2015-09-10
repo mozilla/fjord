@@ -426,7 +426,7 @@ def analytics_search(request):
 
 class ProductsUpdateView(FormView):
     """An administrator view for showing, adding, and updating the products."""
-    template_name = 'analytics/analyzer/addproducts.html'
+    template_name = 'analytics/analyzer/products.html'
     form_class = ProductsUpdateForm
     success_url = 'products'
 
