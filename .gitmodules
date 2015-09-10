@@ -34,9 +34,6 @@
 [submodule "vendor/src/commonware"]
 	path = vendor/src/commonware
 	url = git://github.com/jsocol/commonware.git
-[submodule "vendor/src/django-appconf"]
-	path = vendor/src/django-appconf
-	url = git://github.com/jezdez/django-appconf.git
 [submodule "vendor/src/django-cronjobs"]
 	path = vendor/src/django-cronjobs
 	url = git://github.com/jsocol/django-cronjobs.git
