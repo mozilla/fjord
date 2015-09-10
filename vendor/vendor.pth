@@ -26,7 +26,6 @@ src/cssselect
 src/dennis
 src/django
 src/django-adminplus
-src/django-appconf
 src/django-arecibo
 src/babel
 src/django-browserid
