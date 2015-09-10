@@ -8,7 +8,6 @@ packages/importlib
 packages/mock-1.0.1
 packages/ordereddict
 packages/polib-1.0.7
-packages/python-dateutil
 packages/python-memcached
 packages/pytz-2015.4
 packages/requests-2.7.0
@@ -28,6 +27,7 @@ src/django
 src/django-adminplus
 src/django-arecibo
 src/babel
+src/dateutil
 src/django-browserid
 src/django_compressor
 src/django-cronjobs
