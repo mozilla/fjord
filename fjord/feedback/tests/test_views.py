@@ -95,14 +95,14 @@ class TestFeedback(TestCase):
         url = reverse('feedback', args=(u'firefox',))
         r = self.client.post(url, {
             'happy': 0,
-            'description': u"Firefox doesn't make me sandwiches. :("
+            'description': u"Firefox doesn't make me sandwiches :("
         })
 
         self.assertRedirects(r, reverse('thanks'))
         assert amount + 1 == models.Response.objects.count()
 
         feedback = models.Response.objects.latest(field_name='id')
-        assert u"Firefox doesn't make me sandwiches. :(" == feedback.description
+        assert u"Firefox doesn't make me sandwiches :(" == feedback.description
         assert u'' == feedback.url
         assert False == feedback.happy
 
@@ -121,14 +121,14 @@ class TestFeedback(TestCase):
         r = self.client.get(url)
 
         assert r.status_code == 200
-        assert r.context['feedback'] == None
-        assert r.context['suggestions'] == None
+        assert r.context['feedback'] is None
+        assert r.context['suggestions'] is None
 
     def test_response_id_in_qs_authenticated(self):
         """Verify response_id in querystring overrides session id"""
         # Create analyzer and log in.
 
-        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
+        jane = AnalyzerProfileFactory().user
         self.client_login_user(jane)
 
         # Create some feedback which sets the response_id in the
@@ -927,7 +927,7 @@ class TestDeprecatedAndroidFeedback(TestCase):
         r = self.client.post(reverse('feedback'), data, HTTP_USER_AGENT=ua)
         assert r.status_code == 302
         feedback = models.Response.objects.latest(field_name='id')
-        assert feedback.happy == True
+        assert feedback.happy is True
         assert feedback.url == data['url']
         assert feedback.description == data['description']
         assert feedback.device == data['device']
@@ -954,7 +954,7 @@ class TestDeprecatedAndroidFeedback(TestCase):
         r = self.client.post(reverse('feedback'), data, HTTP_USER_AGENT=ua)
         assert r.status_code == 302
         feedback = models.Response.objects.latest(field_name='id')
-        assert feedback.happy == False
+        assert feedback.happy is False
         assert feedback.url == data['url']
         assert feedback.description == data['description']
 
@@ -980,7 +980,7 @@ class TestDeprecatedAndroidFeedback(TestCase):
         r = self.client.post(reverse('feedback'), data, HTTP_USER_AGENT=ua)
         assert r.status_code == 302
         feedback = models.Response.objects.latest(field_name='id')
-        assert feedback.happy == False
+        assert feedback.happy is False
         assert feedback.url == data['url']
         assert feedback.description == data['description']
 
@@ -1004,7 +1004,7 @@ class TestDeprecatedAndroidFeedback(TestCase):
         r = self.client.post(reverse('feedback'), data, HTTP_USER_AGENT=ua)
         assert r.status_code == 302
         feedback = models.Response.objects.latest(field_name='id')
-        assert feedback.happy == True
+        assert feedback.happy is True
         assert feedback.url == u''
         assert feedback.description == data['description']
 
@@ -1036,7 +1036,7 @@ class TestDeprecatedAndroidFeedback(TestCase):
         assert feedback.platform == u''
 
         # This comes from the client.post url.
-        assert ( u'en-US' == feedback.locale, u'en-US')
+        assert feedback.locale == u'en-US'
         # This comes from the user agent from the LocalizingClient
         assert feedback.product == u''
         assert feedback.channel == u''

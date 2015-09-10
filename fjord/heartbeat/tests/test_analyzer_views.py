@@ -18,7 +18,7 @@ class HeartbeatHBDataTestCase(TestCase):
         resp = self.client.get(reverse('hb_data'))
         assert resp.status_code == 403
 
-        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
+        jane = AnalyzerProfileFactory().user
         self.client_login_user(jane)
 
         resp = self.client.get(reverse('hb_data'))
@@ -36,7 +36,7 @@ class HeartbeatHBErrorLogTestCase(TestCase):
         resp = self.client.get(reverse('hb_errorlog'))
         assert resp.status_code == 403
 
-        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
+        jane = AnalyzerProfileFactory().user
         self.client_login_user(jane)
 
         resp = self.client.get(reverse('hb_errorlog'))
@@ -52,7 +52,7 @@ class HeartbeatSurveysTestCase(TestCase):
         resp = self.client.get(reverse('hb_surveys'))
         assert resp.status_code == 403
 
-        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
+        jane = AnalyzerProfileFactory().user
         self.client_login_user(jane)
 
         resp = self.client.get(reverse('hb_surveys'))
@@ -66,7 +66,7 @@ class HeartbeatSurveysTestCase(TestCase):
             'enabled': True
         }
 
-        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
+        jane = AnalyzerProfileFactory().user
         self.client_login_user(jane)
 
         resp = self.client.post(reverse('hb_surveys'), data)
@@ -93,7 +93,7 @@ class HeartbeatSurveysTestCase(TestCase):
         )
         assert resp.status_code == 403
 
-        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
+        jane = AnalyzerProfileFactory().user
         self.client_login_user(jane)
 
         resp = self.client.post(

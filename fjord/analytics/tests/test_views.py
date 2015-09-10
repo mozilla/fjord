@@ -376,9 +376,9 @@ class TestResponseview(ElasticTestCase):
         secretarea = pq('dl.secret')
         assert len(secretarea) == 0
 
-        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
-
+        jane = AnalyzerProfileFactory().user
         self.client_login_user(jane)
+
         r = self.client.get(reverse('response_view', args=(resp.id,)))
 
         assert 200 == r.status_code
@@ -401,7 +401,7 @@ class SpotTranslateTestCase(ElasticTestCase):
     def test_spot_translate(self):
         resp = ResponseFactory(happy=True, description=u'the bestest best!')
 
-        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
+        jane = AnalyzerProfileFactory().user
         self.client_login_user(jane)
 
         data = {'system': 'gengo_machine'}

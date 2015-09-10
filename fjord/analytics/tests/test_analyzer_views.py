@@ -31,8 +31,7 @@ class TestAnalyticsDashboardView(ElasticTestCase):
         assert 403 == resp.status_code
 
         # Verify analyzers can see analytics dashboard link
-        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
-
+        jane = AnalyzerProfileFactory().user
         self.client_login_user(jane)
 
         resp = self.client.get(reverse('dashboard'))
@@ -80,8 +79,7 @@ class TestSearchView(ElasticTestCase):
         self.refresh()
 
         # Create analyzer and log analyzer in
-        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
-
+        jane = AnalyzerProfileFactory().user
         self.client_login_user(jane)
 
     def test_zero_fill(self):
@@ -346,7 +344,7 @@ class ProductsTestCase(TestCase):
         resp = self.client.get(reverse('analytics_products'))
         assert resp.status_code == 403
 
-        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
+        jane = AnalyzerProfileFactory().user
         self.client_login_user(jane)
 
         resp = self.client.get(reverse('analytics_products'))
@@ -354,7 +352,7 @@ class ProductsTestCase(TestCase):
         assert prod.display_name in resp.content
 
     def test_add_product(self):
-        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
+        jane = AnalyzerProfileFactory().user
         self.client_login_user(jane)
 
         data = {
@@ -379,7 +377,7 @@ class ProductsTestCase(TestCase):
     def test_update_product(self):
         prod = ProductFactory(display_name='Rehan')
 
-        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
+        jane = AnalyzerProfileFactory().user
         self.client_login_user(jane)
 
         data = {
