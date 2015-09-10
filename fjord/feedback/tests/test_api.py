@@ -924,10 +924,12 @@ class PostFeedbackAPIThrottleTest(TestCase):
         # created
         for i in range(throttle_trigger):
             # django-ratelimit fails the throttling if we hit the url
-            # a fajillion times in rapid succession. For now, we add
-            # a sleep which means this test takes 5 seconds now.
+            # a fajillion times in rapid succession. For now, we add a
+            # sleep which makes this test run a little longer than it
+            # probably needs to.
+            #
             # FIXME: Look into this more for a better solution.
-            time.sleep(0.05)
+            time.sleep(0.01)
             r = self.client.post(
                 reverse('feedback-api'),
                 content_type='application/json',

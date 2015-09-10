@@ -102,8 +102,8 @@ django-picklefield==0.3.1
 # sha256: xxHohhXvN7I1nOMJeOrnxl5UkkrrBDIpZWxeI5Bl5ZY
 django-pipeline==1.5.4
 
-# sha256: -thF7ifqqSii7RbAEh4rtd0TzN6V0cAUTSP5pCUMGmw
-django-ratelimit==0.4.0
+# sha256: k9q80xMaiNb9Gf9N4Kg1HtRLTslD6NWNJzBvf6-IIa8
+django-ratelimit==0.6.0
 
 # sha256: wOkPMEu_bxD2PgAZECmAyVDcaDMm0qTlDnGZ3sxDw2o
 django-statsd-mozilla==0.3.15

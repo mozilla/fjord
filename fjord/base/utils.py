@@ -18,7 +18,7 @@ from django.utils.encoding import force_str, force_text
 from django.utils.feedgenerator import Atom1Feed
 
 from product_details import product_details
-from ratelimit.helpers import is_ratelimited
+from ratelimit.utils import is_ratelimited
 from rest_framework.throttling import BaseThrottle
 from statsd.defaults.django import statsd
 
@@ -279,7 +279,7 @@ class Atom1FeedWithRelatedLinks(Atom1Feed):
                 attrs={'href': item['link_related'], 'rel': 'related'})
 
 
-def actual_ip(req):
+def actual_ip(group, req):
     """Returns the actual ip address
 
     Our dev, stage and prod servers are behind a reverse proxy, so the ip
@@ -295,7 +295,7 @@ def actual_ip(req):
 
 def actual_ip_plus_context(contextfun):
     """Returns a key function that adds md5 hashed context to the key"""
-    def _actual_ip_plus_context(req, *args, **kwargs):
+    def _actual_ip_plus_context(group, req, *args, **kwargs):
         # Force whatever comes out of contextfun to be bytes.
         context = force_str(contextfun(req))
 
@@ -305,7 +305,7 @@ def actual_ip_plus_context(contextfun):
         context = hasher.hexdigest()
 
         # Then return the ip address plus a : plus the desc md5 hash.
-        return actual_ip(req) + ':' + context
+        return actual_ip(group, req) + ':' + context
     return _actual_ip_plus_context
 
 
@@ -323,14 +323,30 @@ def ratelimit(rulename, keyfun=actual_ip, rate='5/m'):
         throttling. defaults to actual_ip.
     :arg rate: (optional) rate to throttle at. defaults to 5/m.
 
+    .. Note::
+
+        Unlike django-ratelimit's ratelimit decorator, this does
+        **not** redirect the user or handle the rate limiting.  Caller
+        must check the request for 'limited' and redirect/handle
+        accordingly.
+
+        For example::
+
+            @ratelimit(rulename='foo', keyfun=actual_ip, rate='1/10m')
+            def view(request):
+                if getattr(request, 'limited', False):
+                    # handle ratelimit here!
+                    raise PermissionDenied()
+
     """
     def decorator(fn):
         @wraps(fn)
         def _wrapped(request, *args, **kwargs):
             already_limited = getattr(request, 'limited', False)
             ratelimited = is_ratelimited(
-                request=request, increment=True, ip=False, method=['POST'],
-                field=None, rate=rate, keys=keyfun)
+                request=request, group=rulename,
+                key=keyfun, rate=rate, method=['POST'],
+                increment=True)
 
             if not already_limited and ratelimited:
                 statsd.incr('throttled.' + rulename)
@@ -387,13 +403,15 @@ class RatelimitThrottle(BaseThrottle):
         return (num, (multiplier * period))
 
     def allow_request(self, request, view):
+        already_limited = getattr(request, 'limited', False)
         ratelimited = is_ratelimited(
-            request=request, increment=True, ip=False, method=self.methods,
-            field=None, rate=self.rate, keys=self.keyfun)
+            request=request, group=self.rulename,
+            key=self.keyfun, rate=self.rate, method=self.methods,
+            increment=True)
 
         if ratelimited:
-            # Failed rate-limiting, so this request is not allowed.
-            statsd.incr('throttled.' + self.rulename)
+            if not already_limited:
+                statsd.incr('throttled.' + self.rulename)
             return self.throttle_failure()
 
         # Did not trigger rate-limiting, so this request is allowed.
