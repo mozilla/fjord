@@ -1,24 +1,19 @@
 import json
-import logging
 from datetime import datetime, timedelta
 
 from elasticsearch.exceptions import ConnectionError
 from pyquery import PyQuery
 
-from django.contrib.auth.models import Group
 from django.http import QueryDict
 
 from fjord.analytics import views
 from fjord.base.tests import (
-    LocalizingClient,
     AnalyzerProfileFactory,
+    LocalizingClient,
     reverse,
 )
 from fjord.feedback.tests import ResponseFactory, ProductFactory
 from fjord.search.tests import ElasticTestCase
-
-
-logger = logging.getLogger(__name__)
 
 
 class TestDashboardView(ElasticTestCase):
@@ -398,3 +393,29 @@ class TestResponseview(ElasticTestCase):
         # Verify there is an mlt section in the secret area.
         mlt = pq('dd#mlt')
         assert len(mlt) == 1
+
+
+class SpotTranslateTestCase(ElasticTestCase):
+    client_class = LocalizingClient
+
+    def test_spot_translate(self):
+        resp = ResponseFactory(happy=True, description=u'the bestest best!')
+
+        jane = AnalyzerProfileFactory(user__email='jane@example.com').user
+        self.client_login_user(jane)
+
+        data = {'system': 'gengo_machine'}
+        resp = self.client.post(
+            reverse('spot_translate', args=(resp.id,)), data,
+            follow=True
+        )
+
+        assert resp.status_code == 200
+
+        # Assert we show a message to the user
+        assert len(resp.context['messages']) == 1
+
+        # FIXME: We could assert that a translation task was created,
+        # but that involves a bunch of other setup and stuff internal
+        # to the translation system and that's more than I want to
+        # deal with for a basic test.
