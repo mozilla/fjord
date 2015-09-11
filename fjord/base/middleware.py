@@ -1,3 +1,9 @@
+"""
+The middlewares in this file do mobile detection, provide a user override,
+and provide a cookie override. They must be used in the correct order.
+MobileMiddleware must always come after any of the other middlewares in this
+file in `settings.MIDDLEWARE_CLASSES`.
+"""
 import urllib
 from warnings import warn
 
@@ -10,14 +16,6 @@ from fjord.base import urlresolvers
 from fjord.base.browsers import parse_ua
 from fjord.base.helpers import urlparams
 from fjord.base.l10n import install_gettext
-
-
-"""
-The middlewares in this file do mobile detection, provide a user override,
-and provide a cookie override. They must be used in the correct order.
-MobileMiddleware must always come after any of the other middlewares in this
-file in `settings.MIDDLEWARE_CLASSES`.
-"""
 
 
 MOBILE_COOKIE = getattr(settings, 'MOBILE_COOKIE', 'mobile')
@@ -117,9 +115,9 @@ class LocaleURLMiddleware(object):
 
     def __init__(self):
         if not settings.USE_I18N or not settings.USE_L10N:
-            warn("USE_I18N or USE_L10N is False but LocaleURLMiddleware is "
-                 "loaded. Consider removing fjord.base.middleware."
-                 "LocaleURLMiddleware from your MIDDLEWARE_CLASSES setting.")
+            warn('USE_I18N or USE_L10N is False but LocaleURLMiddleware is '
+                 'loaded. Consider removing fjord.base.middleware.'
+                 'LocaleURLMiddleware from your MIDDLEWARE_CLASSES setting.')
 
         self.exempt_urls = getattr(settings, 'FF_EXEMPT_LANG_PARAM_URLS', ())
 
