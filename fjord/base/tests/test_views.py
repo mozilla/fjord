@@ -10,7 +10,8 @@ from fjord.base.tests import (
     LocalizingClient,
     TestCase,
     AnalyzerProfileFactory,
-    reverse
+    reverse,
+    template_used
 )
 from fjord.base.views import IntentionalException
 from fjord.search.tests import ElasticTestCase
@@ -22,18 +23,18 @@ class TestAbout(TestCase):
     def test_about_view(self):
         resp = self.client.get(reverse('about-view'))
         assert resp.status_code == 200
-        self.assertTemplateUsed(resp, 'about.html')
+        assert template_used(resp, 'about.html')
 
 
 class TestLoginFailure(TestCase):
     def test_login_failure_view(self):
         resp = self.client.get(reverse('login-failure'))
         assert resp.status_code == 200
-        self.assertTemplateUsed(resp, 'login_failure.html')
+        assert template_used(resp, 'login_failure.html')
 
         resp = self.client.get(reverse('login-failure'), {'mobile': 1})
         assert resp.status_code == 200
-        self.assertTemplateUsed(resp, 'mobile/login_failure.html')
+        assert template_used(resp, 'mobile/login_failure.html')
 
 
 # Note: This needs to be an ElasticTestCase because the view does ES
@@ -79,15 +80,6 @@ class TestMonitorView(ElasticTestCase):
             views.test_memcached = test_memcached
 
 
-class TestFileNotFound(TestCase):
-    client_class = LocalizingClient
-
-    def test_404(self):
-        request = self.client.get('/a/path/that/should/never/exist')
-        assert request.status_code == 404
-        self.assertTemplateUsed(request, '404.html')
-
-
 class TestServerError(TestCase):
     @override_settings(SHOW_STAGE_NOTICE=True)
     def test_500(self):
@@ -99,14 +91,14 @@ class TestRobots(TestCase):
     def test_robots(self):
         resp = self.client.get('/robots.txt')
         assert resp.status_code == 200
-        self.assertTemplateUsed(resp, 'robots.txt')
+        assert template_used(resp, 'robots.txt')
 
 
 class TestContribute(TestCase):
     def test_contribute(self):
         resp = self.client.get('/contribute.json')
         assert resp.status_code == 200
-        self.assertTemplateUsed(resp, 'contribute.json')
+        assert template_used(resp, 'contribute.json')
 
     def test_contribute_if_valid_json(self):
         resp = self.client.get('/contribute.json')
@@ -125,14 +117,14 @@ class TestNewUserView(ElasticTestCase):
         # sure they get redirected to the dashboard.
         resp = self.client.get(reverse('new-user-view'), follow=True)
         assert resp.status_code == 200
-        self.assertTemplateNotUsed('new_user.html')
-        self.assertTemplateUsed('analytics/dashboard.html')
+        assert not template_used(resp, 'new_user.html')
+        assert template_used(resp, 'analytics/dashboard.html')
 
     def test_default_next_url(self):
         self.client_login_user(self.jane)
         resp = self.client.get(reverse('new-user-view'))
         assert resp.status_code == 200
-        self.assertTemplateUsed('new_user.html')
+        assert template_used(resp, 'new_user.html')
 
         # Pull out next link
         pq = PyQuery(resp.content)
@@ -146,7 +138,7 @@ class TestNewUserView(ElasticTestCase):
             'next': '/ou812'  # stretches the meaning of 'valid'
         })
         assert resp.status_code == 200
-        self.assertTemplateUsed('new_user.html')
+        assert template_used(resp, 'new_user.html')
 
         # Pull out next link which is naughty, so it should have been
         # replaced with a dashboard link.
@@ -161,7 +153,7 @@ class TestNewUserView(ElasticTestCase):
             'next': 'javascript:prompt%28document.cookie%29'
         })
         assert resp.status_code == 200
-        self.assertTemplateUsed('new_user.html')
+        assert template_used(resp, 'new_user.html')
 
         # Pull out next link which is naughty, so it should have been
         # replaced with a dashboard link.

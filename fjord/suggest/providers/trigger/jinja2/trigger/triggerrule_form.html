@@ -17,7 +17,7 @@
       <form id="trigger-form" class="analyzer-form" action="{{ action_url }}" method="post">
         <button class="submitBtn half">Save</button>
         <button class="testBtn half">Test</button>
-        {{ csrf() }}
+        {% csrf_token %}
         {{ form.as_p() }}
         <button class="submitBtn half">Save</button>
         <button class="testBtn half">Test</button>

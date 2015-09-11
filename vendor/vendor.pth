@@ -33,10 +33,11 @@ src/django_compressor
 src/django-eadred
 src/django-extensions
 src/django-grappelli
+src/django-jinja
 src/django-mobility
+src/django-multidb-router
 src/django-pipeline
 src/django-product-details
-src/django-multidb-router
 src/django-ratelimit
 src/django-rest-framework
 src/django-session-csrf
@@ -50,8 +51,6 @@ src/factory_boy
 src/funcsigs
 src/gengo-python
 src/html5lib-python
-src/jingo
-src/jingo-minify
 src/kombu
 src/nuggets
 src/py-amqp

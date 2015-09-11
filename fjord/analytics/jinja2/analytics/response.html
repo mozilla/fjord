@@ -21,7 +21,7 @@
 {% endif %}
 {% block content_middle %}
   <div class="block feedback">
-    <h2>{{ _('Response id: {id}')|f(id=response.id) }}</h2>
+    <h2>{{ _('Response id: {id}')|fe(id=response.id) }}</h2>
 
     <ul>
       <li class="opinion">
@@ -59,13 +59,13 @@
               {% elif user.is_authenticated() and user.has_perm('analytics.can_view_dashboard') %}
                 <div class="inline secret">
                   <form method="POST" action="{{ url('spot_translate', response.id) }}">
-                    {{ csrf() }}
+                    {% csrf_token %}
                     <input type="hidden" name="system" value="gengo_machine">
                     <button type="submit">{{ _('Translate (machine)') }}</button>
                   </form>
                   {% if user.is_superuser %}
                     <form method="POST" action="{{ url('spot_translate', response.id) }}">
-                      {{ csrf() }}
+                      {% csrf_token %}
                       <input type="hidden" name="system" value="gengo_human">
                       <button type="submit">{{ _('Translate (human)') }}</button>
                     </form>
