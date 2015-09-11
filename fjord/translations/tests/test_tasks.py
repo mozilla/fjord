@@ -1,6 +1,6 @@
-from ..models import SuperModel
-from ..tasks import translate_tasks_by_id_list
 from fjord.base.tests import TestCase
+from fjord.translations.models import SuperModel
+from fjord.translations.tasks import translate_tasks_by_id_list
 
 
 class TranslateTasksByIdListTestCase(TestCase):

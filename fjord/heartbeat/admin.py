@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Survey
+from fjord.heartbeat.models import Survey
 
 
 class SurveyAdmin(admin.ModelAdmin):

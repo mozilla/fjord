@@ -4,8 +4,8 @@ import rest_framework.views
 import rest_framework.response
 from statsd.defaults.django import statsd
 
-from .models import Answer, AnswerSerializer
 from fjord.base.utils import cors_enabled
+from fjord.heartbeat.models import Answer, AnswerSerializer
 from fjord.journal.utils import j_error
 
 

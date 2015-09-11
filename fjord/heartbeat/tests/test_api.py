@@ -1,9 +1,9 @@
 import json
 import time
 
-from . import SurveyFactory
-from ..models import Answer
 from fjord.base.tests import TestCase, reverse
+from fjord.heartbeat.models import Answer
+from fjord.heartbeat.tests import SurveyFactory
 from fjord.journal.models import Record
 
 
@@ -152,7 +152,7 @@ class HeartbeatPostAPITest(TestCase):
 
             assert getattr(ans, field) == data[field]
 
-        assert ans.is_test == False
+        assert ans.is_test is False
 
     def test_country_unknown(self):
         """This is a stopgap fix for handling 'unknown' value for country"""
@@ -318,15 +318,15 @@ class HeartbeatPostAPITest(TestCase):
         # Make sure the answer made it to the db and that the data
         # matches.
         ans = Answer.objects.latest('id')
-        assert ans.person_id ==  data['person_id']
+        assert ans.person_id == data['person_id']
         assert ans.survey_id.name == data['survey_id']
-        assert ans.flow_id ==  data['flow_id']
-        assert ans.question_id ==  data['question_id']
-        assert ans.updated_ts ==  data['updated_ts']
-        assert ans.question_text ==  data['question_text']
-        assert ans.variation_id ==  data['variation_id']
-        assert ans.score ==  None
-        assert ans.max_score == None
+        assert ans.flow_id == data['flow_id']
+        assert ans.question_id == data['question_id']
+        assert ans.updated_ts == data['updated_ts']
+        assert ans.question_text == data['question_text']
+        assert ans.variation_id == data['variation_id']
+        assert ans.score is None
+        assert ans.max_score is None
 
         ans_id = ans.id
 
@@ -420,7 +420,7 @@ class HeartbeatPostAPITest(TestCase):
             reverse('heartbeat-api'),
             HTTP_ACCESS_CONTROL_REQUEST_METHOD='',
             HTTP_ACCESS_CONTROL_REQUEST_HEADERS='')
-        assert resp['Access-Control-Allow-Methods'] =='POST'
+        assert resp['Access-Control-Allow-Methods'] == 'POST'
         assert resp['Access-Control-Allow-Origin'] == '*'
 
     # FIXME: test bad types and validation so we can suss out

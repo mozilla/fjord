@@ -1,8 +1,8 @@
 import rest_framework.views
 import rest_framework.response
 
-from .models import get_product_details_history
 from fjord.base.utils import smart_str
+from fjord.events.models import get_product_details_history
 
 
 class EventAPI(rest_framework.views.APIView):

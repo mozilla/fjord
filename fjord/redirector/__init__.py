@@ -18,4 +18,6 @@ def get_redirectors():
     return list(_REDIRECTORS)
 
 
-from .base import build_redirect_url, Redirector, RedirectParseError
+from fjord.redirector.base import (
+    build_redirect_url, Redirector, RedirectParseError
+)

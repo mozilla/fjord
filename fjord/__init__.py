@@ -13,6 +13,7 @@ _has_setup_vendor_path = False
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+
 def path(*a):
     return os.path.join(ROOT, *a)
 
@@ -58,4 +59,4 @@ setup_vendor_path()
 # Setup celery
 # This will make sure the app is always imported when
 # Django starts so that shared_task will use this app.
-from .celery import app as celery_app
+from fjord.celery import app as celery_app  # noqa
