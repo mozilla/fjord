@@ -1,5 +1,4 @@
 import inspect
-import os
 from functools import total_ordering, wraps
 
 from django.conf import settings
@@ -19,25 +18,6 @@ from fjord.base.urlresolvers import reverse  # noqa
 from fjord.base.urlresolvers import is_supported_nonlocale, split_path
 
 from fjord.base.models import Profile
-
-
-def has_environ_variable(var):
-    """Returns True if a variable exists in the environment"""
-    return var in os.environ
-
-
-def eq_(a, b, msg=None):
-    if msg:
-        assert a == b, msg
-    else:
-        assert a == b
-
-
-def ok_(a, msg=None):
-    if msg:
-        assert a, msg
-    else:
-        assert a
 
 
 def with_waffle(flagname, flagvalue=True):

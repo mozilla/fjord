@@ -1,6 +1,6 @@
 from ..models import SuperModel
 from ..tasks import translate_tasks_by_id_list
-from fjord.base.tests import eq_, TestCase
+from fjord.base.tests import TestCase
 
 
 class TranslateTasksByIdListTestCase(TestCase):
@@ -12,13 +12,13 @@ class TranslateTasksByIdListTestCase(TestCase):
         obj.save()
 
         # Verify no translation, yet
-        eq_(obj.trans_desc, u'')
+        assert obj.trans_desc == u''
         translate_tasks_by_id_list.delay(model_path, [obj.id])
 
         # Fetch the object from the db to verify it's been translated.
         obj = SuperModel.objects.get(id=obj.id)
 
-        eq_(obj.trans_desc, u'THIS IS A TEST STRING')
+        assert obj.trans_desc == u'THIS IS A TEST STRING'
 
     def test_many(self):
         model_path = SuperModel.__module__ + '.' + SuperModel.__name__
@@ -36,4 +36,4 @@ class TranslateTasksByIdListTestCase(TestCase):
             obj = SuperModel.objects.get(id=obj.id)
             # Note: The fake translation just uppercases things. We're
             # abusing inner knowledge of that here.
-            eq_(obj.trans_desc, obj.desc.upper())
+            assert obj.trans_desc == obj.desc.upper()
