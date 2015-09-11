@@ -1,7 +1,8 @@
 # NOTE: The code in this file was mostly copied from tower.
 import re
 
-from django.utils.translation import ugettext, ungettext
+# FIXME
+# from django.utils.translation import ugettext, ungettext
 
 import jinja2
 from babel.messages.extract import extract_python as babel_extract_python
@@ -9,16 +10,17 @@ from jinja2 import ext
 from jinja2.ext import InternationalizationExtension
 
 
-def install_gettext():
-    """Install gettext into the Jinja2 environment."""
-    class Translation(object):
-        # We pass this object to jinja so it can use django's gettext
-        # implementation.
-        ugettext = staticmethod(ugettext)
-        ungettext = staticmethod(ungettext)
+# FIXME
+# def install_gettext():
+#     """Install gettext into the Jinja2 environment."""
+#     class Translation(object):
+#         # We pass this object to jinja so it can use django's gettext
+#         # implementation.
+#         ugettext = staticmethod(ugettext)
+#         ungettext = staticmethod(ungettext)
 
-    import jingo
-    jingo.env.install_gettext_translations(Translation)
+#     import jingo
+#     jingo.env.install_gettext_translations(Translation)
 
 
 def add_context(context, message):

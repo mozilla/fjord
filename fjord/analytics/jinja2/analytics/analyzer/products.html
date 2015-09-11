@@ -48,7 +48,7 @@
       db_name for an existing product since it'll orphan responses.
     </p>
     <form class="analyzer-form" action="" method="POST">
-      {{ csrf() }}
+      {% csrf_token %}
       {{ form.as_p() }}
       <input type="submit" value="Save">
     </form>

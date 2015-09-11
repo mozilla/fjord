@@ -6,6 +6,7 @@ from fjord.base.tests import (
     AnalyzerProfileFactory,
     LocalizingClient,
     reverse,
+    template_used,
     TestCase
 )
 from fjord.feedback.tests import (
@@ -94,7 +95,7 @@ class TestSearchView(ElasticTestCase):
         })
         # The histogram data is of the form [d, v], where d is a number of
         # milliseconds since the epoch, and v is the value at that time stamp.
-        dates = [d[0] for d in r.context['histogram'][0]['data']]
+        dates = [d[0] for d in r.jinja_context['histogram'][0]['data']]
         dates = [date.fromtimestamp(d // 1000) for d in dates]
         days = [d.day for d in dates]
 
@@ -114,8 +115,7 @@ class TestSearchView(ElasticTestCase):
     def test_front_page(self):
         resp = self.client.get(self.url)
         assert resp.status_code == 200
-        self.assertTemplateUsed(resp, 'analytics/analyzer/search.html')
-
+        assert template_used(resp, 'analytics/analyzer/search.html')
         pq = PyQuery(resp.content)
         assert len(pq('li.opinion')) == 7
 

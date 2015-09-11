@@ -17,7 +17,6 @@ from elasticsearch.helpers import bulk_index
 from elasticsearch_dsl import DocType, Search, Index
 from elasticsearch_dsl.connections import connections
 
-
 # Note: This module should not import any Fjord modules. Otherwise we
 # get into import recursion issues.
 

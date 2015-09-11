@@ -27,14 +27,14 @@ from django.utils.decorators import method_decorator
 
 from fjord.analytics.forms import ProductsUpdateForm
 from fjord.analytics.utils import counts_to_options, zero_fill
-from fjord.base.helpers import locale_name
+from fjord.base.templatetags.jinja_helpers import locale_name
 from fjord.base.utils import (
     analyzer_required,
     check_new_user,
     smart_int,
     smart_date
 )
-from fjord.feedback.helpers import country_name
+from fjord.feedback.templatetags.jinja_helpers import country_name
 from fjord.feedback.models import Product, Response, ResponseDocType
 from fjord.search.index import es_required_or_50x
 from fjord.search.utils import es_error_statsd

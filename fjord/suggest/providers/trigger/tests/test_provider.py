@@ -129,7 +129,7 @@ class TestTrigger(SuggesterTestMixin, RedirectorTestMixin, TestCase):
             data={'happy': 0, 'description': u'rc4 is awesome'}
         )
 
-        links = resp.context['suggestions']
+        links = resp.jinja_context['suggestions']
 
         assert len(links) == 0
 
@@ -140,7 +140,7 @@ class TestTrigger(SuggesterTestMixin, RedirectorTestMixin, TestCase):
             data={'happy': 0, 'description': u'rc4 is awesome'}
         )
 
-        links = resp.context['suggestions']
+        links = resp.jinja_context['suggestions']
 
         assert len(links) == 1
         assert links[0].provider == PROVIDER
@@ -156,7 +156,7 @@ class TestTrigger(SuggesterTestMixin, RedirectorTestMixin, TestCase):
             data={'happy': 0, 'description': u'rc4 is awesome'}
         )
 
-        links = resp.context['suggestions']
+        links = resp.jinja_context['suggestions']
 
         assert len(links) == 0
 
@@ -177,7 +177,7 @@ class TestTrigger(SuggesterTestMixin, RedirectorTestMixin, TestCase):
             data={'happy': 0, 'description': u'rc4 is awesome'}
         )
 
-        links = resp.context['suggestions']
+        links = resp.jinja_context['suggestions']
 
         # The disabled one won't match, but the other two will match in the
         # sort order.
@@ -205,7 +205,7 @@ class TestTrigger(SuggesterTestMixin, RedirectorTestMixin, TestCase):
             data={'happy': 0, 'description': u'rc4 is awesome'}
         )
 
-        links = resp.context['suggestions']
+        links = resp.jinja_context['suggestions']
 
         # The disabled one won't match, but the other two will match in the
         # sort order.
@@ -225,7 +225,7 @@ class TestTrigger(SuggesterTestMixin, RedirectorTestMixin, TestCase):
             data={'happy': 0, 'description': u'rc4 is awesome'}
         )
 
-        links = resp.context['suggestions']
+        links = resp.jinja_context['suggestions']
 
         assert len(links) == 1
         assert links[0].url == build_redirect_url(format_redirect(tr.slug))
@@ -244,7 +244,7 @@ class TestTrigger(SuggesterTestMixin, RedirectorTestMixin, TestCase):
             data={'happy': 0, 'description': u'rc4 is awesome'}
         )
 
-        links = resp.context['suggestions']
+        links = resp.jinja_context['suggestions']
 
         assert len(links) == 1
         assert links[0].url == build_redirect_url(format_redirect(tr.slug))

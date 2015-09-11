@@ -49,9 +49,6 @@
 [submodule "vendor/src/django-sha2"]
 	path = vendor/src/django-sha2
 	url = git://github.com/fwenzel/django-sha2.git
-[submodule "vendor/src/jingo"]
-	path = vendor/src/jingo
-	url = git://github.com/jbalogh/jingo.git
 [submodule "vendor/src/kombu"]
 	path = vendor/src/kombu
 	url = git://github.com/celery/kombu.git
@@ -124,3 +121,6 @@
 [submodule "vendor/src/dateutil"]
 	path = vendor/src/dateutil
 	url = https://github.com/dateutil/dateutil.git
+[submodule "vendor/src/django-jinja"]
+	path = vendor/src/django-jinja
+	url = https://github.com/niwinz/django-jinja.git

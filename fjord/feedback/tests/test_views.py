@@ -8,6 +8,7 @@ from fjord.base.tests import (
     LocalizingClient,
     AnalyzerProfileFactory,
     reverse,
+    template_used,
     TestCase,
 )
 from fjord.feedback import models
@@ -121,8 +122,8 @@ class TestFeedback(TestCase):
         r = self.client.get(url)
 
         assert r.status_code == 200
-        assert r.context['feedback'] is None
-        assert r.context['suggestions'] is None
+        assert r.jinja_context['feedback'] is None
+        assert r.jinja_context['suggestions'] is None
 
     def test_response_id_in_qs_authenticated(self):
         """Verify response_id in querystring overrides session id"""
@@ -149,8 +150,8 @@ class TestFeedback(TestCase):
         r = self.client.get(url)
 
         assert r.status_code == 200
-        assert r.context['feedback'].id == feedback.id
-        assert r.context['suggestions'] == []
+        assert r.jinja_context['feedback'].id == feedback.id
+        assert r.jinja_context['suggestions'] == []
 
     def test_happy_prefill_in_querystring_is_ignored(self):
         url = reverse('feedback', args=(u'firefox',), locale='en-US')
@@ -178,12 +179,12 @@ class TestFeedback(TestCase):
         url = reverse('feedback')
         ua = 'Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0'
         r = self.client.get(url, HTTP_USER_AGENT=ua)
-        self.assertTemplateUsed(r, 'feedback/fxos_feedback.html')
+        assert template_used(r, 'feedback/fxos_feedback.html')
 
         # Specifying fxos as the product in the url
         url = reverse('feedback', args=(u'fxos',))
         r = self.client.get(url)
-        self.assertTemplateUsed(r, 'feedback/fxos_feedback.html')
+        assert template_used(r, 'feedback/fxos_feedback.html')
 
     def test_firefox_os_view_works_for_all_browsers(self):
         """Firefox OS feedback form should work for all browsers"""
@@ -195,7 +196,7 @@ class TestFeedback(TestCase):
             'Safari/537.36'
         )
         r = self.client.get(url, HTTP_USER_AGENT=ua)
-        self.assertTemplateUsed(r, 'feedback/fxos_feedback.html')
+        assert template_used(r, 'feedback/fxos_feedback.html')
 
     @override_settings(DEV_LANGUAGES=('en-US', 'es'))
     def test_urls_locale(self):
@@ -591,9 +592,9 @@ class TestFeedback(TestCase):
         """Test valid url field values"""
         test_data = [
             # input, expected
-            ('example.com', 'http://example.com/'),
-            ('http://example.com', 'http://example.com/'),
-            ('https://example.com', 'https://example.com/'),
+            ('example.com', 'http://example.com'),
+            ('http://example.com', 'http://example.com'),
+            ('https://example.com', 'https://example.com'),
             ('ftp://example.com', ''),  # We currently redact ftp urls
             ('about:config', 'about:config'),
             ('chrome://foo', 'chrome://foo')
@@ -1055,7 +1056,7 @@ class TestPicker(TestCase):
         resp = self.client.get(reverse('feedback'))
 
         assert resp.status_code == 200
-        self.assertTemplateUsed(resp, 'feedback/picker.html')
+        assert template_used(resp, 'feedback/picker.html')
         assert 'No products available.' in resp.content
 
     def test_picker_with_products(self):
