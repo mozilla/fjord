@@ -10,18 +10,18 @@ from dennis.translator import Translator
 from statsd.defaults.django import statsd
 import waffle
 
-from .gengo_utils import (
+from fjord.base.models import ModelBase
+from fjord.base.utils import instance_to_key, wrap_with_paragraphs
+from fjord.journal.models import Record
+from fjord.journal.utils import j_error, j_info
+from fjord.translations.gengo_utils import (
     GengoError,
     FjordGengo,
     GengoUnknownLanguage,
     GengoUnsupportedLanguage,
     GENGO_UNSUPPORTED_MACHINE_LC_SRC
 )
-from .utils import locale_equals_language
-from fjord.base.models import ModelBase
-from fjord.base.utils import instance_to_key, wrap_with_paragraphs
-from fjord.journal.models import Record
-from fjord.journal.utils import j_error, j_info
+from fjord.translations.utils import locale_equals_language
 
 
 class SuperModel(models.Model):

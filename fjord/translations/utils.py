@@ -1,4 +1,4 @@
-from .exceptions import NoSuchSystem
+from fjord.translations.exceptions import NoSuchSystem
 
 
 def translate(instance, system, src_lang, src_field, dst_lang, dst_field):
@@ -19,7 +19,7 @@ def translate(instance, system, src_lang, src_field, dst_lang, dst_field):
 
     """
     # Have to import this here because of circular import problems.
-    from .models import get_translation_systems
+    from fjord.translations.models import get_translation_systems
 
     # Get the translation system class.
     TranslationSystem = get_translation_systems().get(system)

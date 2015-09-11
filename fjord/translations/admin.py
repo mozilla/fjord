@@ -6,13 +6,13 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.module_loading import import_by_path
 
-from .gengo_utils import FjordGengo
-from .models import GengoJob, GengoOrder
-from .tasks import translate_tasks_by_id_list
-from .utils import locale_equals_language
 from fjord.base.utils import smart_date, smart_str
 from fjord.feedback.models import Product
 from fjord.journal.models import Record
+from fjord.translations.gengo_utils import FjordGengo
+from fjord.translations.models import GengoJob, GengoOrder
+from fjord.translations.tasks import translate_tasks_by_id_list
+from fjord.translations.utils import locale_equals_language
 
 
 class GengoJobAdmin(admin.ModelAdmin):

@@ -5,8 +5,8 @@ from uuid import uuid4
 
 from django.test.utils import override_settings
 
-from . import AlertFlavorFactory, AlertFactory, LinkFactory
 from fjord.alerts.models import Alert, Link
+from fjord.alerts.tests import AlertFlavorFactory, AlertFactory, LinkFactory
 from fjord.api_auth.tests import TokenFactory
 from fjord.base.tests import reverse, TestCase, WHATEVER
 

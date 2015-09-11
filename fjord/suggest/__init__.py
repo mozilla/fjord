@@ -12,4 +12,4 @@ def get_suggesters():
     return list(_SUGGESTERS)
 
 
-from .base import Link, Suggester
+from fjord.suggest.base import Link, Suggester

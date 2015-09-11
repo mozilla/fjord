@@ -11,7 +11,7 @@ from django.views import debug
 
 from celery import current_app
 
-from .tasks import celery_health_task
+from fjord.base.tasks import celery_health_task
 
 
 def timezone_view(request):

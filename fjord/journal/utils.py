@@ -1,4 +1,4 @@
-from .models import Record, RECORD_INFO, RECORD_ERROR
+from fjord.journal.models import Record, RECORD_INFO, RECORD_ERROR
 
 
 def j_info(app, src, action, msg, instance=None, metadata=None):

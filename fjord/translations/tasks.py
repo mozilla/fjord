@@ -3,7 +3,7 @@ from django.utils.module_loading import import_by_path
 
 from fjord.base.utils import key_to_instance
 from fjord.celery import app
-from .utils import translate
+from fjord.translations.utils import translate
 
 
 @app.task(rate_limit='60/m')

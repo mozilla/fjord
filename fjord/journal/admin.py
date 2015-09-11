@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Record
+from fjord.journal.models import Record
 
 
 class RecordAdmin(admin.ModelAdmin):

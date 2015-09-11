@@ -1,7 +1,7 @@
-from ..utils import translate
 from fjord.base.tests import TestCase
 from fjord.translations import gengo_utils
 from fjord.translations.models import SuperModel
+from fjord.translations.utils import translate
 
 
 class GeneralTranslateTests(TestCase):
