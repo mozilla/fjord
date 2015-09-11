@@ -23,24 +23,24 @@ class TestAnalyticsDashboardView(ElasticTestCase):
         # Verifies that only analyzers can see the analytics dashboard
         # link
         resp = self.client.get(reverse('dashboard'))
-        assert 200 == resp.status_code
+        assert resp.status_code == 200
         assert 'adashboard' not in resp.content
 
         # Verifies that only analyzers can see the analytics dashboard
         resp = self.client.get(reverse('analytics_dashboard'))
-        assert 403 == resp.status_code
+        assert resp.status_code == 403
 
         # Verify analyzers can see analytics dashboard link
         jane = AnalyzerProfileFactory().user
         self.client_login_user(jane)
 
         resp = self.client.get(reverse('dashboard'))
-        assert 200 == resp.status_code
+        assert resp.status_code == 200
         assert 'adashboard' in resp.content
 
         # Verify analyzers can see analytics dashboard
         resp = self.client.get(reverse('analytics_dashboard'))
-        assert 200 == resp.status_code
+        assert resp.status_code == 200
 
 
 class TestSearchView(ElasticTestCase):
@@ -112,11 +112,11 @@ class TestSearchView(ElasticTestCase):
             d += timedelta(days=1)
 
     def test_front_page(self):
-        r = self.client.get(self.url)
-        assert 200 == r.status_code
-        self.assertTemplateUsed(r, 'analytics/analyzer/search.html')
+        resp = self.client.get(self.url)
+        assert resp.status_code == 200
+        self.assertTemplateUsed(resp, 'analytics/analyzer/search.html')
 
-        pq = PyQuery(r.content)
+        pq = PyQuery(resp.content)
         assert len(pq('li.opinion')) == 7
 
     def test_search(self):

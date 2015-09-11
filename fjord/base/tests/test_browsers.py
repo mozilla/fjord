@@ -7,7 +7,6 @@ from fjord.base import browsers, middleware
 
 
 class TestUserAgentDetection(object):
-
     def check_ua(self, case):
         """Check and individual user agent test case."""
         parsed = browsers.parse_ua(case['user_agent'])
@@ -54,7 +53,7 @@ class TestUserAgentDetection(object):
             'mobile': True,
         }
 
-        assert(hasattr(request, 'BROWSER'))
+        assert hasattr(request, 'BROWSER')
         for k, v in checks.items():
-            assert(hasattr(request.BROWSER, k))
+            assert hasattr(request.BROWSER, k)
             assert getattr(request.BROWSER, k) == v

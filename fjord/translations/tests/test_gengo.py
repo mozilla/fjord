@@ -123,11 +123,8 @@ class GuessLanguageTest(BaseGengoTestCase):
     @guess_language('un')
     def test_guess_language_throws_error(self):
         gengo_api = gengo_utils.FjordGengo()
-        self.assertRaises(
-            gengo_utils.GengoUnknownLanguage,
-            gengo_api.guess_language,
-            u'Muy lento',
-        )
+        with pytest.raises(gengo_utils.GengoUnknownLanguage):
+            gengo_api.guess_language(u'Muy lento')
 
     @guess_language('es')
     def test_guess_language_returns_language(self):
@@ -151,11 +148,8 @@ class GuessLanguageTest(BaseGengoTestCase):
             post_return.json.side_effect = ValueError('bleh')
             req_patch.post.return_value = post_return
 
-            self.assertRaises(
-                gengo_utils.GengoAPIFailure,
-                gengo_api.guess_language,
-                u'whatever text'
-            )
+            with pytest.raises(gengo_utils.GengoAPIFailure):
+                gengo_api.guess_language(u'whatever text')
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
@@ -176,7 +170,7 @@ class GetLanguagesTestCase(BaseGengoTestCase):
             instance.getServiceLanguages.return_value = response
 
             # Make sure the cache is empty
-            assert gengo_utils.GENGO_LANGUAGE_CACHE == None
+            assert gengo_utils.GENGO_LANGUAGE_CACHE is None
 
             # Test that we generate a list based on what we think the
             # response is.
@@ -213,7 +207,7 @@ class GetLanguagePairsTestCase(BaseGengoTestCase):
             instance.getServiceLanguagePairs.return_value = resp
 
             # Make sure the cache is empty
-            assert gengo_utils.GENGO_LANGUAGE_PAIRS_CACHE == None
+            assert gengo_utils.GENGO_LANGUAGE_PAIRS_CACHE is None
 
             # Test that we generate a list based on what we think the
             # response is.
@@ -221,13 +215,13 @@ class GetLanguagePairsTestCase(BaseGengoTestCase):
             assert (
                 gengo_api.get_language_pairs() ==
                 [(u'en', u'es-la'), (u'de', u'pl')]
-                )
+            )
 
             # Test that the new list is cached.
             assert (
                 gengo_utils.GENGO_LANGUAGE_PAIRS_CACHE ==
                 [(u'en', u'es-la'), (u'de', u'pl')]
-                )
+            )
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
@@ -353,7 +347,7 @@ class HumanTranslationTestCase(BaseGengoTestCase):
                 assert len(GengoJob.objects.all()) == 0
 
                 # Verify we didn't call the API at all.
-                assert GengoMock.called == False
+                assert GengoMock.called is False
 
     @guess_language('en')
     def test_translate_gengo_human_english_copy_over(self):
@@ -665,7 +659,7 @@ class CompletedJobsForOrderTestCase(BaseGengoTestCase):
             assert(
                 [item['custom_data'] for item in jobs] ==
                 [u'localhost||GengoJob||7']
-                )
+            )
 
     def test_pull_translations(self):
         ght = GengoHumanTranslator()

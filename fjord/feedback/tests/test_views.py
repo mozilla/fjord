@@ -1068,10 +1068,10 @@ class TestPicker(TestCase):
 
         assert resp.status_code == 200
 
-        self.assertContains(resp, 'ProductFoo')
-        self.assertContains(resp, 'productfoo')
-        self.assertContains(resp, 'ProductBar')
-        self.assertContains(resp, 'productbar')
+        assert 'ProductFoo' in resp.content
+        assert 'productfoo' in resp.content
+        assert 'ProductBar' in resp.content
+        assert 'productbar' in resp.content
 
     def test_picker_with_disabled_products(self):
         ProductFactory(display_name=u'ProductFoo', slug=u'productfoo',
@@ -1086,12 +1086,12 @@ class TestPicker(TestCase):
         assert resp.status_code == 200
 
         # This is on the picker
-        self.assertContains(resp, 'ProductFoo')
-        self.assertContains(resp, 'productfoo')
+        assert 'ProductFoo' in resp.content
+        assert 'productfoo' in resp.content
 
         # This is not on the picker
-        self.assertNotContains(resp, 'ProductBar')
-        self.assertNotContains(resp, 'productbar')
+        assert 'ProductBar' not in resp.content
+        assert 'productbar' not in resp.content
 
     def test_picker_with_not_on_picker_products(self):
         ProductFactory(display_name=u'ProductFoo', slug=u'productfoo',
@@ -1106,12 +1106,12 @@ class TestPicker(TestCase):
         assert resp.status_code == 200
 
         # This is on the picker
-        self.assertContains(resp, 'ProductFoo')
-        self.assertContains(resp, 'productfoo')
+        assert 'ProductFoo' in resp.content
+        assert 'productfoo' in resp.content
 
         # This is not on the picker
-        self.assertNotContains(resp, 'ProductBar')
-        self.assertNotContains(resp, 'productbar')
+        assert 'ProductBar' not in resp.content
+        assert 'productbar' not in resp.content
 
 
 class TestCSRF(TestCase):

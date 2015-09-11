@@ -1,5 +1,7 @@
 from django.core.exceptions import ValidationError
 
+import pytest
+
 from fjord.base.models import ListField
 from fjord.base.tests import TestCase
 
@@ -20,11 +22,13 @@ class ListFieldTestCase(TestCase):
 
     def test_to_python_non_list_raises_validationerror_on_assert(self):
         field = ListField()
-        self.assertRaises(ValidationError, field.to_python, (u'42',))
+        with pytest.raises(ValidationError):
+            field.to_python(42)
 
     def test_to_python_raises_validationerror_on_syntaxerror(self):
         field = ListField()
-        self.assertRaises(ValidationError, field.to_python, (u'abc',))
+        with pytest.raises(ValidationError):
+            field.to_python('abc')
 
     def test_get_prep_value(self):
         tests = [

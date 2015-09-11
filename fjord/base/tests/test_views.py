@@ -2,6 +2,7 @@ import json
 
 from django.test.utils import override_settings
 
+import pytest
 from pyquery import PyQuery
 
 from fjord.base import views
@@ -19,20 +20,20 @@ class TestAbout(TestCase):
     client_class = LocalizingClient
 
     def test_about_view(self):
-        r = self.client.get(reverse('about-view'))
-        assert 200 == r.status_code
-        self.assertTemplateUsed(r, 'about.html')
+        resp = self.client.get(reverse('about-view'))
+        assert resp.status_code == 200
+        self.assertTemplateUsed(resp, 'about.html')
 
 
 class TestLoginFailure(TestCase):
     def test_login_failure_view(self):
-        r = self.client.get(reverse('login-failure'))
-        assert 200 == r.status_code
-        self.assertTemplateUsed(r, 'login_failure.html')
+        resp = self.client.get(reverse('login-failure'))
+        assert resp.status_code == 200
+        self.assertTemplateUsed(resp, 'login_failure.html')
 
-        r = self.client.get(reverse('login-failure'), {'mobile': 1})
-        assert 200 == r.status_code
-        self.assertTemplateUsed(r, 'mobile/login_failure.html')
+        resp = self.client.get(reverse('login-failure'), {'mobile': 1})
+        assert resp.status_code == 200
+        self.assertTemplateUsed(resp, 'mobile/login_failure.html')
 
 
 # Note: This needs to be an ElasticTestCase because the view does ES
@@ -90,7 +91,7 @@ class FileNotFoundTesting(TestCase):
 class ServerErrorTesting(TestCase):
     @override_settings(SHOW_STAGE_NOTICE=True)
     def test_500(self):
-        with self.assertRaises(IntentionalException):
+        with pytest.raises(IntentionalException):
             self.client.get('/services/throw-error')
 
 

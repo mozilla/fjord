@@ -40,7 +40,7 @@ class GettextStringTest(ElasticTestCase):
         """Verify that _() returns a safe string in templates."""
         url = reverse('dashboard')
         r = self.client.get(url)
-        assert 200 == r.status_code
+        assert r.status_code == 200
 
         # The & shouldn't get escaped to &amp;
         assert '&amp;raquo;' not in r.content

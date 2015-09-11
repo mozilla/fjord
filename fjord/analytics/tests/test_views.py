@@ -48,11 +48,11 @@ class TestDashboardView(ElasticTestCase):
 
     def test_front_page(self):
         url = reverse('dashboard')
-        r = self.client.get(url)
-        assert 200 == r.status_code
-        self.assertTemplateUsed(r, 'analytics/dashboard.html')
+        resp = self.client.get(url)
+        assert resp.status_code == 200
+        self.assertTemplateUsed(resp, 'analytics/dashboard.html')
 
-        pq = PyQuery(r.content)
+        pq = PyQuery(resp.content)
         # Make sure that each opinion is shown and that the count is correct.
         assert pq('.block.count strong').text() == '7'
         assert len(pq('li.opinion')) == 7
@@ -89,25 +89,25 @@ class TestDashboardView(ElasticTestCase):
 
     def test_dashboard_atom_links(self):
         """Test dashboard atom links are correct"""
-        r = self.client.get(reverse('dashboard'))
-        assert 200 == r.status_code
-        assert '/en-US/?format=atom' in r.content
+        resp = self.client.get(reverse('dashboard'))
+        assert resp.status_code == 200
+        assert '/en-US/?format=atom' in resp.content
 
-        r = self.client.get(
+        resp = self.client.get(
             reverse('dashboard'),
             {'happy': 1})
-        assert 200 == r.status_code
-        pq = PyQuery(r.content)
+        assert resp.status_code == 200
+        pq = PyQuery(resp.content)
         pq = pq('link[type="application/atom+xml"]')
         qs = QueryDict(pq[0].attrib['href'].split('?')[1])
         assert qs['happy'] == u'1'
         assert qs['format'] == u'atom'
 
-        r = self.client.get(
+        resp = self.client.get(
             reverse('dashboard'),
             {'product': 'Firefox', 'version': '20.0'})
-        assert 200 == r.status_code
-        pq = PyQuery(r.content)
+        assert resp.status_code == 200
+        pq = PyQuery(resp.content)
         pq = pq('link[type="application/atom+xml"]')
         qs = QueryDict(pq[0].attrib['href'].split('?')[1])
         assert qs['product'] == u'Firefox'
@@ -336,7 +336,7 @@ class TestResponseview(ElasticTestCase):
 
         url = reverse('dashboard')
         r = self.client.get(url)
-        assert 200 == r.status_code
+        assert r.status_code == 200
         self.assertTemplateUsed(r, 'analytics/dashboard.html')
 
         pq = PyQuery(r.content)
@@ -344,7 +344,7 @@ class TestResponseview(ElasticTestCase):
         permalink = pq('li.opinion a[href*="response"]').attr('href')
 
         r = self.client.get(permalink)
-        assert 200 == r.status_code
+        assert r.status_code == 200
         self.assertTemplateUsed(r, 'analytics/response.html')
         assert str(resp.description) in r.content
 
@@ -356,7 +356,7 @@ class TestResponseview(ElasticTestCase):
 
         r = self.client.get(reverse('response_view', args=(resp.id,)),
                             {'mobile': 1})
-        assert 200 == r.status_code
+        assert r.status_code == 200
         self.assertTemplateUsed(r, 'analytics/mobile/response.html')
         assert str(resp.description) in r.content
 
@@ -367,7 +367,7 @@ class TestResponseview(ElasticTestCase):
         self.refresh()
         r = self.client.get(reverse('response_view', args=(resp.id,)))
 
-        assert 200 == r.status_code
+        assert r.status_code == 200
         self.assertTemplateUsed(r, 'analytics/response.html')
         assert str(resp.description) in r.content
 
@@ -381,7 +381,7 @@ class TestResponseview(ElasticTestCase):
 
         r = self.client.get(reverse('response_view', args=(resp.id,)))
 
-        assert 200 == r.status_code
+        assert r.status_code == 200
         self.assertTemplateUsed(r, 'analytics/response.html')
         assert str(resp.description) in r.content
 

@@ -1,11 +1,11 @@
-from unittest import TestCase
-
 from django.core.exceptions import ValidationError
+
+import pytest
 
 from fjord.base.validators import EnhancedURLValidator
 
 
-class EnhancedURLValidatorTests(TestCase):
+class TestEnhancedURLValidator:
     def test_valid_urls(self):
         test_data = [
             'example.com',
@@ -59,4 +59,5 @@ class EnhancedURLValidatorTests(TestCase):
         validator = EnhancedURLValidator()
 
         for url in test_data:
-            self.assertRaises(ValidationError, validator, url)
+            with pytest.raises(ValidationError):
+                validator(url)
