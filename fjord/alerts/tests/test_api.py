@@ -11,7 +11,7 @@ from fjord.api_auth.tests import TokenFactory
 from fjord.base.tests import reverse, TestCase, WHATEVER
 
 
-class AlertsGetAPIAuthTest(TestCase):
+class TestAlertsGetAPIAuth(TestCase):
     def test_missing_flavor(self):
         qs = {
             'flavors': 'fooflavor'
@@ -210,7 +210,7 @@ class AlertsGetAPIAuthTest(TestCase):
         )
 
 
-class AlertsGetAPITest(TestCase):
+class TestAlertsGetAPI(TestCase):
     def test_bad_args(self):
         token = TokenFactory()
         flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')
@@ -854,7 +854,7 @@ class AlertsGetAPITest(TestCase):
         )
 
 
-class AlertsPostAPITest(TestCase):
+class TestAlertsPostAPI(TestCase):
     def test_post(self):
         token = TokenFactory()
         flavor = AlertFlavorFactory(name='Foo', slug='fooflavor')

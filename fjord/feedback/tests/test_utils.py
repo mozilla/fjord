@@ -2,7 +2,7 @@ from fjord.base.tests import TestCase
 from fjord.feedback.utils import clean_url, compute_grams
 
 
-class Testclean_url(TestCase):
+class TestCleanUrl(TestCase):
     def test_basic(self):
         data = [
             (None, None),

@@ -8,7 +8,7 @@ from fjord.heartbeat.api_views import log_error
 from fjord.heartbeat.tests import AnswerFactory, SurveyFactory
 
 
-class HeartbeatHBDataTestCase(TestCase):
+class TestHeartbeatHBData(TestCase):
     client_class = LocalizingClient
 
     def test_permissions_and_basic_view(self):
@@ -26,7 +26,7 @@ class HeartbeatHBDataTestCase(TestCase):
         assert answer.flow_id in resp.content
 
 
-class HeartbeatHBErrorLogTestCase(TestCase):
+class TestHeartbeatHBErrorLog(TestCase):
     client_class = LocalizingClient
 
     def test_permissions_and_basic_view(self):
@@ -44,7 +44,7 @@ class HeartbeatHBErrorLogTestCase(TestCase):
         assert 'rehanrocks' in resp.content
 
 
-class HeartbeatSurveysTestCase(TestCase):
+class TestHeartbeatSurveys(TestCase):
     client_class = LocalizingClient
 
     def test_permissions_and_basic_view(self):

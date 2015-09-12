@@ -4,7 +4,7 @@ from django.test import TestCase
 from fjord.base.forms import EnhancedURLField, StringListField
 
 
-class StringListTestCase(TestCase):
+class TestStringList(TestCase):
     def test_prepare_value(self):
         test_data = [
             # test data, expected
@@ -29,7 +29,7 @@ class StringListTestCase(TestCase):
             assert field.clean(testcase) == expected
 
 
-class EnhancedURLFieldTestCase(TestCase):
+class TestEnhancedURLField(TestCase):
     def test_valid(self):
         test_data = [
             # expected, url

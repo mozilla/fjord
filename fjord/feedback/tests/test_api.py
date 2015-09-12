@@ -14,7 +14,7 @@ from fjord.feedback.tests import ResponseFactory
 from fjord.search.tests import ElasticTestCase
 
 
-class PublicFeedbackAPITest(ElasticTestCase):
+class TestPublicFeedbackAPI(ElasticTestCase):
     def create_basic_data(self):
         testdata = [
             (True, 'en-US', 'Linux', 'Firefox', '30.0', 'desc'),
@@ -224,7 +224,7 @@ class PublicFeedbackAPITest(ElasticTestCase):
         assert json_data['count'] == 10
 
 
-class PublicFeedbackAPIDateTest(ElasticTestCase):
+class TestPublicFeedbackAPIDate(ElasticTestCase):
     # Get the YYYY-MM part of the date for last month. We use last
     # month since arbitrarily appending the day will always create
     # dates in the past.
@@ -345,7 +345,7 @@ class PublicFeedbackAPIDateTest(ElasticTestCase):
             ])
 
 
-class FeedbackHistogramAPITest(ElasticTestCase):
+class TestFeedbackHistogramAPI(ElasticTestCase):
     def generate_response(self, created, description=u'So awesome!'):
         ResponseFactory(
             created=datetime(created.year, created.month, created.day,
@@ -414,9 +414,9 @@ class FeedbackHistogramAPITest(ElasticTestCase):
     # FIXME: Test interval
 
 
-class PostFeedbackAPITest(TestCase):
+class TestPostFeedbackAPI(TestCase):
     def setUp(self):
-        super(PostFeedbackAPITest, self).setUp()
+        super(TestPostFeedbackAPI, self).setUp()
         # Make sure the unit tests aren't papering over CSRF issues.
         self.client = Client(enforce_csrf_checks=True)
 
@@ -895,10 +895,9 @@ class PostFeedbackAPITest(TestCase):
         assert feedback.browser_platform == u'Firefox OS'
 
 
-class PostFeedbackAPIThrottleTest(TestCase):
+class TestPostFeedbackAPIThrottle(TestCase):
     def setUp(self):
-        super(TestCase, self).setUp()
-
+        super(TestPostFeedbackAPIThrottle, self).setUp()
         get_cache('default').clear()
 
     def test_throttle(self):

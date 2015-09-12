@@ -119,7 +119,7 @@ def guess_language(lang):
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
-class GuessLanguageTest(BaseGengoTestCase):
+class TestGuessLanguage(BaseGengoTestCase):
     @guess_language('un')
     def test_guess_language_throws_error(self):
         gengo_api = gengo_utils.FjordGengo()
@@ -153,7 +153,7 @@ class GuessLanguageTest(BaseGengoTestCase):
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
-class GetLanguagesTestCase(BaseGengoTestCase):
+class TestGetLanguages(BaseGengoTestCase):
     def test_get_languages(self):
         response = {
             u'opstat': u'ok',
@@ -182,7 +182,7 @@ class GetLanguagesTestCase(BaseGengoTestCase):
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
-class GetLanguagePairsTestCase(BaseGengoTestCase):
+class TestGetLanguagePairs(BaseGengoTestCase):
     def test_get_language_pairs(self):
         resp = {
             u'opstat': u'ok',
@@ -225,7 +225,7 @@ class GetLanguagePairsTestCase(BaseGengoTestCase):
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
-class GetBalanceTestCase(BaseGengoTestCase):
+class TestGetBalance(BaseGengoTestCase):
     @account_balance(20.0)
     def test_get_balance(self):
         gengo_api = gengo_utils.FjordGengo()
@@ -233,7 +233,7 @@ class GetBalanceTestCase(BaseGengoTestCase):
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
-class MachineTranslateTestCase(BaseGengoTestCase):
+class TestMachineTranslate(BaseGengoTestCase):
     @guess_language('es')
     def test_translate_gengo_machine(self):
         # Note: This just sets up the GengoJob--it doesn't create any
@@ -306,7 +306,7 @@ class MachineTranslateTestCase(BaseGengoTestCase):
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
-class HumanTranslationTestCase(BaseGengoTestCase):
+class TestHumanTranslation(BaseGengoTestCase):
     @guess_language('es')
     def test_translate_gengo_human(self):
         # Note: This just sets up the GengoJob--it doesn't create any
@@ -572,7 +572,7 @@ class HumanTranslationTestCase(BaseGengoTestCase):
 
 
 @override_settings(GENGO_PUBLIC_KEY='ou812', GENGO_PRIVATE_KEY='ou812')
-class CompletedJobsForOrderTestCase(BaseGengoTestCase):
+class TestCompletedJobsForOrder(BaseGengoTestCase):
     def test_no_approved_jobs(self):
         gtoj_resp = {
             u'opstat': u'ok',
@@ -745,9 +745,8 @@ class CompletedJobsForOrderTestCase(BaseGengoTestCase):
             assert orders[0].status == 'complete'
 
 
-@pytest.mark.skipif(not has_gengo_creds(),
-                    reason='no gengo creds')
-class LiveGengoTestCase(TestCase):
+@pytest.mark.skipif(not has_gengo_creds(), reason='no gengo creds')
+class TestGengoLive(TestCase):
     """These are tests that execute calls against the real live Gengo API
 
     These tests require GENGO_PUBLIC_KEY and GENGO_PRIVATE_KEY to be
@@ -766,7 +765,7 @@ class LiveGengoTestCase(TestCase):
         # Wipe out the caches
         gengo_utils.GENGO_LANGUAGE_CACHE = None
         gengo_utils.GENGO_LANGUAGE_PAIRS_CACHE = None
-        super(LiveGengoTestCase, self).setUp()
+        super(TestGengoLive, self).setUp()
 
     def test_get_language(self):
         text = u'Facebook no se puede enlazar con peru'

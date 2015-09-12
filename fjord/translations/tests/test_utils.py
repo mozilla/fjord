@@ -4,7 +4,7 @@ from fjord.translations.models import SuperModel
 from fjord.translations.utils import translate
 
 
-class GeneralTranslateTests(TestCase):
+class TestGeneralTranslate(TestCase):
     def setUp(self):
         gengo_utils.GENGO_LANGUAGE_CACHE = (
             {u'opstat': u'ok',

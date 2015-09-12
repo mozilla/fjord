@@ -10,7 +10,7 @@ from fjord.base.tests import (
 from fjord.feedback.tests import ResponseFactory
 
 
-class TriggerRuleMatchViewAPITestCase(TestCase):
+class TestTriggerRuleMatchViewAPI(TestCase):
     client_class = LocalizingClient
 
     def test_not_logged_in(self):

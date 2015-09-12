@@ -3,7 +3,7 @@ import json
 from fjord.base.tests import TestCase, reverse
 
 
-class EventAPITest(TestCase):
+class TestEventAPI(TestCase):
     def test_root(self):
         resp = self.client.get(reverse('event-api'))
         json_data = json.loads(resp.content)

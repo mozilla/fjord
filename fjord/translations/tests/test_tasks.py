@@ -3,7 +3,7 @@ from fjord.translations.models import SuperModel
 from fjord.translations.tasks import translate_tasks_by_id_list
 
 
-class TranslateTasksByIdListTestCase(TestCase):
+class TestTranslateTasksByIdList(TestCase):
     def test_one(self):
         """Test the basic case"""
         model_path = SuperModel.__module__ + '.' + SuperModel.__name__

@@ -22,7 +22,7 @@ from fjord.suggest.tests import SuggesterTestMixin
 from fjord.redirector.tests import RedirectorTestMixin
 
 
-class SUMOTestCase(TestCase):
+class TestSUMO(TestCase):
     suggester = SUMOSuggest()
 
     def test_not_sad(self):
@@ -101,8 +101,8 @@ class SUMOTestCase(TestCase):
                 assert logger_patch.exception.call_count == 1
 
 
-class SuggestWithRequestTestCase(SuggesterTestMixin, RedirectorTestMixin,
-                                 TestCase):
+class TestSuggestWithRequest(SuggesterTestMixin, RedirectorTestMixin,
+                             TestCase):
     client_class = LocalizingClient
     suggesters = [
         'fjord.suggest.providers.sumo.SUMOSuggest'
@@ -223,7 +223,7 @@ class SuggestWithRequestTestCase(SuggesterTestMixin, RedirectorTestMixin,
 
 @pytest.mark.skipif('LIVE_API' not in os.environ,
                     reason='LIVE_API not in environ')
-class LiveSUMOProviderTestCase(SuggesterTestMixin, TestCase):
+class TestSUMOProviderLive(SuggesterTestMixin, TestCase):
     """Test it LIVE!
 
     This only executes if LIVE_API is defined in the environment.

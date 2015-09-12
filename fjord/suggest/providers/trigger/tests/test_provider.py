@@ -16,7 +16,7 @@ from fjord.suggest.providers.trigger.tests import TriggerRuleFactory
 from fjord.suggest.tests import SuggesterTestMixin
 
 
-class InterpolateTestCase(TestCase):
+class TestInterpolate(TestCase):
     def test_no_interpolation(self):
         resp = ResponseFactory()
         url = interpolate_url('http://example.com', resp)
@@ -110,7 +110,7 @@ class InterpolateTestCase(TestCase):
         )
 
 
-class TriggerTestCase(SuggesterTestMixin, RedirectorTestMixin, TestCase):
+class TestTrigger(SuggesterTestMixin, RedirectorTestMixin, TestCase):
     client_class = LocalizingClient
     suggesters = [
         'fjord.suggest.providers.trigger.provider.TriggerSuggester'

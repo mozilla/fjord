@@ -7,7 +7,7 @@ from fjord.heartbeat.tests import SurveyFactory
 from fjord.journal.models import Record
 
 
-class HeartbeatPostAPITest(TestCase):
+class TestHeartbeatPostAPI(TestCase):
     _base_ts = time.time()
 
     def timestamp(self, offset=0):

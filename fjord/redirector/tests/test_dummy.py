@@ -5,7 +5,7 @@ from fjord.redirector.providers.dummy import DummyRedirector
 from fjord.redirector.tests import RedirectorTestMixin
 
 
-class DummyRedirectorLoadingTestCase(RedirectorTestMixin, TestCase):
+class TestDummyRedirectorLoading(RedirectorTestMixin, TestCase):
     redirectors = []
 
     def test_didnt_load(self):
@@ -16,7 +16,7 @@ class DummyRedirectorLoadingTestCase(RedirectorTestMixin, TestCase):
         assert len(dummy_providers) == 0
 
 
-class DummyRedirectorTestCase(RedirectorTestMixin, TestCase):
+class TestDummyRedirector(RedirectorTestMixin, TestCase):
     redirectors = [
         'fjord.redirector.providers.dummy.DummyRedirector'
     ]

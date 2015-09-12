@@ -395,7 +395,7 @@ class TestResponseview(ElasticTestCase):
         assert len(mlt) == 1
 
 
-class SpotTranslateTestCase(ElasticTestCase):
+class TestSpotTranslate(ElasticTestCase):
     client_class = LocalizingClient
 
     def test_spot_translate(self):

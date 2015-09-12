@@ -32,7 +32,7 @@ def set_sys_argv(sys_argv):
     return _set_sys_argv
 
 
-class GoogleUtilsTestCase(TestCase):
+class TestGoogleUtils(TestCase):
     @set_sys_argv(['test'])
     def test_ga_track_event_test(self):
         with patch('fjord.base.google_utils.requests') as req_patch:

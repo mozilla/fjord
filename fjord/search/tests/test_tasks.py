@@ -7,7 +7,7 @@ from fjord.search.tests import RecordFactory, ElasticTestCase
 from fjord.search.utils import to_class_path
 
 
-class IndexChunkTaskTest(ElasticTestCase):
+class TestIndexChunkTask(ElasticTestCase):
     def test_index_chunk_task(self):
         responses = ResponseFactory.create_batch(10)
 

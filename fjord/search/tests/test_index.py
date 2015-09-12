@@ -1,23 +1,21 @@
-from fjord.base.tests import TestCase
 from fjord.feedback.models import ResponseDocType
 from fjord.feedback.tests import ResponseFactory
 from fjord.search.index import chunked
 from fjord.search.tests import ElasticTestCase
 
 
-class ChunkedTests(TestCase):
-    def test_chunked(self):
-        # chunking nothing yields nothing.
-        assert list(chunked([], 1)) == []
+def test_chunked():
+    # chunking nothing yields nothing.
+    assert list(chunked([], 1)) == []
 
-        # chunking list where len(list) < n
-        assert list(chunked([1], 10)) == [(1,)]
+    # chunking list where len(list) < n
+    assert list(chunked([1], 10)) == [(1,)]
 
-        # chunking a list where len(list) == n
-        assert list(chunked([1, 2], 2)) == [(1, 2)]
+    # chunking a list where len(list) == n
+    assert list(chunked([1, 2], 2)) == [(1, 2)]
 
-        # chunking list where len(list) > n
-        assert list(chunked([1, 2, 3, 4, 5], 2)) == [(1, 2), (3, 4), (5,)]
+    # chunking list where len(list) > n
+    assert list(chunked([1, 2, 3, 4, 5], 2)) == [(1, 2), (3, 4), (5,)]
 
 
 class TestLiveIndexing(ElasticTestCase):

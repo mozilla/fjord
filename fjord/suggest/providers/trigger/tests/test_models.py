@@ -4,7 +4,7 @@ from fjord.suggest.providers.trigger.models import _generate_keywords_regex
 from fjord.suggest.providers.trigger.tests import TriggerRuleFactory
 
 
-class TriggerRuleMatchTestCase(TestCase):
+class TestTriggerRuleMatch(TestCase):
     def test_match_locale(self):
         tests = [
             # tr locales, feedback locale, expected

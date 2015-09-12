@@ -8,7 +8,7 @@ from fjord.suggest.providers.dummy import DummySuggester
 from fjord.suggest.tests import SuggesterTestMixin
 
 
-class DummySuggesterLoadingTestCase(SuggesterTestMixin, TestCase):
+class TestDummySuggesterLoading(SuggesterTestMixin, TestCase):
     suggesters = []
 
     def test_didnt_load(self):
@@ -19,7 +19,7 @@ class DummySuggesterLoadingTestCase(SuggesterTestMixin, TestCase):
         assert len(dummy_providers) == 0
 
 
-class DummySuggesterTestCase(SuggesterTestMixin, TestCase):
+class TestDummySuggester(SuggesterTestMixin, TestCase):
     suggesters = [
         'fjord.suggest.providers.dummy.DummySuggester'
     ]

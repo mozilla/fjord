@@ -6,7 +6,7 @@ from fjord.base.models import ListField
 from fjord.base.tests import TestCase
 
 
-class ListFieldTestCase(TestCase):
+class TestListField(TestCase):
     def test_to_python(self):
         tests = [
             # test data, expected

@@ -26,7 +26,7 @@ def test_smart_truncate():
     assert smart_truncate(u'ééé ééé', length=4) == u'ééé...'
 
 
-class SmartStrTestCase(TestCase):
+class TestSmartStr:
     def test_str(self):
         assert 'a' == smart_str('a')
         assert u'a' == smart_str(u'a')
@@ -40,7 +40,7 @@ class SmartStrTestCase(TestCase):
         assert u'' == smart_str(None)
 
 
-class SmartIntTestCase(TestCase):
+class TestSmartIntTest:
     def test_sanity(self):
         assert 10 == smart_int('10')
         assert 10 == smart_int('10.5')
@@ -62,7 +62,7 @@ class SmartIntTestCase(TestCase):
         assert 0 == smart_int('1e309')
 
 
-class SmartDateTest(TestCase):
+class TestSmartDate:
     def test_sanity(self):
         assert datetime.date(2012, 1, 1) == smart_date('2012-01-01')
         assert None == smart_date('1742-11-05')
@@ -83,8 +83,7 @@ class SmartDateTest(TestCase):
         assert None == smart_date('/etc/passwd\x00')
 
 
-class SmartBoolTest(TestCase):
-
+class TestSmartBool:
     msg_template = 'smart_bool(%r) - Expected %r, got %r'
 
     def test_truthy(self):
@@ -106,7 +105,7 @@ class SmartBoolTest(TestCase):
             assert b == 'fallback', self.msg_template % (x, 'fallback', b)
 
 
-class SmartTimeDeltaTest(TestCase):
+class TestSmartTimeDelta:
     def test_valid(self):
         assert smart_timedelta('1d') == datetime.timedelta(days=1)
         assert smart_timedelta('14d') == datetime.timedelta(days=14)
@@ -117,7 +116,7 @@ class SmartTimeDeltaTest(TestCase):
         assert smart_timedelta('d', 'fallback') == 'fallback'
 
 
-class WrapWithParagraphsTest(TestCase):
+class TestWrapWithParagraphs:
     def test_basic(self):
         test_data = [
             ('', 72, ''),

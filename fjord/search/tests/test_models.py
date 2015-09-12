@@ -3,7 +3,7 @@ from fjord.search.models import Record
 from fjord.search.tests import RecordFactory
 
 
-class RecordTest(TestCase):
+class TestRecord(TestCase):
     def test_mark(self):
         """Test marking as fail/success."""
         r = RecordFactory()

@@ -8,7 +8,7 @@ from fjord.search.tests import ElasticTestCase
 # page (which this queries) uses ElasticSearch. Being an
 # ElasticTestCase makes sure that the testing index is properly set
 # up, instead of trying to access a possibly missing index.
-class MobileQueryStringOverrideTest(ElasticTestCase):
+class TestMobileQueryStringOverride(ElasticTestCase):
     client_class = LocalizingClient
 
     def test_mobile_override(self):
@@ -33,7 +33,7 @@ class MobileQueryStringOverrideTest(ElasticTestCase):
         assert resp.cookies[MOBILE_COOKIE].value == 'no'
 
 
-class GettextStringTest(ElasticTestCase):
+class TestGettextString(ElasticTestCase):
     client_class = LocalizingClient
 
     def test_gettext_in_templates(self):

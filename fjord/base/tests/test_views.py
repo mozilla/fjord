@@ -38,7 +38,7 @@ class TestLoginFailure(TestCase):
 
 # Note: This needs to be an ElasticTestCase because the view does ES
 # stuff.
-class MonitorViewTest(ElasticTestCase):
+class TestMonitorView(ElasticTestCase):
     def test_monitor_view(self):
         """Tests for the monitor view."""
         # TODO: When we add a mocking framework, we can mock this
@@ -79,7 +79,7 @@ class MonitorViewTest(ElasticTestCase):
             views.test_memcached = test_memcached
 
 
-class FileNotFoundTesting(TestCase):
+class TestFileNotFound(TestCase):
     client_class = LocalizingClient
 
     def test_404(self):
@@ -88,7 +88,7 @@ class FileNotFoundTesting(TestCase):
         self.assertTemplateUsed(request, '404.html')
 
 
-class ServerErrorTesting(TestCase):
+class TestServerError(TestCase):
     @override_settings(SHOW_STAGE_NOTICE=True)
     def test_500(self):
         with pytest.raises(IntentionalException):
