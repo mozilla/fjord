@@ -85,9 +85,8 @@ line in brackets.
 
 Lines shouldn't exceed 72 characters.
 
-See `these guidelines
-<http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html>`_
-for some more explanation.
+See `these guidelines <http://chris.beams.io/posts/git-commit/>`_
+for more explanation.
 
 
 Localization conventions
