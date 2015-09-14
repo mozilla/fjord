@@ -15,7 +15,6 @@ from django.utils.encoding import smart_str
 from fjord.base import urlresolvers
 from fjord.base.browsers import parse_ua
 from fjord.base.templatetags.jinja_helpers import urlparams
-# FIXME: from fjord.base.l10n import install_gettext
 
 
 MOBILE_COOKIE = getattr(settings, 'MOBILE_COOKIE', 'mobile')
@@ -162,5 +161,3 @@ class LocaleURLMiddleware(object):
         request.path_info = '/' + prefixer.shortened_path
         request.locale = prefixer.locale
         translation.activate(prefixer.locale)
-        # FIXME
-        # install_gettext()

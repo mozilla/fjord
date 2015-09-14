@@ -58,12 +58,6 @@ USE_I18N = True
 # calendars according to the current locale
 USE_L10N = True
 
-# Gettext text domain
-TEXT_DOMAIN = 'django'
-STANDALONE_DOMAINS = [TEXT_DOMAIN]
-TOWER_KEYWORDS = {'_lazy': None}
-TOWER_ADD_HEADERS = True
-
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-US'
@@ -380,7 +374,6 @@ TEMPLATES = [
                 'jinja2.ext.do',
                 'jinja2.ext.loopcontrols',
                 'jinja2.ext.with_',
-                'jinja2.ext.i18n',
                 'jinja2.ext.autoescape',
                 'django_jinja.builtins.extensions.CsrfExtension',
                 'django_jinja.builtins.extensions.CacheExtension',
@@ -388,8 +381,8 @@ TEMPLATES = [
                 'django_jinja.builtins.extensions.UrlsExtension',
                 'django_jinja.builtins.extensions.StaticFilesExtension',
                 'django_jinja.builtins.extensions.DjangoFiltersExtension',
-                # FIXME
-                # 'fjord.base.l10n.MozInternationalizationExtension',
+                # We use our own i18n extension to collapse whitespace.
+                'fjord.base.l10n.MozInternationalizationExtension',
                 'pipeline.templatetags.ext.PipelineExtension',
             ],
             'globals': {
@@ -595,6 +588,7 @@ DOMAIN_METHODS = {
     'django': [
         ('fjord/**.py', 'fjord.base.l10n.extract_python'),
         ('fjord/**/templates/**.html', 'fjord.base.l10n.extract_template'),
+        ('fjord/**/jinja2/**.html',  'fjord.base.l10n.extract_template'),
         ('templates/**.html', 'fjord.base.l10n.extract_template'),
     ]
 }
