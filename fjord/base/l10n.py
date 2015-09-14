@@ -4,7 +4,7 @@ import re
 from django.utils.translation import ugettext, ungettext
 
 import jinja2
-from babel.messages.extract import extract_python
+from babel.messages.extract import extract_python as babel_extract_python
 from jinja2 import ext
 from jinja2.ext import InternationalizationExtension
 
@@ -20,16 +20,17 @@ def install_gettext():
     import jingo
     jingo.env.install_gettext_translations(Translation)
 
+
 def add_context(context, message):
     # \x04 is a magic gettext number.
-    return u"%s\x04%s" % (context, message)
+    return u'%s\x04%s' % (context, message)
 
 
 def split_context(message):
     # \x04 is a magic gettext number.
-    ret = message.split(u"\x04")
+    ret = message.split(u'\x04')
     if len(ret) == 1:
-        ret.insert(0, "")
+        ret.insert(0, '')
     return ret
 
 
@@ -38,10 +39,11 @@ def strip_whitespace(message):
 
 
 @jinja2.contextfunction
-def _gettext_alias(context, string, *args, **kw):
+def _gettext_alias(context, text, *args, **kwargs):
     """Takes the result of gettext and marks it safe."""
     return jinja2.Markup(
-        context.resolve('gettext')(string, *args, **kw))
+        context.resolve('gettext')(text, *args, **kwargs)
+    )
 
 
 class MozInternationalizationExtension(InternationalizationExtension):
@@ -65,15 +67,17 @@ def tweak_message(message):
     functions) but they don't support some things we need so this function will
     tweak the message.  Specifically:
 
-        1) We strip whitespace from the msgid.  Jinja2 will only strip
-            whitespace from the ends of a string so linebreaks show up in
-            your .po files still.
+    1. We collapse whitespace in the msgid. Jinja2 will only strip
+       whitespace from the ends of a string so linebreaks show up in
+       your .po files still.
 
-        2) Babel doesn't support context (msgctxt).  We hack that in ourselves
-            here.
+    2. Babel doesn't support context (msgctxt). We hack that in ourselves
+       here.
+
     """
     if isinstance(message, basestring):
         message = strip_whitespace(message)
+
     elif isinstance(message, tuple):
         # A tuple of 2 has context, 3 is plural, 4 is plural with context
         if len(message) == 2:
@@ -92,19 +96,15 @@ def tweak_message(message):
     return message
 
 
-def extract_tower_python(fileobj, keywords, comment_tags, options):
-    for lineno, funcname, message, comments in \
-            list(extract_python(fileobj, keywords, comment_tags, options)):
-
+def extract_python(fileobj, keywords, comment_tags, options):
+    msgs = list(babel_extract_python(fileobj, keywords, comment_tags, options))
+    for lineno, funcname, message, comments in msgs:
         message = tweak_message(message)
-
         yield lineno, funcname, message, comments
 
 
-def extract_tower_template(fileobj, keywords, comment_tags, options):
-    for lineno, funcname, message, comments in \
-            list(ext.babel_extract(fileobj, keywords, comment_tags, options)):
-
+def extract_template(fileobj, keywords, comment_tags, options):
+    msgs = list(ext.babel_extract(fileobj, keywords, comment_tags, options))
+    for lineno, funcname, message, comments in msgs:
         message = tweak_message(message)
-
         yield lineno, funcname, message, comments

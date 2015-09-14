@@ -576,12 +576,9 @@ CSRF_FAILURE_VIEW = 'fjord.base.views.csrf_failure'
 # function handles the extraction.
 DOMAIN_METHODS = {
     'django': [
-        ('%s/**.py' % PROJECT_MODULE,
-         'fjord.base.l10n.extract_tower_python'),
-        ('%s/**/templates/**.html' % PROJECT_MODULE,
-         'fjord.base.l10n.extract_tower_template'),
-        ('templates/**.html',
-         'fjord.base.l10n.extract_tower_template'),
+        ('fjord/**.py', 'fjord.base.l10n.extract_python'),
+        ('fjord/**/templates/**.html', 'fjord.base.l10n.extract_template'),
+        ('templates/**.html', 'fjord.base.l10n.extract_template'),
     ]
 }
 
