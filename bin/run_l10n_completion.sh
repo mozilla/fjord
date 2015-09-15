@@ -10,6 +10,7 @@ function usage() {
 }
 
 if [[ $# -lt 2 ]]; then
+    echo "Not enough arguments."
     usage
 fi
 
@@ -17,7 +18,8 @@ WEBAPP=$1
 PYTHONBIN=$2
 
 # check if file and dir are there
-if [[ ! -f "$PYTHONBIN" ]]; then 
+if [[ ! -f "$PYTHONBIN" ]]; then
+    echo "$PYTHONBIN does not exist."
     usage
 fi
 
