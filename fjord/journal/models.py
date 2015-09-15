@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
@@ -72,7 +72,7 @@ class Record(models.Model):
     # Generic foreign key to the object this record is about if any
     content_type = models.ForeignKey(ContentType, null=True)
     object_id = models.PositiveIntegerField(null=True)
-    content_object = generic.GenericForeignKey()
+    content_object = GenericForeignKey()
 
     # When this log entry was created
     created = models.DateTimeField(default=datetime.now)
