@@ -212,6 +212,14 @@ Unit tests
 1. run ``./py.test`` to run the unit tests with a clean database
 
 
+JavaScript tests
+----------------
+
+1. run ``./manage.py runserver``
+2. open your browser
+3. go to http://127.0.0.1:8000/static/tests/index.html
+
+
 Smoketests
 ----------
 
@@ -249,7 +257,7 @@ Testing Elasticsearch and indexing
    index some stuff
 3. run ``./manage.py esstatus`` to make sure the new index is there
 4. run ``./manage.py esdelete <index>`` to delete that index
-5. run ``./manage.py esstatus`` to make sure the index was created
+5. run ``./manage.py esstatus`` to make sure the index was deleted
 6. run ``./manage.py esreindex --percent=5`` to recreate the index
 7. verify feedback is indexed
 
@@ -340,7 +348,7 @@ With an existing vagrant environment:
 
 1. run ``vagrant up``
 2. run ``./peep.sh install -r requirements/requirements.txt``
-3. run ``./peep.sh install -r requirements.dev.txt``
+3. run ``./peep.sh install -r requirements/dev.txt``
 4. run ``vagrant ssh``
 
    1. run ``cd fjord``
@@ -356,5 +364,5 @@ Now we're going to create a new vagrant environment:
    1. run ``cd fjord``
    2. run ``./py.test``
 
-If that works, then it probably works fine in vagrant development
-environment.
+If that works, then the Vagrant development environment probably works
+fine, too.
