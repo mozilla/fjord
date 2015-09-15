@@ -1,11 +1,11 @@
 PyYAML==3.11
-certifi==2015.04.28
+certifi==2015.9.6.2
 chardet==2.3.0
-execnet==1.4.0
+execnet==1.4.1
 oauthlib==1.0.3
 py==1.4.30
 pyasn1==0.1.8
-pytest==2.7.2
+pytest==2.7.3
 pytest-mozwebqa==1.6
 pytest-xdist==1.13.1
 requests==2.7.0
