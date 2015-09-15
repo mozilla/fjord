@@ -1,19 +1,16 @@
-# These requirements are helpful, but not required, for working on fjord
-# For testing remote-troubleshooting capture.
-# sha256: DcQq0cP8Yttg6S5O-HnzrvTco61_o146MoZukfNbGwM
-django-sslserver==0.15
-
-# If you are updating this, you might want to update
-# the hashes of the hooks repositories listed in the
-# .pre-commit-config.yaml file as well.
-# sha256: AnUshRna3Tz1V6c2KD9KB3LF72xU6XwRPs3_1mtnrKw
-pre-commit==0.5.5
-
 # sha256: qRNwGDrqY8h9hIfns5ntLZmnwvFLEI0nwLyK2e9ZXZo
 aspy.yaml==0.2.1
 
 # sha256: 4wgagYLT1LcoPuredsOCvP1N_WRMqABZginC73mKu1M
 cached-property==1.2.0
+
+# These requirements are helpful, but not required, for working on fjord
+# For testing remote-troubleshooting capture.
+# sha256: DcQq0cP8Yttg6S5O-HnzrvTco61_o146MoZukfNbGwM
+django-sslserver==0.15
+
+# sha256: 9iU9--BTitLjh72P39kpPJJdY1U_WBPE5Yd0VBZQHm0
+functools32==3.2.3-2
 
 # sha256: Nmc6w3j-7T2qWVYnaoKWmQVlI9eWECeRHwZLUiVerUE
 jsonschema==2.5.1
@@ -21,17 +18,14 @@ jsonschema==2.5.1
 # sha256: 4teASdw41L4gVS3AO3AVbYCUBQfcnCAcdvLWEasfbZU
 nodeenv==0.13.5
 
-# sha256: w2yTiocuX_SUk4szsUqqFWy0OexnVI_Ks1Nbt4sIRug
-pyyaml==3.11
-
-# sha256: qryO8YzdvYoqnH-SvEPi_qVLEUczDWXbkg7zzpgS49w
-virtualenv==13.1.2
-
-# sha256: IX5Hl9o6mkqfvmci4NuYBwuEQ6iCEtes29JBp2aBQdk
-simplejson==3.8.0
-
 # sha256: HDW0rCBs7y0kgWyJ-Jzyid09OM98RJuz-re_bUPwGx8
 ordereddict==1.1
+
+# If you are updating this, you might want to update
+# the hashes of the hooks repositories listed in the
+# .pre-commit-config.yaml file as well.
+# sha256: AnUshRna3Tz1V6c2KD9KB3LF72xU6XwRPs3_1mtnrKw
+pre-commit==0.5.5
 
 # sha256: twPldoXtfCgLGlHElqSYTYPYne8qkwtenl2lpsoVFRQ
 py==1.4.30
@@ -42,8 +36,14 @@ pytest==2.7.2
 # sha256: 0UWsncelV6cZq3l3C-CUEATh4DjhN8NFkZGdnfKnkLE
 pytest-django==2.8.0
 
+# sha256: w2yTiocuX_SUk4szsUqqFWy0OexnVI_Ks1Nbt4sIRug
+pyyaml==3.11
+
+# sha256: IX5Hl9o6mkqfvmci4NuYBwuEQ6iCEtes29JBp2aBQdk
+simplejson==3.8.0
+
 # sha256: Gm5RMMK0LS3jAWk8KZ94zEvTUB54thDAjkXvxw4rURQ
 Sphinx==1.3.1
 
-# sha256: 9iU9--BTitLjh72P39kpPJJdY1U_WBPE5Yd0VBZQHm0
-functools32==3.2.3-2
+# sha256: qryO8YzdvYoqnH-SvEPi_qVLEUczDWXbkg7zzpgS49w
+virtualenv==13.1.2
