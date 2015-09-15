@@ -324,6 +324,15 @@ Testing cron jobs
 1. for each job in ``bin/crontab/crontab.tpl``, make sure it works
 
 
+Testing documentation
+---------------------
+
+Verify that the documentatino builds:
+
+1. run ``cd docs/``
+2. run ``make html`` and make sure there are no build errors
+
+
 Testing vagrant
 ---------------
 
