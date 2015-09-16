@@ -6,6 +6,7 @@ import time
 from django import VERSION
 from django.contrib import admin, messages
 from django.http import HttpResponseRedirect
+from django.http.request import build_request_repr
 from django.shortcuts import render
 from django.views import debug
 
@@ -22,20 +23,25 @@ def timezone_view(request):
     # often or was viewable by users. If these two assumptions ever
     # change, then this should be rewritten.
 
-    from fjord.feedback.models import Response, ResponseMappingType
+    from fjord.feedback.models import (
+        Response,
+        ResponseDocType,
+        ResponseDocTypeManager
+    )
     from fjord.feedback.tests import ResponseFactory
-    from fjord.search.index import get_es, get_index
+    from fjord.search.index import get_es, get_index_name
 
     server_time = datetime.now()
 
     # Create a new response.
-    resp = ResponseFactory.create()
+    resp = ResponseFactory()
     resp_time = resp.created
 
-    # Index the response by hand so we know it gets to Elasticsearch. Otherwise
-    # it gets done by celery and we don't know how long that'll take.
-    doc = ResponseMappingType.extract_document(resp.id)
-    ResponseMappingType.index(doc, resp.id)
+    # Index the response by hand so we know it gets to
+    # Elasticsearch. Otherwise it gets done by celery and we don't
+    # know how long that'll take.
+    doc = ResponseDocType.extract_doc(resp)
+    ResponseDocTypeManager.bulk_index(docs=[doc])
 
     # Fetch the response from the db.
     resp = Response.objects.get(id=resp.id)
@@ -43,12 +49,13 @@ def timezone_view(request):
 
     # Refresh and sleep 5 seconds as a hand-wavey way to make sure
     # that Elasticsearch has had time to refresh the index.
-    get_es().indices.refresh(get_index())
+    get_es().indices.refresh(get_index_name())
     time.sleep(5)
 
-    es_time = ResponseMappingType.search().filter(id=resp.id)[0].created
+    s = ResponseDocTypeManager.search().filter('term', id=resp.id).execute()
+    es_time = s[0].created
 
-    # Delete the test response we created.
+    # Delete the test response which also deletes it in the index.
     resp.delete()
 
     return render(request, 'admin/timezone_view.html', {
@@ -73,7 +80,6 @@ def settings_view(request):
         'settings': sorted_settings,
         'title': 'App Settings'
     })
-
 
 admin.site.register_view(path='settings',
                          name='Settings - App settings',
@@ -112,7 +118,8 @@ def env_view(request):
     """Admin view that displays the wsgi env."""
     return render(request, 'admin/env_view.html', {
         'pythonver': sys.version,
-        'djangover': VERSION
+        'djangover': VERSION,
+        'requestrepr': build_request_repr(request)
     })
 
 admin.site.register_view(path='env',
