@@ -348,9 +348,7 @@ _CONTEXT_PROCESSORS = [
     'django.contrib.auth.context_processors.auth',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
-
     'session_csrf.context_processor',
-
     'fjord.base.context_processors.globals',
     'fjord.base.context_processors.i18n',
 ]
@@ -376,12 +374,8 @@ TEMPLATES = [
                 'jinja2.ext.with_',
                 'jinja2.ext.autoescape',
                 'django_jinja.builtins.extensions.CsrfExtension',
-                'django_jinja.builtins.extensions.CacheExtension',
-                'django_jinja.builtins.extensions.TimezoneExtension',
-                'django_jinja.builtins.extensions.UrlsExtension',
                 'django_jinja.builtins.extensions.StaticFilesExtension',
                 'django_jinja.builtins.extensions.DjangoFiltersExtension',
-                # We use our own i18n extension to collapse whitespace.
                 'fjord.base.l10n.MozInternationalizationExtension',
                 'pipeline.templatetags.ext.PipelineExtension',
             ],
