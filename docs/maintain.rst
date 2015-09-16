@@ -74,14 +74,18 @@ Comment template::
 
     [1] http://fjord.readthedocs.org/en/latest/welcome.html
 
-    If you have any questions, please ask on the mailing list or in the
-    #input channel on irc.mozilla.org.
+    ----
 
     <required skills>
 
     <explanation of how to implement>
 
     <note any wry twists>
+
+    ----
+
+    If you have any questions, please ask in the comments on this bug, on
+    the mailing list or in the #input IRC channel on irc.mozilla.org.
 
 
 Once a week, go through any assigned mentored bugs and ping them to
