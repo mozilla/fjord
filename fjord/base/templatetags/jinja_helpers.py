@@ -116,9 +116,3 @@ def fe(s, *args, **kwargs):
         kwargs[k] = jinja2.escape(smart_text(kwargs[k]))
 
     return jinja2.Markup(s.format(*args, **kwargs))
-
-
-@library.filter
-def ifeq(a, b, text):
-    """Return ``text`` if ``a == b``."""
-    return jinja2.Markup(text if a == b else '')
