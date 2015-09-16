@@ -48,13 +48,13 @@
           </dd>
           <dt>{{ _('Description') }}</dt>
           <dd>
-            <p>{{ response.description|nl2br }}</p>
+            <p>{{ response.description|linebreaks }}</p>
           </dd>
           <dt>{{ _('Translated') }}</dt>
           <dd>
             <p>
               {% if response.translated_description %}
-                {{ response.translated_description|nl2br }}
+                {{ response.translated_description|linebreaks }}
 
               {% elif user.is_authenticated() and user.has_perm('analytics.can_view_dashboard') %}
                 <div class="inline secret">

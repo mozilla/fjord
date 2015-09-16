@@ -122,11 +122,3 @@ def fe(s, *args, **kwargs):
 def ifeq(a, b, text):
     """Return ``text`` if ``a == b``."""
     return jinja2.Markup(text if a == b else '')
-
-
-@library.filter
-def nl2br(text):
-    """Turn newlines into <br>."""
-    if not text:
-        return ''
-    return jinja2.Markup('<br>'.join(jinja2.escape(text).splitlines()))
