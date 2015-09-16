@@ -9,6 +9,12 @@ the system continues to work. Further, they make it easier to verify
 correctness for behavioral details.
 
 
+.. contents::
+
+
+Unit tests
+==========
+
 .. Note::
 
    We use the ``py.test`` script in the root directory rather than the
@@ -16,9 +22,6 @@ correctness for behavioral details.
    because we have many of the libraries in ``vendor/``. Once we get
    rid of ``vendor/`` we can use the regular ``py.test`` script.
 
-
-Running tests
-=============
 
 Setup
 -----
@@ -111,7 +114,7 @@ See http://pytest.org/latest/usage.html for more examples.
 
 
 Writing New Tests
-=================
+-----------------
 
 Code should be written so it can be tested, and then there should be
 tests for it.
@@ -133,8 +136,8 @@ runner as long as the look like a test.
   directory.
 
 
-Writing New JavaScript Tests
-============================
+JavaScript Tests
+================
 
 JavaScript tests are not run in our normal unit test suite. Instead we have
 a different test system.
@@ -167,19 +170,199 @@ the relevant place and then create a new ``test_FILENAMEHERE.js`` file
 with your QUnit tests.
 
 
-Changing tests
-==============
+Smoketests
+==========
 
-Unless the current behavior, and thus the test that verifies that
-behavior is correct, is demonstrably wrong, don't change tests. Tests
-may be refactored as long as its clear that the result is the same.
+We have a smoketest suite. For more details, see that README:
+
+https://github.com/mozilla/fjord/tree/master/smoketests
 
 
-Removing tests
-==============
+Comprehensive test plan
+=======================
 
-On those rare, wonderful occasions when we get to remove code, we
-should remove the tests for it, as well.
+Sometimes, we need to make substantive changes to the site that touch a lot of
+parts. This test plan covers all the things you should do (at a minimum) to make
+sure those parts are still working.
 
-If we liberate some functionality into a new package, the tests for
-that functionality should move to that package, too.
+This is a good thing to do after doing a Django upgrade.
+
+.. Note::
+
+   These tests aren't run frequently and they're probably out of date.
+
+   Run through the test plan with your code **before** you make your
+   changes and update parts that have changed. Make sure to add
+   sections for new functionality.
+
+.. Note::
+
+   This is labeled "comprehensive", but probably leave some stuff out. We should
+   improve it as we use it.
+
+.. Note::
+
+   This test plan is very terse. You'll need to know your way around Fjord and
+   Input for this to make a lot of sense. Sorry about that.
+
+
+Unit tests
+----------
+
+1. run ``./py.test`` to run the unit tests with a clean database
+
+
+JavaScript tests
+----------------
+
+1. run ``./manage.py runserver``
+2. open your browser
+3. go to http://127.0.0.1:8000/static/tests/index.html
+
+
+Smoketests
+----------
+
+1. run ``./manage.py runserver`` in one terminal and launch the smoketests
+   in another terminal
+
+
+Testing collectstatic
+---------------------
+
+1. delete everything in ``static/``
+2. run ``./manage.py collectstatic`` and verify no errors and ``.js`` and ``.css``
+   files got built
+
+
+Testing migrations
+------------------
+
+1. run ``./manage.py makemigrations`` -- it shouldn't create any new
+   migrations
+2. run ``./manage.py migrate`` with a db dump
+
+
+Django check
+------------
+
+1. run ``./manage.py check`` and verify no errors
+
+
+Testing Elasticsearch and indexing
+----------------------------------
+
+1. run ``./manage.py esstatus``
+2. run ``./manage.py esreindex --percent=5`` to create a new index and
+   index some stuff
+3. run ``./manage.py esstatus`` to make sure the new index is there
+4. run ``./manage.py esdelete <index>`` to delete that index
+5. run ``./manage.py esstatus`` to make sure the index was deleted
+6. run ``./manage.py esreindex --percent=5`` to recreate the index
+7. verify feedback is indexed
+
+   1. run ``./manage.py runserver`` to launch the server
+   2. open up a browser
+   3. create some feedback and verify it appears on the front page
+      dashboard
+   4. run some searches in the dashboard to make sure searches work
+
+8. verify reindexing works from admin:
+
+   1. make sure ``CELERY_ALWAYS_EAGER = False`` in
+      ``fjord/settings/local.py``
+   2. run ``./manage.py celeryd`` to launch celery server
+   3. in another terminal, run ``./manage.py runserver``
+   4. open up a browser
+   5. log in to the server
+   6. go to admin
+   7. go to *Elasticssearch maintenance*
+   8. launch a reindexing
+
+      Make sure it's reindexing things. Once you know it's reindexing
+      things, then you can cut it short. Otherwise it takes *forever.
+
+
+Testing localizations
+---------------------
+
+1. make sure your ``locale/`` directory is up to date
+2. run ``./manage.py extract`` and make sure that it produced or updated
+   a ``locale/templates/LC_MESSAGES/django.pot`` file and that msgids
+   did not change
+3. run ``./manage.py merge`` and make sure it did the right thing
+4. run ``./bin/compile-linted-mo.sh`` and make sure dennis linted the
+   ``.po`` files and that the script compiled ``.mo`` files
+5. verify that localizations work:
+
+   1. run ``./manage.py runserver`` to launch the server
+   2. open up a browser
+   3. go to the front page dashboard and look at it in French and make
+      sure all strings are translated
+   4. leave feedback and make sure feedback form is in French
+
+
+Testing analyzer section
+------------------------
+
+Verify analyzer views load:
+
+1. run ``./manage.py runserver`` to launch the server
+2. open up a browser
+3. log in to the server
+4. go to analyzer section
+5. make sure all the views load
+
+
+Testing admin
+-------------
+
+Verify the admin views load:
+
+1. run ``./manage.py runserver`` to launch the server
+2. open up a browser
+3. log in to the server
+4. go to admin
+5. make sure all the admin views load
+
+
+Testing cron jobs
+-----------------
+
+1. for each job in ``bin/crontab/crontab.tpl``, make sure it works
+
+
+Testing documentation
+---------------------
+
+Verify that the documentatino builds:
+
+1. run ``cd docs/``
+2. run ``make html`` and make sure there are no build errors
+
+
+Testing vagrant
+---------------
+
+With an existing vagrant environment:
+
+1. run ``vagrant up``
+2. run ``./peep.sh install -r requirements/requirements.txt``
+3. run ``./peep.sh install -r requirements/dev.txt``
+4. run ``vagrant ssh``
+
+   1. run ``cd fjord``
+   2. run ``./py.test``
+
+Now we're going to create a new vagrant environment:
+
+1. run ``vagrant halt``
+2. run ``vagrant destroy --force``
+3. run ``vagrant up``
+4. run ``vagrant ssh``
+
+   1. run ``cd fjord``
+   2. run ``./py.test``
+
+If that works, then the Vagrant development environment probably works
+fine, too.
