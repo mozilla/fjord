@@ -28,7 +28,7 @@ CACHES = {
 
 # Debugging displays nice error messages, but leaks memory. Set this
 # to False on all server instances and True only for development.
-DEBUG = TEMPLATE_DEBUG = True
+DEBUG = True
 
 # Is this a development instance? Set this to True on
 # development instances and False on stage/prod.
