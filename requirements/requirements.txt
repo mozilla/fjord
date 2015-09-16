@@ -86,8 +86,8 @@ django-extensions==1.5.6
 # sha256: b0wujFraFwOf8cHji8Ub6pMXrzZ24oRmFIyN9fx48TI
 django-jinja==1.4.1
 
-# sha256: KBZYpZ2o6Kzqe_nK0TriNgqazbM-NGzwILCUknI-h10
-django-grappelli==2.6.3
+# sha256: gaXcJP2OVA1azbPP7LRLZ4e84yig6b2Vgbd_eCHSVss
+django-grappelli==2.7.1
 
 # sha256: TEiNy4TP_Yi80rFlGWK3Z_m7JFIGQHyOpngEPNOdPKg
 django-multidb-router==0.6
