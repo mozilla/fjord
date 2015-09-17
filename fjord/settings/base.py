@@ -232,7 +232,6 @@ LANGUAGES = lazy(lazy_langs, dict)()
 
 INSTALLED_APPS = (
     # Local apps
-    'cronjobs',  # for ./manage.py cron * cmd line tasks
     'django_browserid',
 
     # Django contrib apps
