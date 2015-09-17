@@ -5,16 +5,18 @@ from django.contrib.auth.models import User
 class Command(BaseCommand):
     help = 'Converts specified user into a superuser'
 
+    def add_arguments(self, parser):
+        parser.add_argument('email', nargs=1,
+                            help='Email address for account to elevate.')
+
     def handle(self, *args, **options):
-        if not args:
-            raise CommandError(
-                'You must specify the account email address to elevate.')
+        email = options['email'][0]
 
         try:
-            user = User.objects.get(email=args[0])
+            user = User.objects.get(email=email)
 
         except User.DoesNotExist:
-            raise CommandError('User %s does not exist.' % args[0])
+            raise CommandError('User %s does not exist.' % email)
 
         if user.is_superuser and user.is_staff:
             raise CommandError('User already has the power!')

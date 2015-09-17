@@ -9,10 +9,6 @@ setuptools==18.3.1
 # sha256: vWKlBersFicnz_K9LUwnYlm1HhXt9bgxvWKB915vfog
 https://github.com/jbalogh/django-mobility/archive/e2b60a1f96e4c4aed736395c01bf707e969d8e83.tar.gz#egg=django-mobility==0.1.0.1
 
-# jingo: something post 0.7
-# sha256: 5Yt-sicAUr_gY1Y-SwW6W_mvvxyBuUe2gzPpoB-3VbQ
-https://github.com/jbalogh/jingo/archive/fce09043542e71d972cc97d2ae703740741f80d0.tar.gz#egg=jingo==0.7.0.1
-
 # django-product-details: no releases
 # sha256: tLy18AIevr3_Rd7saf4cKuq_W1M3zpKFVOLBmggiCck
 https://github.com/mozilla/django-product-details/archive/d168ab2e689a1b54a30a923386fe7948a74ff334.tar.gz#egg=django-product-details==0.6.0.1
@@ -75,8 +71,8 @@ cssselect==0.9.1
 # sha256: MxnZwEi7pMyJqWkRgdDgIYei8JtDQ_0vz2zL-EtO4Yo
 dennis==0.6.1
 
-# sha256: uTV9LOvmGZcFXUF9YH-cZQ6BfNGjg7mhuIvx7a15fHU
-Django==1.7.10
+# sha256: gmmWyB4cx3NQASTVwZIS5KdoGlXuFp-rkIXyswFacNg
+Django==1.8.4
 
 # sha256: JL4TJtBHNh5HWbqZkqyoPtZd9Vg3UN_ovoEOscEx2HY
 django-adminplus==0.3
@@ -87,8 +83,11 @@ django-browserid==1.0
 # sha256: ZfstcU_VvbmwiDKZPCyEeLJdmMKj54dpbP52KsrmRUQ
 django-extensions==1.5.6
 
-# sha256: KBZYpZ2o6Kzqe_nK0TriNgqazbM-NGzwILCUknI-h10
-django-grappelli==2.6.3
+# sha256: b0wujFraFwOf8cHji8Ub6pMXrzZ24oRmFIyN9fx48TI
+django-jinja==1.4.1
+
+# sha256: gaXcJP2OVA1azbPP7LRLZ4e84yig6b2Vgbd_eCHSVss
+django-grappelli==2.7.1
 
 # sha256: TEiNy4TP_Yi80rFlGWK3Z_m7JFIGQHyOpngEPNOdPKg
 django-multidb-router==0.6

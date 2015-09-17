@@ -1,4 +1,4 @@
-from fjord.base.helpers import locale_name
+from fjord.base.templatetags.jinja_helpers import locale_name
 from fjord.base.tests import TestCase
 
 

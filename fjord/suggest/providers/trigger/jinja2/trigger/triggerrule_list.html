@@ -28,7 +28,7 @@
           <td>{{ obj.id }}</td>
           <td>{{ obj.is_enabled }}</td>
           <td>{{ obj.title }}</td>
-          <td>{{ '\n'.join(obj.locales)|nl2br or '--' }}</td>
+          <td>{{ '\n'.join(obj.locales)|linebreaks or '--' }}</td>
           <td>
             {% for prod in obj.products.all() %}
               {{ prod.db_name }}{% if not loop.last %}<br>{% endif %}
@@ -36,9 +36,9 @@
               --
             {% endfor %}
           </td>
-          <td>{{ '\n'.join(obj.versions)|nl2br or '--' }}</td>
+          <td>{{ '\n'.join(obj.versions)|linebreaks or '--' }}</td>
           <td>{% if obj.url_exists is none %}--{% else %}{{ obj.url_exists }}{% endif %}</td>
-          <td>{{ '\n'.join(obj.keywords)|nl2br or '--' }}</td>
+          <td>{{ '\n'.join(obj.keywords)|linebreaks or '--' }}</td>
         </tr>
       {% endfor %}
     </table>

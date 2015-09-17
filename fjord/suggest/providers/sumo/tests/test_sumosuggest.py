@@ -182,7 +182,7 @@ class TestSuggestWithRequest(SuggesterTestMixin, RedirectorTestMixin,
                 assert doc['summary'] == ret_doc['title']
                 assert doc['description'] == ret_doc['summary']
 
-            links = resp.context['suggestions']
+            links = resp.jinja_context['suggestions']
 
             # Abuse the fact that we know what order the links are in
             # since we're mocking.
@@ -265,7 +265,7 @@ class TestSUMOProviderLive(SuggesterTestMixin, TestCase):
         # strings since we don't really know what it's going to
         # return.
 
-        links = resp.context['suggestions']
+        links = resp.jinja_context['suggestions']
         assert links[0].provider == 'sumosuggest'
         assert links[0].provider_version == 1
 

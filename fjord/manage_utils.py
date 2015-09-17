@@ -7,6 +7,7 @@ These functions shouldn't be used after startup is completed.
 import logging
 import os
 import sys
+from functools import wraps
 from itertools import chain
 
 from fjord import path
@@ -14,10 +15,10 @@ from fjord import path
 
 log = logging.getLogger(__name__)
 
-# Denotes that setup_environ has been run.
+# Denotes that setup_environ has been run
 _has_setup_environ = False
 
-# Prevent from patching twice.
+# Prevent from patching twice
 _has_patched = False
 
 
@@ -158,11 +159,11 @@ def monkeypatch():
     if _has_patched:
         return
 
-    # Import for side-effect: configures logging handlers.
+    # Import for side-effect: configures logging handlers
     from fjord.settings.log_settings import noop
     noop()
 
-    # Monkey-patch admin site.
+    # Monkey-patch admin site
     from django.contrib import admin
     from django.contrib.auth.decorators import login_required
     from session_csrf import anonymous_csrf
@@ -172,23 +173,52 @@ def monkeypatch():
     admin.site = AdminSitePlus()
     admin.site.login = login_required(anonymous_csrf(admin.site.login))
 
-    # Monkey-patch django forms to avoid having to use Jinja2's |safe
-    # everywhere.
-    import jingo.monkey
-    jingo.monkey.patch()
-
     # Monkey-patch Django's csrf_protect decorator to use
-    # session-based CSRF tokens.
+    # session-based CSRF tokens
     import session_csrf
     session_csrf.monkeypatch()
 
-    from jingo import load_helpers
-    load_helpers()
-
     logging.debug('Note: monkeypatches executed in %s' % __file__)
 
-    # Prevent it from being run again later.
+    # Prevent it from being run again later
     _has_patched = True
+
+
+def monkeypatch_render():
+    import django.shortcuts
+
+    def more_info(fun):
+        """Django's render shortcut, but captures information for testing
+
+        When using Django's render shortcut with Jinja2 templates, none of
+        the information is captured and thus you can't use it for testing.
+
+        This alleviates that somewhat by capturing some of the information
+        allowing you to test it.
+
+        Caveats:
+
+        * it does *not* capture all the Jinja2 templates used to render.
+        Only the topmost one requested by the render() function.
+
+        """
+        @wraps(fun)
+        def _more_info(request, template_name, *args, **kwargs):
+            resp = fun(request, template_name, *args, **kwargs)
+
+            # If we're in a test situation, then capture it all
+            resp.jinja_templates = [template_name]
+            if args:
+                resp.jinja_context = args[0]
+            elif 'context' in kwargs:
+                resp.jinja_context = kwargs['context']
+            else:
+                resp.jinja_context = {}
+
+            return resp
+        return _more_info
+
+    django.shortcuts.render = more_info(django.shortcuts.render)
 
 
 def main(argv=None):

@@ -22,6 +22,10 @@ if __name__ == '__main__':
     manage_utils.setup_environ()
     manage_utils.monkeypatch()
 
+    # Also, we monkeypatch render so it captures the data we need
+    # in our tests.
+    manage_utils.monkeypatch_render()
+
     SKIP_CHECK = os.environ.get('SKIP_CHECK', '0')
     USING_VENDOR = os.environ.get('USING_VENDOR', '0')
 

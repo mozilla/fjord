@@ -4,39 +4,29 @@ import time
 import urllib
 import urlparse
 
-from django.contrib.humanize.templatetags import humanize
-from django.contrib.staticfiles.storage import staticfiles_storage
-from django.template import defaultfilters
-from django.utils.encoding import smart_str
-from django.utils.html import strip_tags
+from django.utils.encoding import smart_str, smart_text
 from django.utils.translation import ugettext_lazy as _lazy
 
 import jinja2
-from jingo import register
+from django_jinja import library
 from product_details import product_details
 
 from fjord.base.urlresolvers import reverse
 
 
-# Yanking filters from Django.
-register.filter(strip_tags)
-register.filter(defaultfilters.timesince)
-register.filter(defaultfilters.truncatewords)
+@library.filter
+def unknown(text):
+    """Converts empty string to localized 'Unknown'"""
+    return text if text else _lazy('Unknown')
 
 
-@register.function
-def thisyear():
-    """The current year."""
-    return jinja2.Markup(datetime.date.today().year)
-
-
-@register.function
+@library.global_function
 def url(viewname, *args, **kwargs):
-    """Helper for Django's ``reverse`` in templates."""
+    """Performs our localized reverse"""
     return reverse(viewname, args=args, kwargs=kwargs)
 
 
-@register.filter
+@library.filter
 def urlparams(url_, hash=None, **query):
     """Add a fragment and/or query paramaters to a URL.
 
@@ -48,7 +38,7 @@ def urlparams(url_, hash=None, **query):
 
     # Use dict(parse_qsl) so we don't get lists of values.
     q = url.query
-    query_dict = dict(urlparse.parse_qsl(smart_str(q))) if q else {}
+    query_dict = dict(urlparse.parse_qsl(smart_text(q))) if q else {}
     query_dict.update((k, v) for k, v in query.items())
 
     query_string = _urlencode([(k, v) for k, v in query_dict.items()
@@ -66,24 +56,6 @@ def _urlencode(items):
         return urllib.urlencode([(k, smart_str(v)) for k, v in items])
 
 
-@register.filter
-def urlencode(txt):
-    """Url encode a path."""
-    if isinstance(txt, unicode):
-        txt = txt.encode('utf-8')
-    return urllib.quote_plus(txt)
-
-
-@register.function
-def static(path):
-    return staticfiles_storage.url(path)
-
-
-@register.filter
-def naturaltime(*args):
-    return humanize.naturaltime(*args)
-
-
 def json_handle_datetime(obj):
     """Convert a datetime obj to a number of milliseconds since epoch.
 
@@ -97,12 +69,12 @@ def json_handle_datetime(obj):
         return obj
 
 
-@register.filter
+@library.filter
 def to_json(data):
     return json.dumps(data, default=json_handle_datetime)
 
 
-@register.filter
+@library.filter
 def locale_name(locale, native=False, default=_lazy(u'Unknown')):
     """Convert a locale code into a human readable locale name"""
     if locale in product_details.languages:
@@ -112,26 +84,35 @@ def locale_name(locale, native=False, default=_lazy(u'Unknown')):
         return default
 
 
-@register.function
+@library.global_function
 def date_ago(days=0):
     now = datetime.datetime.now()
     diff = datetime.timedelta(days=days)
     return (now - diff).date()
 
 
-@register.function
-def to_datetime_string(dt):
-    """Converts date/datetime to '%Y-%m-%dT%H:%M:%S'"""
-    return dt.strftime('%Y-%m-%dT%H:%M:%S')
-
-
-@register.function
+@library.global_function
 def to_date_string(dt):
     """Converts date/datetime to '%Y-%m-%d'"""
     return dt.strftime('%Y-%m-%d')
 
 
-@register.function
+@library.global_function
 def displayname(user):
     """Returns the best display name for the user"""
     return user.first_name or user.email
+
+
+@library.filter
+def fe(s, *args, **kwargs):
+    """Format a safe string with potentially unsafe arguments
+
+    :returns: safe string
+
+    """
+    args = [jinja2.escape(smart_text(v)) for v in args]
+
+    for k in kwargs:
+        kwargs[k] = jinja2.escape(smart_text(kwargs[k]))
+
+    return jinja2.Markup(s.format(*args, **kwargs))

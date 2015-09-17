@@ -75,7 +75,7 @@
     <h2>{% if update %}Update{% else %}Create{% endif %} Survey</h2>
     <p><span>{% if update %}<a href="{{ url('hb_surveys') }}">&lt; Back to surveys</a>{% endif %}</span></p>
     <form class="analyzer-form" action="" method="POST">
-      {{ csrf() }}
+      {% csrf_token %}
       {{ form.as_p() }}
       <input type="submit" value="Save">
     </form>
