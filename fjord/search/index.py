@@ -131,7 +131,7 @@ def get_doctypes(doctypes=None):
     if doctypes is None:
         return _doctypes
 
-    return dict((key, val) for key, val in _doctypes.itesm()
+    return dict((key, val) for key, val in _doctypes.items()
                 if key in doctypes)
 
 
