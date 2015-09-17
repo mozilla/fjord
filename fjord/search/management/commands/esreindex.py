@@ -1,24 +1,34 @@
+import argparse
 import logging
-from optparse import make_option
 from textwrap import dedent
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from fjord.search.index import es_reindex_cmd
 
 
+def int_percent(value):
+    value = int(value)
+    if not 1 <= value <= 100:
+        raise argparse.ArgumentTypeError('should be between 1 and 100')
+    return value
+
+
 class Command(BaseCommand):
     help = dedent("""\
-    Reindex the database for Elastic
+    Reindex the database for Elasticsearch.
 
-    Use --percent=20 for criticalmass indexing.
+    Note: Use --percent=10 for criticalmass indexing.
     """)
-    option_list = BaseCommand.option_list + (
-        make_option('--percent', type='int', dest='percent', default=100,
-                    help='Reindex a percentage of things'),
-        make_option('--doctypes', type='string', dest='doctypes',
-                    default=None,
-                    help='Comma-separated list of doc types to index'),
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--percent', type=int_percent, action='store', default=100,
+            help='Reindex a percentage of things. Defaults to 100.'
+        )
+        parser.add_argument(
+            '--doctypes', type=str, action='store',
+            help='Comma-separated list of doctypes to index.'
         )
 
     def handle(self, *args, **options):
@@ -28,6 +38,5 @@ class Command(BaseCommand):
 
         percent = options['percent']
         doctypes = options['doctypes']
-        if not 1 <= percent <= 100:
-            raise CommandError('percent should be between 1 and 100')
+
         es_reindex_cmd(percent, doctypes)

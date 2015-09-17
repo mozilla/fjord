@@ -2,7 +2,6 @@
 # TODO: Look into switching to makemessages provided by django-jinja.
 import os
 import sys
-from optparse import make_option
 from subprocess import Popen, call, PIPE
 from tempfile import TemporaryFile
 
@@ -35,12 +34,12 @@ class Command(BaseCommand):
     compendium will be used by gettext for fuzzy matching.
 
     """
-    option_list = BaseCommand.option_list + (
-        make_option('-c', '--create',
-                    action='store_true', dest='create', default=False,
-                    help='Create locale subdirectories'),
-
-    )
+    def add_argument(self, parser):
+        parser.add_argument(
+            '-c', '--create',
+            action='store_true', dest='create', default=False,
+            help='Create locale subdirectories'
+        )
 
     def handle(self, *args, **options):
         locale_dir = os.path.join(settings.ROOT, 'locale')
