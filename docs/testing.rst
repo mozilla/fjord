@@ -161,6 +161,10 @@ Then go to::
 (You might have to use a different protocol, host and port depending
 on how you have Fjord set up.)
 
+.. Note::
+
+   These are also run as part of the smoketest suite.
+
 
 Adding tests
 ------------
@@ -212,19 +216,15 @@ Unit tests
 1. run ``./py.test`` to run the unit tests with a clean database
 
 
-JavaScript tests
-----------------
-
-1. run ``./manage.py runserver``
-2. open your browser
-3. go to http://127.0.0.1:8000/static/tests/index.html
-
-
 Smoketests
 ----------
 
 1. run ``./manage.py runserver`` in one terminal and launch the smoketests
    in another terminal
+
+.. Note::
+
+   This also runs the JavaScript tests.
 
 
 Testing collectstatic
