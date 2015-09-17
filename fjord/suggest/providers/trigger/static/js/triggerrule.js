@@ -94,15 +94,26 @@
         }
 
         /**
+         * Converts a \n delimited text blob into an array.
+         *
+         * @param {String} The \n delimited text.
+         *
+         * @returns {Array} An array of strings.
+         */
+        function textToArray(value) {
+            return value.split('\n').filter(function (val) { return val !== ''; });
+        }
+
+        /**
          * Pulls values from form, sets up data, performs API call and when
          * that returns, generates the matches on the page.
          */
         function getMatches() {
             var data = {
-                locales: $('#id_locales').val().split('\n'),
+                locales: textToArray($('#id_locales').val()),
                 products: [],
-                versions: $('#id_versions').val().split('\n'),
-                keywords: $('#id_keywords').val().split('\n'),
+                versions: textToArray($('#id_versions').val()),
+                keywords: textToArray($('#id_keywords').val()),
                 url_exists: null
             };
             // product is in a select and we want the text--not the value.
