@@ -18,5 +18,5 @@ HOME=/tmp
 # translation systems.
 0 * * * * {{ user }} cd {{ source }} && {{ python }} manage.py translation_sync -v 0 --traceback
 
-# On Sundays at 3:10am
+# On Sundays at 3:10am, purge data per our data retention policies.
 10 3 * * 0 {{ user }} cd {{ source }} && {{ python }} manage.py purge_data -v 3 --traceback
