@@ -280,7 +280,7 @@ Testing Elasticsearch and indexing
    8. launch a reindexing
 
       Make sure it's reindexing things. Once you know it's reindexing
-      things, then you can cut it short. Otherwise it takes *forever.
+      things, then you can cut it short. Otherwise it takes *forever*.
 
 
 Testing localizations
