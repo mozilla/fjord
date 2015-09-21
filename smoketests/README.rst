@@ -11,8 +11,7 @@ These tests use the following things:
 1. py.test
 2. pytest-mozwebqa
 3. pytest-xdist
-4. UnittestZero
-5. selenium
+4. selenium
 
 
 Setting up to run the tests
