@@ -27,7 +27,7 @@ rest of Fjord so you're not mixing requirements::
 Running the tests
 =================
 
-Whenever you want to run these tests, first enter your virutal environment.
+Whenever you want to run these tests, first enter your virtual environment.
 
 To run tests it's a simple case of calling ``py.test`` from the root
 directory::
