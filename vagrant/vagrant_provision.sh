@@ -13,7 +13,7 @@ cd ~vagrant/fjord
 # Update sources and package indexes:
 apt-get update
 
-#configure locales:
+# Configure locales
 export LC_ALL="en_US.UTF-8"
 locale-gen en_US.UTF-8
 
