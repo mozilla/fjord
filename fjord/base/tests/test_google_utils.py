@@ -20,6 +20,12 @@ def set_sys_argv(sys_argv):
             def test_something(self):
                 ...
 
+    .. warning::
+
+       Since ``sys.argv`` could be used by anything, changing it in
+       this manner could have unintended side-effects. You have been
+       warned!
+
     """
     def _set_sys_argv(fun):
         @wraps(fun)
