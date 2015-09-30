@@ -4,6 +4,8 @@ from functools import wraps
 import requests_mock
 from mock import MagicMock, patch
 
+from django.test.utils import override_settings
+
 from fjord.base.google_utils import GOOGLE_API_URL, ga_track_event
 from fjord.base.tests import TestCase
 
@@ -17,6 +19,12 @@ def set_sys_argv(sys_argv):
             @set_sys_argv(['test'])
             def test_something(self):
                 ...
+
+    .. warning::
+
+       Since ``sys.argv`` could be used by anything, changing it in
+       this manner could have unintended side-effects. You have been
+       warned!
 
     """
     def _set_sys_argv(fun):
@@ -33,8 +41,9 @@ def set_sys_argv(sys_argv):
 
 
 class TestGoogleUtils(TestCase):
-    @set_sys_argv(['test'])
-    def test_ga_track_event_test(self):
+    @override_settings(DEBUG=True)
+    @set_sys_argv([])
+    def test_ga_track_event_debug_prefixes_with_test(self):
         with patch('fjord.base.google_utils.requests') as req_patch:
             # Create a mock that we can call .post() on and query what
             # it got params-wise. It doesn't matter what the return
@@ -77,24 +86,32 @@ class TestGoogleUtils(TestCase):
                 }
             )
 
+    @set_sys_argv([])
     def test_ga_track_event_async_true(self):
         """async=True, then delay() gets called once"""
         with requests_mock.Mocker() as m:
             m.post(GOOGLE_API_URL, text='')
 
-            d = 'fjord.base.google_utils.post_event.delay'
-            with patch(d) as delay_patch:
-                params = {'cid': 'xxx', 'ec': 'ou812'}
-                ga_track_event(params, async=True)
-                assert delay_patch.call_count == 1
+            post_event = 'fjord.base.google_utils.post_event'
+            post_event_delay = 'fjord.base.google_utils.post_event.delay'
+            with patch(post_event) as post_event_patch:
+                with patch(post_event_delay) as post_event_delay_patch:
+                    params = {'cid': 'xxx', 'ec': 'ou812'}
+                    ga_track_event(params, async=True)
+                    assert post_event_patch.call_count == 0
+                    assert post_event_delay_patch.call_count == 1
 
+    @set_sys_argv([])
     def test_ga_track_event_async_false(self):
         """async=False, then delay() never gets called"""
         with requests_mock.Mocker() as m:
             m.post(GOOGLE_API_URL, text='')
 
-            d = 'fjord.base.google_utils.post_event.delay'
-            with patch(d) as delay_patch:
-                params = {'cid': 'xxx', 'ec': 'ou812'}
-                ga_track_event(params, async=False)
-                assert delay_patch.call_count == 0
+            post_event = 'fjord.base.google_utils.post_event'
+            post_event_delay = 'fjord.base.google_utils.post_event.delay'
+            with patch(post_event) as post_event_patch:
+                with patch(post_event_delay) as post_event_delay_patch:
+                    params = {'cid': 'xxx', 'ec': 'ou812'}
+                    ga_track_event(params, async=False)
+                    assert post_event_patch.call_count == 1
+                    assert post_event_delay_patch.call_count == 0

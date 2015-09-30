@@ -31,6 +31,15 @@ def ga_track_event(params, async=True):
        testing/development data hosing your production data.
 
     """
+    # FIXME: We should only have the google id in settings in
+    # production and not anywhere else. Thus when not running in
+    # production, this function would check that setting, notice it
+    # was blank and then exit. Then we don't have to do this goofy
+    # "are we testing?" test which breaks when we change our testing
+    # infrastructure.
+    if sys.argv and sys.argv[0].endswith('py.test'):
+        return
+
     params.update({
         'v': '1',
         # FIXME: turn this into a setting. the complexity is that it's
@@ -39,9 +48,9 @@ def ga_track_event(params, async=True):
         't': 'event'
     })
 
-    # If we're in DEBUG mode or running tests, we don't want to hose
-    # production data, so we prepend test_ to the category.
-    if 'ec' in params and (settings.DEBUG or 'test' in sys.argv):
+    # If we're in DEBUG mode, we don't want to hose production data,
+    # so we prepend test_ to the category.
+    if 'ec' in params and settings.DEBUG:
         params['ec'] = 'test_' + params['ec']
 
     if async:
