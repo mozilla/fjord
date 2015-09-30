@@ -16,7 +16,7 @@ from fjord.base.l10n import split_context
 DEFAULT_DOMAIN = 'all'
 TEXT_DOMAIN = 'django'
 KEYWORDS = dict(DEFAULT_KEYWORDS)
-KEYWORDS.update({'_lazy': None})
+KEYWORDS['_lazy'] = None
 
 # List of domains that should be separate from the django.pot file.
 STANDALONE_DOMAINS = [TEXT_DOMAIN]
