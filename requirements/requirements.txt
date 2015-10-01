@@ -110,8 +110,8 @@ djangorestframework==3.2.3
 # sha256: 4o-THuB1Rpz5wPzTUfeAHqCqbXiNAc2-g54qs1a4yjY
 eadred==0.3
 
-# sha256: u5PYXKflDWjkGXhSu226YJi7dyUA-C9dsv9KgHEVBck
-elasticsearch==1.2.0
+# sha256: hIjWwDFu11Yezog5cwLDcjHGGkAiJ0lMqzGpGVmFHxI
+elasticsearch==1.7.0
 
 # sha256: zYMG5kw6EV3soTZoXpRduI_-FxOCAS7JOO0kGiDdfro
 factory-boy==2.5.2
