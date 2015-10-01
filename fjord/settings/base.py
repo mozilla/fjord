@@ -25,6 +25,7 @@ ROOT_URLCONF = '%s.urls' % PROJECT_MODULE
 
 ADMINS = ()
 DEV = False
+DEBUG = False
 
 DATABASES = {'default': config('DATABASE_URL', type_='database_url')}
 
@@ -56,12 +57,6 @@ USE_I18N = True
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale
 USE_L10N = True
-
-# Gettext text domain
-TEXT_DOMAIN = 'django'
-STANDALONE_DOMAINS = [TEXT_DOMAIN]
-TOWER_KEYWORDS = {'_lazy': None}
-TOWER_ADD_HEADERS = True
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -257,6 +252,8 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.messages',
     'django_extensions',
+    'django_jinja',
+    'django_jinja.contrib._humanize',  # Adds django humanize filters
     'eadred',
     'pipeline',
     'dennis.django_dennis',
@@ -347,27 +344,57 @@ STATIC_ROOT = path('static')
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/static/'
 
-def JINJA_CONFIG():
-    config = {
-        'extensions': [
-            'fjord.base.l10n.MozInternationalizationExtension',
-            'jinja2.ext.do',
-            'jinja2.ext.with_',
-            'jinja2.ext.loopcontrols',
-            'pipeline.templatetags.ext.PipelineExtension',
-        ],
-        'finalize': lambda x: x if x is not None else ''
-    }
-    return config
+_CONTEXT_PROCESSORS = [
+    'django.contrib.auth.context_processors.auth',
+    'django.contrib.messages.context_processors.messages',
+    'django.core.context_processors.request',
+    'session_csrf.context_processor',
+    'fjord.base.context_processors.globals',
+    'fjord.base.context_processors.i18n',
+]
 
-# Because Jinja2 is the default template loader, add any non-Jinja
-# templated apps here:
-JINGO_EXCLUDE_APPS = [
-    'admin',
-    'adminplus',
-    'grappelli',
-    'registration',
-    'browserid',
+# Template variables
+TEMPLATES = [
+    {
+        'BACKEND': 'django_jinja.backend.Jinja2',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            # Use jinja2/ for jinja templates
+            'app_dirname': 'jinja2',
+            # Don't figure out which template loader to use based on
+            # file extension
+            'match_extension': '',
+            'newstyle_gettext': True,
+            'context_processors': _CONTEXT_PROCESSORS,
+            'undefined': 'jinja2.Undefined',
+            'extensions': [
+                'jinja2.ext.do',
+                'jinja2.ext.loopcontrols',
+                'jinja2.ext.with_',
+                'jinja2.ext.autoescape',
+                'django_jinja.builtins.extensions.CsrfExtension',
+                'django_jinja.builtins.extensions.StaticFilesExtension',
+                'django_jinja.builtins.extensions.DjangoFiltersExtension',
+                'fjord.base.l10n.MozInternationalizationExtension',
+                'pipeline.templatetags.ext.PipelineExtension',
+            ],
+            'globals': {
+                'browserid_info': 'django_browserid.helpers.browserid_info',
+                'browserid_login': 'django_browserid.helpers.browserid_login',
+                'browserid_logout': 'django_browserid.helpers.browserid_logout'
+            }
+        }
+    },
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'debug': DEBUG,
+            'context_processors': _CONTEXT_PROCESSORS,
+        }
+    },
 ]
 
 # Django Pipeline
@@ -543,28 +570,6 @@ LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL_FAILURE = '/login-failure'
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'jingo.Loader',
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
-
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.contrib.auth.context_processors.auth',
-    'django.core.context_processors.debug',
-    'django.core.context_processors.media',
-    'django.core.context_processors.request',
-    'session_csrf.context_processor',
-    'django.contrib.messages.context_processors.messages',
-    'fjord.base.context_processors.i18n',
-    'fjord.base.context_processors.globals',
-)
-
-TEMPLATE_DIRS = (
-    path('templates'),
-)
-
 # Always generate a CSRF token for anonymous users.
 ANON_ALWAYS = True
 
@@ -577,6 +582,7 @@ DOMAIN_METHODS = {
     'django': [
         ('fjord/**.py', 'fjord.base.l10n.extract_python'),
         ('fjord/**/templates/**.html', 'fjord.base.l10n.extract_template'),
+        ('fjord/**/jinja2/**.html',  'fjord.base.l10n.extract_template'),
         ('templates/**.html', 'fjord.base.l10n.extract_template'),
     ]
 }

@@ -7,7 +7,7 @@
         <label for="language">{{ _('Other languages:') }}</label>
         <select id="language" name="lang" dir="ltr">
           {% for code, name in LANGUAGES|dictsort -%}
-            <option value="{{ code }}" {{ code|ifeq(LANG|lower, "selected") }}>
+            <option value="{{ code }}" {{ "selected" if code == LANG.lower() }}>
               {{ name }}
             </option>
           {%- endfor %}

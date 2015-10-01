@@ -13,6 +13,5 @@ def i18n(request):
 
 def globals(request):
     return {
-        'request': request,
-        'settings': settings
+        'settings': settings,
     }

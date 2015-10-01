@@ -11,6 +11,7 @@ from fjord.base.tests import (
     AnalyzerProfileFactory,
     LocalizingClient,
     reverse,
+    template_used
 )
 from fjord.feedback.tests import ResponseFactory, ProductFactory
 from fjord.search.tests import ElasticTestCase
@@ -50,7 +51,7 @@ class TestDashboardView(ElasticTestCase):
         url = reverse('dashboard')
         resp = self.client.get(url)
         assert resp.status_code == 200
-        self.assertTemplateUsed(resp, 'analytics/dashboard.html')
+        assert template_used(resp, 'analytics/dashboard.html')
 
         pq = PyQuery(resp.content)
         # Make sure that each opinion is shown and that the count is correct.
@@ -307,7 +308,7 @@ class TestDashboardView(ElasticTestCase):
         """If index is missing, show es_down template."""
         self.teardown_indexes()
         resp = self.client.get(reverse('dashboard'))
-        self.assertTemplateUsed(resp, 'analytics/es_down.html')
+        assert template_used(resp, 'analytics/es_down.html')
 
     def test_frontpage_es_down(self):
         """If can't connect to ES, show es_down template."""
@@ -319,7 +320,7 @@ class TestDashboardView(ElasticTestCase):
             views.counts_to_options = mock_counts_to_options
 
             resp = self.client.get(reverse('dashboard'))
-            self.assertTemplateUsed(resp, 'analytics/es_down.html')
+            assert template_used(resp, 'analytics/es_down.html')
 
         finally:
             views.counts_to_options = old_counts_to_options
@@ -337,7 +338,7 @@ class TestResponseview(ElasticTestCase):
         url = reverse('dashboard')
         r = self.client.get(url)
         assert r.status_code == 200
-        self.assertTemplateUsed(r, 'analytics/dashboard.html')
+        assert template_used(r, 'analytics/dashboard.html')
 
         pq = PyQuery(r.content)
         # Get the permalink
@@ -345,7 +346,7 @@ class TestResponseview(ElasticTestCase):
 
         r = self.client.get(permalink)
         assert r.status_code == 200
-        self.assertTemplateUsed(r, 'analytics/response.html')
+        assert template_used(r, 'analytics/response.html')
         assert str(resp.description) in r.content
 
     def test_response_view_mobile(self):
@@ -357,7 +358,7 @@ class TestResponseview(ElasticTestCase):
         r = self.client.get(reverse('response_view', args=(resp.id,)),
                             {'mobile': 1})
         assert r.status_code == 200
-        self.assertTemplateUsed(r, 'analytics/mobile/response.html')
+        assert template_used(r, 'analytics/mobile/response.html')
         assert str(resp.description) in r.content
 
     def test_response_view_analyzer(self):
@@ -368,7 +369,7 @@ class TestResponseview(ElasticTestCase):
         r = self.client.get(reverse('response_view', args=(resp.id,)))
 
         assert r.status_code == 200
-        self.assertTemplateUsed(r, 'analytics/response.html')
+        assert template_used(r, 'analytics/response.html')
         assert str(resp.description) in r.content
 
         # Verify there is no secret area visible for non-analyzers.
@@ -382,7 +383,7 @@ class TestResponseview(ElasticTestCase):
         r = self.client.get(reverse('response_view', args=(resp.id,)))
 
         assert r.status_code == 200
-        self.assertTemplateUsed(r, 'analytics/response.html')
+        assert template_used(r, 'analytics/response.html')
         assert str(resp.description) in r.content
 
         # Verify the secret area is there.
@@ -413,7 +414,7 @@ class TestSpotTranslate(ElasticTestCase):
         assert resp.status_code == 200
 
         # Assert we show a message to the user
-        assert len(resp.context['messages']) == 1
+        assert len(resp.jinja_context['messages']) == 1
 
         # FIXME: We could assert that a translation task was created,
         # but that involves a bunch of other setup and stuff internal

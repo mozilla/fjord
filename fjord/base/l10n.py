@@ -1,24 +1,10 @@
 # NOTE: The code in this file was mostly copied from tower.
 import re
 
-from django.utils.translation import ugettext, ungettext
-
 import jinja2
 from babel.messages.extract import extract_python as babel_extract_python
 from jinja2 import ext
 from jinja2.ext import InternationalizationExtension
-
-
-def install_gettext():
-    """Install gettext into the Jinja2 environment."""
-    class Translation(object):
-        # We pass this object to jinja so it can use django's gettext
-        # implementation.
-        ugettext = staticmethod(ugettext)
-        ungettext = staticmethod(ungettext)
-
-    import jingo
-    jingo.env.install_gettext_translations(Translation)
 
 
 def add_context(context, message):
@@ -34,15 +20,15 @@ def split_context(message):
     return ret
 
 
-def strip_whitespace(message):
+def collapse_whitespace(message):
     return re.compile(r'\s+', re.UNICODE).sub(' ', message).strip()
 
 
 @jinja2.contextfunction
 def _gettext_alias(context, text, *args, **kwargs):
-    """Takes the result of gettext and marks it safe."""
+    """Takes the result of gettext and marks it safe"""
     return jinja2.Markup(
-        context.resolve('gettext')(text, *args, **kwargs)
+        context.resolve('gettext')(context, text, *args, **kwargs)
     )
 
 
@@ -59,7 +45,7 @@ class MozInternationalizationExtension(InternationalizationExtension):
     def _parse_block(self, parser, allow_pluralize):
         parse_block = InternationalizationExtension._parse_block
         ref, buffer = parse_block(self, parser, allow_pluralize)
-        return ref, strip_whitespace(buffer)
+        return ref, collapse_whitespace(buffer)
 
 
 def tweak_message(message):
@@ -76,8 +62,7 @@ def tweak_message(message):
 
     """
     if isinstance(message, basestring):
-        message = strip_whitespace(message)
-
+        message = collapse_whitespace(message)
     elif isinstance(message, tuple):
         # A tuple of 2 has context, 3 is plural, 4 is plural with context
         if len(message) == 2:
@@ -85,13 +70,13 @@ def tweak_message(message):
         elif len(message) == 3:
             if all(isinstance(x, basestring) for x in message[:2]):
                 singular, plural, num = message
-                message = (strip_whitespace(singular),
-                           strip_whitespace(plural),
+                message = (collapse_whitespace(singular),
+                           collapse_whitespace(plural),
                            num)
         elif len(message) == 4:
             singular, plural, num, ctxt = message
-            message = (add_context(ctxt, strip_whitespace(singular)),
-                       add_context(ctxt, strip_whitespace(plural)),
+            message = (add_context(ctxt, collapse_whitespace(singular)),
+                       add_context(ctxt, collapse_whitespace(plural)),
                        num)
     return message
 

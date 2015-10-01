@@ -2,7 +2,6 @@
 # TODO: Look into switching to makemessages provided by django-jinja.
 import os
 import sys
-from optparse import make_option
 from subprocess import Popen, call, PIPE
 from tempfile import TemporaryFile
 
@@ -10,36 +9,37 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 
 
-try:
-    domains = settings.STANDALONE_DOMAINS
-except AttributeError:
-    domains = [settings.TEXT_DOMAIN]
+TEXT_DOMAIN = 'django'
+
+# List of domains that should be separate from the django.pot file.
+STANDALONE_DOMAINS = [TEXT_DOMAIN]
 
 
 class Command(BaseCommand):
     """Updates all locales' PO files by merging them with the POT files.
 
-    The command looks for POT files in locale/templates/LC_MESSAGES, which is
-    where software like Verbatim looks for them as well.
+    The command looks for POT files in locale/templates/LC_MESSAGES,
+    which is where software like Verbatim looks for them as well.
 
-    For a given POT file, if a corresponding PO file doesn't exist for a
-    locale, the command will initialize it with `msginit`. This guarantees
-    that the newly created PO file has proper gettext metadata headers.
+    For a given POT file, if a corresponding PO file doesn't exist for
+    a locale, the command will initialize it with `msginit`. This
+    guarantees that the newly created PO file has proper gettext
+    metadata headers.
 
     During merging (or initializing), the command will also look in
-    `locale/compendia` for a locale-specific compendium of translations
-    (serving as a translation memory of sorts). The compendium file must
-    be called `${locale}.compendium`, e.g. `es_ES.compendium` for Spanish.
-    The translations in the compendium will be used by gettext for fuzzy
-    matching.
+    `locale/compendia` for a locale-specific compendium of
+    translations (serving as a translation memory of sorts). The
+    compendium file must be called `${locale}.compendium`,
+    e.g. `es_ES.compendium` for Spanish.  The translations in the
+    compendium will be used by gettext for fuzzy matching.
 
     """
-    option_list = BaseCommand.option_list + (
-        make_option('-c', '--create',
-                    action='store_true', dest='create', default=False,
-                    help='Create locale subdirectories'),
-
-    )
+    def add_argument(self, parser):
+        parser.add_argument(
+            '-c', '--create',
+            action='store_true', dest='create', default=False,
+            help='Create locale subdirectories'
+        )
 
     def handle(self, *args, **options):
         locale_dir = os.path.join(settings.ROOT, 'locale')
@@ -51,7 +51,7 @@ class Command(BaseCommand):
                 if not os.path.exists(d):
                     os.makedirs(d)
 
-        for domain in domains:
+        for domain in STANDALONE_DOMAINS:
             print 'Merging %s strings to each locale...' % domain
             domain_pot = os.path.join(locale_dir, 'templates', 'LC_MESSAGES',
                                       '%s.pot' % domain)

@@ -18,7 +18,7 @@ from elasticsearch_dsl import F
 from mobility.decorators import mobile_template
 
 from fjord.analytics.utils import counts_to_options
-from fjord.base.helpers import locale_name
+from fjord.base.templatetags.jinja_helpers import locale_name
 from fjord.base.urlresolvers import reverse
 from fjord.base.utils import (
     analyzer_required,

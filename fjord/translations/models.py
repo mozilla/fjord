@@ -1,8 +1,8 @@
 from datetime import datetime
 
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
 from django.core.mail import mail_admins
 from django.db import models
 
@@ -224,7 +224,7 @@ class GengoJob(ModelBase):
     # Generic foreign key to the instance this record is about
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey()
+    content_object = GenericForeignKey()
 
     tier = models.CharField(max_length=10, default=u'')
 

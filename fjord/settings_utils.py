@@ -65,13 +65,12 @@ def parse_database_url(val):
         'PASSWORD': url_parts.password,
         'HOST': url_parts.hostname.lower(),
         'PORT': url_parts.port,
+        'CHARSET': 'utf8',
+        'COLLATION': 'utf8_general_ci',
         'OPTIONS': {
             'init_command': 'SET storage_engine=InnoDB',
-            'charset': 'utf8',
             'use_unicode': True,
         },
-        'TEST_CHARSET': 'utf8',
-        'TEST_COLLATION': 'utf8_general_ci',
     }
 
 

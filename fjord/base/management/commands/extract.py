@@ -2,7 +2,6 @@
 # TODO: Look into switching to makemessages provided by django-jinja.
 import os
 import tempfile
-from optparse import make_option
 from subprocess import Popen
 
 from django.core.management.base import BaseCommand
@@ -15,48 +14,29 @@ from fjord.base.l10n import split_context
 
 
 DEFAULT_DOMAIN = 'all'
-TEXT_DOMAIN = getattr(settings, 'TEXT_DOMAIN', 'messages')
+TEXT_DOMAIN = 'django'
+KEYWORDS = dict(DEFAULT_KEYWORDS)
+KEYWORDS['_lazy'] = None
 
-
-# JINJA_CONFIG can be a callable or a dict.
-if hasattr(settings.JINJA_CONFIG, '__call__'):
-    JINJA_CONFIG = settings.JINJA_CONFIG()
-else:
-    JINJA_CONFIG = settings.JINJA_CONFIG
-
-
-# By default, all the domains you speficy will be merged into one big
-# messages.po file.  If you want to separate a domain from the main .po file,
-# specify it in this list.  Make sure to include TEXT_DOMAIN in this list, even
-# if you have other .po files you're generating
-try:
-    standalone_domains = settings.STANDALONE_DOMAINS
-except AttributeError:
-    standalone_domains = [TEXT_DOMAIN]
-
-
-TOWER_KEYWORDS = dict(DEFAULT_KEYWORDS)
-
-
-if hasattr(settings, 'TOWER_KEYWORDS'):
-    TOWER_KEYWORDS.update(settings.TOWER_KEYWORDS)
-
+# List of domains that should be separate from the django.pot file.
+STANDALONE_DOMAINS = [TEXT_DOMAIN]
 
 OPTIONS_MAP = {
-    '**.*': {'extensions': ','.join(JINJA_CONFIG['extensions'])},
+    '**.*': {
+        # Get list of extensions for django-jinja template backend
+        'extensions': ','.join(settings.TEMPLATES[0]['OPTIONS']['extensions'])
+    }
 }
-
 
 COMMENT_TAGS = ['L10n:', 'L10N:', 'l10n:', 'l10N:']
 
 
 def create_pounit(filename, lineno, message, comments):
     unit = po.pounit(encoding='UTF-8')
-    context, msg = split_context(message)
-    unit.setsource(msg)
+    context, msgid = split_context(message)
+    unit.setsource(msgid)
     if context:
         unit.msgctxt = ['"%s"' % context]
-
     for comment in comments:
         unit.addnote(comment, 'developer')
 
@@ -65,13 +45,7 @@ def create_pounit(filename, lineno, message, comments):
 
 
 def create_pofile_from_babel(extracted):
-    try:
-        if settings.TOWER_ADD_HEADERS:
-            catalog = po.pofile()
-        else:
-            catalog = po.pofile(inputfile='')
-    except AttributeError:
-        catalog = po.pofile(inputfile='')
+    catalog = po.pofile()
 
     for extracted_unit in extracted:
         filename, lineno, message, comments, context = extracted_unit
@@ -83,16 +57,16 @@ def create_pofile_from_babel(extracted):
 
 
 class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
-        make_option(
+    def add_arguments(self, parser):
+        parser.add_argument(
             '--domain', '-d', default=DEFAULT_DOMAIN, dest='domain',
             help=(
                 'The domain of the message files.  If "all" '
                 'everything will be extracted and combined into '
                 '%s.pot. (default: %%default).' % TEXT_DOMAIN
             )
-        ),
-        make_option(
+        )
+        parser.add_argument(
             '--output-dir', '-o',
             default=os.path.join(settings.ROOT, 'locale', 'templates',
                                  'LC_MESSAGES'),
@@ -101,13 +75,12 @@ class Command(BaseCommand):
                 'The directory where extracted files will be placed. '
                 '(Default: %default)'
             )
-        ),
-        make_option(
+        )
+        parser.add_argument(
             '-c', '--create',
             action='store_true', dest='create', default=False,
             help='Create output-dir if missing'
-        ),
-    )
+        )
 
     def handle(self, *args, **options):
         domains = options.get('domain')
@@ -136,13 +109,14 @@ class Command(BaseCommand):
             print 'Extracting all strings in domain %s...' % (domain)
 
             methods = settings.DOMAIN_METHODS[domain]
-            extracted = extract_from_dir(root,
-                                         method_map=methods,
-                                         keywords=TOWER_KEYWORDS,
-                                         comment_tags=COMMENT_TAGS,
-                                         callback=callback,
-                                         options_map=OPTIONS_MAP,
-                                         )
+            extracted = extract_from_dir(
+                root,
+                method_map=methods,
+                keywords=KEYWORDS,
+                comment_tags=COMMENT_TAGS,
+                callback=callback,
+                options_map=OPTIONS_MAP,
+            )
             catalog = create_pofile_from_babel(extracted)
             if not os.path.exists(outputdir):
                 raise Exception('Expected %s to exist... BAILING' % outputdir)
@@ -150,7 +124,7 @@ class Command(BaseCommand):
             catalog.savefile(os.path.join(outputdir, '%s.pot' % domain))
 
         pot_files = []
-        for i in [x for x in domains if x not in standalone_domains]:
+        for i in [x for x in domains if x not in STANDALONE_DOMAINS]:
             pot_files.append(os.path.join(outputdir, '%s.pot' % i))
 
         if len(pot_files) > 1:
@@ -165,8 +139,7 @@ class Command(BaseCommand):
             pot_files.append(final_out)
 
             meltingpot = tempfile.TemporaryFile()
-            command = ['msgcat'] + pot_files
-            p1 = Popen(command, stdout=meltingpot)
+            p1 = Popen(['msgcat'] + pot_files, stdout=meltingpot)
             p1.communicate()
             meltingpot.seek(0)
 
@@ -176,7 +149,7 @@ class Command(BaseCommand):
 
             meltingpot.close()
 
-            for i in [x for x in domains if x not in standalone_domains]:
+            for i in [x for x in domains if x not in STANDALONE_DOMAINS]:
                 os.remove(os.path.join(outputdir, '%s.pot' % i))
 
         print 'Done'
