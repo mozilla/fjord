@@ -26,10 +26,6 @@ https://github.com/mozilla/django-session-csrf/archive/f00ad913c62e139d36078e8a7
 # sha256: LNuiwc8Y2VXj1exySpULEZ1aUq4SvixomRyR-kjxTYE
 https://github.com/willkg/django-waffle/archive/fe1a279c14c45624e491efa8bdae252e51b91b33.tar.gz#egg=django-waffle==0.10.1.1
 
-# elasticsearch-dsl-py: something after 0.4 on the master branch
-# sha256: vjS8Y8ALOYaefyPtR39argGfmTTFReNUVOUvuJcx7Zs
-https://github.com/elastic/elasticsearch-dsl-py/archive/423c4f20d5f28599145712bd11ac9ce23e616f9a.tar.gz#egg=elasticsearch-dsl==0.4.0.1
-
 # Requirements from PyPI
 
 # sha256: 68_IZ95aaPn1uhTRHbrYjmr_hDWo05M51c6w5bBt5kA
@@ -112,6 +108,9 @@ eadred==0.3
 
 # sha256: hIjWwDFu11Yezog5cwLDcjHGGkAiJ0lMqzGpGVmFHxI
 elasticsearch==1.7.0
+
+# sha256: 8UuM7WZr4UJlQTP-ZznWVrMZxKnsMiitFEvQ8o42pDU
+elasticsearch-dsl==0.0.8
 
 # sha256: zYMG5kw6EV3soTZoXpRduI_-FxOCAS7JOO0kGiDdfro
 factory-boy==2.5.2
