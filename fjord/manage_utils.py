@@ -185,6 +185,13 @@ def monkeypatch():
 
 
 def monkeypatch_render():
+    """Monkeypatches django.shortcuts.render for Jinja2 kung-fu action
+
+    .. Note::
+
+       Only call this in a testing context!
+
+    """
     import django.shortcuts
 
     def more_info(fun):
@@ -206,7 +213,6 @@ def monkeypatch_render():
         def _more_info(request, template_name, *args, **kwargs):
             resp = fun(request, template_name, *args, **kwargs)
 
-            # If we're in a test situation, then capture it all
             resp.jinja_templates = [template_name]
             if args:
                 resp.jinja_context = args[0]
