@@ -32,6 +32,30 @@ class JSONDatetimeEncoder(json.JSONEncoder):
         return super(JSONDatetimeEncoder, self).default(value)
 
 
+def mobile_template(template):
+    """
+    Mark a function as mobile-ready and pass a mobile template if MOBILE.
+
+    @mobile_template('a/{mobile/}/b.html')
+    def view(request, template=None):
+        ...
+
+    if request.MOBILE=True the template will be 'a/mobile/b.html'.
+    if request.MOBILE=False the template will be 'a/b.html'.
+
+    This function is useful if the mobile view uses the same context but a
+    different template.
+    """
+    def decorator(f):
+        @wraps(f)
+        def wrapper(request, *args, **kw):
+            fmt = {'mobile/': 'mobile/' if request.MOBILE else ''}
+            kw['template'] = template.format(**fmt)
+            return f(request, *args, **kw)
+        return wrapper
+    return decorator
+
+
 def wrap_with_paragraphs(text, width=72):
     """Runs textwrap on text, but keeps pre-existing paragraphs"""
     if not text:

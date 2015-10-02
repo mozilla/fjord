@@ -8,7 +8,6 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.decorators.http import require_POST
 
-from mobility.decorators import mobile_template
 from statsd.defaults.django import statsd
 import waffle
 
@@ -16,6 +15,7 @@ from fjord.base.browsers import UNKNOWN
 from fjord.base.urlresolvers import reverse
 from fjord.base.utils import (
     actual_ip_plus_context,
+    mobile_template,
     ratelimit,
     smart_int,
     smart_str,
