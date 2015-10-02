@@ -64,8 +64,8 @@ commonware==0.4.3
 # sha256: BTWn4nAUh0snrjpNM-h0njRb36YnZhlSCLeZa_EQBoI
 cssselect==0.9.1
 
-# sha256: MxnZwEi7pMyJqWkRgdDgIYei8JtDQ_0vz2zL-EtO4Yo
-dennis==0.6.1
+# sha256: _eJnrrA6jUnjNB5_caIoxnSNzkO1wA9lWBeA2Ztwstk
+dennis==0.7
 
 # sha256: gmmWyB4cx3NQASTVwZIS5KdoGlXuFp-rkIXyswFacNg
 Django==1.8.4
