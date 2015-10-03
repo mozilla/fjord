@@ -16,9 +16,9 @@ from django.views.decorators.csrf import csrf_exempt
 
 from celery.messaging import establish_connection
 from elasticsearch.exceptions import ConnectionError, NotFoundError
-from mobility.decorators import mobile_template
 
 from fjord.base.models import Profile
+from fjord.base.utils import mobile_template
 from fjord.base.urlresolvers import reverse
 from fjord.search.index import get_index_name, get_index_stats
 

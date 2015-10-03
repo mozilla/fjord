@@ -15,7 +15,6 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from elasticsearch_dsl import F
-from mobility.decorators import mobile_template
 
 from fjord.analytics.utils import counts_to_options
 from fjord.base.templatetags.jinja_helpers import locale_name
@@ -23,6 +22,7 @@ from fjord.base.urlresolvers import reverse
 from fjord.base.utils import (
     analyzer_required,
     check_new_user,
+    mobile_template,
     smart_int,
     smart_date,
     Atom1FeedWithRelatedLinks,

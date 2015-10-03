@@ -5,10 +5,6 @@ setuptools==18.3.1
 
 # Requirements from github urls because we're using non-released things
 
-# django-mobility: no releases
-# sha256: vWKlBersFicnz_K9LUwnYlm1HhXt9bgxvWKB915vfog
-https://github.com/jbalogh/django-mobility/archive/e2b60a1f96e4c4aed736395c01bf707e969d8e83.tar.gz#egg=django-mobility==0.1.0.1
-
 # django-product-details: no releases
 # sha256: tLy18AIevr3_Rd7saf4cKuq_W1M3zpKFVOLBmggiCck
 https://github.com/mozilla/django-product-details/archive/d168ab2e689a1b54a30a923386fe7948a74ff334.tar.gz#egg=django-product-details==0.6.0.1
