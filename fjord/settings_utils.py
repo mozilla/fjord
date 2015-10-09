@@ -71,6 +71,10 @@ def parse_database_url(val):
             'init_command': 'SET storage_engine=InnoDB',
             'use_unicode': True,
         },
+        'TEST': {
+            'CHARSET': 'utf8',
+            'COLLATIONS': 'utf8_general_ci',
+        }
     }
 
 
