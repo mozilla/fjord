@@ -50,7 +50,7 @@ def hb_data(request, answerid=None):
         # Get fields and split on comma, then get rid of empty fields.
         fields = request.GET.get('fields', '').split(',')
 
-        # Make sure all the fields
+        # Nix any fields that don't exist
         fields = [field for field in fields if field and field in ALL_FIELDS]
 
         # If we have no fields, then use default_fields.
