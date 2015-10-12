@@ -51,7 +51,7 @@ def hb_data(request, answerid=None):
         fields = request.GET.get('fields', '').split(',')
 
         # Nix any fields that don't exist
-        fields = [field for field in fields if field and field in ALL_FIELDS]
+        fields = [field for field in fields if field in ALL_FIELDS]
 
         # If we have no fields, then use default_fields.
         fields = fields or DEFAULT_FIELDS
