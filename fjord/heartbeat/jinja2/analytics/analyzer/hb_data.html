@@ -37,6 +37,7 @@
         <option value="test" {% if showdata == 'test' %} selected {% endif %}>Only test data</option>
         <option value="notest" {% if showdata == 'notest' %} selected {% endif %}>Only non-test data</option>
       </select>
+      <input type="hidden" name="fields" value="{{ ','.join(fields) }}">
       <input type="hidden" name="sortby" value="{{ sortby }}">
       <input type="submit" value="Filter">
     </form>
@@ -156,59 +157,48 @@
 
         <table class="summarytable">
           <tr>
-            <th><a href="{{ request.get_full_path()|urlparams(sortby='id') }}">id</a>{% if sortby == 'id' %} v{% endif %}</th>
-            <th><a href="{{ request.get_full_path()|urlparams(sortby='received_ts') }}">received</a>{% if sortby == 'received_ts' %} v{% endif %}</th>
-            <th><a href="{{ request.get_full_path()|urlparams(sortby='updated_ts') }}">updated</a>{% if sortby == 'updated_ts' %} v{% endif %}</th>
-            <th>experiment ver</th>
-            <th>response ver</th>
-            <th>person_id</th>
-            <th>survey_id</th>
-            <th>flow_id</th>
-            <th>question_id</th>
-            <th>variation_id</th>
-
-            <th>score</th>
-            <th>max_score</th>
-            <th>flow_began_ts</th>
-            <th>flow_offered_ts</th>
-            <th>flow_voted_ts</th>
-            <th>flow_engaged_ts</th>
-            <th>platform</th>
-            <th>channel</th>
-            <th>version</th>
-            <th>locale</th>
-            <th>profile_age</th>
+            {% for field in fields %}
+              {% set is_sortbyheader = (field in ('id', 'received_ts', 'updated_ts')) %}
+              <th>
+                {% if is_sortbyheader %}
+                  <a href="{{ request.get_full_path()|urlparams(sortby=field) }}">{{ field }}</a>
+                {% else %}
+                  {{ field }}
+                {% endif %}
+              </th>
+            {% endfor %}
           </tr>
 
           {% for ans in answers %}
             <tr {% if ans.is_test %} class="test-answer" {% endif %}>
-              <td><a href="{{ url('hb_data', answerid=ans.id) }}">{{ ans.id }}</a></td>
-              <td><span class="nowrap" title="{{ ans.received_ts }}">{{ ans.received_ts }}</span></td>
-              <td><span class="nowrap" title="{{ ans.updated_ts }}">{{ fix_ts(ans.updated_ts) }}</span></td>
-              <td>{{ ans.experiment_version }}</td>
-              <td>{{ ans.response_version }}</td>
-              <td>{{ ans.person_id }}</td>
-              <td>{{ ans.survey_id.name }}</td>
-              <td>{{ ans.flow_id }}</td>
-              <td>{{ ans.question_id }}</td>
-              <td>{{ ans.variation_id }}</td>
-
-              <td>{{ ans.score }}</td>
-              <td>{{ ans.max_score }}</td>
-              <td>{{ display_ts(fix_ts, ans.flow_began_ts) }}</td>
-              <td>{{ display_ts(fix_ts, ans.flow_offered_ts) }}</td>
-              <td>{{ display_ts(fix_ts, ans.flow_voted_ts) }}</td>
-              <td>{{ display_ts(fix_ts, ans.flow_engaged_ts) }}</td>
-              <td>{{ ans.platform }}</td>
-              <td>{{ ans.channel }}</td>
-              <td>{{ ans.version }}</td>
-              <td>{{ ans.locale }}</td>
-              <td>{{ ans.profile_age }}</td>
+              {% for field in fields %}
+                <td>
+                  {% if field == 'id' %}
+                    <a href="{{ url('hb_data', answerid=ans.id) }}">{{ ans.id }}</a>
+                  {% else %}
+                    {% if field == 'updated_ts' %}
+                      {% set val = fix_ts(ans.updated_ts) %}
+                    {% elif field == 'survey_id' %}
+                      {% set val = ans.survey_id.name %}
+                    {% elif field in ('flow_begin_ts', 'flow_offered_ts', 'flow_voted_ts', 'flow_engaged_ts') %}
+                      {% set val = display_ts(fix_ts, getattr(ans, field)) %}
+                    {% else %}
+                      {% set val = getattr(ans, field) %}
+                    {% endif %}
+                    <span class="nowrap">{{ val }}</span>
+                  {% endif %}
+                </td>
+              {% endfor %}
             </tr>
           {% endfor %}
         </table>
 
         {{ page_links(request, sortby, answers, survey, surveys) }}
+
+        <p>Available fields:</p>
+        <p>
+          {{ ', '.join(all_fields)}}
+
       {% endif %}
     </div>
   </div>

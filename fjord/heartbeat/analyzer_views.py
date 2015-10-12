@@ -19,38 +19,65 @@ def hb_data(request, answerid=None):
     """View for hb data that shows one or all of the answers"""
     VALID_SORTBY_FIELDS = ('id', 'received_ts', 'updated_ts')
 
+    ALL_FIELDS = [
+        'id', 'received_ts', 'updated_ts', 'experiment_version',
+        'response_version', 'person_id', 'survey_id',
+        'flow_id', 'question_id', 'question_text', 'variation_id',
+        'score', 'max_score', 'flow_began_ts', 'flow_offered_ts',
+        'flow_voted_ts', 'flow_engaged_ts', 'platform', 'channel',
+        'version', 'locale', 'country', 'build_id', 'partner_id',
+        'profile_age', 'profile_usage', 'addons', 'extra'
+    ]
+
+    DEFAULT_FIELDS = [
+        'id', 'received_ts', 'updated_ts', 'experiment_version',
+        'response_version', 'person_id', 'survey_id', 'flow_id',
+        'question_id', 'variation_id', 'score', 'max_score',
+        'flow_began_ts', 'flow_voted_ts', 'platform', 'channel',
+        'locale'
+    ]
+
     sortby = 'id'
     answer = None
     answers = []
     survey = None
-    showdata = None
+    showdata_filter = None
 
     if answerid is not None:
         answer = Answer.objects.get(id=answerid)
 
     else:
+        # Get fields and split on comma, then get rid of empty fields.
+        fields = request.GET.get('fields', '').split(',')
+
+        # Nix any fields that don't exist
+        fields = [field for field in fields if field in ALL_FIELDS]
+
+        # If we have no fields, then use default_fields.
+        fields = fields or DEFAULT_FIELDS
+
         sortby = request.GET.get('sortby', sortby)
         if sortby not in VALID_SORTBY_FIELDS:
             sortby = 'id'
 
         page = request.GET.get('page')
         answers = Answer.objects.order_by('-' + sortby)
-        survey = request.GET.get('survey', survey)
-        showdata = request.GET.get('showdata', None)
+        survey_filter = request.GET.get('survey', survey)
+        showdata_filter = request.GET.get('showdata', None)
 
-        if showdata:
-            if showdata == 'test':
+        if showdata_filter:
+            if showdata_filter == 'test':
                 answers = answers.filter(is_test=True)
-            elif showdata == 'notest':
+            elif showdata_filter == 'notest':
                 answers = answers.exclude(is_test=True)
             else:
-                showdata = 'all'
+                showdata_filter = 'all'
         else:
-            showdata = 'all'
+            showdata_filter = 'all'
 
-        if survey:
+        if survey_filter:
             try:
-                survey = Survey.objects.get(id=survey)
+                survey = Survey.objects.get(id=survey_filter)
                 answers = answers.filter(survey_id=survey)
             except Survey.DoesNotExist:
                 survey = None
@@ -68,14 +95,17 @@ def hb_data(request, answerid=None):
         return datetime.fromtimestamp(ts)
 
     return render(request, 'analytics/analyzer/hb_data.html', {
+        'all_fields': ALL_FIELDS,
+        'fields': fields,
         'sortby': sortby,
         'answer': answer,
         'answers': answers,
         'fix_ts': fix_ts,
+        'getattr': getattr,
         'pformat': pformat,
         'survey': survey,
         'surveys': Survey.objects.all(),
-        'showdata': showdata,
+        'showdata': showdata_filter,
     })
 
 
