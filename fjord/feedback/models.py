@@ -64,7 +64,11 @@ class Product(ModelBase):
 
     # We're not using foreign keys, so when we save something to the
     # database, we use this name
-    db_name = models.CharField(max_length=50)
+    db_name = models.CharField(
+        max_length=50,
+        help_text=(u'Do not change this after you have created the product. '
+                   u'You will orphan all the existing feedback!')
+    )
 
     # This is the slug used in the feedback product urls; we don't use
     # the SlugField because we don't require slugs be unique

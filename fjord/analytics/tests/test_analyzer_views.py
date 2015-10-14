@@ -395,7 +395,8 @@ class ProductsTestCase(TestCase):
         }
 
         resp = self.client.post(
-            reverse('analytics_products'), data, follow=True
+            reverse('analytics_products_update', args=(prod.id,)),
+            data, follow=True
         )
         assert resp.status_code == 200
         assert data['display_name'] in resp.content

@@ -1,52 +1,99 @@
 {% extends "analytics/analyzer/dashboard.html" %}
+{# Note: This is not l10n-ized since it's only available to analyzers for now. #}
+
 {% block content_middle %}
   <div class="block">
     <h2>Analytics: Products</h2>
-    <table class="summarytable">
-      <tr>
-        <th>id</th>
-        <th>enabled?</th>
-        <th>on dashboard?</th>
-        <th>on picker?</th>
-        <th>display name</th>
-        <th>db name</th>
-        <th>slug</th>
-        <th>automatic translations?</th>
-        <th>feedback product url</th>
-        <th>browser</th>
-        <th>browser data browser</th>
-        <th>notes</th>
-      </tr>
-      {% for prod in products %}
+    {% if not update %}
+      <h2>Total products: {{ products.paginator.count }}</h2>
+
+      <div class="pager">
+        {% if next_page %}
+          <a class="older" href="{{ request.get_full_path()|urlparams(page=products.previous_page_number) }}">
+            Older
+          </a>
+        {% else %}
+          Older
+        {% endif %}
+        | Page {{ products.number }} of {{ products.paginator.num_pages }} |
+        {% if prev_page %}
+          <a class="newer" href="{{ request.get_full_path()|urlparams(page=products.next_page_number) }}">
+            Newer
+          </a>
+        {% else %}
+          Newer
+        {% endif %}
+      </div>
+
+      <table class="summarytable">
         <tr>
-          <td>
-            <a href="{{ url('analytics_products') }}?pk={{ prod.id }}">Edit</a>
-            {{ prod.id }}
-          </td>
-          <td>{{ prod.enabled }}</td>
-          <td>{{ prod.on_dashboard }}</td>
-          <td>{{ prod.on_picker }}</td>
-          <td>{{ prod.display_name }}</td>
-          <td>{{ prod.db_name }}</td>
-          <td>{{ prod.slug }}</td>
-          <td>{{ prod.translation_system }}</td>
-          {# FIXME - URL is hard-coded so it doesn't include the locale. Need better way to do this. #}
-          <td><a href="https://input.mozilla.org/feedback/{{ prod.slug }}">https://input.mozilla.org/feedback/{{ prod.slug }}</a></td>
-          <td>{{ prod.browser }}</td>
-          <td>{{ prod.browser_data_browser }}</td>
-          <td>{{ prod.notes }}</td>
+          <th>id</th>
+          <th>enabled?</th>
+          <th>on dashboard?</th>
+          <th>on picker?</th>
+          <th>display name</th>
+          <th>db name</th>
+          <th>slug</th>
+          <th>automatic translations?</th>
+          <th>feedback product url</th>
+          <th>browser</th>
+          <th>browser data browser</th>
+          <th>notes</th>
+          <th></th>
         </tr>
-      {% endfor %}
-    </table>
-    <p>
-      Click on "Edit" above to edit an existing product or fill out
-      the fields below to create a new product.
-    </p>
-    <p class="warning">
-      Note: If you go to update an existing product and you change the
-      db_name, it will create a new product. You can't change the
-      db_name for an existing product since it'll orphan responses.
-    </p>
+        {% for prod in products %}
+          <tr>
+            <td>
+              {{ prod.id }}
+            </td>
+            <td>{{ prod.enabled }}</td>
+            <td>{{ prod.on_dashboard }}</td>
+            <td>{{ prod.on_picker }}</td>
+            <td>{{ prod.display_name }}</td>
+            <td>{{ prod.db_name }}</td>
+            <td>{{ prod.slug }}</td>
+            <td>{{ prod.translation_system }}</td>
+            {# FIXME - URL is hard-coded so it doesn't include the locale. Need better way to do this. #}
+            <td><a href="https://input.mozilla.org/feedback/{{ prod.slug }}">https://input.mozilla.org/feedback/{{ prod.slug }}</a></td>
+            <td>{{ prod.browser }}</td>
+            <td>{{ prod.browser_data_browser }}</td>
+            <td>{{ prod.notes }}</td>
+            <td>
+              <a href="{{ url('analytics_products_update', pk=prod.id) }}">Update</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </table>
+
+      <div class="pager">
+        {% if next_page %}
+          <a class="older" href="{{ request.get_full_path()|urlparams(page=products.previous_page_number) }}">
+            Older
+          </a>
+        {% else %}
+          Older
+        {% endif %}
+        | Page {{ products.number }} of {{ products.paginator.num_pages }} |
+        {% if prev_page %}
+          <a class="newer" href="{{ request.get_full_path()|urlparams(page=products.next_page_number) }}">
+            Newer
+          </a>
+        {% else %}
+          Newer
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if update %}
+      <p class="warning">
+        Note: If you go to update an existing product and you change the
+        db_name, it will create a new product. You can't change the
+        db_name for an existing product since it'll orphan responses.
+      </p>
+    {% endif %}
+
+    <h2>{% if update %}Update{% else %}Create{% endif %} Product</h2>
+    <p><span>{% if update %}<a href="{{ url('analytics_products') }}">&lt; Back to products</a>{% endif %}</span></p>
     <form class="analyzer-form" action="" method="POST">
       {% csrf_token %}
       {{ form.as_p() }}
