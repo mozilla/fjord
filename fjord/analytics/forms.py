@@ -3,7 +3,7 @@ from django import forms
 from fjord.feedback.models import Product
 
 
-class ProductsUpdateForm(forms.ModelForm):
+class ProductsCreateForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = [

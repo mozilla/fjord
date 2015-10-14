@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 
-from fjord.analytics.analyzer_views import ProductsUpdateView
+from fjord.analytics.analyzer_views import ProductCreateView, ProductUpdateView
 
 
 urlpatterns = patterns(
@@ -25,8 +25,12 @@ urlpatterns += patterns(
     # Analytics dashboard
     url(r'^analytics/?$', 'analytics_dashboard',
         name='analytics_dashboard'),
-    url(r'^analytics/products/?$', ProductsUpdateView.as_view(),
+    url(r'^analytics/products/?$',
+        ProductCreateView.as_view(),
         name='analytics_products'),
+    url(r'^analytics/products/(?P<pk>\d+)/update/$',
+        ProductUpdateView.as_view(),
+        name='analytics_products_update'),
     url(r'^analytics/search/?$', 'analytics_search',
         name='analytics_search'),
 )

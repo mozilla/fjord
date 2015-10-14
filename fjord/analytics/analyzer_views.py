@@ -19,13 +19,15 @@ import csv
 
 from elasticsearch_dsl import F
 
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.utils.encoding import force_bytes
-from django.views.generic.edit import FormView
+from django.views.generic.edit import CreateView, UpdateView
 from django.utils.decorators import method_decorator
 
-from fjord.analytics.forms import ProductsUpdateForm
+from fjord.analytics.forms import ProductsCreateForm
 from fjord.analytics.utils import counts_to_options, zero_fill
 from fjord.base.templatetags.jinja_helpers import locale_name
 from fjord.base.utils import (
@@ -384,8 +386,7 @@ def analytics_search(request):
 
     (original_search.aggs
      .bucket('histogram', 'date_histogram', field='created', interval='day')
-     .bucket('per_sentiment', 'terms', field='happy')
-    )
+     .bucket('per_sentiment', 'terms', field='happy'))
 
     results = original_search.execute()
     buckets = results.aggregations['histogram']['buckets']
@@ -424,48 +425,55 @@ def analytics_search(request):
     })
 
 
-class ProductsUpdateView(FormView):
-    """An administrator view for showing, adding, and updating the products."""
+class ProductCreateView(CreateView):
+    model = Product
     template_name = 'analytics/analyzer/products.html'
-    form_class = ProductsUpdateForm
-    success_url = 'products'
+    success_url = reverse_lazy('analytics_products')
+    form_class = ProductsCreateForm
 
     @method_decorator(check_new_user)
     @method_decorator(analyzer_required)
     def dispatch(self, *args, **kwargs):
-        return super(ProductsUpdateView, self).dispatch(*args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        if 'pk' in request.GET:
-            self.object = get_object_or_404(Product, pk=request.GET['pk'])
-        return super(ProductsUpdateView, self).get(request, *args, **kwargs)
+        return super(ProductCreateView, self).dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(ProductsUpdateView, self).get_context_data(**kwargs)
-        context['products'] = Product.objects.all()
+        context = super(ProductCreateView, self).get_context_data(**kwargs)
+        page = self.request.GET.get('page')
+        paginator = Paginator(Product.objects.order_by('id'), 25)
+        try:
+            products = paginator.page(page)
+        except PageNotAnInteger:
+            products = paginator.page(1)
+        except EmptyPage:
+            products = paginator.page(paginator.num_pages)
+
+        context['products'] = products
+        context['update'] = False
         return context
 
-    def get_form_kwargs(self):
-        kwargs = super(ProductsUpdateView, self).get_form_kwargs()
-        if hasattr(self, 'object'):
-            kwargs['instance'] = self.object
-        return kwargs
 
-    def form_valid(self, form):
+class ProductUpdateView(UpdateView):
+    model = Product
+    template_name = 'analytics/analyzer/products.html'
+    success_url = reverse_lazy('analytics_products')
+    form_class = ProductsCreateForm
+
+    @method_decorator(check_new_user)
+    @method_decorator(analyzer_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ProductUpdateView, self).dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductUpdateView, self).get_context_data(**kwargs)
+        page = self.request.GET.get('page')
+        paginator = Paginator(Product.objects.order_by('id'), 25)
         try:
-            instance = Product.objects.get(db_name=form.data.get('db_name'))
-            instance.slug = form.data.get('slug') or instance.slug
-            instance.display_name = (form.data.get('display_name') or
-                                     instance.display_name)
-            instance.notes = form.data.get('notes') or instance.notes
-            instance.enabled = form.data.get('enabled') or False
-            instance.on_dashboard = form.data.get('on_dashboard') or False
-            instance.on_picker = form.data.get('on_picker') or False
-            instance.browser = form.data.get('browser') or u''
-            instance.browser_data_browser = (
-                form.data.get('browser_data_browser') or u''
-            )
-            self.object = instance.save()
-        except Product.DoesNotExist:
-            self.object = form.save()
-        return super(ProductsUpdateView, self).form_valid(form)
+            products = paginator.page(page)
+        except PageNotAnInteger:
+            products = paginator.page(1)
+        except EmptyPage:
+            products = paginator.page(paginator.num_pages)
+
+        context['products'] = products
+        context['update'] = True
+        return context
