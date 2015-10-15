@@ -119,7 +119,6 @@ def analytics_search(request):
         request.GET.get('date_start', None), fallback=None)
     search_date_end = smart_date(
         request.GET.get('date_end', None), fallback=None)
-    search_bigram = request.GET.get('bigram', None)
     selected = request.GET.get('selected', None)
 
     search_has_email = request.GET.get('has_email', None)
@@ -203,20 +202,6 @@ def analytics_search(request):
         current_search['q'] = search_query
         search = search.query('simple_query_string', query=search_query,
                               fields=['description'])
-
-    if search_bigram is not None:
-        f &= F('terms', description_bigrams=search_bigram)
-        filter_data.append({
-            'display': 'Bigram',
-            'name': 'bigram',
-            'options': [{
-                'count': 'all',
-                'name': search_bigram,
-                'display': search_bigram,
-                'value': search_bigram,
-                'checked': True
-            }]
-        })
 
     if search_source is not None:
         f &= F('term', source=search_source)

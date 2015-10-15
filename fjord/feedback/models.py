@@ -18,7 +18,6 @@ from fjord.feedback.config import (
     ANALYSIS_STOPWORDS,
     TRUNCATE_LENGTH
 )
-from fjord.feedback.utils import compute_grams
 from fjord.search.index import (
     FjordDocType,
     FjordDocTypeManager,
@@ -453,7 +452,6 @@ class ResponseDocType(FjordDocType):
     has_email = es_dsl.Boolean()
     description = es_dsl.String(analyzer='snowball')
     category = es_dsl.String(index='not_analyzed')
-    description_bigrams = es_dsl.String(index='not_analyzed')
     description_terms = es_dsl.String(analyzer='standard')
     user_agent = es_dsl.String(index='not_analyzed')
     product = es_dsl.String(index='not_analyzed')
@@ -531,7 +529,6 @@ class ResponseDocType(FjordDocType):
             'has_email',
             'description',
             'category',
-            'description_bigrams',
             'user_agent',
             'product',
             'version',
@@ -590,13 +587,6 @@ class ResponseDocType(FjordDocType):
             'organic': (not resp.campaign),
             'created': resp.created
         }
-
-        # We only compute bigrams for english because the analysis
-        # uses English stopwords, stemmers, ...
-        if resp.locale.startswith(u'en') and resp.description:
-            doc['description_bigrams'] = compute_grams(resp.description)
-        else:
-            doc['description_bigrams'] = []
 
         if with_id:
             doc['_id'] = doc['id']
