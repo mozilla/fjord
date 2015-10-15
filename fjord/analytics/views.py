@@ -193,7 +193,6 @@ def dashboard(request):
         request.GET.get('date_start', None), fallback=None)
     search_date_end = smart_date(
         request.GET.get('date_end', None), fallback=None)
-    search_bigram = request.GET.get('bigram', None)
     selected = request.GET.get('selected', None)
 
     filter_data = []
@@ -267,20 +266,6 @@ def dashboard(request):
         current_search['q'] = search_query
         search = search.query('simple_query_string', query=search_query,
                               fields=['description'])
-
-    if search_bigram is not None:
-        f &= F('terms', description_bigrams=search_bigram)
-        filter_data.append({
-            'display': _('Bigram'),
-            'name': 'bigram',
-            'options': [{
-                'count': 'all',
-                'name': search_bigram,
-                'display': search_bigram,
-                'value': search_bigram,
-                'checked': True
-            }]
-        })
 
     search = search.filter(f).sort('-created')
 

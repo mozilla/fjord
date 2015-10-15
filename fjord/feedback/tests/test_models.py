@@ -17,7 +17,6 @@ from fjord.feedback.tests import (
     ResponseContextFactory,
     ResponsePIFactory
 )
-from fjord.feedback.utils import compute_grams
 from fjord.search.tests import ElasticTestCase
 
 
@@ -178,7 +177,7 @@ class TestGenerateTranslationJobs(TestCase):
         assert len(jobs) == 1
         job = jobs[0]
         assert job[1:] == (u'dennis', u'es', u'description',
-                      u'en', 'translated_description')
+                           u'en', 'translated_description')
 
         assert resp.translated_description == u''
 
@@ -207,55 +206,9 @@ class TestGenerateTranslationJobs(TestCase):
 
         # No jobs should be translated
         assert len(resp.generate_translation_jobs()) == 0
-        assert resp.translated_description == existing_resp.translated_description
-
-
-class TestComputeGrams(TestCase):
-    def test_empty(self):
-        assert compute_grams(u'') == []
-
-    def test_parsing(self):
-        # stop words are removed
-        assert compute_grams(u'i me him her') == []
-
-        # capital letters don't matter
-        assert compute_grams(u'I ME HIM HER') == []
-
-        # punctuation nixed
-        assert compute_grams(u'i, me, him, her') == []
-
-    def test_bigrams(self):
-        # Note: Tokens look weird after being analyzed probably due to
-        # the stemmer. We could write a bunch of code to "undo" some
-        # of the excessive stemming, but it's probably an exercise in
-        # futility. Ergo the tests look a little odd. e.g. "youtub"
-
-        # One word a bigram does not make
-        assert compute_grams(u'youtube') == []
-
-        # Two words is the minimum number to create a bigram
-        assert(
-            sorted(compute_grams(u'youtube crash')) ==
-            ['crash youtube']
-            )
-
-        # Three words creates two bigrams
-        assert(
-            sorted(compute_grams(u'youtube crash flash')) ==
-            ['crash flash', 'crash youtube']
-            )
-
-        # Four words creates three bigrams
-        assert(
-            sorted(compute_grams(u'youtube crash flash bridge')) ==
-            ['bridge flash', 'crash flash', 'crash youtube']
-            )
-
-        # Nix duplicate bigrams
-        assert(
-            sorted(compute_grams(u'youtube crash youtube flash')) ==
-            ['crash youtube', 'flash youtube']
-            )
+        assert (
+            resp.translated_description == existing_resp.translated_description
+        )
 
 
 class TestParseData(ElasticTestCase):
