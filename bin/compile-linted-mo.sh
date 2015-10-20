@@ -22,6 +22,8 @@ function compilemo() {
     then
         mv "${targettmp}" "${target}"
     fi
+
+    rm -rf "${targettmp}"
 }
 
 # Get the path to the python binary from the "-p <PYTHON>"
