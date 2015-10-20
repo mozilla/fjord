@@ -580,10 +580,10 @@ CSRF_FAILURE_VIEW = 'fjord.base.views.csrf_failure'
 # function handles the extraction.
 DOMAIN_METHODS = {
     'django': [
-        ('fjord/**.py', 'fjord.base.l10n.extract_python'),
-        ('fjord/**/templates/**.html', 'fjord.base.l10n.extract_template'),
-        ('fjord/**/jinja2/**.html',  'fjord.base.l10n.extract_template'),
-        ('templates/**.html', 'fjord.base.l10n.extract_template'),
+        ('fjord/**.py', 'babel.messages.extract.extract_python'),
+        ('fjord/**/templates/**.html', 'jinja2.ext.babel_extract'),
+        ('fjord/**/jinja2/**.html',  'jinja2.ext.babel_extract'),
+        ('templates/**.html', 'jinja2.ext.babel_extract'),
     ]
 }
 

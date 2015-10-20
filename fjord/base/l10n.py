@@ -1,9 +1,8 @@
 # NOTE: The code in this file was mostly copied from tower.
+import inspect
 import re
 
 import jinja2
-from babel.messages.extract import extract_python as babel_extract_python
-from jinja2 import ext
 from jinja2.ext import InternationalizationExtension
 
 
@@ -42,54 +41,46 @@ class MozInternationalizationExtension(InternationalizationExtension):
         super(MozInternationalizationExtension, self).__init__(environment)
         environment.globals['_'] = _gettext_alias
 
+    def _yolo_is_trimmed(self):
+        """Was the trans block marked "trimmed"
+
+        NB: We don't have the information we need passed to us, so we have to
+        inspect the stack. Yay.
+
+        """
+        frames = inspect.stack()
+        # frame 0 is the current frame
+        # frame 1 is _parse_block
+        # frame 2 is the caller for _parse_block which has variables in it
+        interesting_frame = frames[2][0]
+
+        # If there's a local named "variables" and "trimmed" is in there,
+        # then this trans block was marked with "trimmed"
+        return 'trimmed' in interesting_frame.f_locals.get('variables', {})
+
     def _parse_block(self, parser, allow_pluralize):
+        """parses the trans block
+
+        This overrides trans parsing to look for a "trimmed" variable. If
+        it's there, then this works just like Django's blocktrans and it'll
+        collapse the whitespace in the trans tag.
+
+        For example, this is not collapsed::
+
+            {% trans %} ... {% endtrans %}
+
+        This is collapsed::
+
+            {% trans trimmed %} ... {% endtrans %}
+
+        And this is also collapsed::
+
+            {% trans foo=bar, trimmed %} ... {% endtrans %}
+
+        """
         parse_block = InternationalizationExtension._parse_block
         ref, buffer = parse_block(self, parser, allow_pluralize)
-        return ref, collapse_whitespace(buffer)
 
-
-def tweak_message(message):
-    """We piggyback on jinja2's babel_extract() (really, Babel's extract_*
-    functions) but they don't support some things we need so this function will
-    tweak the message.  Specifically:
-
-    1. We collapse whitespace in the msgid. Jinja2 will only strip
-       whitespace from the ends of a string so linebreaks show up in
-       your .po files still.
-
-    2. Babel doesn't support context (msgctxt). We hack that in ourselves
-       here.
-
-    """
-    if isinstance(message, basestring):
-        message = collapse_whitespace(message)
-    elif isinstance(message, tuple):
-        # A tuple of 2 has context, 3 is plural, 4 is plural with context
-        if len(message) == 2:
-            message = add_context(message[1], message[0])
-        elif len(message) == 3:
-            if all(isinstance(x, basestring) for x in message[:2]):
-                singular, plural, num = message
-                message = (collapse_whitespace(singular),
-                           collapse_whitespace(plural),
-                           num)
-        elif len(message) == 4:
-            singular, plural, num, ctxt = message
-            message = (add_context(ctxt, collapse_whitespace(singular)),
-                       add_context(ctxt, collapse_whitespace(plural)),
-                       num)
-    return message
-
-
-def extract_python(fileobj, keywords, comment_tags, options):
-    msgs = list(babel_extract_python(fileobj, keywords, comment_tags, options))
-    for lineno, funcname, message, comments in msgs:
-        message = tweak_message(message)
-        yield lineno, funcname, message, comments
-
-
-def extract_template(fileobj, keywords, comment_tags, options):
-    msgs = list(ext.babel_extract(fileobj, keywords, comment_tags, options))
-    for lineno, funcname, message, comments in msgs:
-        message = tweak_message(message)
-        yield lineno, funcname, message, comments
+        if self._yolo_is_trimmed():
+            buffer = collapse_whitespace(buffer)
+        return ref, buffer
