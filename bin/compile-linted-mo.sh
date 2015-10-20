@@ -8,8 +8,22 @@ function compilemo() {
     dir=`dirname $1`
     stem=`basename $1 .po`
 
+    target="${dir}/${stem}.mo"
+    targettmp="${dir}/${stem}.mo.tmp"
+
     echo "Compiling $1..."
-    msgfmt -o "${dir}/${stem}.mo" "$1"
+
+    # Run msgfmt which will compile the .mo file
+    msgfmt --check-header -o "${targettmp}" "$1"
+
+    # If msgfmt returned a zero exit code, then everything is fine and copy
+    # the .mo file to the final destination
+    if [ $? -eq 0 ]
+    then
+        mv "${targettmp}" "${target}"
+    fi
+
+    rm -rf "${targettmp}"
 }
 
 # Get the path to the python binary from the "-p <PYTHON>"
