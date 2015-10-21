@@ -18,10 +18,6 @@ https://github.com/fwenzel/django-sha2/archive/3ba2b4771056fb722bc9fe52cf26918a3
 # sha256: 4buoVNpBPIKO5ziwNqu6xu46TkzWhMgNxNQeA8Mq0h0
 https://github.com/mozilla/django-session-csrf/archive/f00ad913c62e139d36078e8a7e07dab65a021386.tar.gz#egg=django-session-csrf==0.5.0.1
 
-# django-waffle: the django-jinja branch of willkg fork
-# sha256: LNuiwc8Y2VXj1exySpULEZ1aUq4SvixomRyR-kjxTYE
-https://github.com/willkg/django-waffle/archive/fe1a279c14c45624e491efa8bdae252e51b91b33.tar.gz#egg=django-waffle==0.10.1.1
-
 # Requirements from PyPI
 
 # sha256: 68_IZ95aaPn1uhTRHbrYjmr_hDWo05M51c6w5bBt5kA
@@ -95,6 +91,9 @@ django-ratelimit==0.6.0
 
 # sha256: wOkPMEu_bxD2PgAZECmAyVDcaDMm0qTlDnGZ3sxDw2o
 django-statsd-mozilla==0.3.15
+
+# sha256: nNnjqXaEmjzYFoMNeBG5NUPB3J2p88sczC-dqDG4sCU
+django-waffle==0.11
 
 # sha256: Qdq1cn7hrrPVsooSatDSj7-A-DI4LNqj8HgRPx4kdxo
 djangorestframework==3.2.3

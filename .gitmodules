@@ -118,3 +118,6 @@
 [submodule "vendor/src/django-jinja"]
 	path = vendor/src/django-jinja
 	url = https://github.com/niwinz/django-jinja.git
+[submodule "vendor/src/django-waffle"]
+	path = vendor/src/django-waffle
+	url = https://github.com/jsocol/django-waffle.git

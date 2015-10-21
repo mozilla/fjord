@@ -378,6 +378,7 @@ TEMPLATES = [
                 'django_jinja.builtins.extensions.DjangoFiltersExtension',
                 'fjord.base.l10n.MozInternationalizationExtension',
                 'pipeline.templatetags.ext.PipelineExtension',
+                'waffle.jinja.WaffleExtension',
             ],
             'globals': {
                 'browserid_info': 'django_browserid.helpers.browserid_info',
