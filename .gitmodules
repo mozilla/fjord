@@ -70,9 +70,6 @@
 [submodule "vendor/src/factory_boy"]
 	path = vendor/src/factory_boy
 	url = https://github.com/rbarrois/factory_boy.git
-[submodule "vendor/src/django-waffle"]
-	path = vendor/src/django-waffle
-	url = https://github.com/willkg/django-waffle.git
 [submodule "vendor/src/django-product-details"]
 	path = vendor/src/django-product-details
 	url = https://github.com/mozilla/django-product-details.git
@@ -121,3 +118,6 @@
 [submodule "vendor/src/django-jinja"]
 	path = vendor/src/django-jinja
 	url = https://github.com/niwinz/django-jinja.git
+[submodule "vendor/src/django-waffle"]
+	path = vendor/src/django-waffle
+	url = https://github.com/jsocol/django-waffle.git
