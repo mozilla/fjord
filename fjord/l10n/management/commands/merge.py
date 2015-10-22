@@ -1,5 +1,4 @@
 # NOTE: This code was copied from tower.
-# TODO: Look into switching to makemessages provided by django-jinja.
 import os
 import sys
 from subprocess import Popen, call, PIPE
@@ -9,6 +8,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 
 
+# FIXME: Move settings handling into a module
 TEXT_DOMAIN = 'django'
 
 # List of domains that should be separate from the django.pot file.

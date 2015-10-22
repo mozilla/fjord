@@ -267,6 +267,7 @@ INSTALLED_APPS = (
     'fjord.flags',
     'fjord.heartbeat',
     'fjord.journal',
+    'fjord.l10n',
     'fjord.search',
     'fjord.suggest',
     'fjord.suggest.providers.trigger',
@@ -376,7 +377,7 @@ TEMPLATES = [
                 'django_jinja.builtins.extensions.CsrfExtension',
                 'django_jinja.builtins.extensions.StaticFilesExtension',
                 'django_jinja.builtins.extensions.DjangoFiltersExtension',
-                'fjord.base.l10n.MozInternationalizationExtension',
+                'fjord.l10n.ext.TowerI18nExtension',
                 'pipeline.templatetags.ext.PipelineExtension',
                 'waffle.jinja.WaffleExtension',
             ],
@@ -581,10 +582,12 @@ CSRF_FAILURE_VIEW = 'fjord.base.views.csrf_failure'
 # function handles the extraction.
 DOMAIN_METHODS = {
     'django': [
-        ('fjord/**.py', 'fjord.base.l10n.extract_python'),
-        ('fjord/**/templates/**.html', 'fjord.base.l10n.extract_template'),
-        ('fjord/**/jinja2/**.html',  'fjord.base.l10n.extract_template'),
-        ('templates/**.html', 'fjord.base.l10n.extract_template'),
+        ('fjord/**.py', 'babel.messages.extract.extract_python'),
+        ('fjord/**/jinja2/**.html',  'jinja2.ext.babel_extract'),
+        # FIXME: These are using Jinja2 template extraction for Django
+        # templates. Does that work right?
+        ('fjord/**/templates/**.html', 'jinja2.ext.babel_extract'),
+        ('templates/**.html', 'jinja2.ext.babel_extract'),
     ]
 }
 
