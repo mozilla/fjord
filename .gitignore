@@ -26,5 +26,6 @@ tmp/*
 *.less.css
 james.ini
 /smoketests/results
+/smoketests/.cache
 .vagrant/
 vagrantconfig_local.yaml
