@@ -6,32 +6,38 @@ from subprocess import Popen
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
-from babel.messages.extract import DEFAULT_KEYWORDS, extract_from_dir
+from babel.messages.extract import extract_from_dir
 from translate.storage import po
 
-# FIXME: Move settings handling into a settings module
+from fjord.l10n.settings import get_setting
 
-# FIXME: Put all the settings under TOWER as a dict
+
 DEFAULT_DOMAIN = 'all'
-TEXT_DOMAIN = 'django'
 
-# FIXME: Make this configurable and default it to babel defaults plus
-# Django _lazy variants
-KEYWORDS = dict(DEFAULT_KEYWORDS)
-KEYWORDS['_lazy'] = None
 
-# Reinstitute DOMAINS settings, but default to just 'django'.
-# List of domains that should be separate from the django.pot file.
-STANDALONE_DOMAINS = [TEXT_DOMAIN]
+def generate_options_map():
+    try:
+        return settings.TOWER['JINJA2_CONFIG']
+    except KeyError:
+        pass
 
-OPTIONS_MAP = {
-    '**.*': {
-        # Get list of extensions for django-jinja template backend
-        'extensions': ','.join(settings.TEMPLATES[0]['OPTIONS']['extensions'])
-    }
-}
-
-COMMENT_TAGS = ['L10n:', 'L10N:', 'l10n:', 'l10N:']
+    for tmpl_config in settings.TEMPLATES:
+        try:
+            backend = tmpl_config['BACKEND']
+        except KeyError:
+            continue
+        if backend == 'django_jinja.backend.Jinja2':
+            config = {}
+            for key in ('newstyle_gettext',
+                        'autoescape',
+                        'undefined',
+                        'extensions'):
+                try:
+                    config[key] = tmpl_config[key]
+                except KeyError:
+                    pass
+            return {'**.*': config}
+    raise Exception('No valid jinja2 config found in settings.')
 
 
 def create_pounit(filename, lineno, msgid, comments, context):
@@ -132,12 +138,12 @@ class Command(BaseCommand):
             help=(
                 'The domain of the message files.  If "all" '
                 'everything will be extracted and combined into '
-                '%s.pot. (default: %%%%default).' % TEXT_DOMAIN
+                '%s.pot. (default: %%%%default).' % get_setting('TEXT_DOMAIN')
             )
         )
         parser.add_argument(
             '--output-dir', '-o',
-            default=os.path.join(settings.ROOT, 'locale', 'templates',
+            default=os.path.join(get_setting('ROOT'), 'locale', 'templates',
                                  'LC_MESSAGES'),
             dest='outputdir',
             help=(
@@ -156,6 +162,16 @@ class Command(BaseCommand):
         # stomping issues! See docstring for details.
         monkeypatch_i18n()
 
+        # Get all the settings we need; we uppercase them so they're
+        # obviously setings
+        DOMAIN_METHODS = get_setting('DOMAIN_METHODS')
+        STANDALONE_DOMAINS = get_setting('STANDALONE_DOMAINS')
+        KEYWORDS = get_setting('KEYWORDS')
+        COMMENT_TAGS = get_setting('COMMENT_TAGS')
+        ROOT = get_setting('ROOT')
+
+        keywords_dict = dict([(keyword, None) for keyword in KEYWORDS])
+
         domains = options.get('domain')
         outputdir = os.path.abspath(options.get('outputdir'))
 
@@ -169,12 +185,10 @@ class Command(BaseCommand):
 
             os.makedirs(outputdir)
 
-        if domains == 'all':
-            domains = settings.DOMAIN_METHODS.keys()
+        if domains == DEFAULT_DOMAIN:
+            domains = DOMAIN_METHODS.keys()
         else:
             domains = [domains]
-
-        root = settings.ROOT
 
         def callback(filename, method, options):
             if method != 'ignore':
@@ -183,14 +197,14 @@ class Command(BaseCommand):
         for domain in domains:
             print 'Extracting all strings in domain %s...' % (domain)
 
-            methods = settings.DOMAIN_METHODS[domain]
+            methods = DOMAIN_METHODS[domain]
             extracted = extract_from_dir(
-                root,
+                ROOT,
                 method_map=methods,
-                keywords=KEYWORDS,
+                keywords=keywords_dict,
                 comment_tags=COMMENT_TAGS,
                 callback=callback,
-                options_map=OPTIONS_MAP,
+                options_map=generate_options_map(),
             )
             catalog = create_pofile_from_babel(extracted)
             if not os.path.exists(outputdir):
@@ -200,15 +214,21 @@ class Command(BaseCommand):
 
             catalog.savefile(os.path.join(outputdir, '%s.pot' % domain))
 
+        not_standalone_domains = [
+            dom for dom in domains
+            if dom not in STANDALONE_DOMAINS
+        ]
+
         pot_files = []
-        for i in [x for x in domains if x not in STANDALONE_DOMAINS]:
-            pot_files.append(os.path.join(outputdir, '%s.pot' % i))
+        for dom in not_standalone_domains:
+            pot_files.append(os.path.join(outputdir, '%s.pot' % dom))
 
         if len(pot_files) > 1:
-            print ('Concatenating the non-standalone domains into %s.pot' %
-                   TEXT_DOMAIN)
+            pot_file = get_setting('TEXT_DOMAIN') + '.pot'
+            print ('Concatenating the non-standalone domains into %s' %
+                   pot_file)
 
-            final_out = os.path.join(outputdir, '%s.pot' % TEXT_DOMAIN)
+            final_out = os.path.join(outputdir, pot_file)
 
             # We add final_out back on because msgcat will combine all
             # specified files.  We'll redirect everything back in to
@@ -226,7 +246,7 @@ class Command(BaseCommand):
 
             meltingpot.close()
 
-            for i in [x for x in domains if x not in STANDALONE_DOMAINS]:
-                os.remove(os.path.join(outputdir, '%s.pot' % i))
+            for dom in not_standalone_domains:
+                os.remove(os.path.join(outputdir, '%s.pot' % dom))
 
         print 'Done'

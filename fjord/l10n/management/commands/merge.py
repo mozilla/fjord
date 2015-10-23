@@ -7,12 +7,7 @@ from tempfile import TemporaryFile
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
-
-# FIXME: Move settings handling into a module
-TEXT_DOMAIN = 'django'
-
-# List of domains that should be separate from the django.pot file.
-STANDALONE_DOMAINS = [TEXT_DOMAIN]
+from fjord.l10n.settings import get_setting
 
 
 class Command(BaseCommand):
@@ -42,7 +37,10 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        locale_dir = os.path.join(settings.ROOT, 'locale')
+        ROOT = get_setting('ROOT')
+        STANDALONE_DOMAINS = get_setting('STANDALONE_DOMAINS')
+
+        locale_dir = os.path.join(ROOT, 'locale')
 
         if options.get('create'):
             for lang in getattr(settings, 'LANGUAGES', []):

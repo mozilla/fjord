@@ -580,15 +580,18 @@ CSRF_FAILURE_VIEW = 'fjord.base.views.csrf_failure'
 
 # Tells the extract script what files to look for L10n in and what
 # function handles the extraction.
-DOMAIN_METHODS = {
-    'django': [
-        ('fjord/**.py', 'babel.messages.extract.extract_python'),
-        ('fjord/**/jinja2/**.html',  'jinja2.ext.babel_extract'),
-        # FIXME: These are using Jinja2 template extraction for Django
-        # templates. Does that work right?
-        ('fjord/**/templates/**.html', 'jinja2.ext.babel_extract'),
-        ('templates/**.html', 'jinja2.ext.babel_extract'),
-    ]
+TOWER = {
+    'DOMAIN_METHODS': {
+        'django': [
+            ('fjord/**.py', 'babel.messages.extract.extract_python'),
+            ('fjord/**/jinja2/**.html',  'jinja2.ext.babel_extract'),
+            # FIXME: These are using Jinja2 template extraction for Django
+            # templates. Does that work right?
+            ('fjord/**/templates/**.html', 'jinja2.ext.babel_extract'),
+            ('templates/**.html', 'jinja2.ext.babel_extract'),
+        ]
+    },
+    'ROOT': ROOT
 }
 
 WSGI_APPLICATION = 'fjord.wsgi.application'
