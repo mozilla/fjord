@@ -1,45 +1,15 @@
-from jinja2 import DictLoader, contextfunction, Environment
-
-
-templates = {
-    'trans.html': (
-        '<div>{% trans %}tower rules!{% endtrans %}</div>'
-    ),
-    'trans_whitespace.html': (
-        '<div>\n'
-        '  {% trans %}\n'
-        '    Tower rules!\n'
-        '    Yessiree!\n'
-        '  {% endtrans %}\n'
-        '</div>\n'
-    ),
-    'trans_plural.html': (
-        '<div>\n'
-        '  {% trans count %}\n'
-        '    {{ count }} tower rules!\n'
-        '  {% pluralize %}\n'
-        '    {{ count }} towers rule!\n'
-        '  {% endtrans %}\n'
-        '</div>'
-    ),
-    'gettext.html': (
-        '{{ _("blue towers rule!") }}'
-    ),
-    'gettext_safe.html': (
-        '{{ _("<b>blue towers rule!</b>") }}'
-    )
-}
+from jinja2 import contextfunction, DictLoader, Environment
+from jinja2.utils import Markup
 
 
 languages = {
-    # NB: Translated into Pirate using Dennis.
     'xx': {
-        'tower rules!': 'towerr rules arr!',
-        'Tower rules! Yessiree!': 'Towerr rules! Yessiree shiver me timbers!',
-        '%(count)s tower rules!': '%(count)s towerr rules arr!',
-        '%(count)s towers rule!': '%(count)s towarrs rule arr!',
-        'blue towers rule!': 'blue towarrs rule arr!',
-        '<b>blue towers rule!</b>': '<b>blue towarrs rule arr!</b>',
+        'tower rules!': 'TOWER RULES!',
+        'Tower rules!': 'TOWER RULES!',
+        '%(count)s tower rules!': '%(count)s TOWER RULES!',
+        '%(count)s towers rule!': '%(count)s TOWERS RULE!',
+        'blue towers rule!': 'BLUE TOWERS RULE!',
+        '<b>blue towers rule!</b>': '<b>BLUE TOWERS RULE!</b>',
     }
 }
 
@@ -47,67 +17,108 @@ languages = {
 @contextfunction
 def gettext(context, msgid):
     language = context.get('LANGUAGE', 'en')
-    return languages.get(language, {}).get(msgid, msgid)
+    rv = languages.get(language, {}).get(msgid, msgid)
+    if context.eval_ctx.autoescape:
+        rv = Markup(rv)
+    return rv
 
 
 @contextfunction
 def ngettext(context, msgid, msgid_plural, n):
     language = context.get('LANGUAGE', 'en')
     if n != 1:
-        return languages.get(language, {}).get(msgid_plural, msgid_plural)
-    return languages.get(language, {}).get(msgid, msgid)
+        rv = languages.get(language, {}).get(msgid_plural, msgid_plural)
+    else:
+        rv = languages.get(language, {}).get(msgid, msgid)
+    if context.eval_ctx.autoescape:
+        rv = Markup(rv)
+    return rv
 
 
-i18n_env = Environment(
-    loader=DictLoader(templates),
-    extensions=['fjord.l10n.ext.TowerI18nExtension']
-)
-i18n_env.globals.update({
-    '_':            gettext,
-    'gettext':      gettext,
-    'ngettext':     ngettext
-})
+def build_environment(template):
+    env = Environment(
+        # undefined=Undefined,
+        autoescape=True,
+        loader=DictLoader({'tmpl.html': template}),
+        extensions=[
+            'fjord.l10n.ext.TowerI18nExtension'
+        ]
+    )
+    env.install_gettext_callables(gettext, ngettext, newstyle=True)
+    return env
+
+
+def render(template, *args, **kwargs):
+    env = build_environment(template)
+    return env.from_string(template).render(*args, **kwargs)
 
 
 class TestTowerI18nExtension:
     def test_gettext(self):
-        tmpl = i18n_env.get_template('gettext.html')
-        assert tmpl.render(LANGUAGE='en') == 'blue towers rule!'
-        assert tmpl.render(LANGUAGE='xx') == 'blue towarrs rule arr!'
+        """gettext works"""
+        tmpl = '{{ _("blue towers rule!") }}'
+        assert render(tmpl, LANGUAGE='en') == 'blue towers rule!'
+        assert render(tmpl, LANGUAGE='xx') == 'BLUE TOWERS RULE!'
 
     def test_gettext_is_safe(self):
-        tmpl = i18n_env.get_template('gettext_safe.html')
-        assert tmpl.render(LANGUAGE='en') == '<b>blue towers rule!</b>'
-        assert tmpl.render(LANGUAGE='xx') == '<b>blue towarrs rule arr!</b>'
+        """html in gettext is safe"""
+        tmpl = '{{ _("<b>blue towers rule!</b>") }}'
+        assert render(tmpl, LANGUAGE='en') == '<b>blue towers rule!</b>'
+        assert render(tmpl, LANGUAGE='xx') == '<b>BLUE TOWERS RULE!</b>'
+
+    def test_gettext_notsafe(self):
+        """interpolated html is not safe"""
+        tmpl = '{{ _("<b>%(foo)s</b>", foo="<p>") }}'
+        assert render(tmpl, LANGUAGE='en') == '<b>&lt;p&gt;</b>'
+
+    def test_gettext_format_notsafe(self):
+        """format html is not safe"""
+        tmpl = '{{ _("<b>{0}</b>").format("<p>") }}'
+        assert render(tmpl, LANGUAGE='en') == '<b>&lt;p&gt;</b>'
 
     def test_trans(self):
-        tmpl = i18n_env.get_template('trans.html')
-        assert tmpl.render(LANGUAGE='en') == '<div>tower rules!</div>'
-        assert tmpl.render(LANGUAGE='xx') == '<div>towerr rules arr!</div>'
+        tmpl = '<div>{% trans %}tower rules!{% endtrans %}</div>'
+        assert render(tmpl, LANGUAGE='en') == '<div>tower rules!</div>'
+        assert render(tmpl, LANGUAGE='xx') == '<div>TOWER RULES!</div>'
 
     def test_trans_whitespace(self):
-        tmpl = i18n_env.get_template('trans_whitespace.html')
+        tmpl = (
+            '<div>\n'
+            '  {% trans %}\n'
+            '    Tower\n'
+            '    rules!\n'
+            '  {% endtrans %}\n'
+            '</div>\n'
+        )
         assert (
-            tmpl.render(LANGUAGE='en') ==
+            render(tmpl, LANGUAGE='en') ==
             (
                 '<div>\n'
-                '  Tower rules! Yessiree!\n'
+                '  Tower rules!\n'
                 '</div>'
             )
         )
         assert (
-            tmpl.render(LANGUAGE='xx') ==
+            render(tmpl, LANGUAGE='xx') ==
             (
                 '<div>\n'
-                '  Towerr rules! Yessiree shiver me timbers!\n'
+                '  TOWER RULES!\n'
                 '</div>'
             )
         )
 
     def test_trans_plural(self):
-        tmpl = i18n_env.get_template('trans_plural.html')
+        tmpl = (
+            '<div>\n'
+            '  {% trans count %}\n'
+            '    {{ count }} tower rules!\n'
+            '  {% pluralize %}\n'
+            '    {{ count }} towers rule!\n'
+            '  {% endtrans %}\n'
+            '</div>'
+        )
         assert (
-            tmpl.render(LANGUAGE='en', count=1) ==
+            render(tmpl, count=1, LANGUAGE='en') ==
             (
                 '<div>\n'
                 '  1 tower rules!\n'
@@ -115,7 +126,7 @@ class TestTowerI18nExtension:
             )
         )
         assert (
-            tmpl.render(LANGUAGE='en', count=2) ==
+            render(tmpl, count=2, LANGUAGE='en') ==
             (
                 '<div>\n'
                 '  2 towers rule!\n'
@@ -123,18 +134,29 @@ class TestTowerI18nExtension:
             )
         )
         assert (
-            tmpl.render(LANGUAGE='xx', count=1) ==
+            render(tmpl, count=1, LANGUAGE='xx') ==
             (
                 '<div>\n'
-                '  1 towerr rules arr!\n'
+                '  1 TOWER RULES!\n'
                 '</div>'
             )
         )
         assert (
-            tmpl.render(LANGUAGE='xx', count=2) ==
+            render(tmpl, count=2, LANGUAGE='xx') ==
             (
                 '<div>\n'
-                '  2 towarrs rule arr!\n'
+                '  2 TOWERS RULE!\n'
                 '</div>'
             )
+        )
+
+    def test_trans_interpolation(self):
+        tmpl = (
+            '{% trans tag="<p>" %}\n'
+            '  this is a tag <b>{{ tag }}</b>\n'
+            '{% endtrans %}'
+        )
+        assert (
+            render(tmpl, LANGUAGE='en') ==
+            'this is a tag <b>&lt;p&gt;</b>'
         )
