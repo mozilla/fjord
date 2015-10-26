@@ -1,5 +1,3 @@
-import re
-
 from babel.messages.extract import DEFAULT_KEYWORDS as BABEL_KEYWORDS
 
 
@@ -11,9 +9,6 @@ def generate_keywords():
     return list(keywords)
 
 
-_COLLAPSE_RE = re.compile(r'\s+', re.UNICODE)
-
-
 def collapse_whitespace(message):
     """Collapses consecutive whitespace into a single space"""
-    return _COLLAPSE_RE.sub(' ', message).strip()
+    return u' '.join(map(lambda s: s.strip(), message.strip().splitlines()))

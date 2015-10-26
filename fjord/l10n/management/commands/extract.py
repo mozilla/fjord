@@ -12,10 +12,21 @@ from translate.storage import po
 from fjord.l10n.settings import get_setting
 
 
-DEFAULT_DOMAIN = 'all'
+DEFAULT_DOMAIN_VALUE = 'all'
 
 
 def generate_options_map():
+    """Generate an ``options_map` to pass to ``extract_from_dir``
+
+    This is the options_map that's used to generate a Jinja2 environment. We
+    want to generate and environment for extraction that's the same as the
+    environment we use for rendering.
+
+    This allows developers to explicitly set a ``JINJA2_CONFIG`` in settings.
+    If that's not there, then this will pull the relevant bits from the first
+    Jinja2 backend listed in ``TEMPLATES``.
+
+    """
     try:
         return settings.TOWER['JINJA2_CONFIG']
     except KeyError:
@@ -134,7 +145,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--domain', '-d', default=DEFAULT_DOMAIN, dest='domain',
+            '--domain', '-d', default=DEFAULT_DOMAIN_VALUE,
+            dest='domain',
             help=(
                 'The domain of the message files.  If "all" '
                 'everything will be extracted and combined into '
@@ -185,7 +197,7 @@ class Command(BaseCommand):
 
             os.makedirs(outputdir)
 
-        if domains == DEFAULT_DOMAIN:
+        if domains == DEFAULT_DOMAIN_VALUE:
             domains = DOMAIN_METHODS.keys()
         else:
             domains = [domains]

@@ -34,5 +34,4 @@ class TowerI18nExtension(InternationalizationExtension):
     def _parse_block(self, parser, allow_pluralize):
         parse_block = InternationalizationExtension._parse_block
         ref, buffer = parse_block(self, parser, allow_pluralize)
-        print 'PARSE BLOCK!'
         return ref, collapse_whitespace(buffer)

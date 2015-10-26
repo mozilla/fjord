@@ -1,8 +1,6 @@
 from fjord.l10n.utils import generate_keywords
 
 
-DOMAIN = 'all'
-
 # Name for .pot file--should be 'django'
 TEXT_DOMAIN = 'django'
 
