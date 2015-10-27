@@ -30,5 +30,5 @@ if __name__ == '__main__':
     USING_VENDOR = os.environ.get('USING_VENDOR', '0')
 
     sys.exit(
-        load_entry_point('pytest==2.7.2', 'console_scripts', 'py.test')()
+        load_entry_point('pytest==2.8.2', 'console_scripts', 'py.test')()
     )
