@@ -225,6 +225,24 @@ def lazy_langs():
 
 LANGUAGES = lazy(lazy_langs, dict)()
 
+# L10n extraction configuration
+PUENTE = {
+    'BASE_DIR': BASE_DIR,
+    'DOMAIN_METHODS': {
+        'django': [
+            ('fjord/**.py', 'python'),
+            ('fjord/**/jinja2/**.html',  'jinja2'),
+            # FIXME: This is wrong--should be a django-specific extractor
+            ('fjord/**/templates/**.html', 'jinja2'),
+            ('templates/**.html', 'jinja2'),
+        ]
+    },
+    'PROJECT': 'Mozilla Input',
+    'MSGID_BUGS_ADDRESS': (
+        'https://bugzilla.mozilla.org/enter_bug.cgi?product=Input'
+    )
+}
+
 INSTALLED_APPS = (
     # Local apps
     'django_browserid',
@@ -254,9 +272,10 @@ INSTALLED_APPS = (
     'django_extensions',
     'django_jinja',
     'django_jinja.contrib._humanize',  # Adds django humanize filters
+    'dennis.django_dennis',
     'eadred',
     'pipeline',
-    'dennis.django_dennis',
+    'puente',
 
     'fjord.alerts',
     'fjord.analytics',
@@ -376,7 +395,7 @@ TEMPLATES = [
                 'django_jinja.builtins.extensions.CsrfExtension',
                 'django_jinja.builtins.extensions.StaticFilesExtension',
                 'django_jinja.builtins.extensions.DjangoFiltersExtension',
-                'fjord.base.l10n.MozInternationalizationExtension',
+                'puente.ext.i18n',
                 'pipeline.templatetags.ext.PipelineExtension',
                 'waffle.jinja.WaffleExtension',
             ],
@@ -577,16 +596,6 @@ ANON_ALWAYS = True
 # CSRF error page
 CSRF_FAILURE_VIEW = 'fjord.base.views.csrf_failure'
 
-# Tells the extract script what files to look for L10n in and what
-# function handles the extraction.
-DOMAIN_METHODS = {
-    'django': [
-        ('fjord/**.py', 'fjord.base.l10n.extract_python'),
-        ('fjord/**/templates/**.html', 'fjord.base.l10n.extract_template'),
-        ('fjord/**/jinja2/**.html',  'fjord.base.l10n.extract_template'),
-        ('templates/**.html', 'fjord.base.l10n.extract_template'),
-    ]
-}
 
 WSGI_APPLICATION = 'fjord.wsgi.application'
 

@@ -26,7 +26,6 @@ src/dennis
 src/django
 src/django-adminplus
 src/django-arecibo
-src/babel
 src/dateutil
 src/django-browserid
 src/django_compressor
@@ -53,6 +52,7 @@ src/gengo-python
 src/html5lib-python
 src/kombu
 src/nuggets
+src/puente
 src/py-amqp
 src/pyquery
 src/pystatsd
