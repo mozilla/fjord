@@ -9,12 +9,10 @@ from django.utils.functional import lazy
 
 from fjord.settings_utils import config
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ROOT = os.path.dirname(BASE_DIR)
-
+BASE_DIR = os.path.abspath(os.path.join(__file__, '../../..'))
 
 def path(*dirs):
-    return os.path.join(ROOT, *dirs)
+    return os.path.join(BASE_DIR, *dirs)
 
 
 # Name of the top-level module where you put all your apps.
@@ -317,7 +315,7 @@ MIDDLEWARE_CLASSES = (
 )
 
 LOCALE_PATHS = (
-    os.path.join(ROOT, 'locale'),
+    os.path.join(BASE_DIR, 'locale'),
 )
 
 SUPPORTED_NONLOCALES = [

@@ -80,7 +80,7 @@ def robots_view(request):
 
 def contribute_view(request):
     """Generate a contribute.json."""
-    template = render(request, 'contribute.json', dirs=[settings.ROOT])
+    template = render(request, 'contribute.json', dirs=[settings.BASE_DIR])
     return HttpResponse(template, content_type='application/json')
 
 
