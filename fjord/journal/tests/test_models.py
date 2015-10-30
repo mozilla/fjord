@@ -1,8 +1,18 @@
 from datetime import datetime, timedelta
 
 from fjord.base.tests import TestCase
-from fjord.journal.models import purge_data, Record
+from fjord.journal.models import goofy_truncate, purge_data, Record
 from fjord.journal.tests import RecordFactory
+
+
+def test_goofy_truncate():
+    tests = [
+        ('abcde', 5, 'abcde'),
+        ('abcde', 3, 'abc'),
+        (u'abcd\u20ac', 5, 'abcd'),
+    ]
+    for text, length, expected in tests:
+        assert goofy_truncate(text, length) == expected
 
 
 class TestPurgeData(TestCase):

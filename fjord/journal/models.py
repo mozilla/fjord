@@ -12,10 +12,34 @@ RECORD_INFO = u'info'
 RECORD_ERROR = u'error'
 
 
+def goofy_truncate(text, length):
+    """This truncates text accounting for utf-8 sequences
+
+    This assumes a limited number of bytes of storage, but that we
+    want to maintain utf-8 sequences. Thus it does this goofy loop
+    to make sure we don't break a sequence, but that the result
+    is correctly truncated.
+
+    :arg text: either unicode or str
+    :arg length: the number of bytes to truncate to
+
+    :returns: utf-8 encoded string
+    """
+    text = unicode(text)
+
+    while len(text.encode('utf-8')) > length:
+        if len(text) > 255:
+            text = text[:255]
+        else:
+            text = text[:-1]
+    return text.encode('utf-8')
+
+
 class RecordManager(models.Manager):
     @classmethod
     def log(cls, type_, app, src, action, msg, instance=None, metadata=None):
-        msg = msg.encode('utf-8')
+        msg = goofy_truncate(msg, 255)
+
         metadata = metadata or {}
 
         rec = Record(
