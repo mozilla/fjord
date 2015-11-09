@@ -11,11 +11,11 @@ import sys
 _has_setup_vendor_path = False
 
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def path(*a):
-    return os.path.join(ROOT, *a)
+    return os.path.join(BASE_DIR, *a)
 
 
 def setup_vendor_path():
@@ -30,7 +30,7 @@ def setup_vendor_path():
 
     # Make root application importable without the need for
     # python setup.py install|develop
-    sys.path.append(ROOT)
+    sys.path.append(BASE_DIR)
 
     # FIXME: This is vendor/-specific. When we ditch vendor/ we can
     # ditch this.
