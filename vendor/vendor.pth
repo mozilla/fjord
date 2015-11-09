@@ -15,6 +15,7 @@ packages/requests-mock-0.6.0
 packages/six-1.9.0
 packages/tldextract
 packages/urllib3
+src/babel
 src/billiard
 src/bleach
 src/celery
