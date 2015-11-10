@@ -28,8 +28,8 @@ cd $WEBAPP/locale && svn up && cd $WEBAPP
 
 # Run l10n completion to calculate percent completed and update .json
 # file; keep 90 days of data
-$PYTHONBIN $WEBAPP/bin/l10n_completion.py --truncate 90 $WEBAPP/static/l10n_completion.json $WEBAPP/locale/
+$PYTHONBIN $WEBAPP/bin/l10n_completion.py --truncate 90 $WEBAPP/media/l10n_completion.json $WEBAPP/locale/
 
 echo 'Complete.'
-ls -l $WEBAPP/static/l10n_completion.json
+ls -l $WEBAPP/media/l10n_completion.json
 exit 1
