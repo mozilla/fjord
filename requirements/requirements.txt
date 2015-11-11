@@ -137,6 +137,9 @@ ordereddict==1.1
 # sha256: Q85g0F_6RCup08VyIZOq25PDgXS5-0ccjqfMv4NJu8o
 polib==1.0.7
 
+# sha256: rICPLJjoegN70AMOWZWO-mdbHs1nQnBIHQ2MZ2bVAiM
+puente==0.3
+
 # sha256: RsUeuHi3h-gU7o-XN7CmIREDSutNHAZFCsWo6lpw5gI
 pyquery==1.2.9
 
