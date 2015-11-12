@@ -12,7 +12,7 @@ from fjord.base.tests import (
     TestCase,
 )
 from fjord.feedback import models
-from fjord.feedback.config import URL_LENGTH
+from fjord.feedback.config import URL_LENGTH, USER_AGENT_LENGTH
 from fjord.feedback.tests import ProductFactory, ResponseFactory
 
 
@@ -650,6 +650,23 @@ class TestFeedback(TestCase):
         })
         feedback = models.Response.objects.latest(field_name='id')
         assert feedback.url == url_value[:-1]
+
+    def test_user_agent_max_length(self):
+        """Long user agents are truncated"""
+        url = reverse('feedback', args=(u'firefox',))
+
+        ua = (
+            'Mozilla/5.0 (' +
+            ('a' * USER_AGENT_LENGTH) +
+            ') Gecko/24.0 Firefox/24.0'
+        )
+        data = {
+            'happy': 0,
+            'description': u'foo'
+        }
+        self.client.post(url, data, HTTP_USER_AGENT=ua)
+        feedback = models.Response.objects.latest(field_name='id')
+        assert feedback.user_agent == ua[:USER_AGENT_LENGTH]
 
     def test_email_collection(self):
         """If the user enters an email and checks the box, collect email."""

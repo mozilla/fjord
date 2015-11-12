@@ -160,12 +160,13 @@ def _handle_feedback_post(request, locale=None, product=None,
     if user_agent:
         browser = request.BROWSER
 
-        opinion.user_agent = user_agent
-        opinion.browser = browser.browser
-        opinion.browser_version = browser.browser_version
-        opinion.browser_platform = browser.platform
-        if browser.platform == 'Windows':
-            opinion.browser_platform += ' ' + browser.platform_version
+        opinion.browser = browser.browser[:30]
+        opinion.browser_version = browser.browser_version[:30]
+        bp = browser.platform
+        if bp == 'Windows':
+            bp += (' ' + browser.platform_version)
+        opinion.browser_platform = bp[:30]
+        opinion.user_agent = user_agent[:config.USER_AGENT_LENGTH]
 
     # source is src or utm_source
     source = (
@@ -221,10 +222,10 @@ def _handle_feedback_post(request, locale=None, product=None,
                         product_db_name, request.BROWSER)
 
     # Make sure values are at least empty strings--no Nones.
-    opinion.product = product_db_name or u''
-    opinion.version = version or u''
-    opinion.channel = channel or u''
-    opinion.platform = platform or u''
+    opinion.product = (product_db_name or u'')[:30]
+    opinion.version = (version or u'')[:30]
+    opinion.channel = (channel or u'')[:30]
+    opinion.platform = (platform or u'')[:30]
 
     opinion.save()
 

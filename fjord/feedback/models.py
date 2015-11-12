@@ -14,9 +14,11 @@ from fjord.base.domain import get_domain
 from fjord.base.models import ModelBase, JSONObjectField, EnhancedURLField
 from fjord.base.utils import smart_truncate, instance_to_key, is_url
 from fjord.feedback.config import (
-    CODE_TO_COUNTRY,
     ANALYSIS_STOPWORDS,
-    TRUNCATE_LENGTH
+    CODE_TO_COUNTRY,
+    TRUNCATE_LENGTH,
+    URL_LENGTH,
+    USER_AGENT_LENGTH
 )
 from fjord.search.index import (
     FjordDocType,
@@ -28,10 +30,6 @@ from fjord.search.index import (
 from fjord.search.tasks import register_live_index
 from fjord.translations.models import get_translation_system_choices
 from fjord.translations.tasks import register_auto_translation
-
-
-# Maximum length for urls
-URL_LENGTH = 1000
 
 
 class ProductManager(models.Manager):
@@ -163,7 +161,7 @@ class Response(ModelBase):
 
     # Data coming from the user
     happy = models.BooleanField(default=True)
-    url = EnhancedURLField(blank=True, max_length=1000)
+    url = EnhancedURLField(blank=True, max_length=URL_LENGTH)
     description = models.TextField()
 
     # Translation into English of the description
@@ -190,7 +188,7 @@ class Response(ModelBase):
     api = models.IntegerField(null=True, blank=True)
 
     # User agent and inferred data from the user agent
-    user_agent = models.CharField(max_length=255, blank=True)
+    user_agent = models.CharField(max_length=USER_AGENT_LENGTH, blank=True)
     browser = models.CharField(max_length=30, blank=True)
     browser_version = models.CharField(max_length=30, blank=True)
     browser_platform = models.CharField(max_length=30, blank=True)
@@ -671,8 +669,7 @@ class PostResponseSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False)
 
     # user agent
-    user_agent = serializers.CharField(
-        max_length=255, allow_blank=True, default=u'')
+    user_agent = serializers.CharField(allow_blank=True, default=u'')
 
     # source and campaign
     source = serializers.CharField(
@@ -687,15 +684,6 @@ class PostResponseSerializer(serializers.Serializer):
             )
         return value
 
-    def validate_url(self, value):
-        if value:
-            if not is_url(value):
-                raise serializers.ValidationError(
-                    u'{0} is not a valid url'.format(value)
-                )
-            value = value[:URL_LENGTH]
-        return value
-
     def validate_product(self, value):
         """Validates the product against Product model"""
         # This looks goofy, but it makes it more likely we have a
@@ -705,6 +693,15 @@ class PostResponseSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 u'{0} is not a valid product'.format(value)
             )
+        return value
+
+    def validate_url(self, value):
+        if value:
+            if not is_url(value):
+                raise serializers.ValidationError(
+                    u'{0} is not a valid url'.format(value)
+                )
+            value = value[:URL_LENGTH]
         return value
 
     def create(self, validated_data):
@@ -720,16 +717,17 @@ class PostResponseSerializer(serializers.Serializer):
                 validated_data[key] = validated_data[key].strip()
 
         # If there's a user agent, infer all the things from
-        # the user agent.
+        # the user agent and truncate it.
         user_agent = validated_data.get('user_agent')
         if user_agent:
             browser = parse_ua(user_agent)
-            validated_data['browser'] = browser.browser
-            validated_data['browser_version'] = browser.browser_version
+            validated_data['browser'] = browser.browser[:30]
+            validated_data['browser_version'] = browser.browser_version[:30]
             bp = browser.platform
-            if browser.platform == 'Windows':
+            if bp == 'Windows':
                 bp += (' ' + browser.platform_version)
-            validated_data['browser_platform'] = bp
+            validated_data['browser_platform'] = bp[:30]
+            validated_data['user_agent'] = user_agent[:USER_AGENT_LENGTH]
 
         return Response.objects.create(api=1, **validated_data)
 
