@@ -10,7 +10,7 @@ from django.test.client import Client
 from fjord.base.tests import TestCase, reverse
 from fjord.feedback import models
 from fjord.feedback.api_views import PER_HOUR_LIMIT
-from fjord.feedback.config import URL_LENGTH
+from fjord.feedback.config import URL_LENGTH, USER_AGENT_LENGTH
 from fjord.feedback.models import Response
 from fjord.feedback.tests import ResponseFactory
 from fjord.search.tests import ElasticTestCase
@@ -867,6 +867,29 @@ class TestPostFeedbackAPI(TestCase):
             assert r.status_code == 201
 
             get_cache('default').clear()
+
+    def test_user_agent_max_length(self):
+        """Long user agents are truncated"""
+        ua = (
+            'Mozilla/5.0 (' +
+            ('a' * USER_AGENT_LENGTH) +
+            ') Gecko/18.0 Firefox/18.0'
+        )
+
+        data = {
+            'happy': True,
+            'description': u'Great!',
+            'product': u'Firefox OS',
+            'user_agent': ua,
+        }
+
+        r = self.client.post(
+            reverse('feedback-api'),
+            content_type='application/json',
+            data=json.dumps(data))
+        assert r.status_code == 201
+        feedback = models.Response.objects.latest(field_name='id')
+        assert feedback.user_agent == ua[:USER_AGENT_LENGTH]
 
     def test_user_agent_inferred_bits(self):
         """Tests that we infer the right bits from the user-agent"""

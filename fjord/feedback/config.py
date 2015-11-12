@@ -5,6 +5,13 @@ from django.utils.translation import ugettext_lazy as _lazy
 # want to use this to validate urls, but we do want to use this to truncate.
 URL_LENGTH = 1000
 
+# Maximum length for values in the user-agent field of feedback Responses. We
+# don't want to use this to validate user agents, but we do want to use this to
+# truncate. With user agents, we risk losing important information at the end
+# of the value and also messing up the syntax, but I claim it won't have any
+# impact on how we use the data.
+USER_AGENT_LENGTH = 1000
+
 # List of (value, name, _lazy(name)) tuples for countries Firefox OS has
 # been released in.
 # Values are ISO 3166 country codes.
