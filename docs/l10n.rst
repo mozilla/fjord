@@ -46,8 +46,9 @@ settings file, ``./fjord/settings/local.py``.
 Extract/merge/sync strings with svn
 ===================================
 
-First, ping Kadir (or whoever else) and tell him/her we're merging strings
-(i.e. extracting them from our codebase and committing the changes to svn).
+First, ping Will or whoever else can sync strings with Verbatim and tell
+him/her we're merging strings (i.e. extracting them from our codebase and
+committing the changes to svn).
 
 Then, update the svn repository::
 
@@ -57,8 +58,13 @@ Then, update the svn repository::
 
 Then, extract the strings from the codebase::
 
+    ./manage.py extract_db
     ./manage.py extract
     ./manage.py merge
+
+Commit the db strings to the repo::
+
+    git commit -a
 
 Then, commit the new strings to svn::
 
