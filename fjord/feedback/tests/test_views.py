@@ -77,16 +77,6 @@ class TestFeedback(TestCase):
         # Make sure it doesn't create a context record
         assert models.ResponseContext.objects.count() == 0
 
-    def test_response_id_in_session(self):
-        url = reverse('feedback', args=(u'firefox',))
-        self.client.post(url, {
-            'happy': 1,
-            'description': u'Firefox rocks!',
-            'url': u'http://mozilla.org/'
-        })
-        response = models.Response.objects.order_by('-id')[0]
-        assert self.client.session['response_id'] == response.id
-
     def test_valid_sad(self):
         """Submitting a valid sad form creates an item in the DB.
 
@@ -113,6 +103,16 @@ class TestFeedback(TestCase):
         # Note: This comes from the user agent from the LocalizingClient
         assert u'Firefox' == feedback.product
         assert u'14.0.1' == feedback.version
+
+    def test_response_id_in_session(self):
+        url = reverse('feedback', args=(u'firefox',))
+        self.client.post(url, {
+            'happy': 1,
+            'description': u'Firefox rocks!',
+            'url': u'http://mozilla.org/'
+        })
+        response = models.Response.objects.order_by('-id')[0]
+        assert self.client.session['response_id'] == response.id
 
     def test_response_id_in_qs_unauthenticated(self):
         """Verify response_id in querystring is ignored if user is not
