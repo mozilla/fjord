@@ -217,11 +217,11 @@ LANGUAGE_URL_MAP = lazy(lazy_lang_url_map, dict)()
 def lazy_langs():
     from django.conf import settings
     from product_details import product_details
-    langs = DEV_LANGUAGES if settings.DEV else settings.PROD_LANGUAGES
-    return dict([(lang.lower(), product_details.languages[lang]['native'])
-                 for lang in langs if lang in product_details.languages])
+    langs = sorted(DEV_LANGUAGES if settings.DEV else settings.PROD_LANGUAGES)
+    return [(lang.lower(), product_details.languages[lang]['native'])
+            for lang in langs if lang in product_details.languages]
 
-LANGUAGES = lazy(lazy_langs, dict)()
+LANGUAGES = lazy(lazy_langs, list)()
 
 # L10n extraction configuration
 PUENTE = {
@@ -239,6 +239,17 @@ PUENTE = {
     'MSGID_BUGS_ADDRESS': (
         'https://bugzilla.mozilla.org/enter_bug.cgi?product=Input'
     )
+}
+
+# DB strings extraction
+DB_LOCALIZE = {
+    'feedback': {
+        'Product': {
+            'queryset': lambda cls: cls.objects.on_picker(),
+            'attrs': ['display_name'],
+            'comments': ['This is a product name']
+        }
+    }
 }
 
 INSTALLED_APPS = (
@@ -665,7 +676,7 @@ GRAPPELLI_ADMIN_TITLE = 'Input admin and diabolical dashboard'
 # Always allow for override via querystring
 WAFFLE_OVERRIDE = True
 
-## Logging
+# Logging
 LOG_LEVEL = logging.INFO
 HAS_SYSLOG = True
 SYSLOG_TAG = 'http_app_playdoh'  # Change this after you fork.

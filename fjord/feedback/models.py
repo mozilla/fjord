@@ -33,9 +33,13 @@ from fjord.translations.tasks import register_auto_translation
 
 
 class ProductManager(models.Manager):
-    def public(self):
-        """Returns publicly visible products"""
+    def on_dashboard(self):
+        """Returns products visible on frontpage dashboard"""
         return self.filter(on_dashboard=True)
+
+    def on_picker(self):
+        """Returns products visible in picker"""
+        return self.filter(enabled=True, on_picker=True)
 
     def from_slug(self, slug):
         return self.get(slug=slug)
