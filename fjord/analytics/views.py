@@ -219,7 +219,8 @@ def dashboard(request):
 
     visible_products = [
         prod.encode('utf-8')
-        for prod in Product.objects.public().values_list('db_name', flat=True)
+        for prod in Product.objects.on_dashboard().values_list(
+            'db_name', flat=True)
     ]
 
     # This covers the "unknown" product which is also visible.

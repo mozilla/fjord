@@ -241,6 +241,17 @@ PUENTE = {
     )
 }
 
+# DB strings extraction
+DB_LOCALIZE = {
+    'feedback': {
+        'Product': {
+            'queryset': lambda cls: cls.objects.on_picker(),
+            'attrs': ['display_name'],
+            'comments': ['This is a product name']
+        }
+    }
+}
+
 INSTALLED_APPS = (
     # Local apps
     'django_browserid',
@@ -665,7 +676,7 @@ GRAPPELLI_ADMIN_TITLE = 'Input admin and diabolical dashboard'
 # Always allow for override via querystring
 WAFFLE_OVERRIDE = True
 
-## Logging
+# Logging
 LOG_LEVEL = logging.INFO
 HAS_SYSLOG = True
 SYSLOG_TAG = 'http_app_playdoh'  # Change this after you fork.
