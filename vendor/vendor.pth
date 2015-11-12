@@ -1,6 +1,7 @@
 packages/GitPython/lib
 packages/anyjson
 packages/argparse-1.3.0
+packages/Babel-2.1.1
 packages/carrot
 packages/certifi-2015.9.6.1
 packages/django-picklefield/src
@@ -9,13 +10,12 @@ packages/mock-1.0.1
 packages/ordereddict
 packages/polib-1.0.7
 packages/python-memcached
-packages/pytz-2015.4
+packages/pytz-2015.7
 packages/requests-2.7.0
 packages/requests-mock-0.6.0
 packages/six-1.9.0
 packages/tldextract
 packages/urllib3
-src/babel
 src/billiard
 src/bleach
 src/celery

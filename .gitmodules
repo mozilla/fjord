@@ -88,9 +88,6 @@
 [submodule "vendor/src/click"]
 	path = vendor/src/click
 	url = https://github.com/mitsuhiko/click.git
-[submodule "vendor/src/babel"]
-	path = vendor/src/babel
-	url = https://github.com/mitsuhiko/babel.git
 [submodule "vendor/src/translate"]
 	path = vendor/src/translate
 	url = https://github.com/translate/translate.git
