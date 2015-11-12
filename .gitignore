@@ -1,13 +1,10 @@
-settings_local.py
-settings/local.py
-*/settings/local.py
+fjord/settings/local.py
 *.py[co]
 *.sw[po]
 .cache
 .coverage
 .cache
 pip-log.txt
-docs/_gh-pages
 build.py
 build
 .DS_Store
@@ -15,7 +12,6 @@ build
 *-all.css
 *-min.js
 *-all.js
-.noseids
 tmp/*
 *~
 *.mo
