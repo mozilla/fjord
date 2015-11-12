@@ -30,6 +30,10 @@ from fjord.translations.models import get_translation_system_choices
 from fjord.translations.tasks import register_auto_translation
 
 
+# Maximum length for urls
+URL_LENGTH = 1000
+
+
 class ProductManager(models.Manager):
     def public(self):
         """Returns publicly visible products"""
@@ -159,7 +163,7 @@ class Response(ModelBase):
 
     # Data coming from the user
     happy = models.BooleanField(default=True)
-    url = EnhancedURLField(blank=True)
+    url = EnhancedURLField(blank=True, max_length=1000)
     description = models.TextField()
 
     # Translation into English of the description
@@ -637,7 +641,7 @@ class PostResponseSerializer(serializers.Serializer):
     # this and instead default it to False.
     happy = serializers.BooleanField(default=False)
 
-    url = serializers.CharField(max_length=200, allow_blank=True, default=u'')
+    url = serializers.CharField(allow_blank=True, default=u'')
     description = serializers.CharField(required=True)
 
     category = serializers.CharField(
@@ -689,6 +693,7 @@ class PostResponseSerializer(serializers.Serializer):
                 raise serializers.ValidationError(
                     u'{0} is not a valid url'.format(value)
                 )
+            value = value[:URL_LENGTH]
         return value
 
     def validate_product(self, value):

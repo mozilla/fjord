@@ -10,6 +10,8 @@ from django.test.client import Client
 from fjord.base.tests import TestCase, reverse
 from fjord.feedback import models
 from fjord.feedback.api_views import PER_HOUR_LIMIT
+from fjord.feedback.config import URL_LENGTH
+from fjord.feedback.models import Response
 from fjord.feedback.tests import ResponseFactory
 from fjord.search.tests import ElasticTestCase
 
@@ -787,15 +789,16 @@ class TestPostFeedbackAPI(TestCase):
     def test_url_max_length(self):
         url_base = 'http://example.com/'
 
-        # Up to 199 characters is fine.
+        # Up to URL_LENGTH characters, everything is there.
+        url = url_base + ('a' * (URL_LENGTH - 1 - len(url_base))) + 'b'
         data = {
             'happy': True,
             'channel': u'stable',
             'version': u'1.1',
-            'description': u'Great! 199',
+            'description': u'Great! 999',
             'product': u'Firefox OS',
             'platform': u'Firefox OS',
-            'url': url_base + ('a' * (199 - len(url_base))) + 'b',
+            'url': url,
             'locale': 'en-US',
         }
 
@@ -804,16 +807,19 @@ class TestPostFeedbackAPI(TestCase):
             content_type='application/json',
             data=json.dumps(data))
         assert r.status_code == 201
+        feedback = Response.objects.latest('id')
+        assert feedback.url == url
 
-        # 200th character is not fine.
+        # URL_LENGTH + 1 character gets truncated.
+        url = url_base + ('a' * (URL_LENGTH - len(url_base))) + 'b'
         data = {
             'happy': True,
             'channel': u'stable',
             'version': u'1.1',
-            'description': u'Great! 200',
+            'description': u'Great! 1000',
             'product': u'Firefox OS',
             'platform': u'Firefox OS',
-            'url': url_base + ('a' * (200 - len(url_base))) + 'b',
+            'url': url,
             'locale': 'en-US',
         }
 
@@ -821,7 +827,9 @@ class TestPostFeedbackAPI(TestCase):
             reverse('feedback-api'),
             content_type='application/json',
             data=json.dumps(data))
-        assert r.status_code == 400
+        assert r.status_code == 201
+        feedback = Response.objects.latest('id')
+        assert feedback.url == url[:-1]
 
     def test_valid_urls(self):
         test_data = [
