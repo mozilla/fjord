@@ -1,6 +1,10 @@
 from django.utils.translation import ugettext_lazy as _lazy
 
 
+# Maximum length for values in the url field of feedback Responses. We don't
+# want to use this to validate urls, but we do want to use this to truncate.
+URL_LENGTH = 1000
+
 # List of (value, name, _lazy(name)) tuples for countries Firefox OS has
 # been released in.
 # Values are ISO 3166 country codes.

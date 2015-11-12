@@ -1,6 +1,7 @@
 from django import forms
 
 from fjord.base.forms import EnhancedURLField
+from fjord.feedback.config import URL_LENGTH
 
 
 class URLInput(forms.TextInput):
@@ -33,3 +34,11 @@ class ResponseForm(forms.Form):
         attrs={'class': 'manufacturer'}))
     device = forms.CharField(required=False, widget=forms.HiddenInput(
         attrs={'class': 'device'}))
+
+    def clean_url(self):
+        # Truncate the url if it's > URL_LENGTH characters. We truncate rather
+        # than use it to validate because it probably doesn't matter if we keep
+        # super long urls and we'd rather not error out on the user.
+        data = self.cleaned_data['url']
+        data = data[:URL_LENGTH]
+        return data
