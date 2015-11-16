@@ -20,6 +20,7 @@ from fjord.feedback.config import (
     URL_LENGTH,
     USER_AGENT_LENGTH
 )
+from fjord.feedback.utils import convert_emoji
 from fjord.search.index import (
     FjordDocType,
     FjordDocTypeManager,
@@ -324,6 +325,10 @@ class Response(ModelBase):
         return keys
 
     def save(self, *args, **kwargs):
+        # Convert emoji because emoji break MySQL
+        self.description = convert_emoji(self.description)
+
+        # Truncate the description
         self.description = self.description.strip()[:TRUNCATE_LENGTH]
         super(Response, self).save(*args, **kwargs)
 

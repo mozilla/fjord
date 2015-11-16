@@ -1,3 +1,10 @@
+import re
+# unicodedata2 is the unicodedata backport to Python 2
+try:
+    import unicodedata2 as unicodedata
+except ImportError:
+    import unicodedata
+
 import urlparse
 
 
@@ -28,3 +35,23 @@ def clean_url(url):
     new_url = (parsed.scheme, parsed.hostname, parsed.path, None, None, None)
 
     return urlparse.urlunparse(new_url)
+
+
+POSSIBLE_EMOJIS_RE = re.compile(u'[\U00010000-\U0010ffff]')
+
+
+def convert_emoji(text):
+    """Takes unicode text and converts emoji characters
+
+    Emoji break MySQL, so we convert them into ascii.
+
+    """
+    # convert to unicodedata.name()
+    def _convert(match_char):
+        c = match_char.group(0)
+        try:
+            return unicodedata.name(c)
+        except ValueError:
+            # Throws a ValueError if the name doesn't exist.
+            return ''
+    return POSSIBLE_EMOJIS_RE.sub(_convert, text)
