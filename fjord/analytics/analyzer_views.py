@@ -124,7 +124,7 @@ def analytics_search(request):
     search_has_email = request.GET.get('has_email', None)
     search_country = request.GET.get('country', None)
     search_domain = request.GET.get('domain', None)
-    search_api = smart_int(request.GET.get('api', None), fallback=None)
+    search_api = request.GET.get('api', None)
     search_source = request.GET.get('source', None)
     search_campaign = request.GET.get('campaign', None)
     search_organic = request.GET.get('organic', None)

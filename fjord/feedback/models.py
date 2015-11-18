@@ -457,7 +457,7 @@ class ResponseDocTypeManager(FjordDocTypeManager):
 class ResponseDocType(FjordDocType):
     id = es_dsl.Integer()
     happy = es_dsl.Boolean()
-    api = es_dsl.Integer()
+    api = es_dsl.String(index='not_analyzed')
     url = es_dsl.String(index='not_analyzed')
     url_domain = es_dsl.String(index='not_analyzed')
     has_email = es_dsl.Boolean()
@@ -573,7 +573,9 @@ class ResponseDocType(FjordDocType):
         doc = {
             'id': resp.id,
             'happy': resp.happy,
-            'api': resp.api,
+            # This is an int or None, but we convert it to a str which
+            # converts the None and gives us values that are easier to query.
+            'api': str(resp.api),
             'url': resp.url,
             'url_domain': resp.url_domain,
             'has_email': bool(resp.user_email),

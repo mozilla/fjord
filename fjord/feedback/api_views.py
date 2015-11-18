@@ -57,6 +57,19 @@ class FeedbackHistogramAPI(rest_framework.views.APIView):
                     if versions:
                         f &= F('terms', version=versions)
 
+        if 'source' in request.GET:
+            # FIXME: Having a , in the source is valid, so this might not work
+            # right.
+            sources = request.GET['source'].split(',')
+            if sources:
+                f &= F('terms', source=sources)
+
+        if 'api' in request.GET:
+            # The int (as a str) or "None"
+            apis = request.GET['api'].split(',')
+            if apis:
+                f &= F('terms', api=apis)
+
         date_start = smart_date(request.GET.get('date_start', None))
         date_end = smart_date(request.GET.get('date_end', None))
         delta = smart_timedelta(request.GET.get('date_delta', None))
