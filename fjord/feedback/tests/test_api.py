@@ -414,6 +414,7 @@ class TestFeedbackHistogramAPI(ElasticTestCase):
     # FIXME: Test happy/sad
     # FIXME: Test platforms
     # FIXME: Test interval
+    # FIXME: Test source
 
 
 class TestPostFeedbackAPI(TestCase):
