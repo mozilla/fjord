@@ -985,10 +985,12 @@ class TestDeprecatedAndroidFeedback(TestCase):
         assert feedback.manufacturer == data['manufacturer']
 
         # This comes from the client.post url.
-        assert u'en-US' == feedback.locale
-        # Note: This comes from the user agent from the LocalizingClient
-        assert u'Firefox for Android' == feedback.product
-        assert u'24.0' == feedback.version
+        assert feedback.locale == u'en-US'
+        # Note: This comes from the user agent from the LocalizingClient.
+        assert feedback.product == u'Firefox for Android'
+        assert feedback.version == u'24.0'
+        # Verify it's tagged with a source.
+        assert feedback.source == u'oldfennec-in-product'
 
     def test_deprecated_firefox_for_android_sad_is_sad(self):
         data = {
