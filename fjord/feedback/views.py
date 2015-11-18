@@ -339,11 +339,13 @@ def firefox_os_stable_feedback(request, locale=None, product=None,
 @csrf_exempt
 @require_POST
 def android_about_feedback(request, locale=None):
-    """A view specifically for Firefox for Android.
+    """A view specifically for old Firefox for Android
 
-    Firefox for Android has a feedback form built in that generates
-    POSTS directly to Input, and is always sad or ideas. Since Input no
-    longer supports idea feedbacks, everything is Sad.
+    Old versions of Firefox for Android have a feedback form built in that
+    generates POSTS directly to Input and is always sad or ideas. The POST data
+    matches what the old Input used to do. The new Input doesn't have a
+    ``_type`` field and doesn't have Idea feedback, so we switch it so that all
+    Idea feedback is Sad and tag it with a source.
 
     FIXME - measure usage of this and nix it when we can. See bug
     #964292.
@@ -363,6 +365,12 @@ def android_about_feedback(request, locale=None):
     else:
         happy = 0
     request.POST['happy'] = happy
+
+    # If there's no source, then we tag it with a source so we can distinguish
+    # these from other feedback and know when we can remove this code.
+    if not ('src' in request.GET or 'utm_source' in request.GET):
+        request.GET = request.GET.copy()
+        request.GET['utm_source'] = 'oldfennec-in-product'
 
     # Note: product, version and channel are always None in this view
     # since this is to handle backwards-compatibility. So we don't
