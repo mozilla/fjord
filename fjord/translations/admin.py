@@ -56,6 +56,7 @@ def gengo_translator_view(request):
     configured = False
     gengo_languages = None
     missing_prod_locales = None
+    outstanding = []
 
     if settings.GENGO_PUBLIC_KEY and settings.GENGO_PRIVATE_KEY:
         gengo_api = FjordGengo()
