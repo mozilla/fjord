@@ -57,6 +57,7 @@ def gengo_translator_view(request):
     gengo_languages = None
     missing_prod_locales = None
     outstanding = []
+    seven_days_of_orders = []
 
     if settings.GENGO_PUBLIC_KEY and settings.GENGO_PRIVATE_KEY:
         gengo_api = FjordGengo()
@@ -113,7 +114,7 @@ def gengo_translator_view(request):
             for i in range(7)
         ]
 
-        seven_days_of_orders = []
+
         for day in sorted(days):
             seven_days_of_orders.append(
                 (day,
