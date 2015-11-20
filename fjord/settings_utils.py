@@ -65,15 +65,17 @@ def parse_database_url(val):
         'PASSWORD': url_parts.password,
         'HOST': url_parts.hostname.lower(),
         'PORT': url_parts.port,
-        'CHARSET': 'utf8',
-        'COLLATION': 'utf8_general_ci',
+        'CHARSET': 'utf8mb4',
+        'COLLATION': 'utf8mb4_unicode_ci',
         'OPTIONS': {
             'init_command': 'SET storage_engine=InnoDB',
             'use_unicode': True,
+            # Affects connection encoding
+            'charset': 'utf8mb4'
         },
         'TEST': {
-            'CHARSET': 'utf8',
-            'COLLATIONS': 'utf8_general_ci',
+            'CHARSET': 'utf8mb4',
+            'COLLATION': 'utf8mb4_unicode_ci',
         }
     }
 
