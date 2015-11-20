@@ -51,29 +51,14 @@ class Command(BaseCommand):
     """
     help = 'Pulls strings from the database and writes them to python file.'
 
-    def add_arguments(self, parser):
-        parser.add_argument(
-            '-o', '--outputfile',
-            type=str,
-            action='store',
-            default=os.path.join(settings.BASE_DIR, 'fjord', 'base',
-                                 'db_strings.py'),
-            help=(
-                'The file where extracted strings are written to. (Default: '
-                '%default)'
-            ),
-        )
-
     def handle(self, *args, **options):
         try:
             apps = settings.DB_LOCALIZE
         except AttributeError:
             raise CommandError('DB_LOCALIZE setting is not defined!')
 
-        outputfile = options['outputfile']
-
-        strings = []
         for app, models in apps.items():
+            strings = []
             for model, params in models.items():
                 model_class = get_model(app, model)
                 attrs = params['attrs']
@@ -83,27 +68,27 @@ class Command(BaseCommand):
                     for i in range(len(attrs)):
                         msg = {
                             'id': item[i],
-                            'loc': 'DB: %s.%s.%s' % (app, model, attrs[i]),
+                            'ctxt': 'DB: %s.%s.%s' % (app, model, attrs[i]),
                             'comments': params.get('comments')
                         }
                         strings.append(msg)
 
-        py_file = os.path.expanduser(outputfile)
-        py_file = os.path.abspath(py_file)
-
-        print 'Outputting db strings to: %s' % py_file
-        with open(py_file, 'w+') as f:
-            f.write(HEADER)
-            f.write(
-                'from django.utils.translation import ugettext_lazy as _lazy'
-                '\n\n'
+            outputfile = os.path.join(
+                settings.BASE_DIR, 'fjord', app, 'db_strings.py'
             )
-            for s in strings:
-                comments = s['comments']
-                if comments:
-                    for c in comments:
+            outputfile = os.path.abspath(outputfile)
+
+            tmpl = u'pgettext("""%(ctxt)s""", """%(id)s""")\n'
+
+            print 'Outputting db strings to: %s' % outputfile
+            with open(outputfile, 'w+') as f:
+                f.write(HEADER)
+                f.write(
+                    'from django.utils.translation import pgettext'
+                    '\n\n'
+                )
+                for s in strings:
+                    for c in s['comments']:
                         f.write((u'# l10n: %s\n' % c).encode('utf8'))
 
-                f.write(
-                    (u'_lazy("""%(id)s""", \'%(loc)s\')\n' % s).encode('utf8')
-                )
+                    f.write((tmpl % s).encode('utf8'))

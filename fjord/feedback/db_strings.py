@@ -13,15 +13,15 @@
 #     ./manage.py extract_db
 #
 #######################################################################
-from django.utils.translation import ugettext_lazy as _lazy
+from django.utils.translation import pgettext
 
 # l10n: This is a product name
-_lazy("""Firefox""", 'DB: feedback.Product.display_name')
+pgettext("""DB: feedback.Product.display_name""", """Firefox""")
 # l10n: This is a product name
-_lazy("""Firefox for Android""", 'DB: feedback.Product.display_name')
+pgettext("""DB: feedback.Product.display_name""", """Firefox for Android""")
 # l10n: This is a product name
-_lazy("""Firefox OS""", 'DB: feedback.Product.display_name')
+pgettext("""DB: feedback.Product.display_name""", """Firefox OS""")
 # l10n: This is a product name
-_lazy("""Firefox Developer""", 'DB: feedback.Product.display_name')
+pgettext("""DB: feedback.Product.display_name""", """Firefox Developer""")
 # l10n: This is a product name
-_lazy("""Firefox for iOS""", 'DB: feedback.Product.display_name')
+pgettext("""DB: feedback.Product.display_name""", """Firefox for iOS""")
