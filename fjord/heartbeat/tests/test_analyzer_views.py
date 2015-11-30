@@ -25,6 +25,16 @@ class TestHeartbeatHBData(TestCase):
         assert resp.status_code == 200
         assert answer.flow_id in resp.content
 
+    def test_answer_view(self):
+        """Verify only analyzers can see hb_data view and view shows answers"""
+        answer = AnswerFactory(flow_id='rehanrocks')
+
+        jane = AnalyzerProfileFactory().user
+        self.client_login_user(jane)
+
+        resp = self.client.get(reverse('hb_data', args=(answer.id,)))
+        assert answer.flow_id in resp.content
+
 
 class TestHeartbeatHBErrorLog(TestCase):
     client_class = LocalizingClient

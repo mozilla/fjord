@@ -40,6 +40,7 @@ def hb_data(request, answerid=None):
     sortby = 'id'
     answer = None
     answers = []
+    fields = []
     survey = None
     showdata_filter = None
 
