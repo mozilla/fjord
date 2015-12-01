@@ -49,7 +49,7 @@ class HeartbeatV2API(rest_framework.views.APIView):
         # If it's an empty packet, bail immediately with a nicer message.
         if not post_data:
             statsd.incr('heartbeat.emptypacket')
-            return self.rest_error(post_data, ['empty packet'])
+            return self.rest_error(post_data, 'empty packet')
 
         # Stopgap fix for 1195747 where the hb client is sending
         # "unknown" which fails validation because the column has
