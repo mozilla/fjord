@@ -13,7 +13,7 @@ from elasticsearch.exceptions import (
     ElasticsearchException,
     NotFoundError
 )
-from elasticsearch.helpers import bulk_index
+from elasticsearch.helpers import bulk
 from elasticsearch_dsl import DocType, Search, Index
 from elasticsearch_dsl.connections import connections
 
@@ -188,7 +188,7 @@ class FjordDocTypeManager(object):
         if not docs:
             return
 
-        bulk_index(
+        bulk(
             es,
             docs,
             index=get_index_name(),
