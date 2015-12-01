@@ -21,6 +21,16 @@ class TestHeartbeatPostAPI(TestCase):
         """
         return int(self._base_ts + offset) * 1000
 
+    def test_empty_packet(self):
+        data = {}
+
+        resp = self.client.post(
+            reverse('heartbeat-api'),
+            content_type='application/json',
+            data=json.dumps(data))
+
+        assert resp.status_code == 400
+
     def test_minimal_data(self):
         """Minimum amount of data required"""
         survey = SurveyFactory.create()
