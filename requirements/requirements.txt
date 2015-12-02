@@ -104,8 +104,8 @@ eadred==0.3
 # sha256: 6w1LWyCkzPnkm9IEmLYhXV6WDYpjoOrkTNRDHj8wOiQ
 elasticsearch==1.9.0
 
-# sha256: 8UuM7WZr4UJlQTP-ZznWVrMZxKnsMiitFEvQ8o42pDU
-elasticsearch-dsl==0.0.8
+# sha256: csEI95SnmxVMMs9ZShGFRZM41qrsM3BR8DsgNKFurL0
+elasticsearch-dsl==0.0.9
 
 # sha256: zYMG5kw6EV3soTZoXpRduI_-FxOCAS7JOO0kGiDdfro
 factory-boy==2.5.2
