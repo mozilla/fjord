@@ -101,8 +101,8 @@ djangorestframework==3.2.3
 # sha256: 4o-THuB1Rpz5wPzTUfeAHqCqbXiNAc2-g54qs1a4yjY
 eadred==0.3
 
-# sha256: hIjWwDFu11Yezog5cwLDcjHGGkAiJ0lMqzGpGVmFHxI
-elasticsearch==1.7.0
+# sha256: 6w1LWyCkzPnkm9IEmLYhXV6WDYpjoOrkTNRDHj8wOiQ
+elasticsearch==1.9.0
 
 # sha256: 8UuM7WZr4UJlQTP-ZznWVrMZxKnsMiitFEvQ8o42pDU
 elasticsearch-dsl==0.0.8
