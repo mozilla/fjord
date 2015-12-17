@@ -6,8 +6,9 @@ MAILTO=input-tracebacks@mozilla.com
 
 HOME=/tmp
 
-# Once a day at 3:00am run the translation daily activites.
+# Once a day at 3:00am run the translation daily activites and hb health check
 0 3 * * * {{ user }} cd {{ source }} && {{ python }} manage.py translation_daily -v 0 --traceback
+0 3 * * * {{ user }} cd {{ source }} && {{ python }} manage.py hbhealthcheck -v 0 --traceback
 
 # Every hour, sync translations. This pulls and pushes to the various
 # translation systems.
