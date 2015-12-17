@@ -295,6 +295,7 @@ INSTALLED_APPS = (
     'fjord.flags',
     'fjord.heartbeat',
     'fjord.journal',
+    'fjord.mailinglist',
     'fjord.search',
     'fjord.suggest',
     'fjord.suggest.providers.trigger',
