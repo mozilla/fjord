@@ -315,6 +315,23 @@ def generic_feedback(request, locale=None, product=None, version=None,
     })
 
 
+@csrf_protect
+def android_feedback(request, locale=None, product=None, version=None,
+                     channel=None):
+    """Generic feedback form for desktop and mobile"""
+    form = ResponseForm()
+
+    if request.method == 'POST':
+        return _handle_feedback_post(request, locale, product,
+                                     version, channel)
+
+    return render(request, 'feedback/android_feedback.html', {
+        'form': form,
+        'product': product,
+        'TRUNCATE_LENGTH': TRUNCATE_LENGTH,
+    })
+
+
 @csrf_exempt
 def firefox_os_stable_feedback(request, locale=None, product=None,
                                version=None, channel=None):
@@ -381,6 +398,7 @@ def android_about_feedback(request, locale=None):
 
 
 PRODUCT_OVERRIDE = {
+    u'android': android_feedback
 }
 
 
@@ -471,7 +489,11 @@ def feedback_router(request, product=None, version=None, channel=None,
         # If the product is really a form name, we use that
         # form specifically.
         view = PRODUCT_OVERRIDE[product]
-        product = None
+        if product == 'android':
+            pass
+        else:
+            # Otherwise we don't have a product, just a form name.
+            product = None
 
     elif (product is None
           or product not in models.Product.objects.get_product_map()):
@@ -481,7 +503,8 @@ def feedback_router(request, product=None, version=None, channel=None,
             'products': picker_products
         })
 
-    product = models.Product.objects.from_slug(product)
+    if product:
+        product = models.Product.objects.from_slug(product)
 
     if view is None:
         view = generic_feedback
