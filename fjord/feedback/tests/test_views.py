@@ -193,6 +193,29 @@ class TestFeedback(TestCase):
         r = self.client.get(url, HTTP_USER_AGENT=ua)
         assert template_used(r, 'feedback/fxos_feedback.html')
 
+    def test_android_view(self):
+        """Android returns correct view"""
+        # Specifying fxos as the product in the url
+        url = reverse('feedback', args=(u'android',))
+        r = self.client.get(url)
+        assert template_used(r, 'feedback/android_feedback.html')
+
+    def test_android_view_redirects_to_android_thanks(self):
+        """Sad feedback in Android redirects to proper thanks template"""
+        url = reverse('feedback', args=(u'android',))
+        ua = 'Mozilla/5.0 (Android; Tablet; rv:24.0) Gecko/24.0 Firefox/24.0'
+        data = {
+            'happy': 0,
+            'description': u'Video plays backwards :(',
+            'url': u'http://mozilla.org/'
+        }
+        r1 = self.client.post(url, data, HTTP_USER_AGENT=ua)
+        self.assertRedirects(r1, reverse('thanks'))
+        # The below tests whether the feedback view function
+        # register_feedback_config() is working as it should
+        r2 = self.client.get(r1.url)
+        assert template_used(r2, 'feedback/android_thanks.html')
+
     def test_description_values(self):
         desc = u'Terima kasih \U0001f60a'
         url = reverse('feedback', args=(u'firefox',))
