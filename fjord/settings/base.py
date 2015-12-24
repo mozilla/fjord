@@ -468,6 +468,14 @@ PIPELINE_CSS = {
         ),
         'output_filename': 'feedback.css'
     },
+    'android-feedback': {
+        'source_filenames': (
+            'css/lib/normalize.css',
+            'css/feedback.less',
+            'css/android_feedback.less',
+        ),
+        'output_filename': 'android-feedback.css'
+    },
 }
 
 PIPELINE_JS = {
