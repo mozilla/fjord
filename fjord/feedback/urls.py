@@ -15,7 +15,6 @@ urlpatterns = patterns(
         'feedback_router', name='feedback'),
 
     url(r'^thanks/?$', 'thanks', name='thanks'),
-    url(r'^downloadfirefox/?$', 'download_firefox', name='download-firefox'),
 
     # These are redirects for backwards compatibility with old urls
     # used for Firefox feedback
