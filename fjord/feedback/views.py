@@ -28,11 +28,25 @@ from fjord.feedback.config import TRUNCATE_LENGTH
 from fjord.suggest.utils import get_suggestions
 
 
+# Feedback configurations for products. If it's not in here, you'll get
+# the generic one.
+#
+# product_slug -> {'view': view_fun, 'thanks_template': template_path}
 PRODUCT_CONFIG = {}
 
 
 def register_feedback_config(product_slug, thanks_template):
-    """Registers a product config"""
+    """Registers a product config
+
+    Example::
+
+        @register_feedback_config('android', 'feedback/android_thanks.html')
+        @csrf_protect
+        def android_feedback(request, locale=None, product=None, version=None,
+                             channel=None):
+            # blah blah blah
+
+    """
     def _register(fun):
         PRODUCT_CONFIG[product_slug] = {
             'view': fun,
