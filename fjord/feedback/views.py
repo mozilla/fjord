@@ -28,6 +28,25 @@ from fjord.feedback.config import TRUNCATE_LENGTH
 from fjord.suggest.utils import get_suggestions
 
 
+PRODUCT_CONFIG = {}
+
+
+def register_feedback_config(product_slug, thanks_template):
+    """Registers a product config"""
+    def _register(fun):
+        PRODUCT_CONFIG[product_slug] = {
+            'view': fun,
+            'thanks_template': thanks_template
+        }
+        return fun
+    return _register
+
+
+def get_config(product_slug):
+    """Returns a product config or the generic one"""
+    return PRODUCT_CONFIG.get(product_slug, PRODUCT_CONFIG['generic'])
+
+
 def happy_redirect(request):
     """Support older redirects from Input v1 era"""
     return HttpResponseRedirect(reverse('picker') + '?happy=1')
@@ -38,11 +57,11 @@ def sad_redirect(request):
     return HttpResponseRedirect(reverse('picker') + '?happy=0')
 
 
-def thanks(request):
+def thanks_view(request):
     feedback = None
     suggestions = None
-    # FIXME: Hard-coded default product.
-    product = u'Firefox'
+    # FIXME: hard-coded product
+    product_slug = u'Firefox'
 
     response_id = None
     # If the user is an analyzer/admin, then we let them specify
@@ -65,11 +84,13 @@ def thanks(request):
             pass
 
     if feedback:
-        product = feedback.product
+        product_slug = feedback.product
         suggestions = get_suggestions(feedback, request)
 
-    return render(request, 'feedback/thanks.html', {
-        'product': product,
+    template = get_config(product_slug)['thanks_template']
+
+    return render(request, template, {
+        'product': product_slug,
         'feedback': feedback,
         'suggestions': suggestions
     })
@@ -268,6 +289,7 @@ def _handle_feedback_post(request, locale=None, product=None,
     return HttpResponseRedirect(reverse('thanks'))
 
 
+@register_feedback_config('generic', 'feedback/thanks.html')
 @csrf_protect
 def generic_feedback(request, locale=None, product=None, version=None,
                      channel=None):
@@ -288,6 +310,7 @@ def generic_feedback(request, locale=None, product=None, version=None,
     })
 
 
+@register_feedback_config('fxos', None)
 @csrf_exempt
 def firefox_os_stable_feedback(request, locale=None, product=None,
                                version=None, channel=None):
@@ -407,30 +430,18 @@ def feedback_router(request, product_slug=None, version=None, channel=None,
         request = fix_oldandroid(request)
         return _handle_feedback_post(request, request.locale)
 
-    view_fun = generic_feedback
-
     # FIXME - validate these better
     product_slug = smart_str(product_slug, fallback=None)
     version = smart_str(version)
     channel = smart_str(channel).lower()
 
-    if product_slug == 'fxos':
-        # Firefox OS has their form which uses the API.
-        view_fun = firefox_os_stable_feedback
-        product_slug = 'fxos'
+    view_fun = get_config(product_slug)['view']
 
-    # Add new product_slug -> form stuff here.
+    if product_slug not in models.Product.objects.get_product_map():
+        # If the product doesn't exist, redirect them to the picker.
+        return HttpResponseRedirect(reverse('picker'))
 
-    if ((product_slug is not None
-         and product_slug in models.Product.objects.get_product_map())):
-
-        # Convert the product_slug to a product.
-        product = models.Product.objects.from_slug(product_slug)
-
-        # Send them on their way
-        return view_fun(request, request.locale, product, version, channel,
-                        *args, **kwargs)
-
-    # At this point, if we don't know the product or it doesn't exist, redirect
-    # them to the picker.
-    return HttpResponseRedirect(reverse('picker'))
+    # Convert the product_slug to a product and send them on their way.
+    product = models.Product.objects.from_slug(product_slug)
+    return view_fun(request, request.locale, product, version, channel,
+                    *args, **kwargs)

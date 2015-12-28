@@ -17,7 +17,7 @@ urlpatterns = patterns(
         r'/?$',
         'feedback_router', name='feedback'),
 
-    url(r'^thanks/?$', 'thanks', name='thanks'),
+    url(r'^thanks/?$', 'thanks_view', name='thanks'),
 
     # These are redirects for backwards compatibility with old urls
     # used for Firefox feedback
