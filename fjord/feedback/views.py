@@ -15,7 +15,6 @@ from fjord.base.browsers import UNKNOWN
 from fjord.base.urlresolvers import reverse
 from fjord.base.utils import (
     actual_ip_plus_context,
-    mobile_template,
     ratelimit,
     smart_int,
     smart_str,
@@ -38,11 +37,6 @@ def happy_redirect(request):
 def sad_redirect(request):
     """Support older redirects from Input v1 era"""
     return HttpResponseRedirect(reverse('feedback') + '?happy=0')
-
-
-@mobile_template('feedback/{mobile/}download_firefox.html')
-def download_firefox(request, template):
-    return render(request, template)
 
 
 def thanks(request):
@@ -80,26 +74,6 @@ def thanks(request):
         'feedback': feedback,
         'suggestions': suggestions
     })
-
-
-def requires_firefox(func):
-    """Redirects to "download firefox" page if not Firefox.
-
-    If it isn't a Firefox browser, then we don't want to deal with it.
-
-    This is a temporary solution. See bug #848568.
-
-    """
-    @wraps(func)
-    def _requires_firefox(request, *args, **kwargs):
-        # Note: This is sort of a lie. What's going on here is that
-        # parse_ua only parses Firefox-y browsers. So if it's UNKNOWN
-        # at this point, then it's not Firefox-y. If parse_ua ever
-        # changes, then this will cease to be true.
-        if request.BROWSER.browser == UNKNOWN:
-            return HttpResponseRedirect(reverse('download-firefox'))
-        return func(request, *args, **kwargs)
-    return _requires_firefox
 
 
 @ratelimit(rulename='doublesubmit_1p10m',
