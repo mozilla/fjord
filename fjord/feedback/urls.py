@@ -6,11 +6,14 @@ from fjord.feedback import api_views
 urlpatterns = patterns(
     'fjord.feedback.views',
 
+    # feedback/
+    url(r'^feedback/?$', 'picker_view', name='picker'),
+
     # feedback/%PRODUCT%/%VERSION%/%CHANNEL%
     url(r'^feedback'
-        r'(?:/(?P<product>[^/]+)'
+        r'/(?P<product_slug>[^/]+)'
         r'(?:/(?P<version>[^/]+)'
-        r'(?:/(?P<channel>[^/]+))?)?)?'
+        r'(?:/(?P<channel>[^/]+))?)?'
         r'/?$',
         'feedback_router', name='feedback'),
 
