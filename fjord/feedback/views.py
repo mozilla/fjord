@@ -349,13 +349,14 @@ def firefox_os_stable_feedback(request, locale=None, product=None,
 def fix_oldandroid(request):
     """Fixes old android requests
 
-    Old versions of Firefox for Android have a feedback form built in that
-    generates POSTS directly to Input and is always sad or ideas. The POST data
-    matches what the old Input used to do. The new Input doesn't have a
-    ``_type`` field and doesn't have Idea feedback, so we switch it so that all
-    Idea feedback is Sad and tag it with a source.
+    Old versions of Firefox for Android have an in-product feedback form that
+    generates POSTS directly to Input and is always "sad" or "idea". The POST
+    data matches what the old Input used to do. The new Input doesn't have a
+    ``_type`` field and doesn't have "idea" feedback, so we switch "idea" to be
+    "sad", put it in the right field and then additionally tag the feedback
+    with a source if it doesn't already have one.
 
-    FIXME - measure usage of this and nix it when we can. See bug #964292.
+    FIXME: Measure usage of this and nix it when we can. See bug #964292.
 
     :arg request: a Request object
 
