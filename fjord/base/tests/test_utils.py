@@ -180,7 +180,7 @@ class TestActualIPPlusContext(TestCase):
             lambda req: req.POST.get('description', 'no description')
         )
 
-        url = reverse('feedback')
+        url = reverse('picker')
         factory = RequestFactory(HTTP_X_CLUSTER_CLIENT_IP='192.168.100.101')
 
         # create a request with this as the description
@@ -214,7 +214,7 @@ class TestActualIPPlusContext(TestCase):
             lambda req: req.POST.get('description', 'no description')
         )
 
-        url = reverse('feedback')
+        url = reverse('picker')
         factory = RequestFactory(
             HTTP_X_CLUSTER_CLIENT_IP='0000:0000:0000:0000:0000:0000:0000:0000')
 

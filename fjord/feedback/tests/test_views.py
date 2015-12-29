@@ -21,11 +21,11 @@ class TestRedirectFeedback(TestCase):
 
     def test_happy_redirect(self):
         r = self.client.get(reverse('happy-redirect'))
-        self.assertRedirects(r, reverse('feedback') + '?happy=1')
+        self.assertRedirects(r, reverse('picker') + '?happy=1')
 
     def test_sad_redirect(self):
         r = self.client.get(reverse('sad-redirect'))
-        self.assertRedirects(r, reverse('feedback') + '?happy=0')
+        self.assertRedirects(r, reverse('picker') + '?happy=0')
 
 
 class TestFeedback(TestCase):
@@ -176,12 +176,6 @@ class TestFeedback(TestCase):
 
     def test_firefox_os_view(self):
         """Firefox OS returns correct view"""
-        # Firefox OS is the user agent
-        url = reverse('feedback')
-        ua = 'Mozilla/5.0 (Mobile; rv:18.0) Gecko/18.0 Firefox/18.0'
-        r = self.client.get(url, HTTP_USER_AGENT=ua)
-        assert template_used(r, 'feedback/fxos_feedback.html')
-
         # Specifying fxos as the product in the url
         url = reverse('feedback', args=(u'fxos',))
         r = self.client.get(url)
@@ -962,6 +956,10 @@ class TestFeedback(TestCase):
 class TestDeprecatedAndroidFeedback(TestCase):
     client_class = LocalizingClient
 
+    # Note: We hardcode `/feedback/` because that's exactly where Firefox
+    # for Android is sending data.
+    url = '/feedback/'
+
     def test_deprecated_firefox_for_android_feedback_works(self):
         """Verify firefox for android can post feedback"""
         data = {
@@ -975,7 +973,7 @@ class TestDeprecatedAndroidFeedback(TestCase):
 
         ua = 'Mozilla/5.0 (Android; Tablet; rv:24.0) Gecko/24.0 Firefox/24.0'
 
-        r = self.client.post(reverse('feedback'), data, HTTP_USER_AGENT=ua)
+        r = self.client.post(self.url, data, HTTP_USER_AGENT=ua)
         assert r.status_code == 302
         feedback = models.Response.objects.latest(field_name='id')
         assert feedback.happy is True
@@ -1004,7 +1002,7 @@ class TestDeprecatedAndroidFeedback(TestCase):
 
         ua = 'Mozilla/5.0 (Android; Tablet; rv:24.0) Gecko/24.0 Firefox/24.0'
 
-        r = self.client.post(reverse('feedback'), data, HTTP_USER_AGENT=ua)
+        r = self.client.post(self.url, data, HTTP_USER_AGENT=ua)
         assert r.status_code == 302
         feedback = models.Response.objects.latest(field_name='id')
         assert feedback.happy is False
@@ -1030,7 +1028,7 @@ class TestDeprecatedAndroidFeedback(TestCase):
 
         ua = 'Mozilla/5.0 (Android; Tablet; rv:24.0) Gecko/24.0 Firefox/24.0'
 
-        r = self.client.post(reverse('feedback'), data, HTTP_USER_AGENT=ua)
+        r = self.client.post(self.url, data, HTTP_USER_AGENT=ua)
         assert r.status_code == 302
         feedback = models.Response.objects.latest(field_name='id')
         assert feedback.happy is False
@@ -1054,7 +1052,7 @@ class TestDeprecatedAndroidFeedback(TestCase):
 
         ua = 'Mozilla/5.0 (Android; Tablet; rv:24.0) Gecko/24.0 Firefox/24.0'
 
-        r = self.client.post(reverse('feedback'), data, HTTP_USER_AGENT=ua)
+        r = self.client.post(self.url, data, HTTP_USER_AGENT=ua)
         assert r.status_code == 302
         feedback = models.Response.objects.latest(field_name='id')
         assert feedback.happy is True
@@ -1080,8 +1078,7 @@ class TestDeprecatedAndroidFeedback(TestCase):
               'Build/IMM76) AppleWebKit/534.30 (KHTML, like Gecko) '
               'Version/4.0 Safari/534.30')
 
-        r = self.client.post(reverse('feedback'), data,
-                             HTTP_USER_AGENT=ua)
+        r = self.client.post(self.url, data, HTTP_USER_AGENT=ua)
         assert r.status_code == 302
         feedback = models.Response.objects.latest(field_name='id')
         assert feedback.browser == u''
@@ -1105,7 +1102,7 @@ class TestPicker(TestCase):
         models.Product.objects.all().delete()
 
     def test_picker_no_products(self):
-        resp = self.client.get(reverse('feedback'))
+        resp = self.client.get(reverse('picker'))
 
         assert resp.status_code == 200
         assert template_used(resp, 'feedback/picker.html')
@@ -1117,7 +1114,7 @@ class TestPicker(TestCase):
 
         cache.clear()
 
-        resp = self.client.get(reverse('feedback'))
+        resp = self.client.get(reverse('picker'))
 
         assert resp.status_code == 200
 
@@ -1134,7 +1131,7 @@ class TestPicker(TestCase):
 
         cache.clear()
 
-        resp = self.client.get(reverse('feedback'))
+        resp = self.client.get(reverse('picker'))
 
         assert resp.status_code == 200
 
@@ -1154,7 +1151,7 @@ class TestPicker(TestCase):
 
         cache.clear()
 
-        resp = self.client.get(reverse('feedback'))
+        resp = self.client.get(reverse('picker'))
 
         assert resp.status_code == 200
 

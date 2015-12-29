@@ -39,7 +39,7 @@
               <ul id="product-cards" class="card-grid cf">
                 {% for prod in products %}
                   <li>
-                    <a class="cf" href="{{ url('feedback', product=prod.slug) }}?{{ request.GET.urlencode() }}">
+                    <a class="cf" href="{{ url('feedback', product_slug=prod.slug) }}?{{ request.GET.urlencode() }}">
                       <img class="logo-sprite" src="{{ settings.STATIC_URL }}img/{{ prod.image_file or 'blank.png' }}" alt="" />
                       <span class="title">{{ prod.display_name }}</span>
                       <span class="description">{{ prod.display_description }}</span>

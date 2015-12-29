@@ -6,7 +6,6 @@ from django.shortcuts import render
 from django.utils import translation
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
-from django.views.decorators.http import require_POST
 
 from statsd.defaults.django import statsd
 import waffle
@@ -29,21 +28,54 @@ from fjord.feedback.config import TRUNCATE_LENGTH
 from fjord.suggest.utils import get_suggestions
 
 
+# Feedback configurations for products. If it's not in here, you'll get
+# the generic one.
+#
+# product_slug -> {'view': view_fun, 'thanks_template': template_path}
+PRODUCT_CONFIG = {}
+
+
+def register_feedback_config(product_slug, thanks_template):
+    """Registers a product config
+
+    Example::
+
+        @register_feedback_config('android', 'feedback/android_thanks.html')
+        @csrf_protect
+        def android_feedback(request, locale=None, product=None, version=None,
+                             channel=None):
+            # blah blah blah
+
+    """
+    def _register(fun):
+        PRODUCT_CONFIG[product_slug] = {
+            'view': fun,
+            'thanks_template': thanks_template
+        }
+        return fun
+    return _register
+
+
+def get_config(product_slug):
+    """Returns a product config or the generic one"""
+    return PRODUCT_CONFIG.get(product_slug, PRODUCT_CONFIG['generic'])
+
+
 def happy_redirect(request):
     """Support older redirects from Input v1 era"""
-    return HttpResponseRedirect(reverse('feedback') + '?happy=1')
+    return HttpResponseRedirect(reverse('picker') + '?happy=1')
 
 
 def sad_redirect(request):
     """Support older redirects from Input v1 era"""
-    return HttpResponseRedirect(reverse('feedback') + '?happy=0')
+    return HttpResponseRedirect(reverse('picker') + '?happy=0')
 
 
-def thanks(request):
+def thanks_view(request):
     feedback = None
     suggestions = None
-    # FIXME: Hard-coded default product.
-    product = u'Firefox'
+    # FIXME: hard-coded product
+    product_slug = u'Firefox'
 
     response_id = None
     # If the user is an analyzer/admin, then we let them specify
@@ -66,11 +98,13 @@ def thanks(request):
             pass
 
     if feedback:
-        product = feedback.product
+        product_slug = feedback.product
         suggestions = get_suggestions(feedback, request)
 
-    return render(request, 'feedback/thanks.html', {
-        'product': product,
+    template = get_config(product_slug)['thanks_template']
+
+    return render(request, template, {
+        'product': product_slug,
         'feedback': feedback,
         'suggestions': suggestions
     })
@@ -269,6 +303,7 @@ def _handle_feedback_post(request, locale=None, product=None,
     return HttpResponseRedirect(reverse('thanks'))
 
 
+@register_feedback_config('generic', 'feedback/thanks.html')
 @csrf_protect
 def generic_feedback(request, locale=None, product=None, version=None,
                      channel=None):
@@ -289,6 +324,7 @@ def generic_feedback(request, locale=None, product=None, version=None,
     })
 
 
+@register_feedback_config('fxos', None)
 @csrf_exempt
 def firefox_os_stable_feedback(request, locale=None, product=None,
                                version=None, channel=None):
@@ -310,19 +346,21 @@ def firefox_os_stable_feedback(request, locale=None, product=None,
     })
 
 
-@csrf_exempt
-@require_POST
-def android_about_feedback(request, locale=None):
-    """A view specifically for old Firefox for Android
+def fix_oldandroid(request):
+    """Fixes old android requests
 
-    Old versions of Firefox for Android have a feedback form built in that
-    generates POSTS directly to Input and is always sad or ideas. The POST data
-    matches what the old Input used to do. The new Input doesn't have a
-    ``_type`` field and doesn't have Idea feedback, so we switch it so that all
-    Idea feedback is Sad and tag it with a source.
+    Old versions of Firefox for Android have an in-product feedback form that
+    generates POSTS directly to Input and is always "sad" or "idea". The POST
+    data matches what the old Input used to do. The new Input doesn't have a
+    ``_type`` field and doesn't have "idea" feedback, so we switch "idea" to be
+    "sad", put it in the right field and then additionally tag the feedback
+    with a source if it doesn't already have one.
 
-    FIXME - measure usage of this and nix it when we can. See bug
-    #964292.
+    FIXME: Measure usage of this and nix it when we can. See bug #964292.
+
+    :arg request: a Request object
+
+    :returns: a fixed Request object
 
     """
     # Firefox for Android only sends up sad and idea responses, but it
@@ -346,16 +384,9 @@ def android_about_feedback(request, locale=None):
         request.GET = request.GET.copy()
         request.GET['utm_source'] = 'oldfennec-in-product'
 
-    # Note: product, version and channel are always None in this view
-    # since this is to handle backwards-compatibility. So we don't
-    # bother passing them along.
+    statsd.incr('feedback.oldandroid')
 
-    # We always return Thanks! now and ignore errors.
-    return _handle_feedback_post(request, locale)
-
-
-PRODUCT_OVERRIDE = {
-}
+    return request
 
 
 def persist_feedbackdev(fun):
@@ -373,23 +404,27 @@ def persist_feedbackdev(fun):
     return _persist_feedbackdev
 
 
+@csrf_exempt  # Need for oldandroid feedback POST handling
+def picker_view(request):
+    """View showing the product picker"""
+    # The old Firefox for Android would POST form data to /feedback/. If we see
+    # that, we fix the request up and then handle it as a feedback post.
+    if '_type' in request.POST:
+        request = fix_oldandroid(request)
+        return _handle_feedback_post(request, request.locale)
+
+    picker_products = models.Product.objects.on_picker()
+    return render(request, 'feedback/picker.html', {
+        'products': picker_products
+    })
+
+
 @csrf_exempt
 @never_cache
 @persist_feedbackdev
-def feedback_router(request, product=None, version=None, channel=None,
+def feedback_router(request, product_slug=None, version=None, channel=None,
                     *args, **kwargs):
-    """Determine a view to use, and call it.
-
-    If product is given, reference `product_routes` to look up a view.
-    If `product` is not passed, or isn't found in `product_routes`,
-    asssume the user is either a stable desktop Firefox or a stable
-    mobile Firefox based on the parsed UA, and serve them the
-    appropriate page. This is to handle the old formname way of doing
-    things. At some point P, we should measure usage of the old
-    formnames and deprecate them.
-
-    This also handles backwards-compatability with the old Firefox for
-    Android form which can't have a CSRF token.
+    """Figure out which flow to use for a product and route accordingly
 
     .. Note::
 
@@ -404,70 +439,24 @@ def feedback_router(request, product=None, version=None, channel=None,
           change this!
 
     """
-    view = None
-
+    # The old Firefox for Android would POST form data to /feedback/. If we see
+    # that, we fix the request up and then handle it as a feedback post.
     if '_type' in request.POST:
-        # Checks to see if `_type` is in the POST data and if so this
-        # is coming from Firefox for Android which doesn't know
-        # anything about csrf tokens. If that's the case, we send it
-        # to a view specifically for FfA Otherwise we pass it to one
-        # of the normal views, which enforces CSRF. Also, nix the
-        # product just in case we're crossing the streams and
-        # confusing new-style product urls with old-style backwards
-        # compatability for the Android form.
-        #
-        # FIXME: Remove this hairbrained monstrosity when we don't need to
-        # support the method that Firefox for Android currently uses to
-        # post feedback which worked with the old input.mozilla.org.
-        view = android_about_feedback
-        product = None
-
-        # This lets us measure how often this section of code kicks
-        # off and thus how often old android stuff is happening. When
-        # we're not seeing this anymore, we can nix all the old
-        # android stuff.
-        statsd.incr('feedback.oldandroid')
-
-        return android_about_feedback(request, request.locale)
+        request = fix_oldandroid(request)
+        return _handle_feedback_post(request, request.locale)
 
     # FIXME - validate these better
-    product = smart_str(product, fallback=None)
+    product_slug = smart_str(product_slug, fallback=None)
     version = smart_str(version)
     channel = smart_str(channel).lower()
 
-    if product == 'fxos' or request.BROWSER.browser == 'Firefox OS':
-        # Firefox OS gets shunted to a different form which has
-        # different Firefox OS specific questions.
-        view = firefox_os_stable_feedback
-        product = 'fxos'
+    view_fun = get_config(product_slug)['view']
 
-    elif product in PRODUCT_OVERRIDE:
-        # If the product is really a form name, we use that
-        # form specifically.
-        view = PRODUCT_OVERRIDE[product]
-        product = None
+    if product_slug not in models.Product.objects.get_product_map():
+        # If the product doesn't exist, redirect them to the picker.
+        return HttpResponseRedirect(reverse('picker'))
 
-    elif (product is None
-          or product not in models.Product.objects.get_product_map()):
-
-        picker_products = models.Product.objects.on_picker()
-        return render(request, 'feedback/picker.html', {
-            'products': picker_products
-        })
-
-    product = models.Product.objects.from_slug(product)
-
-    if view is None:
-        view = generic_feedback
-
-    return view(request, request.locale, product, version, channel,
-                *args, **kwargs)
-
-
-def cyoa(request):
-    template = 'feedback/picker.html'
-
-    products = models.Product.objects.all()
-    return render(request, template, {
-        'products': products
-    })
+    # Convert the product_slug to a product and send them on their way.
+    product = models.Product.objects.from_slug(product_slug)
+    return view_fun(request, request.locale, product, version, channel,
+                    *args, **kwargs)
