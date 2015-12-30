@@ -1,12 +1,12 @@
-from collections import Counter, namedtuple
+from collections import namedtuple
 from datetime import datetime, timedelta
 import logging
 
 from django.conf import settings
 from django.core.mail import send_mail
 from django.db import connection
+from django.template.loader import render_to_string
 
-from fjord.base.email_utils import render_email
 from fjord.heartbeat.models import Answer
 from fjord.mailinglist.utils import get_recipients
 
@@ -47,7 +47,7 @@ class Check(object):
 @register_check
 class CheckAnyAnswers(Check):
     """Are there any heartbeat answers? If not, that's very bad."""
-    name = 'any answers check'
+    name = 'Are there any heartbeat answers?'
 
     @classmethod
     def check(cls):
@@ -70,6 +70,17 @@ class CheckAnyAnswers(Check):
 
 
 def tableify(table):
+    """Takes a list of lists and converts it into a formatted table
+
+    :arg table: list (rows) of lists (columns)
+
+    :returns: string
+
+    .. Note::
+
+       This is text formatting--not html formatting.
+
+    """
     num_cols = 0
     maxes = []
 
@@ -96,8 +107,8 @@ def tableify(table):
 
 @register_check
 class CheckMissingVotes(Check):
-    """should freak out if votes are 0 for any 'large' cell."""
-    name = 'missing votes check'
+    """FIXME: I don't understand this check"""
+    name = 'Are there votes of 0 for large cells?'
 
     @classmethod
     def check(cls):
@@ -168,21 +179,19 @@ def run_healthchecks():
 
 
 def email_healthchecks(results):
-    counter = Counter()
-    counter.update([result.severity for result in results])
+    has_high = any([result.severity == SEVERITY_HIGH for result in results])
 
     # The subject should indicate very very obviously whether the sky is
     # falling or not.
-    subject = ' '.join([
-        '[hb health]',
-        ('SEVERITY HIGH' if counter.get(SEVERITY_HIGH) else ''),
-        datetime.now().strftime('(%Y-%m-%d %H:%M)')
-    ])
+    subject = '[hb health] %s (%s)' % (
+        ('RED ALERT' if has_high else 'fine'),
+        datetime.now().strftime('%Y-%m-%d %H:%M')
+    )
 
     # We do the entire email body in HTML because some output will want to
     # preserve whitespace and use a fixed-width font. Further, this lets
     # us make it super easy to spot SEVERITY_HIGH situations.
-    html_body = render_email('heartbeat/email/heartbeat_health_email.html', {
+    html_body = render_to_string('heartbeat/email/heartbeat_health.html', {
         'severity_name': SEVERITY,
         'results': results
     })

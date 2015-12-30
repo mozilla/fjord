@@ -8,7 +8,7 @@ from fjord.heartbeat.healthchecks import (
     SEVERITY_LOW,
     SEVERITY_HIGH,
 )
-from fjord.heartbeat.tests import AnswerFactory, SurveyFactory
+from fjord.heartbeat.tests import AnswerFactory
 from fjord.mailinglist.tests import MailingListFactory
 
 
@@ -54,6 +54,6 @@ class TestEmailHealthChecks(TestCase):
         email_healthchecks(run_healthchecks())
         assert len(mail.outbox) == 1
         assert mail.outbox[0].to == [u'foo@example.com']
-        # Severity should be HIGH since there's no hb items--at least
+        # Severity should be RED ALERT since there's no hb items--at least
         # one of the checks should be all like, "OMG! RED ALERT!"
-        assert 'HIGH' in mail.outbox[0].subject
+        assert 'RED ALERT' in mail.outbox[0].subject
