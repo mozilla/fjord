@@ -9,7 +9,7 @@ from fjord.heartbeat.healthchecks import (
     SEVERITY_HIGH,
 )
 from fjord.heartbeat.tests import AnswerFactory
-from fjord.mailinglist.tests import MailingListFactory
+from fjord.mailinglist.models import MailingList
 
 
 class TestCheckAnyAnswers(TestCase):
@@ -40,16 +40,20 @@ class TestRunHealthChecks(TestCase):
 class TestEmailHealthChecks(TestCase):
     def test_no_recipients(self):
         """If there are no recipients, no email is sent"""
+        # The mailing list gets created in data migrations. For the purposes of
+        # this test, we delete that.
+        MailingList.objects.filter(name='heartbeat_health').delete()
+
         email_healthchecks(run_healthchecks())
         assert len(mail.outbox) == 0
         # FIXME: test that something got logged?
 
     def test_with_recipients(self):
         """If there are recipients, then email is sent"""
-        MailingListFactory(
-            name='heartbeat_health',
-            members=u'foo@example.com'
-        )
+        # Note: The mailing list should get created in data migrations.
+        ml = MailingList.objects.get(name='heartbeat_health')
+        ml.members = u'foo@example.com'
+        ml.save()
 
         email_healthchecks(run_healthchecks())
         assert len(mail.outbox) == 1
