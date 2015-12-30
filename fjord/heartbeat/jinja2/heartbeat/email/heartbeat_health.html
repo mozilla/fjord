@@ -1,0 +1,24 @@
+<html>
+  <style>
+    .high {
+      color: red;
+      font-weight: bold;
+    }
+    .medium {
+    }
+    .low {
+    }
+  </style>
+  <body>
+    {% for res in results %}
+      <h1 class="{{ severity_name[res.severity] }}">{{ severity_name[res.severity] }}: {{ res.name }}</h1>
+      <p>
+        <b>Summary:</b> {{ res.summary }}
+      </p>
+      <p>
+        <b>Raw output:</b>
+      </p>
+      <pre>{{ res.output }}</pre>
+    {% endfor %}
+  </body>
+</html>
