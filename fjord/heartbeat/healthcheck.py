@@ -14,6 +14,8 @@ from fjord.mailinglist.utils import get_recipients
 log = logging.getLogger('i.heartbeat')
 
 
+MAILINGLIST = 'heartbeat_health'
+
 SEVERITY_LOW = 1
 SEVERITY_MEDIUM = 5
 SEVERITY_HIGH = 10
@@ -196,7 +198,7 @@ def email_healthchecks(results):
         'results': results
     })
 
-    recipients = get_recipients('heartbeat_health')
+    recipients = get_recipients(MAILINGLIST)
 
     if recipients:
         send_mail(
@@ -209,6 +211,5 @@ def email_healthchecks(results):
 
     else:
         # FIXME: log this? is that a good idea?
-        log.info('No recipients for "heartbeat_health"' + '\n' +
-                 subject + '\n' +
-                 html_body)
+        log.info('No recipients for "%s"\n%s\n%s' % (
+            MAILINGLIST, subject, html_body))

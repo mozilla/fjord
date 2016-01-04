@@ -54,6 +54,21 @@ class TestHeartbeatHBErrorLog(TestCase):
         assert 'rehanrocks' in resp.content
 
 
+class TestHeartbeatHBHealthCheck(TestCase):
+    client_class = LocalizingClient
+
+    def test_permissions_and_basic_view(self):
+        resp = self.client.get(reverse('hb_healthcheck'))
+        assert resp.status_code == 403
+
+        jane = AnalyzerProfileFactory().user
+        self.client_login_user(jane)
+
+        resp = self.client.get(reverse('hb_healthcheck'))
+        assert resp.status_code == 200
+        assert 'Heartbeat Health Check' in resp.content
+
+
 class TestHeartbeatSurveys(TestCase):
     client_class = LocalizingClient
 

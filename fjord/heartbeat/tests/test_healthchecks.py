@@ -1,9 +1,10 @@
 from django.core import mail
 
 from fjord.base.tests import TestCase
-from fjord.heartbeat.healthchecks import (
+from fjord.heartbeat.healthcheck import (
     CheckAnyAnswers,
     email_healthchecks,
+    MAILINGLIST,
     run_healthchecks,
     SEVERITY_LOW,
     SEVERITY_HIGH,
@@ -42,7 +43,7 @@ class TestEmailHealthChecks(TestCase):
         """If there are no recipients, no email is sent"""
         # The mailing list gets created in data migrations. For the purposes of
         # this test, we delete that.
-        MailingList.objects.filter(name='heartbeat_health').delete()
+        MailingList.objects.filter(name=MAILINGLIST).delete()
 
         email_healthchecks(run_healthchecks())
         assert len(mail.outbox) == 0
@@ -51,7 +52,7 @@ class TestEmailHealthChecks(TestCase):
     def test_with_recipients(self):
         """If there are recipients, then email is sent"""
         # Note: The mailing list should get created in data migrations.
-        ml = MailingList.objects.get(name='heartbeat_health')
+        ml = MailingList.objects.get(name=MAILINGLIST)
         ml.members = u'foo@example.com'
         ml.save()
 

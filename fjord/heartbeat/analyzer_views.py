@@ -9,8 +9,36 @@ from django.utils.decorators import method_decorator
 
 from fjord.base.utils import analyzer_required, check_new_user
 from fjord.heartbeat.forms import SurveyCreateForm
+from fjord.heartbeat.healthcheck import (
+    email_healthchecks,
+    MAILINGLIST,
+    run_healthchecks,
+    SEVERITY
+)
 from fjord.heartbeat.models import Answer, Survey
 from fjord.journal.models import Record
+from fjord.mailinglist.utils import get_recipients
+
+
+@check_new_user
+@analyzer_required
+def hb_healthcheck(request):
+    """View for viewing healtchecks and kicking off a healtcheck email"""
+    ml_recipients = get_recipients(MAILINGLIST)
+
+    results = run_healthchecks()
+
+    # If they did a POST, it means they want to email the results to the
+    # mailing list.
+    if request.method == 'POST':
+        email_healthchecks(results)
+
+    return render(request, 'analytics/analyzer/hb_healthcheck.html', {
+        'results': results,
+        'MAILINGLIST': MAILINGLIST,
+        'ml_recipients': ml_recipients,
+        'severity_name': SEVERITY
+    })
 
 
 @check_new_user
