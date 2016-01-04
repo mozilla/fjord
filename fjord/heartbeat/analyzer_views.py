@@ -23,7 +23,7 @@ from fjord.mailinglist.utils import get_recipients
 @check_new_user
 @analyzer_required
 def hb_healthcheck(request):
-    """View for viewing healtchecks and kicking off a healtcheck email"""
+    """View for viewing healthchecks and kicking off a healthcheck email"""
     ml_recipients = get_recipients(MAILINGLIST)
 
     results = run_healthchecks()
