@@ -1,0 +1,36 @@
+{% extends "analytics/analyzer/dashboard.html" %}
+{# Note: This is not l10n-ized since it's only available to analyzers for now. #}
+
+{% block content_middle %}
+  <div class="block feedback">
+    <h2>Heartbeat Health Check</h2>
+    <p class="secret">
+      Do not tweet!
+    </p>
+
+    <h3>{{ MAILINGLIST }} recipient list:</h3>
+    {% if ml_recipients %}
+      <p>{{ ', '.join(ml_recipients) }}</p>
+      <form method="POST">
+        {% csrf_token %}
+        <input type="submit" value="Email report">
+      </form>
+    {% else %}
+      <p>No recipients.</p>
+    {% endif %}
+
+    <h3>Healthcheck results</h3>
+    <div id="healthcheck">
+      {% for res in results %}
+        <h4 class="{{ severity_name[res.severity] }}">{{ severity_name[res.severity] }}: {{ res.name }}</h4>
+        <p>
+          <b>Summary:</b> {{ res.summary }}
+        </p>
+        <p>
+          <b>Raw output:</b>
+        </p>
+        <pre>{{ res.output }}</pre>
+      {% endfor %}
+    </div>
+   </div>
+{% endblock %}

@@ -21,7 +21,10 @@ urlpatterns += patterns(
     url(r'^analytics/hbsurveys/?$',
         SurveyCreateView.as_view(),
         name='hb_surveys'),
-    url(r'^analytics/hbsurveys/(?P<pk>\d+)/update/$',
+    url(r'^analytics/hbsurveys/(?P<pk>\d+)/update/?$',
         SurveyUpdateView.as_view(),
         name='hb_surveys_update'),
+    url(r'^analytics/hbhealthcheck/?$',
+        'hb_healthcheck',
+        name='hb_healthcheck'),
 )
