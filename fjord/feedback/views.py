@@ -22,7 +22,7 @@ from fjord.base.utils import (
 from fjord.feedback import config
 from fjord.feedback import models
 from fjord.feedback.forms import ResponseForm
-from fjord.feedback.models import Response
+from fjord.feedback.models import Product, Response
 from fjord.feedback.utils import clean_url
 from fjord.feedback.config import TRUNCATE_LENGTH
 from fjord.suggest.utils import get_suggestions
@@ -74,8 +74,6 @@ def sad_redirect(request):
 def thanks_view(request):
     feedback = None
     suggestions = None
-    # FIXME: hard-coded product
-    product_slug = u'Firefox'
 
     response_id = None
     # If the user is an analyzer/admin, then we let them specify
@@ -98,13 +96,18 @@ def thanks_view(request):
             pass
 
     if feedback:
-        product_slug = feedback.product
+        product = Product.objects.get(db_name=feedback.product)
         suggestions = get_suggestions(feedback, request)
+    else:
+        # If there's no feedback, then we just show the thanks page as if it
+        # were for Firefox. This is a weird edge case that might happen if the
+        # user has cookies disabled or something like that.
+        product = Product.objects.get(db_name=u'Firefox')
 
-    template = get_config(product_slug)['thanks_template']
+    template = get_config(product.slug)['thanks_template']
 
     return render(request, template, {
-        'product': product_slug,
+        'product': product,
         'feedback': feedback,
         'suggestions': suggestions
     })
