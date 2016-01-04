@@ -22,7 +22,7 @@
       <div class="card thanks">
         <section>
           <div class="part">
-            {% trans product=product %}
+            {% trans product=product.display_name %}
               Your feedback will be used to create a better experience in
               future releases of {{ product }}.
             {% endtrans %}
@@ -73,7 +73,7 @@
           <div class="part">
             <h2>{{ _('Contribute to Mozilla.') }}</h2>
             <p>
-              {% trans url='http://mozilla.org/contribute/', product=product %}
+              {% trans url='http://mozilla.org/contribute/', product=product.display_name %}
                 Learn how you can <a href="{{ url }}">make {{ product }} and Mozilla better</a>.
               {% endtrans %}
             </p>
@@ -81,7 +81,7 @@
 
           <div class="part" id="thanks-news">
             <h2>
-              {% trans product=product %}
+              {% trans product=product.display_name %}
                 Find the latest news about {{ product }}.
               {% endtrans %}
             </h2>
