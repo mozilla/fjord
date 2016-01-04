@@ -1,6 +1,6 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
-from fjord.heartbeat.healthchecks import run_healthchecks, email_healthchecks
+from fjord.heartbeat.healthcheck import run_healthchecks, email_healthchecks
 
 
 class Command(BaseCommand):
