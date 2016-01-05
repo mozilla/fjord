@@ -8,6 +8,7 @@ import requests_mock
 import pytest
 
 from fjord.base.tests import TestCase
+from fjord.mailinglist.models import MailingList
 from fjord.translations import gengo_utils
 from fjord.translations.models import (
     GengoHumanTranslator,
@@ -382,6 +383,11 @@ class TestHumanTranslation(BaseGengoTestCase):
     @account_balance(0.0)
     def test_push_translations_low_balance_mails_admin(self):
         """Tests that a low balance sends email and does nothing else"""
+        # Add recipients to mailing list
+        ml = MailingList.objects.get(name='gengo_balance')
+        ml.members = u'foo@example.com'
+        ml.save()
+
         # Verify nothing is in the outbox
         assert len(mail.outbox) == 0
 
@@ -460,6 +466,11 @@ class TestHumanTranslation(BaseGengoTestCase):
     )
     def test_gengo_push_translations_not_enough_balance(self):
         """Tests enough balance for one order, but not both"""
+        # Add recipients to mailing list
+        ml = MailingList.objects.get(name='gengo_balance')
+        ml.members = u'foo@example.com'
+        ml.save()
+
         ght = GengoHumanTranslator()
 
         # Create a few jobs covering multiple languages
@@ -548,6 +559,11 @@ class TestHumanTranslation(BaseGengoTestCase):
     )
     def test_gengo_daily_activities_warning(self):
         """Tests warning email is sent"""
+        # Add recipients to mailing list
+        ml = MailingList.objects.get(name='gengo_balance')
+        ml.members = u'foo@example.com'
+        ml.save()
+
         ght = GengoHumanTranslator()
 
         with patch('fjord.translations.gengo_utils.Gengo') as GengoMock:

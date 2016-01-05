@@ -1,9 +1,11 @@
+import logging
 from datetime import datetime
+from textwrap import dedent
 
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.core.mail import mail_admins
+from django.core.mail import send_mail
 from django.db import models
 
 from dennis.translator import Translator
@@ -14,6 +16,7 @@ from fjord.base.models import ModelBase
 from fjord.base.utils import instance_to_key, wrap_with_paragraphs
 from fjord.journal.models import Record
 from fjord.journal.utils import j_error, j_info
+from fjord.mailinglist.utils import get_recipients
 from fjord.translations.gengo_utils import (
     GengoError,
     FjordGengo,
@@ -22,6 +25,9 @@ from fjord.translations.gengo_utils import (
     GENGO_UNSUPPORTED_MACHINE_LC_SRC
 )
 from fjord.translations.utils import locale_equals_language
+
+
+log = logging.getLogger('i.translations')
 
 
 class SuperModel(models.Model):
@@ -484,18 +490,29 @@ class GengoTranslationSystem(TranslationSystem):
         # but I'm (ab)using the admin group for now because I know
         # they're set up right.
         if balance < threshold:
-            mail_admins(
-                subject='Gengo account balance {0} < {1}'.format(
-                    balance, threshold),
-                message=wrap_with_paragraphs(
-                    'Dagnabit! Send more money or the translations get it! '
-                    'Don\'t try no funny business, neither!'
-                    '\n\n'
-                    'Love,'
-                    '\n\n'
-                    'Fjord McGengo'
+            recipients = get_recipients('gengo_balance')
+            subject = 'Gengo account balance {0} < {1}'.format(
+                balance, threshold)
+            body = wrap_with_paragraphs(dedent("""\
+            Dagnabit! Send more money or the translations get it!
+            Don't try no funny business, neither!
+
+            Love,
+
+            Fjord McGengo
+            """))
+            if recipients:
+                send_mail(
+                    subject=subject,
+                    message=body,
+                    recipient_list=recipients,
+                    from_email=settings.SERVER_EMAIL
                 )
-            )
+
+            else:
+                log.info('No recipients for "%s"\n%s\n%s' % (
+                    'gengo_balance', subject, body))
+
             return False
 
         return True
@@ -664,17 +681,28 @@ class GengoHumanTranslator(GengoTranslationSystem):
         threshold = settings.GENGO_ACCOUNT_BALANCE_THRESHOLD
 
         if threshold < balance < (2 * threshold):
-            mail_admins(
-                subject='Warning: Gengo account balance {0} < {1}'.format(
-                    balance, 2 * threshold),
-                message=wrap_with_paragraphs(
-                    'Dear mom,'
-                    '\n\n'
-                    'Translations are the fab. Running low on funds. Send '
-                    'more money when you get a chance.'
-                    '\n\n'
-                    'Love,'
-                    '\n\n'
-                    'Fjord McGengo'
+            recipients = get_recipients('gengo_balance')
+            subject = 'Warning: Gengo account balance {0} < {1}'.format(
+                balance, 2 * threshold)
+            body = wrap_with_paragraphs(dedent("""\
+            Dear mom,
+
+            Translations are the fab. Running low on funds. Send
+            more money when you get a chance.
+
+            Love,
+
+            Fjord McGengo
+            """))
+
+            if recipients:
+                send_mail(
+                    subject=subject,
+                    message=body,
+                    recipient_list=recipients,
+                    from_email=settings.SERVER_EMAIL
                 )
-            )
+
+            else:
+                log.info('No recipients for "%s"\n%s\n%s' % (
+                    'gengo_balance', subject, body))
