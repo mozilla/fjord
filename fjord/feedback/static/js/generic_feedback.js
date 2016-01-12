@@ -160,5 +160,8 @@
                 selectHappySad(1);
             }
         }
+        if (qs.url) {
+            $('#id_url').val(qs.url).trigger('input');
+        }
     });
 }(jQuery, fjord, cards, remoteTroubleshooting, document, window));
