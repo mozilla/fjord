@@ -85,7 +85,8 @@ class TestSubmit(object):
 
         # 1. go to the feedback form with sad prefill
         feedback_pg = GenericFeedbackFormPage(mozwebqa)
-        feedback_pg.go_to_feedback_page('firefox', querystring='happy=0')
+        feedback_pg.go_to_feedback_page(
+            'firefox', querystring='happy=0&url=http%3A%2F%2Fwww.mozilla.org')
 
         # 2. fill out description
         feedback_pg.set_description(desc)
@@ -100,6 +101,7 @@ class TestSubmit(object):
         dashboard_pg.search_for(desc)
         resp = dashboard_pg.messages[0]
         assert resp.type.strip() == 'Sad'
+        assert resp.url.strip() == 'http://www.mozilla.org'
         assert resp.body.strip() == desc.strip()
         assert resp.locale.strip() == 'English (US)'
 
