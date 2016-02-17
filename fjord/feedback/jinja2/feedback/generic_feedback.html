@@ -95,6 +95,16 @@
         <div class="card inactive" id="moreinfo" data-focus="#description" data-title="{{ _('Details') }}" data-back-id="intro">
           <section>
             <div class="ask">
+              {% if collect_browser_data %}
+                <p id="browser-ask-description">
+                  {% trans %}
+                    To help us understand your input, we need more information. By
+                    hitting submit below, you will provide us with technical
+                    information about your browser, along with any feedback you
+                    provide on this page.
+                  {% endtrans %}
+                </p>
+              {% endif %}
               <label for="description">
                 <span class="happy">
                   {% trans %}
@@ -137,11 +147,16 @@
                 <div class="ask">
                   <input id="browser-ok" name="browser_ok" type="checkbox" checked>
                   <label class="browser-ok" for="browser-ok">
-                    {% trans %}
-                      Check here to provide technical information about your browser.
-                      This information helps us better understand our users and create better
-                      products. This information will be kept in accordance with our Privacy
-                      policy.
+                    {% trans technical_url='https://support.mozilla.org/kb/use-troubleshooting-information-page-fix-firefox',
+                             privacy_url='http://www.mozilla.org/privacy/websites' %}
+                      Check here to provide
+                      <a href="{{ technical_url }}">technical information</a> about
+                      your browser, such as basic information about your computer,
+                      your version of Firefox, and the extensions you have installed.
+                      This information helps us better understand our users and
+                      create better products. This information will be kept in
+                      accordance with our
+                      <a href="{{ privacy_url }}">Privacy policy</a>.
                     {% endtrans %}
                   </label>
                   <input id="browser-data" name="browser_data" type="hidden" value="{}" />

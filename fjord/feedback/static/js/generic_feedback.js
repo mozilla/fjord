@@ -125,10 +125,12 @@
         // Hide the "browser-ask" section by default. Only show it if
         // the api is there and there's data.
         $('#browser-ask').hide();
+        $('#browser-ask-description').hide();
 
         remoteTroubleshooting.available(function (yesno) {
             if (yesno) {
                 $('#browser-ask').show();
+                $('#browser-ask-description').show();
                 remoteTroubleshooting.getData(function (data) {
                     browserData = data;
                     if ($('#browser-ok').is(':checked')) {
