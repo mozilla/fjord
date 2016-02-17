@@ -19,12 +19,20 @@ class TestFeedback(TestCase):
         last_url = "http://mozilla.com"
         on_device = True
 
-        # 1. Go to feedback page on device, look for links
+        # Go to feedback page on device, look for links
         feedback_pg.go_to_feedback_page(version, channel, last_url, on_device)
         assert feedback_pg.on_device_links_present
 
-        # 2. Go to feedback page on desktop, look for links
-        feedback_pg.go_to_feedback_page(version, channel, last_url, False)
+    @pytest.mark.nondestructive
+    def test_on_desktop_links(self, mozwebqa):
+        feedback_pg = AndroidFeedbackFormPage(mozwebqa)
+        version = "44"
+        channel = "beta"
+        last_url = "http://mozilla.com"
+        on_device = False
+
+        # Go to feedback page on desktop, look for links
+        feedback_pg.go_to_feedback_page(version, channel, last_url, on_device)
         assert feedback_pg.on_device_links_present is False
 
     @pytest.mark.nondestructive
@@ -35,30 +43,50 @@ class TestFeedback(TestCase):
         last_url = "http://mozilla.com"
         on_device = True
 
-        # 1. Go to feedback page and click happy
+        # Go to feedback page and click happy
         feedback_pg.go_to_feedback_page(version, channel, last_url, on_device)
         feedback_pg.click_happy_feedback()
         assert feedback_pg.current_sentiment == 'happy'
 
-        # 2. Go to happy page in beta, on device
+    @pytest.mark.nondestructive
+    def test_submit_happy_feedback_in_beta(self, mozwebqa):
+        feedback_pg = AndroidFeedbackFormPage(mozwebqa)
+        version = "44"
+        channel = "beta"
+        last_url = "http://mozilla.com"
+        on_device = True
+
+        # Go to happy page in beta, on device
         feedback_pg.go_to_feedback_page(version, channel, last_url, on_device)
         feedback_pg.click_happy_feedback()
         assert feedback_pg.playstore_link_is_intent_beta
 
-        # 3. Go to happy page in release channel, on device
-        feedback_pg.go_to_feedback_page(version,
-                                        "release",
-                                        last_url,
-                                        on_device)
+    @pytest.mark.nondestructive
+    def test_submit_happy_feedback_in_release_on_device(self, mozwebqa):
+        feedback_pg = AndroidFeedbackFormPage(mozwebqa)
+        version = "44"
+        channel = "release"
+        last_url = "http://mozilla.com"
+        on_device = True
+
+        # Go to happy page in release channel, on device
+        feedback_pg.go_to_feedback_page(version, channel, last_url, on_device)
         feedback_pg.click_happy_feedback()
         assert feedback_pg.playstore_link_is_intent_release
 
-        # 4. Go to happy page in release channel, on desktop
-        feedback_pg.go_to_feedback_page(version, "release", last_url, False)
+    @pytest.mark.nondestructive
+    def test_submit_happy_feedback_in_release_on_desktop(self, mozwebqa):
+        feedback_pg = AndroidFeedbackFormPage(mozwebqa)
+        version = "44"
+        channel = "release"
+        last_url = "http://mozilla.com"
+        on_device = False
+
+        # Go to happy page in release channel, on desktop
+        feedback_pg.go_to_feedback_page(version, channel, last_url, on_device)
         feedback_pg.click_happy_feedback()
         assert feedback_pg.playstore_link_is_http_release
 
-    @pytest.mark.nondestructive
     def test_submit_sad_feedback(self, mozwebqa):
         feedback_pg = AndroidFeedbackFormPage(mozwebqa)
         timestamp = str(time.time())

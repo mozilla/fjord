@@ -11,19 +11,16 @@ from pages.feedback import FeedbackPage
 class AndroidFeedbackFormPage(FeedbackPage):
     _page_title = 'Firefox Feedback :: Firefox Input'
 
-    def go_to_feedback_page(self,
-                            version="",
-                            channel="",
-                            last_visited="",
-                            in_device=False):
+    def go_to_feedback_page(self, version='', channel='',
+                            last_visited='', in_device=False):
         url = self.base_url + '/feedback/android'
         params = []
 
         if version:
-            url = '%s/%s' % (url, version)
+            url = url + '/' + version
 
         if channel:
-            url = '%s/%s' % (url, channel)
+            url = url + '/' + channel
 
         if in_device:
             params.append('utm_source=feedback-prompt')
@@ -32,22 +29,21 @@ class AndroidFeedbackFormPage(FeedbackPage):
             params.append('url=%s' % (last_visited))
 
         if len(params) > 0:
-            url = '%s/?%s' % (url, '&'.join(params))
-
-        print('Requesting url: %s' % url)
+            params = '&'.join(params)
+            url = url + '/?' + params
 
         self.selenium.get(url)
         self.is_the_current_page
 
     # Intro card
-    _happy_button_locator = (By.CSS_SELECTOR, '#intro #happy-button')
-    _sad_button_locator = (By.CSS_SELECTOR, '#intro #sad-button')
+    _happy_button_locator = (By.ID, 'happy-button')
+    _sad_button_locator = (By.ID, 'sad-button')
 
     def click_happy_feedback(self):
         self.selenium.find_element(*self._happy_button_locator).click()
 
     # Happy thanks
-    _playstore_locator = (By.CSS_SELECTOR, '#play-store')
+    _playstore_locator = (By.ID, 'play-store')
 
     @property
     def playstore_link_is_http_release(self):
@@ -72,8 +68,8 @@ class AndroidFeedbackFormPage(FeedbackPage):
 
     @property
     def on_device_links_present(self):
-        if (self.is_element_visible_no_wait((By.CSS_SELECTOR, '#maybe-later')) and
-                self.is_element_visible_no_wait((By.CSS_SELECTOR, '#no-thanks'))):
+        if (self.is_element_visible_no_wait((By.ID, 'maybe-later')) and
+                self.is_element_visible_no_wait((By.ID, 'no-thanks'))):
                     return True
 
         return False
@@ -83,30 +79,14 @@ class AndroidFeedbackFormPage(FeedbackPage):
         self.wait_for(self._moreinfo_text_locator)
 
     # Moreinfo card
-    _moreinfo_text_locator = (By.CSS_SELECTOR, '#moreinfo #description')
+    _moreinfo_text_locator = (By.ID, 'description')
     _url_locator = (By.ID, 'id_url')
-    _submit_locator = (By.CSS_SELECTOR, '#moreinfo #form-submit-btn')
+    _submit_locator = (By.ID, 'form-submit-btn')
     _checkbox_locator = (By.ID, 'last-checkbox')
-
-    def set_description_execute_script(self, text):
-        """Sets the value of the description textarea using execute_script
-
-        :arg text: The text to set
-
-        We use ``execute_script`` here because sending keys one at a time
-        takes a crazy amount of time for texts > 200 characters.
-
-        """
-        text = text.replace("'", "\\'").replace('"', '\\"')
-        self.selenium.execute_script("$('#description').val('" + text + "')")
 
     def set_description(self, text):
         desc = self.selenium.find_element(*self._moreinfo_text_locator)
         desc.clear()
-        desc.send_keys(text)
-
-    def update_description(self, text):
-        desc = self.selenium.find_element(*self._moreinfo_text_locator)
         desc.send_keys(text)
 
     @property
@@ -133,17 +113,17 @@ class AndroidFeedbackFormPage(FeedbackPage):
     def uncheck_url(self):
         self.selenium.find_element(*self._checkbox_locator).click()
 
-    _thanks_locator = (By.CSS_SELECTOR, '#thanks')
+    _thanks_locator = (By.ID, 'thanks')
 
     def submit(self, expect_success=True):
         self.selenium.find_element(*self._submit_locator).click()
         if expect_success:
-            self.wait_for((By.CSS_SELECTOR, '#thanks'))
+            self.wait_for((By.ID, 'thanks'))
 
     @property
     def current_card(self):
         for card in ('intro', 'moreinfo', 'thanks'):
-            if self.is_element_visible_no_wait((By.CSS_SELECTOR, '#' + card)):
+            if self.is_element_visible_no_wait((By.ID, card)):
                 return card
 
     @property
