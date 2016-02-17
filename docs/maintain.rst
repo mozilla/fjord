@@ -128,7 +128,7 @@ and so that people can see the site in that language and submit feedback:
       for better language because I only vaguely understand how the
       Verbatim side works.
 
-   Once the locale is in svn and ``locale/``, proceed.
+   Once the locale is in git and ``locale/``, proceed.
 
 4. Add the locale code to the ``PROD_LANGUAGES`` list in
    ``fjord/settings/base.py``.

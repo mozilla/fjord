@@ -15,23 +15,22 @@ Things to know about l10n
    in use
 
 3. the -dev environment should have a cronjob kicking off every 10
-   minutes that updates the svn locale repository so that translators
+   minutes that updates the git locale repository so that translators
    can see the latest stuff
 
-:svn url:    https://svn.mozilla.org/projects/l10n-misc/trunk/input/locale
-:viewvc svn: http://viewvc.svn.mozilla.org/vc/projects/l10n-misc/trunk/input/locale/
-:Verbatim:   https://localize.mozilla.org/projects/input/
+:git url:    https://github.com/mozilla-l10n/input-l10n
+:Pontoon:    https://pontoon.mozilla.org/projects/firefox-input/
 
 
-Installing localizations from svn
+Installing localizations from git
 =================================
 
 Localizations are not stored in this repository--they're in Mozilla's
-subversion repository.
+Git repository.
 
 To get the localizations, do::
 
-    svn checkout https://svn.mozilla.org/projects/l10n-misc/trunk/input/locale locale
+    git clone https://github.com/mozilla-l10n/input-l10n.git locale
 
 To see the translated strings, you need to first compile the .po files to
 .mo files::
@@ -43,17 +42,13 @@ settings file, ``./fjord/settings/local.py``.
 
 .. _l10n-update-strings:
 
-Extract/merge/sync strings with svn
+Extract/merge/sync strings with git
 ===================================
 
-First, ping Will or whoever else can sync strings with Verbatim and tell
-him/her we're merging strings (i.e. extracting them from our codebase and
-committing the changes to svn).
-
-Then, update the svn repository::
+First, update the git repository::
 
     cd locale
-    svn update
+    git pull origin master
     cd ..
 
 Then, extract the strings from the codebase::
@@ -62,17 +57,14 @@ Then, extract the strings from the codebase::
     ./manage.py extract
     ./manage.py merge
 
-Commit the db strings to the repo::
+Commit the db strings to the app repo::
 
     git commit -a
 
-Then, commit the new strings to svn::
+Then, commit the new strings to the string repo::
 
     cd locale
-    svn commit -m 'Input strings update YYYY/MM/DD'
-
-Then, tell him/her that the strings have been extracted. He/she will
-update Verbatim for all locales.
+    git commit -m 'Input strings update YYYY/MM/DD'
 
 .. Note::
 
@@ -83,9 +75,9 @@ After that, send an email to the `dev-l10n-web mailing list
 
     Hi!
 
-    I've just pushed new strings to Verbatim for Input.
+    I've just pushed new strings to Pontoon for Input.
 
-    https://localize.mozilla.org/projects/input/
+    https://pontoon.mozilla.org/projects/firefox-input/
 
     < explanation of strings changes here >
 
@@ -106,8 +98,7 @@ translations. It's nice to copy/paste the specific strings that need to be
 translated.
 
 Sometimes the translator says they've finished, but the string updates aren't
-in svn. If that happens, tell the translator that they have to push the
-"Commit to VCS" button/link.
+in git. If that happens, contact the Pontoon admin team.
 
 
 Creating new localization locales

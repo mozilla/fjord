@@ -503,7 +503,7 @@ your Elasticsearch index, reindexing, getting status, deleting the
 index and debugging tools.
 
 :ref:`l10n-chapter` covers how we do localization in Fjord like links
-to the svn repository where .po files are stored, Verbatim links,
+to the git repository where .po files are stored, Verbatim links,
 getting localized strings, updating strings in Verbatim with new
 strings, testing strings with Dennis, linting strings, creating new
 locales, etc.
