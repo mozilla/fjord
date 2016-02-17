@@ -160,4 +160,7 @@ class LocaleURLMiddleware(object):
 
         request.path_info = '/' + prefixer.shortened_path
         request.locale = prefixer.locale
-        translation.activate(prefixer.locale)
+        # prefixer.locale can be '', but we need a real locale code to activate
+        # otherwise the request uses the previously handled request's
+        # translations.
+        translation.activate(prefixer.locale or settings.LANGUAGE_CODE)
