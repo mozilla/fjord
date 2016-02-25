@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block extra_headers %}
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+{% endblock %}
+
+{% block site_js %}
+  {% javascript 'android_feedback' %}
+{% endblock %}
+
+{% block site_css %}
+  {% stylesheet 'android-feedback' %}
+{% endblock %}
+
+{# L10N note: In order to reduce the work required by translators
+ # to launch the initial port of this form, we copied localized
+ # strings directly from Fennec (see bug 1235419). We can/should
+ # fix strings after launch.
+ #}
+{% block page_title %}{{ _('Firefox Feedback') }}{% endblock %}
+
+{% set extra_body_attrs =
+  {
+    'data-form-name': 'android',
+    'data-version': version,
+    'data-channel': channel
+  }
+%}
+
+{% block body_id %}android{% endblock %}
+
+{% block body %}
+  <div class="main">
+    {% block content %}
+        <div class="content">
+
+          <div class="deck">
+            <div class="card no-back" id="intro">
+              <section>
+
+                <h1>
+                  {% trans %}
+                    Have a minute?
+                  {% endtrans %}
+                </h1>
+                <div class="message">
+                  {% trans product=product.display_name %}
+                    Tell us what you think about {{product}} so far.
+                  {% endtrans %}
+                </div>
+
+                <noscript>
+                  <p class="error">
+                    {% trans %}
+                      JavaScript is required to leave feedback. Please enable JavaScript in your browser and refresh this page.
+                    {% endtrans %}
+                  </p>
+                </noscript>
+
+                <div id="happy-button" class="link-box sentiment-button" tabindex=0>
+                  <a>
+                    {% trans %}
+                      I love it
+                    {% endtrans %}
+                  </a>
+                </div>{# #happy-button #}
+
+                <div id="sad-button" class="link-box sentiment-button" tabindex=0>
+                  <a>
+                    {% trans %}
+                      I ran into some problems
+                    {% endtrans %}
+                  </a>
+                </div>{# #sad-button #}
+
+              </section>
+            </div>{# #intro.card #}
+
+            <div class="card inactive" id="moreinfo" data-focus="#description" data-back-id="intro">
+              <section>
+                <div class="happy">
+                  <h1>
+                    {% trans %}
+                      That's great to hear!
+                    {% endtrans %}
+                  </h1>
+
+                  <div class="message-box">
+                    <div class="message">
+                      {% trans %}
+                        Want to share the love by giving us a 5 star rating on
+                        Google Play?
+                      {% endtrans %}
+                    </div>{# .message #}
+                    <div>
+                      {% trans %}
+                        It takes less than a minute and feels great.
+                      {% endtrans %}
+                    </div>
+                    <a class="stars" id="play-store" data-event="FeedbackOpenPlay" href="#">
+                      <svg>
+                        <defs>
+                          <symbol viewBox="0 0 100 100" id="star">
+                            <polygon points="48 75 18.6107374 90.4508497 24.2235871 57.7254249 0.447174185 34.5491503 33.3053687 29.7745751 48 0 62.6946313 29.7745751 95.5528258 34.5491503 71.7764129 57.7254249 77.3892626 90.4508497" class="star" xmlns="http://www.w3.org/2000/svg" fill="#0092db"></polygon>
+                          </symbol>
+                        </defs>
+                        <use width="25" height="25" xlink:href="#star" x="0" y="0"></use>
+                        <use width="25" height="25" xlink:href="#star" x="25" y="0"></use>
+                        <use width="25" height="25" xlink:href="#star" x="50" y="0"></use>
+                        <use width="25" height="25" xlink:href="#star" x="75" y="0"></use>
+                        <use width="25" height="25" xlink:href="#star" x="100" y="0"></use>
+                      </svg>
+                      {% trans %}
+                        Yes, go to Google Play
+                      {% endtrans %}
+                    </a>
+                  </div>{# .message-box #}
+                </div>{# .happy #}
+
+                <div class="sad">
+                  <h1>
+                    {% trans %}
+                      Oh no!
+                    {% endtrans %}
+                  </h1>
+
+                  <div class="ask">
+                    <form id="responseform" action="" method="post">
+                      <div class="input-box">
+                        <label for="description">
+                          {% trans %}
+                            We're sorry that you had some problems with Firefox.
+                            Please tell us what happened so that we can fix it.
+                          {% endtrans %}
+                        </label>
+                        <div id="description-counter">{{ TRUNCATE_LENGTH }}</div>
+                        <textarea data-max-length="{{ TRUNCATE_LENGTH }}" id="description" name="description" placeholder="Enter your feedback here"></textarea>
+                      </div>{# .input-box #}
+
+                      <div class="input-box">
+                        <label for="id_url">
+                          {% trans %}
+                            Include last visited site
+                          {% endtrans %}
+                          <input id="last-checkbox" type="checkbox" checked="checked"/>
+                          <input class="url" id="id_url" name="url" placeholder="http://" type="text">
+                        </label>
+                      </div>{# .input-box #}
+
+                      {% for hidden in form.hidden_fields() %}
+                        {{ hidden }}
+                      {% endfor %}
+                      {% csrf_token %}
+
+                      <div class="input-box">
+                        <input type="submit" value="{{ _('Send Feedback') }}" id="form-submit-btn" class="complete btn submit" disabled="disabled">
+                        </input>
+                      </div>{# .input-box #}
+
+                      <div class="privacy">
+                        {% trans %}
+                          For your privacy, please do not include any personal information
+                          in your feedback.
+                        {% endtrans %}
+                      </div>{# .privacy #}
+                    </form>
+                  </div>{# .ask #}
+
+                </div>{# .sad #}
+              </section>
+            </div>{# #moreinfo.card #}
+          </div>{# .deck #}
+        </div>{# .content #}
+
+    {% endblock %}
+  </div>
+  <div class="footer happy">
+    <a id="maybe-later" data-event="FeedbackMaybeLater" href="#">
+      {% trans %}
+        Maybe later
+      {% endtrans %}
+    </a>
+    <a id="no-thanks" data-event="FeedbackClose" href="#">
+      {% trans %}
+        No thanks
+      {% endtrans %}
+    </a>
+  </div>{# .footer.happy #}
+  <div class="footer sad">
+    <div class="help-section">
+      <svg viewBox="0 0 156 156">
+        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+          <g transform="translate(3.000000, 2.000000)">
+              <ellipse stroke="#DE1920" stroke-width="6" fill="#FFFFFF" transform="translate(75.008751, 75.991249) rotate(-270.000000) translate(-75.008751, -75.991249) " cx="75.008751" cy="75.991249" rx="75.008751" ry="75.008751"></ellipse>
+              <path d="M114.879498,75.7124061 L150.016995,75.7124061 C149.8667,34.4144668 116.341953,0.982498052 75.008751,0.982498052 C74.7295491,0.982498052 74.4507036,0.98402351 74.1722222,0.987066548 L74.1722222,36.1205023 C74.357816,36.1179759 74.543714,36.1167085 74.729908,36.1167085 C96.7198153,36.1167085 114.581115,53.7933778 114.879498,75.7124061 Z M74.729908,116.423475 L74.729908,150.999529 C33.4319688,150.849198 0,117.324451 0,75.991249 C0,75.8982618 0.000169204083,75.805314 0.000507321153,75.7124061 L34.5803184,75.7124061 C34.5777919,75.8979999 34.5765246,76.083898 34.5765246,76.270092 C34.5765246,98.4461933 52.5538067,116.423475 74.729908,116.423475 Z" fill="#DE1920" transform="translate(75.008497, 75.990995) rotate(-270.000000) translate(-75.008497, -75.990995) "></path>
+              <ellipse stroke="#DE1920" stroke-width="6" fill-opacity="0" transform="translate(74.729908, 76.270092) rotate(-270.000000) translate(-74.729908, -76.270092) " cx="74.729908" cy="76.270092" rx="40.1533834" ry="40.1533834"></ellipse>
+          </g>
+        </g>
+      </svg>
+      {% trans support_url="https://support.mozilla.org/products/mobile/popular-articles-android?as=u&utm_source=inproduct" %}
+        Visit our <a href="{{support_url}}">Support Site</a> to get answers for common issues.
+        {% endtrans %}
+    </div>{# .help-section #}
+  </div>{# .footer.sad #}
+{% endblock %}

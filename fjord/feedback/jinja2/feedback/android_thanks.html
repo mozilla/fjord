@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block extra_headers %}
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+{% endblock %}
+
+{% block site_js %}
+  {% javascript 'android_feedback' %}
+{% endblock %}
+
+{% block site_css %}
+  {% stylesheet 'android-feedback' %}
+{% endblock %}
+
+{# L10N note: In order to reduce the work required by translators
+ # to launch the initial port of this form, we copied localized
+ # strings directly from Fennec (see bug 1235419). We can/should
+ # fix strings after launch.
+ #}
+{% block page_title %}{{ _('Firefox Feedback') }}{% endblock %}
+
+{% block body_id %}android{% endblock %}
+
+{% block body %}
+  <div class="main">
+
+    {% block content %}
+      <div class="content">
+        <div class="deck">
+          <div class="card no-back" id="thanks">
+            <section>
+
+              <h1>
+                {% trans %}
+                  Thank you.
+                {% endtrans %}
+              </h1>
+              <div class="message heart">
+                <svg viewBox="0 0 100 110">
+                  <path d="M4.20152102,44.5344113 C-12.8987227,5.08506476 37.2648073,-17.6397688 50.6373929,18.0189693 C63.9576781,-17.6397683 114.277469,5.08506476 97.1772249,44.5344113 C91.8645859,55.9698934 52.2858248,83.7136852 50.5850925,90.6483352 C48.9013298,83.7202158 9.80833953,55.370549 4.20152102,44.5344113 Z" fill="#DE1920"></path>
+                </svg>
+                {% trans %}
+                  We're always working to make Firefox better.
+                  Rest assured that real people will look at your feedback 
+                  and do their very best to resolve your issue.
+                {% endtrans %}
+              </div>
+              <div class="message">
+                {% trans %}
+                  Or else.
+                {% endtrans %}
+              </div>
+            </section>
+          </div>{# #thanks #}
+        </div>{# .deck #}
+      </div>{# .content #}
+    {% endblock %}
+
+  </div>{# .main #}
+  <div class="footer sad show">
+    <div class="help-section">
+      <svg viewBox="0 0 156 156">
+        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+          <g transform="translate(3.000000, 2.000000)">
+              <ellipse stroke="#DE1920" stroke-width="6" fill="#FFFFFF" transform="translate(75.008751, 75.991249) rotate(-270.000000) translate(-75.008751, -75.991249) " cx="75.008751" cy="75.991249" rx="75.008751" ry="75.008751"></ellipse>
+              <path d="M114.879498,75.7124061 L150.016995,75.7124061 C149.8667,34.4144668 116.341953,0.982498052 75.008751,0.982498052 C74.7295491,0.982498052 74.4507036,0.98402351 74.1722222,0.987066548 L74.1722222,36.1205023 C74.357816,36.1179759 74.543714,36.1167085 74.729908,36.1167085 C96.7198153,36.1167085 114.581115,53.7933778 114.879498,75.7124061 Z M74.729908,116.423475 L74.729908,150.999529 C33.4319688,150.849198 0,117.324451 0,75.991249 C0,75.8982618 0.000169204083,75.805314 0.000507321153,75.7124061 L34.5803184,75.7124061 C34.5777919,75.8979999 34.5765246,76.083898 34.5765246,76.270092 C34.5765246,98.4461933 52.5538067,116.423475 74.729908,116.423475 Z" fill="#DE1920" transform="translate(75.008497, 75.990995) rotate(-270.000000) translate(-75.008497, -75.990995) "></path>
+              <ellipse stroke="#DE1920" stroke-width="6" fill-opacity="0" transform="translate(74.729908, 76.270092) rotate(-270.000000) translate(-74.729908, -76.270092) " cx="74.729908" cy="76.270092" rx="40.1533834" ry="40.1533834"></ellipse>
+          </g>
+        </g>
+      </svg>
+      {% trans support_url="https://support.mozilla.org/products/mobile/popular-articles-android?as=u&utm_source=inproduct" %}
+        Visit our <a href="{{support_url}}">Support Site</a> to get answers for common issues.
+      {% endtrans %}
+    </div>{# .help-section #}
+  </div>{# .footer.sad #}
+{% endblock %}

@@ -468,6 +468,14 @@ PIPELINE_CSS = {
         ),
         'output_filename': 'feedback.css'
     },
+    'android-feedback': {
+        'source_filenames': (
+            'css/lib/normalize.css',
+            'css/feedback.less',
+            'css/android-feedback.less',
+        ),
+        'output_filename': 'android-feedback.css'
+    },
 }
 
 PIPELINE_JS = {
@@ -545,6 +553,19 @@ PIPELINE_JS = {
             'js/ga.js',
         ),
         'output_filename': 'fxos_feedback.js'
+    },
+    'android_feedback': {
+        'source_filenames': (
+            'js/lib/jquery.min.js',
+            'js/fjord_utils.js',
+            'js/remote.js',
+            'js/cards.js',
+            'js/common_feedback.js',
+            'js/generic_feedback.js',
+            'js/android_feedback.js',
+            'js/ga.js',
+        ),
+        'output_filename': 'android_feedback.js'
     },
 }
 

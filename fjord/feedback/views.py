@@ -327,6 +327,26 @@ def generic_feedback(request, locale=None, product=None, version=None,
     })
 
 
+@register_feedback_config('android', 'feedback/android_thanks.html')
+@csrf_protect
+def android_feedback(request, locale=None, product=None, version=None,
+                     channel=None):
+    """Generic feedback form for desktop and mobile"""
+    form = ResponseForm()
+
+    if request.method == 'POST':
+        return _handle_feedback_post(request, locale, product,
+                                     version, channel)
+
+    return render(request, 'feedback/android_feedback.html', {
+        'form': form,
+        'product': product,
+        'version': version,
+        'channel': channel,
+        'TRUNCATE_LENGTH': TRUNCATE_LENGTH,
+    })
+
+
 @register_feedback_config('fxos', None)
 @csrf_exempt
 def firefox_os_stable_feedback(request, locale=None, product=None,
