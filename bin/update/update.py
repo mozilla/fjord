@@ -36,21 +36,21 @@ def update_product_details(ctx):
 
 @task
 def update_locales(ctx):
-    """Update a locale directory from SVN.
+    """Update a locale directory from Git.
 
     Assumes localizations:
 
     1) exist,
-    2) are in SVN,
+    2) are in Git,
     3) are in SRC_DIR/locale, and
     4) have a compile-mo.sh script
 
     This should all be pretty standard, but change it if you need to.
 
     """
-    # Do an svn up to get the latest .po files.
+    # Do an git pull to get the latest .po files.
     with ctx.lcd(os.path.join(settings.SRC_DIR, 'locale')):
-        ctx.local('svn up')
+        ctx.local('git pull origin master')
 
     # Run the script that lints the .po files and compiles to .mo the
     # the ones that don't have egregious errors in them. This prints
@@ -121,8 +121,9 @@ def update_info(ctx):
         ctx.local('git submodule status')
         ctx.local(PYTHON + ' manage.py migrate --list')
         with ctx.lcd('locale'):
-            ctx.local('svn info')
-            ctx.local('svn status')
+            ctx.local('git branch')
+            ctx.local('git log -3')
+            ctx.local('git status')
 
         ctx.local('git rev-parse HEAD > media/revision.txt')
 
