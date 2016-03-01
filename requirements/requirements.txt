@@ -59,8 +59,9 @@ cssselect==0.9.1
 # sha256: _eJnrrA6jUnjNB5_caIoxnSNzkO1wA9lWBeA2Ztwstk
 dennis==0.7
 
-# sha256: F6Zt5c9Zte6Bw9xXYJsUW7Ra3dwNwGk3uZhZfW57RSM
-Django==1.8.7
+# sha256: RxtBy1PWdROEdbSIxClCTtFD5XrXVaLIqxIGrDBJAoQ
+# sha256: 0uWxHraUmElXN4QZ-Am3IFWYMmNz1QnQJi-fhLF9GiM
+Django==1.8.10
 
 # sha256: JL4TJtBHNh5HWbqZkqyoPtZd9Vg3UN_ovoEOscEx2HY
 django-adminplus==0.3
