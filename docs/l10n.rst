@@ -8,8 +8,7 @@
 Things to know about l10n
 =========================
 
-1. translations are done in `Verbatim
-   <https://localize.mozilla.org/>`_
+1. translations are done in Pontoon
 
 2. translators are looking at our -dev environment to see the strings
    in use
