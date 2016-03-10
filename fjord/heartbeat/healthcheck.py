@@ -144,32 +144,30 @@ class CheckMissingVotes(Check):
         """
         cursor = connection.cursor()
         cursor.execute(sql)
-        data = cursor.fetchall()
+        data = list(cursor.fetchall())
 
-        if not data:
-            # If we get nothing back, then we have serious issues.
-            return Result(
-                cls.name,
-                SEVERITY_HIGH,
-                'No data from query',
-                repr(data)
-            )
+        severity = SEVERITY_LOW
+        message = 'Data looks ok.'
+        for row in data:
+            votes = row[8]
+            if severity == SEVERITY_LOW and votes >= 50:
+                severity = SEVERITY_MEDIUM
+                message = '{} null votes within the last day.'.format(votes)
 
-        data = list(data)
+            if severity == SEVERITY_MEDIUM and votes >= 250:
+                severity = SEVERITY_HIGH
+                break  # Can't get worse!
 
-        # FIXME: What consistutes SEVERITY_HIGH here?
+        if data:
+            data.insert(0, [
+                'nvoted', 'ydm', 'version', 'channel', 'pct_began',
+                'pct_offered', 'pct_voted', 'pct_engaged', 'N'
+            ])
+            data = tableify(data)
+        else:
+            data = repr(data)
 
-        data.insert(
-            0,
-            ['nvoted', 'ydm', 'version', 'channel', 'pct_began', 'pct_offered',
-             'pct_voted', 'pct_engaged', 'N']
-        )
-        return Result(
-            cls.name,
-            SEVERITY_LOW,
-            'Data looks ok.',
-            tableify(data)
-        )
+        return Result(cls.name, severity, message, data)
 
 
 def get_all_healthchecks():

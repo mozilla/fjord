@@ -3,13 +3,15 @@ from django.core import mail
 from fjord.base.tests import TestCase
 from fjord.heartbeat.healthcheck import (
     CheckAnyAnswers,
+    CheckMissingVotes,
     email_healthchecks,
     MAILINGLIST,
     run_healthchecks,
     SEVERITY_LOW,
+    SEVERITY_MEDIUM,
     SEVERITY_HIGH,
 )
-from fjord.heartbeat.tests import AnswerFactory
+from fjord.heartbeat.tests import AnswerFactory, SurveyFactory
 from fjord.mailinglist.models import MailingList
 
 
@@ -29,6 +31,45 @@ class TestCheckAnyAnswers(TestCase):
         assert result.severity == SEVERITY_HIGH
         assert result.summary == '0 answers in last 24 hours.'
         assert result.output == '0'
+
+
+class TestCheckMissingVotesChecks(TestCase):
+    def create_answers(self, number, score):
+        survey = SurveyFactory.create(name='heartbeat-by-user-first-impression')
+        AnswerFactory.create_batch(
+            number,
+            score=score,
+            locale='en-us',
+            survey_id=survey
+        )
+
+    def test_no_null_results(self):
+        """No votes with null scores is fine."""
+        self.create_answers(2, score=3)
+        result = CheckMissingVotes.check()
+        assert result.severity == SEVERITY_LOW
+        assert result.summary == 'Data looks ok.'
+
+    def test_few_null_results(self):
+        """Less than 50 votes with null scores is fine."""
+        self.create_answers(49, score=None)
+        result = CheckMissingVotes.check()
+        assert result.severity == SEVERITY_LOW
+        assert result.summary == 'Data looks ok.'
+
+    def test_many_null_results(self):
+        """Between 50 and 250 null scores is medium severity."""
+        self.create_answers(249, score=None)
+        result = CheckMissingVotes.check()
+        assert result.severity == SEVERITY_MEDIUM
+        assert result.summary == '249 null votes within the last day.'
+
+    def test_too_many_null_results(self):
+        """250 or more null scores is high severity."""
+        self.create_answers(300, score=None)
+        result = CheckMissingVotes.check()
+        assert result.severity == SEVERITY_HIGH
+        assert result.summary == '300 null votes within the last day.'
 
 
 class TestRunHealthChecks(TestCase):
