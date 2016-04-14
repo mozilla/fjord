@@ -12,4 +12,4 @@ pytest-mozwebqa==1.6
 pytest-xdist==1.13.1
 requests==2.8.1
 rsa==3.2
-selenium==2.48.0
+selenium==2.53.1
