@@ -46,6 +46,7 @@ pytest==2.8.2
 pytest-django==2.9.1
 
 # sha256: w2yTiocuX_SUk4szsUqqFWy0OexnVI_Ks1Nbt4sIRug
+# sha256: Gbs6w1Dvh43ahKYtN8fVwXoTc4bd6cLOcknHoh1_ask
 pyyaml==3.11
 
 # sha256: IX5Hl9o6mkqfvmci4NuYBwuEQ6iCEtes29JBp2aBQdk

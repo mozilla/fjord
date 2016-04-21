@@ -1,6 +1,7 @@
 # Requirements that need to be updated first
 
 # sha256: L6IwcnEEsH5SLe7BeSnoTgQckEfjksBVNHoCsNXKh00
+# sha256: VgrecEvl0AC1Dic-Sj9uAnLztGVwPEign7Pd1eLTVjc
 setuptools==18.3.1
 
 # Requirements from github urls because we're using non-released things
@@ -124,6 +125,8 @@ GitPython==0.1.7
 html5lib==0.999999
 
 # sha256: fLtRSjUvghxpuOi9qmsuWXKFR6iWVQPHWGUsKCbRV7U
+# sha256: AfwKKh4BmQqXsJZhXBEyj6QwbO0XM8mNiEFgOHdg1Hk
+# sha256: ZfNCpgSi4QKHB8XgVSZqskMcJuIP4QeAtCMyCHCITaw
 importlib==1.0.3
 
 # sha256: H1ZavUTEt9-qTdVD1S-YLS8AaroKKzgwVCtNJagB_gk
