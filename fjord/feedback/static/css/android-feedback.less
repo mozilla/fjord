@@ -17,7 +17,25 @@ body {
 }
 
 section {
-  margin: 0px;
+  margin: auto;
+}
+
+@media screen and (min-width: 1024px) {
+  .main {
+    width: 100%;
+  }
+  section {
+    width: 900px;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .main {
+    width: 100%;
+  }
+  section {
+    width: 750px;
+  }
 }
 
 h1 {
@@ -32,10 +50,6 @@ a {
   &:hover {
     text-decoration: none;
   }
-}
-
-.invisible {
-  display:none;
 }
 
 textarea {
