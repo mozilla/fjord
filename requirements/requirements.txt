@@ -154,6 +154,8 @@ python-dateutil==2.4.2
 python-memcached==1.48
 
 # sha256: p4tITVRy3Yxoj4s-7hhkaiXGbORbLCZlKFD2r5zlKxc
+# sha256: xO5wy0B_koRResNo8SHPB5anE0uWHlPZ2vGqro9E-5A
+# sha256: APNfsOfi_DSM0JHSXTbGdotyFGPRI5bWipSRqKX5Hs8
 pytz==2015.4
 
 # sha256: OYo9ttYYmdJf1KBsbKEgUbDOFx1wXezX7VURUXtLuT0
