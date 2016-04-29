@@ -11,10 +11,8 @@ from pages.feedback import FeedbackPage
 class AndroidFeedbackFormPage(FeedbackPage):
     _page_title = 'Firefox Feedback :: Firefox Input'
 
-    def go_to_feedback_page(self, version='', channel='',
-                            last_visited='', in_device=False):
+    def go_to_feedback_page(self, version='', channel='', on_device=False):
         url = self.base_url + '/feedback/android'
-        params = []
 
         if version:
             url = url + '/' + version
@@ -22,21 +20,19 @@ class AndroidFeedbackFormPage(FeedbackPage):
         if channel:
             url = url + '/' + channel
 
-        if in_device:
-            params.append('utm_source=feedback-prompt')
-
-        if last_visited:
-            params.append('url=%s' % (last_visited))
-
-        if len(params) > 0:
-            params = '&'.join(params)
-            url = url + '/?' + params
-
         self.selenium.get(url)
         self.is_the_current_page
 
+        if on_device:
+            # this event tells input's javascript that we
+            # are on fennec and came via a feedback prompt
+            fire_event = ('var e = document.createEvent("Events");'
+                          'e.initEvent("FeedbackPrompted", true, false);'
+                          'document.dispatchEvent(e);')
+            self.selenium.execute_script(fire_event)
+
     # Intro card
-    _happy_button_locator = (By.ID, 'happy-button')
+    _happy_button_locator = (By.ID, 'happy-button-android')
     _sad_button_locator = (By.ID, 'sad-button')
 
     def click_happy_feedback(self):
@@ -68,8 +64,8 @@ class AndroidFeedbackFormPage(FeedbackPage):
 
     @property
     def on_device_links_present(self):
-        if (self.is_element_visible_no_wait((By.ID, 'maybe-later')) and
-                self.is_element_visible_no_wait((By.ID, 'no-thanks'))):
+        if (self.is_element_visible_no_wait((By.CSS_SELECTOR, '.maybe-later')) and
+                self.is_element_visible_no_wait((By.CSS_SELECTOR, '.no-thanks'))):
                     return True
 
         return False
@@ -82,7 +78,6 @@ class AndroidFeedbackFormPage(FeedbackPage):
     _moreinfo_text_locator = (By.ID, 'description')
     _url_locator = (By.ID, 'id_url')
     _submit_locator = (By.ID, 'form-submit-btn')
-    _checkbox_locator = (By.ID, 'last-checkbox')
 
     def set_description(self, text):
         desc = self.selenium.find_element(*self._moreinfo_text_locator)
@@ -96,22 +91,13 @@ class AndroidFeedbackFormPage(FeedbackPage):
     @property
     def support_link_present(self):
         return self.is_element_visible_no_wait(
-            (By.CSS_SELECTOR, '.footer.sad .help-section a')
+            (By.CSS_SELECTOR, '.sad footer .help-section a')
         )
-
-    def url_prepopulated(self):
-        contents = self.selenium.find_element(
-            *self._url_locator
-        ).get_attribute("value")
-        return contents
 
     def set_url(self, text):
         url = self.selenium.find_element(*self._url_locator)
         url.clear()
         url.send_keys(text)
-
-    def uncheck_url(self):
-        self.selenium.find_element(*self._checkbox_locator).click()
 
     _thanks_locator = (By.ID, 'thanks')
 

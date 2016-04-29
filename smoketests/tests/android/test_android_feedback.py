@@ -16,11 +16,10 @@ class TestFeedback(TestCase):
         feedback_pg = AndroidFeedbackFormPage(mozwebqa)
         version = "44"
         channel = "beta"
-        last_url = "http://mozilla.com"
         on_device = True
 
         # Go to feedback page on device, look for links
-        feedback_pg.go_to_feedback_page(version, channel, last_url, on_device)
+        feedback_pg.go_to_feedback_page(version, channel, on_device)
         assert feedback_pg.on_device_links_present
 
     @pytest.mark.nondestructive
@@ -28,11 +27,10 @@ class TestFeedback(TestCase):
         feedback_pg = AndroidFeedbackFormPage(mozwebqa)
         version = "44"
         channel = "beta"
-        last_url = "http://mozilla.com"
         on_device = False
 
         # Go to feedback page on desktop, look for links
-        feedback_pg.go_to_feedback_page(version, channel, last_url, on_device)
+        feedback_pg.go_to_feedback_page(version, channel, on_device)
         assert feedback_pg.on_device_links_present is False
 
     @pytest.mark.nondestructive
@@ -40,11 +38,10 @@ class TestFeedback(TestCase):
         feedback_pg = AndroidFeedbackFormPage(mozwebqa)
         version = "44"
         channel = "beta"
-        last_url = "http://mozilla.com"
         on_device = True
 
         # Go to feedback page and click happy
-        feedback_pg.go_to_feedback_page(version, channel, last_url, on_device)
+        feedback_pg.go_to_feedback_page(version, channel, on_device)
         feedback_pg.click_happy_feedback()
         assert feedback_pg.current_sentiment == 'happy'
 
@@ -53,11 +50,10 @@ class TestFeedback(TestCase):
         feedback_pg = AndroidFeedbackFormPage(mozwebqa)
         version = "44"
         channel = "beta"
-        last_url = "http://mozilla.com"
         on_device = True
 
         # Go to happy page in beta, on device
-        feedback_pg.go_to_feedback_page(version, channel, last_url, on_device)
+        feedback_pg.go_to_feedback_page(version, channel, on_device)
         feedback_pg.click_happy_feedback()
         assert feedback_pg.playstore_link_is_intent_beta
 
@@ -66,11 +62,10 @@ class TestFeedback(TestCase):
         feedback_pg = AndroidFeedbackFormPage(mozwebqa)
         version = "44"
         channel = "release"
-        last_url = "http://mozilla.com"
         on_device = True
 
         # Go to happy page in release channel, on device
-        feedback_pg.go_to_feedback_page(version, channel, last_url, on_device)
+        feedback_pg.go_to_feedback_page(version, channel, on_device)
         feedback_pg.click_happy_feedback()
         assert feedback_pg.playstore_link_is_intent_release
 
@@ -79,11 +74,10 @@ class TestFeedback(TestCase):
         feedback_pg = AndroidFeedbackFormPage(mozwebqa)
         version = "44"
         channel = "release"
-        last_url = "http://mozilla.com"
         on_device = False
 
         # Go to happy page in release channel, on desktop
-        feedback_pg.go_to_feedback_page(version, channel, last_url, on_device)
+        feedback_pg.go_to_feedback_page(version, channel, on_device)
         feedback_pg.click_happy_feedback()
         assert feedback_pg.playstore_link_is_http_release
 
@@ -93,32 +87,29 @@ class TestFeedback(TestCase):
         desc = 'input-tests testing sad android feedback ' + timestamp
         version = "44"
         channel = "beta"
-        last_url = "http://mozilla.com"
         on_device = True
+        last_url = "mozilla.com"
 
-        # 1. Go to feedback page and click sad
-        feedback_pg.go_to_feedback_page(version, channel, last_url, on_device)
+        # Go to feedback page and click sad
+        feedback_pg.go_to_feedback_page(version, channel, on_device)
         feedback_pg.click_sad_feedback()
         assert feedback_pg.current_sentiment == 'sad'
 
-        # 2. Look for Support link
+        # Look for Support link
         assert feedback_pg.support_link_present
 
-        # 3. Look for URL we passed
-        assert feedback_pg.url_prepopulated() == last_url
-
-        # 4. don't send the URL
-        feedback_pg.uncheck_url()
-
-        # 5. fill in description
+        # fill in description
         feedback_pg.set_description(desc)
 
-        # 6. submit
+        # fill in the URL
+        feedback_pg.set_url(last_url)
+
+        # submit
         feedback_pg.submit(expect_success=True)
         self.take_a_breather()
         assert feedback_pg.current_card == 'thanks'
 
-        # 7. verify
+        # verify
         dashboard_pg = DashboardPage(mozwebqa)
         dashboard_pg.go_to_dashboard_page()
         dashboard_pg.search_for(desc)
@@ -126,5 +117,4 @@ class TestFeedback(TestCase):
         assert resp.type.strip() == 'Sad'
         assert resp.body.strip() == desc.strip()
         assert resp.locale.strip() == 'English (US)'
-        # we didn't send the url, it should not be here
-        assert resp.site.strip() != last_url
+        assert resp.site.strip() == last_url

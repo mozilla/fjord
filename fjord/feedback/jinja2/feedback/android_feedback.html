@@ -57,13 +57,13 @@
                   </p>
                 </noscript>
 
-                <div id="happy-button" class="link-box sentiment-button" tabindex=0>
+                <div id="happy-button-android" class="link-box sentiment-button" tabindex=0>
                   <a>
                     {% trans %}
                       I love it
                     {% endtrans %}
                   </a>
-                </div>{# #happy-button #}
+                </div>{# #happy-button-android #}
 
                 <div id="sad-button" class="link-box sentiment-button" tabindex=0>
                   <a>
@@ -74,6 +74,18 @@
                 </div>{# #sad-button #}
 
               </section>
+              <div class="bottom-links">
+                <a class="maybe-later" data-event="FeedbackMaybeLater" href="#">
+                  {% trans %}
+                    Maybe later
+                  {% endtrans %}
+                </a>
+                <a class="no-thanks" data-event="FeedbackClose" href="#">
+                  {% trans %}
+                    No thanks
+                  {% endtrans %}
+                </a>
+              </div>{# .bottom-links #}
             </div>{# #intro.card #}
 
             <div class="card inactive" id="moreinfo" data-focus="#description" data-back-id="intro">
@@ -85,7 +97,7 @@
                     {% endtrans %}
                   </h1>
 
-                  <div class="message-box">
+                  <div class="message-box play-store-cta">
                     <div class="message">
                       {% trans %}
                         Want to share the love by giving us a 5 star rating on
@@ -115,6 +127,18 @@
                       {% endtrans %}
                     </a>
                   </div>{# .message-box #}
+                  <div class="bottom-links play-store-cta">
+                    <a class="maybe-later" data-event="FeedbackMaybeLater" href="#">
+                      {% trans %}
+                        Maybe later
+                      {% endtrans %}
+                    </a>
+                    <a class="no-thanks" data-event="FeedbackClose" href="#">
+                      {% trans %}
+                        No thanks
+                      {% endtrans %}
+                    </a>
+                  </div>{# .bottom-links #}
                 </div>{# .happy #}
 
                 <div class="sad">
@@ -140,9 +164,8 @@
                       <div class="input-box">
                         <label for="id_url">
                           {% trans %}
-                            Include last visited site
+                            Last visited site (optional)
                           {% endtrans %}
-                          <input id="last-checkbox" type="checkbox" checked="checked"/>
                           <input class="url" id="id_url" name="url" placeholder="http://" type="text">
                         </label>
                       </div>{# .input-box #}
@@ -165,7 +188,13 @@
                       </div>{# .privacy #}
                     </form>
                   </div>{# .ask #}
-
+                  <footer>
+                    <div class="help-section">
+                      {% trans support_url="https://support.mozilla.org/products/mobile/popular-articles-android?as=u&utm_source=inproduct" %}
+                        Visit our <a href="{{support_url}}">Support Site</a> to get answers for common issues.
+                        {% endtrans %}
+                    </div>{# .help-section #}
+                  </footer>
                 </div>{# .sad #}
               </section>
             </div>{# #moreinfo.card #}
@@ -174,32 +203,4 @@
 
     {% endblock %}
   </div>
-  <div class="footer happy">
-    <a id="maybe-later" data-event="FeedbackMaybeLater" href="#">
-      {% trans %}
-        Maybe later
-      {% endtrans %}
-    </a>
-    <a id="no-thanks" data-event="FeedbackClose" href="#">
-      {% trans %}
-        No thanks
-      {% endtrans %}
-    </a>
-  </div>{# .footer.happy #}
-  <div class="footer sad">
-    <div class="help-section">
-      <svg viewBox="0 0 156 156">
-        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-          <g transform="translate(3.000000, 2.000000)">
-              <ellipse stroke="#DE1920" stroke-width="6" fill="#FFFFFF" transform="translate(75.008751, 75.991249) rotate(-270.000000) translate(-75.008751, -75.991249) " cx="75.008751" cy="75.991249" rx="75.008751" ry="75.008751"></ellipse>
-              <path d="M114.879498,75.7124061 L150.016995,75.7124061 C149.8667,34.4144668 116.341953,0.982498052 75.008751,0.982498052 C74.7295491,0.982498052 74.4507036,0.98402351 74.1722222,0.987066548 L74.1722222,36.1205023 C74.357816,36.1179759 74.543714,36.1167085 74.729908,36.1167085 C96.7198153,36.1167085 114.581115,53.7933778 114.879498,75.7124061 Z M74.729908,116.423475 L74.729908,150.999529 C33.4319688,150.849198 0,117.324451 0,75.991249 C0,75.8982618 0.000169204083,75.805314 0.000507321153,75.7124061 L34.5803184,75.7124061 C34.5777919,75.8979999 34.5765246,76.083898 34.5765246,76.270092 C34.5765246,98.4461933 52.5538067,116.423475 74.729908,116.423475 Z" fill="#DE1920" transform="translate(75.008497, 75.990995) rotate(-270.000000) translate(-75.008497, -75.990995) "></path>
-              <ellipse stroke="#DE1920" stroke-width="6" fill-opacity="0" transform="translate(74.729908, 76.270092) rotate(-270.000000) translate(-74.729908, -76.270092) " cx="74.729908" cy="76.270092" rx="40.1533834" ry="40.1533834"></ellipse>
-          </g>
-        </g>
-      </svg>
-      {% trans support_url="https://support.mozilla.org/products/mobile/popular-articles-android?as=u&utm_source=inproduct" %}
-        Visit our <a href="{{support_url}}">Support Site</a> to get answers for common issues.
-        {% endtrans %}
-    </div>{# .help-section #}
-  </div>{# .footer.sad #}
 {% endblock %}

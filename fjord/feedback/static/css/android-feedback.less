@@ -17,7 +17,25 @@ body {
 }
 
 section {
-  margin: 0px;
+  margin: auto;
+}
+
+@media screen and (min-width: 1024px) {
+  .main {
+    width: 100%;
+  }
+  section {
+    width: 900px;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .main {
+    width: 100%;
+  }
+  section {
+    width: 750px;
+  }
 }
 
 h1 {
@@ -59,9 +77,25 @@ textarea {
   background-color: #a7b0b8;
 }
 
-@media screen and (min-width: 500px) {
+@media screen and (min-width: 450px) {
   .message-box, .message {
     text-align: center;
+  }
+}
+
+.bottom-links {
+  padding: 0;
+  position: absolute;
+  bottom: 40px;
+  left: 0px;
+  width: 100%;
+  text-align: center;
+  a {
+    margin: 0 25px;
+    text-decoration: underline;
+  }
+  a.maybe-later, a.no-thanks {
+    display: none;
   }
 }
 
@@ -82,17 +116,8 @@ textarea {
   }
 }
 
-.footer.happy {
-  text-align: center;
-  width: 100%;
-  a {
-    margin: 0px 25px;
-    text-decoration: underline;
-  }
-}
-
 @media not screen and (max-height: 400px) {
-  .footer.happy {
+  .happy footer {
     position: absolute;
     left: 0px;
     bottom: 40px;
@@ -127,53 +152,59 @@ textarea {
   margin: 0px auto;
 }
 
-.footer.sad {
-  display: none;
+.sad footer {
   background-color: #ebe9f0;
+  color: #222222;
   border-top: 2px solid #d4d3d8;
-  position: fixed;
+  position: absolute;
   bottom: 0px;
+  left: 0px;
   width: 100%;
+  height: auto;
   margin: 0px auto;
   padding: 15px 0px;
+  a {
+    font-weight: normal;
+    text-decoration: underline;
+  }
 }
 
-.footer.sad.show {
+.sad footer.show {
   display: block;
 }
 
 .help-section {
-  max-width: 500px;
-  padding: 5px;
+  max-width: 26em;
+  padding: 0 0 0 40px;
   overflow: hidden;
   font-size: 16px;
-  svg {
-    float: left;
-    margin-right: 20px;
-    width: 31px;
-    height: 31px;
-  }
+  background: url(../img/icon_floaty_SVG.svg) no-repeat left center;
+  background-size: 31px 31px;
+  min-height: 31px;
+  line-height: 31px;
+  margin: 0 auto;
 }
 
 @media screen and (max-height: 450px) {
-  .footer.sad {
+  .sad footer {
     position: relative;
   }
 }
 
-@media screen and (min-width: 500px) {
+@media screen and (max-width: 450px) {
+  .ask {
+    padding: 0;
+  }
   .help-section {
-    margin: auto;
+    line-height: normal;
+    margin: 0 20px;
   }
 }
 
 /* THANKS styles */
 
 .heart {
-  svg {
-    width: 70px;
-    height: 70px;
-    display: block;
-    margin: 0 auto;
-  }
+  background: url(../img/icon_heart_SVG.svg) no-repeat center top;
+  background-size: 70px 70px;
+  padding-top: 80px;
 }
