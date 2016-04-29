@@ -16,9 +16,11 @@ docutils==0.12
 django-sslserver==0.15
 
 # sha256: 9iU9--BTitLjh72P39kpPJJdY1U_WBPE5Yd0VBZQHm0
+# sha256: idgkqmw1jEIaI01_nuC9dZM6Z8KViM5QqqOs301AP6A
 functools32==3.2.3-2
 
 # sha256: Nmc6w3j-7T2qWVYnaoKWmQVlI9eWECeRHwZLUiVerUE
+# sha256: kIhJTaTHRJenonhCrkypwzVbX3dUEh7cRARj6vAg8Hk
 jsonschema==2.5.1
 
 # sha256: _qr7BIbXdjYO-Tm9hbo0z_m2IwE7EygNHjdw04HuK38
