@@ -9,10 +9,10 @@ Project details
 ===============
 
 Code:
-    http://github.com/mozilla/fjord
+    https://github.com/mozilla/fjord
 
 Documentation:
-    http://fjord.rtfd.org/
+    https://fjord.readthedocs.io/
 
 Project page:
     https://wiki.mozilla.org/Firefox/Input
