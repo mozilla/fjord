@@ -38,7 +38,7 @@ DEV = True
 # languages to be computed based on the contents of your locale/
 # directory.
 #
-# See http://fjord.readthedocs.org/en/latest/l10n.html
+# See https://fjord.readthedocs.io/en/latest/l10n.html
 DEV_LANGUAGES = ('en-US',)
 
 # Uncomment these to activate and customize Celery:

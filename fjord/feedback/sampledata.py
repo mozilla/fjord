@@ -44,7 +44,7 @@ URLS = (
     u'http://example.com/',
     u'http://pyvideo.org/',
     u'http://github.com/mozilla/fjord',
-    u'https://fjord.readthedocs.org/en/latest/',
+    u'https://fjord.readthedocs.io/en/latest/',
     u'http://mozilla.org/',
 )
 

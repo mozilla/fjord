@@ -118,5 +118,5 @@ which will create directories for any locales that are missing in
 
 .. seealso::
 
-   http://playdoh.readthedocs.org/en/latest/userguide/l10n.html#creating-new-locales
+   https://playdoh.readthedocs.io/en/latest/userguide/l10n.html#creating-new-locales
      Playdoh docs on creating new locales
