@@ -26,14 +26,14 @@ Onboarding a new developer
 
 7. Read the documentation:
 
-   :manual: http://fjord.rtfd.org/
+   :manual: https://fjord.readthedocs.io/
    :wiki page: https://wiki.mozilla.org/Firefox/Input
 
 8. Set up your development environment by reading through and doing all
    the things in the :ref:`getting-started-chapter`
 
 9. If you haven't read through the `Webdev Bootcamp
-   <http://mozweb.readthedocs.org/en/latest/>`_, now is a good time
+   <https://mozweb.readthedocs.io/>`_, now is a good time
 
 10. Bask in the tranquil rhythmic sounds of the Fjord
 
@@ -72,7 +72,7 @@ Comment template::
     list of things you need to do before contributing and then add a comment
     to this bug asking to have it assigned to you.
 
-    [1] http://fjord.readthedocs.org/en/latest/welcome.html
+    [1] https://fjord.readthedocs.io/en/latest/welcome.html
 
     ----
 

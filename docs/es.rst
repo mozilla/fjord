@@ -110,6 +110,5 @@ the admin or using the esreindex command-line tool, as detailed above.
 Debugging tools
 ===============
 
-See `ElasticUtils documentation
-<http://elasticutils.readthedocs.org/en/latest/index.html>`_ for
-debugging tools and tips.
+See `ElasticUtils documentation <https://elasticutils.readthedocs.io/>`_
+for debugging tools and tips.

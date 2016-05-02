@@ -110,7 +110,7 @@ set.
 
 Consult the documentation on how to use and maintain this VM.
 
-https://fjord.readthedocs.org/
+https://fjord.readthedocs.io/
 
 Next steps:
 

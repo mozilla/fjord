@@ -7,7 +7,7 @@
     },
     "participate": {
         "home": "https://wiki.mozilla.org/Firefox/Input",
-        "docs": "https://fjord.readthedocs.org/",
+        "docs": "https://fjord.readthedocs.io/",
         "mailing-list": "https://mail.mozilla.org/listinfo/input-dev",
         "irc": "irc://irc.mozilla.org/#input",
         "irc-contacts": [

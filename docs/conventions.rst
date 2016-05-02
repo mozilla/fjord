@@ -192,7 +192,7 @@ Be mindful of work that localizers will have to do.
 
 .. seealso::
 
-   http://playdoh.readthedocs.org/en/latest/userguide/l10n.html#localization-l10n
+   https://playdoh.readthedocs.io/en/latest/userguide/l10n.html#localization-l10n
      Localization (l10n) in the Playdoh docs
 
 
