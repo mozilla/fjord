@@ -129,8 +129,9 @@ html5lib==0.999999
 # sha256: ZfNCpgSi4QKHB8XgVSZqskMcJuIP4QeAtCMyCHCITaw
 importlib==1.0.3
 
-# sha256: H1ZavUTEt9-qTdVD1S-YLS8AaroKKzgwVCtNJagB_gk
-kombu==3.0.26
+# sha256: _ss07fSFIGTzhdv1OWkEeyI1PTYIpXZJfdBfcblD-uY
+# sha256: uQL-do6kkXPHwmsRe_bFHSWPgi0A11PlQ7fiKFVA-Fo
+kombu==3.0.30
 
 # sha256: uDndLZwRfHAUMMFJlWkYpCOphjtIsJyQ4wpgE-fS9E8
 mock==1.0.1
