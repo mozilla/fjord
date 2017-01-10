@@ -7,7 +7,12 @@ Welcome to Fjord's documentation!
 Overview
 ========
 
-Fjord is the software that runs `Mozilla Input
+Mozilla's instance of Fjord has been
+`decommissioned <https://bugzilla.mozilla.org/show_bug.cgi?id=1315316>`_ and
+replaced with an externally-managed product. This project is no longer
+actively maintained.
+
+Fjord was the software that runs `Mozilla Input
 <https://input.mozilla.org/>`_. The site has two sides to it: one for
 gathering product feedback and user sentiment and the other for
 exposing that data and analytics on it. The Mozilla Input feedback
