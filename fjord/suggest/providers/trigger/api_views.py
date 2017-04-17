@@ -92,7 +92,7 @@ class TriggerRuleMatchViewAPI(rest_framework.views.APIView):
                 'product': obj.product,
                 'version': obj.version,
                 'url': obj.url,
-                'created': obj.created,
+                'created': obj.created.strftime(u'%Y-%m-%dT%H:%M:%S')
             }
             for obj in matched_objs
         ]

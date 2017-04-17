@@ -263,7 +263,7 @@ class TestAlertsGetAPI(TestCase):
                 u'alerts': [
                     {
                         u'id': WHATEVER,
-                        u'summary': u'alert 1',
+                        u'summary': u'alert 3',
                         u'description': u'the account balance is at $5.',
                         u'flavor': flavor.slug,
                         u'emitter_version': 0,
@@ -287,7 +287,7 @@ class TestAlertsGetAPI(TestCase):
                         u'links': []
                     }, {
                         u'id': WHATEVER,
-                        u'summary': u'alert 3',
+                        u'summary': u'alert 1',
                         u'description': u'the account balance is at $5.',
                         u'flavor': flavor.slug,
                         u'emitter_version': 0,
@@ -330,9 +330,9 @@ class TestAlertsGetAPI(TestCase):
                 u'alerts': [
                     {
                         u'id': WHATEVER,
-                        u'summary': u'alert 1',
+                        u'summary': u'alert 2',
                         u'description': u'the account balance is at $5.',
-                        u'flavor': flavor.slug,
+                        u'flavor': flavor2.slug,
                         u'emitter_version': 0,
                         u'emitter_name': u'balance-checker',
                         u'start_time': None,
@@ -342,9 +342,9 @@ class TestAlertsGetAPI(TestCase):
                         u'links': []
                     }, {
                         u'id': WHATEVER,
-                        u'summary': u'alert 2',
+                        u'summary': u'alert 1',
                         u'description': u'the account balance is at $5.',
-                        u'flavor': flavor2.slug,
+                        u'flavor': flavor.slug,
                         u'emitter_version': 0,
                         u'emitter_name': u'balance-checker',
                         u'start_time': None,

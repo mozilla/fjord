@@ -1,5 +1,5 @@
-# sha256: H6pJd-mFBzHot_ih1YuGJzk6N0RUN4jsQ3-0XgbP5AE
-MySQL-python==1.2.3c1
+# sha256: gRBAtkfl1WhvhNtBXv1pfmJQAIsRK2kJunesBZ4UDHQ
+MySQL-python==1.2.5
 
 # sha256: IvlnXkLcZAxEadT30hC67LXmlYI6-VTIE9UckwI1Z10
 Jinja2==2.5.5
